@@ -37,8 +37,10 @@ export function useFrameSelection(photos: Photo[], isActive: boolean): FrameSele
   // before pinning the viewed one back.
   if (newestId !== shownNewestId) {
     setShownNewestId(newestId)
-    // undefined: the first load, nothing arrived.
-    if (shownNewestId !== undefined) handleArrival(shownNewestId)
+    // undefined: the first load, nothing arrived. A previous newest missing from the list was deleted.
+    if (shownNewestId !== undefined && photos.some(({ id }) => id === shownNewestId)) {
+      handleArrival(shownNewestId)
+    }
   }
   // Nobody is looking any more: show what arrived meanwhile.
   if (!isActive && newPhotoCount > 0) showNewest()
@@ -63,9 +65,12 @@ export function useFrameSelection(photos: Photo[], isActive: boolean): FrameSele
     setView('photo')
   }
 
+  // The pinned photo may have been deleted: fall back to the newest.
+  const pinnedId = photos.find(({ id }) => id === selectedId)?.id
+
   return {
     view,
-    currentId: selectedId ?? newestId,
+    currentId: pinnedId ?? newestId,
     newPhotoCount,
     setView,
     selectPhoto,
