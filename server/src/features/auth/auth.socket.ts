@@ -15,16 +15,19 @@ function toHandshakeError(error: unknown): Error {
 
 // No sliding here: a handshake has no HTTP response to carry a renewed cookie.
 export function createSocketAuth(service: AuthService): SocketMiddleware {
-  return (socket, next) => {
+  return async (socket, next) => {
     const token = readSessionToken(socket.request.headers.cookie)
-    service.authenticate(token).then(
-      ({ user }) => {
-        socket.data.userId = user.id
-        // Step 2 sends each user's photos to this room; broadcasting stays global for now.
-        socket.join(`user:${user.id}`)
-        next()
-      },
-      (error: unknown) => next(toHandshakeError(error)),
-    )
+    let userId: string
+    try {
+      userId = (await service.authenticate(token)).user.id
+    } catch (error: unknown) {
+      next(toHandshakeError(error))
+      return
+    }
+    // Outside the try: a failure here must surface as a crash, not hang the handshake.
+    socket.data.userId = userId
+    // Step 2 sends each user's photos to this room; broadcasting stays global for now.
+    socket.join(`user:${userId}`)
+    next()
   }
 }
