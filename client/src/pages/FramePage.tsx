@@ -32,7 +32,7 @@ export default function FramePage(): JSX.Element {
     socket.on('photo:new', (photo) => {
       // The fetch and the event can bring the same photo.
       setPhotos((current) =>
-        current.some((p) => p.id === photo.id) ? current : [photo, ...current],
+        current.some(({ id }) => id === photo.id) ? current : [photo, ...current],
       )
     })
 

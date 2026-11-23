@@ -4,6 +4,7 @@ import { errorMessage } from '../api.ts'
 type Status = 'idle' | 'sending' | 'success' | 'error'
 
 const UPLOADER_NAME_KEY = 'familyframe.uploaderName'
+const MAX_UPLOADER_NAME_LENGTH = 30 // same limit as the API
 
 // localStorage throws in private browsing or when storage is blocked.
 function loadUploaderName(): string {
@@ -85,7 +86,12 @@ export default function UploadPage(): JSX.Element {
       <form onSubmit={handleSubmit}>
         <label>
           Pseudo
-          <input value={uploaderName} onChange={handleUploaderNameChange} required maxLength={30} />
+          <input
+            value={uploaderName}
+            onChange={handleUploaderNameChange}
+            required
+            maxLength={MAX_UPLOADER_NAME_LENGTH}
+          />
         </label>
 
         <label>
