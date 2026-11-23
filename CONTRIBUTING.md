@@ -10,13 +10,16 @@
   3. commits atomiques, pour faciliter la revue ;
   4. PR vers `develop`, ouverte en **draft** tant qu'elle n'est pas prête ; le corps se termine par `Closes #N` si une issue existe ;
   5. **squash merge** : la PR devient un seul commit sur `develop`, dont le message est le titre de la PR. Puis suppression de la branche.
-- **PR empilées** (une PR qui part de la branche d'une autre) : une fois la PR de base squashée, ses commits n'existent plus sur `develop`. Rebaser la suivante dessus, puis la recibler vers `develop` :
+- **PR empilées** (une PR qui part de la branche d'une autre) : une fois la PR de base squashée, ses commits n'existent plus sur `develop`.
+  1. **Avant** de merger la PR de base, recibler la suivante vers `develop` : supprimer une branche ferme les PR qui la ciblent, sans retour possible.
+  2. Squash merge de la PR de base, suppression de sa branche.
+  3. Rebaser la suivante sur `develop`, en partant du dernier commit de l'ancienne base :
 
-  ```bash
-  git fetch
-  git rebase --onto origin/develop <ancienne-base> <branche>
-  git push --force-with-lease
-  ```
+     ```bash
+     git fetch
+     git rebase --onto origin/develop <ancienne-base> <branche>
+     git push --force-with-lease
+     ```
 
 - Livraison : PR `develop` → `main` en **merge commit** (pas de squash ni de rebase). `main` et `develop` gardent ainsi un historique commun, et chaque livraison laisse un commit repérable sur `main`.
 
