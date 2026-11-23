@@ -15,8 +15,6 @@ flowchart LR
 
 Deux interfaces React (envoi, cadre) servies par le même client Vite, une API Express qui porte aussi le serveur Socket.IO. Les images sont stockées sur Cloudinary ; MongoDB ne garde que les métadonnées.
 
-> Seule la route `GET /api/health` existe aujourd'hui ; le reste du schéma décrit la cible du MVP (J1).
-
 ## Organisation du dépôt
 
 Monorepo **pnpm workspaces** : un lockfile unique, des scripts racine qui orchestrent les deux packages (`pnpm -r`).
@@ -31,10 +29,47 @@ Le détail des fichiers n'est pas listé ici : il change trop vite pour rester j
 
 1. Le proche saisit son pseudo et prend ou choisit une photo (`<input type="file" accept="image/*" capture>`).
 2. Le client envoie l'image en `multipart/form-data` à une route Express ; **Multer** la reçoit en mémoire.
-3. Le serveur contrôle le fichier (type, taille), puis le **décode et le réencode avec Sharp** : seule une image valide et propre est conservée.
-4. L'image réencodée est envoyée à **Cloudinary**.
+3. Le serveur contrôle le pseudo (30 caractères max) et le fichier (10 Mo max, JPEG/PNG/WebP), puis le **décode et le réencode avec Sharp** : JPEG de 1920 px max, orientation EXIF appliquée, métadonnées (GPS compris) supprimées. Le type déclaré par le navigateur n'est pas fiable : c'est le décodage par Sharp qui valide vraiment l'image.
+4. L'image réencodée est envoyée à **Cloudinary**, dans le dossier `familyframe`.
 5. **Prisma** enregistre dans MongoDB l'URL, l'identifiant Cloudinary, le pseudo et la date.
 6. Le serveur émet un événement **Socket.IO** ; le cadre affiche la nouvelle photo sans rechargement.
+
+## Pages
+
+| Chemin   | Page                                                                                          |
+| -------- | --------------------------------------------------------------------------------------------- |
+| `/`      | envoi : pseudo (mémorisé dans `localStorage`), « Prendre une photo » ou « Choisir une image » |
+| `/frame` | cadre : dernière photo en grand, les précédentes en vignettes                                 |
+
+Le routage est fait côté navigateur (`react-router`). En production (J2), le serveur qui sert le client devra donc renvoyer `index.html` pour `/frame` (« SPA fallback »), sinon un rechargement de la page donne une 404.
+
+## API
+
+| Route              | Réponse                                                                              |
+| ------------------ | ------------------------------------------------------------------------------------ |
+| `GET /api/health`  | `200 { "status": "ok" }` (servira de healthcheck Docker en J2)                       |
+| `GET /api/photos`  | `200 Photo[]`, les 20 plus récentes en premier                                       |
+| `POST /api/photos` | `multipart/form-data` avec `uploaderName` (texte) et `photo` (fichier) → `201 Photo` |
+
+Une `Photo` vaut `{ id, url, uploaderName, createdAt }` (`createdAt` en ISO 8601). L'identifiant Cloudinary reste côté serveur.
+
+En cas d'erreur, l'API renvoie `{ "error": code }` ; le client traduit le code en message français :
+
+| Cas                                                     | Statut | `error`                 |
+| ------------------------------------------------------- | ------ | ----------------------- |
+| pseudo absent, vide ou de plus de 30 caractères         | 400    | `UPLOADER_NAME_INVALID` |
+| aucun fichier                                           | 400    | `PHOTO_MISSING`         |
+| autre erreur Multer (mauvais champ, plusieurs fichiers) | 400    | `UPLOAD_INVALID`        |
+| fichier de plus de 10 Mo                                | 413    | `PHOTO_TOO_LARGE`       |
+| type autre que JPEG, PNG ou WebP                        | 415    | `FORMAT_UNSUPPORTED`    |
+| image illisible par Sharp                               | 422    | `IMAGE_UNREADABLE`      |
+| toute autre erreur (Cloudinary, base)                   | 500    | `SERVER_ERROR`          |
+
+## Temps réel
+
+- Un seul événement, du serveur vers les clients : `photo:new`, avec la `Photo` créée, diffusé à tous (`io.emit`).
+- Le cadre recharge la liste à chaque connexion Socket.IO, reconnexions comprises : une photo envoyée pendant une coupure n'est pas perdue.
+- Les types partagés (`Photo`, codes d'erreur, événements) sont dupliqués entre `server/src/types.ts` et `client/src` : un package commun compliquerait les builds Docker.
 
 ## Réseau en développement
 
@@ -50,7 +85,7 @@ Le détail des fichiers n'est pas listé ici : il change trop vite pour rester j
 
 ## Configuration
 
-- Variables d'environnement lues dans `server/src/config.ts`, qui **échoue au démarrage** si une variable obligatoire manque (`DATABASE_URL`).
+- Variables d'environnement lues dans `server/src/config.ts`, qui **échoue au démarrage** si une variable obligatoire manque : `DATABASE_URL`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`.
 - En local, `server/.env` (non versionné) est chargé par Node (`--env-file-if-exists`) ; la liste des variables attendues est dans `server/.env.example`.
 - Côté client, aucun secret : le client n'appelle que des chemins relatifs.
 
@@ -64,8 +99,14 @@ Le détail des fichiers n'est pas listé ici : il change trop vite pour rester j
 - **TypeScript** partout : `tsx watch` en dev côté serveur, `tsc` pour le build ; `tsc -b` + Vite côté client.
 - **Biome** : lint, formatage et tri des imports (remplace ESLint + Prettier).
 - **lefthook** : `biome check` au pre-commit, **commitlint** au commit-msg.
+- **Bruno** (`server/bruno/`) : requêtes de l'API avec assertions, un dossier par endpoint, des fichiers `NN-nominal-…` / `NN-edge-…`. Lancées par `pnpm test:bruno` contre l'API démarrée (CLI via `pnpm dlx`, version figée, pas de dépendance).
 - **Hooks Claude Code** (`.claude/hooks/`) : garde-fous pour l'agent IA, testés avec `node:test`.
 
 ## Conteneurisation
 
 À venir (J2–J4) : images Docker du client et de l'API, orchestration Docker Compose, gestion des secrets.
+
+Points déjà connus :
+
+- **Sharp** embarque des binaires propres à chaque plateforme : il doit être installé dans l'image, jamais copié depuis le `node_modules` Windows.
+- Le serveur qui sert le client doit faire le **SPA fallback** pour `/frame` (voir [Pages](#pages)).

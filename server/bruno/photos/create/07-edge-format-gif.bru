@@ -1,0 +1,25 @@
+meta {
+  name: Edge - image GIF
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/photos
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  uploaderName: {{uploaderName}}
+  photo: @file(fixtures/animation.gif) @contentType(image/gif)
+}
+
+assert {
+  res.status: eq 415
+  res.body.error: eq FORMAT_UNSUPPORTED
+}
+
+docs {
+  EDGE → 415 FORMAT_UNSUPPORTED, seuls JPEG, PNG et WebP sont acceptés.
+}

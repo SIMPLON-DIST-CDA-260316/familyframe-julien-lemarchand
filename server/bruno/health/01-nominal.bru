@@ -1,0 +1,20 @@
+meta {
+  name: Nominal - l'API répond
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/health
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body.status: eq ok
+}
+
+docs {
+  NOMINAL → 200 {"status":"ok"}. Servira aussi de healthcheck Docker (J2).
+}

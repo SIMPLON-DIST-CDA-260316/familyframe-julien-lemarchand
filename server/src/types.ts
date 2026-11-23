@@ -1,0 +1,24 @@
+// Types shared with the client. Duplicated in client/src on purpose:
+// a shared package would complicate the Docker builds (J2). Keep both copies in sync.
+
+export type ApiErrorCode =
+  | 'UPLOADER_NAME_INVALID'
+  | 'PHOTO_MISSING'
+  | 'UPLOAD_INVALID'
+  | 'PHOTO_TOO_LARGE'
+  | 'FORMAT_UNSUPPORTED'
+  | 'IMAGE_UNREADABLE'
+  | 'SERVER_ERROR'
+
+export type ApiError = { error: ApiErrorCode }
+
+// A photo as sent to the client (REST and Socket.IO). createdAt is an ISO 8601 string.
+export type Photo = { id: string; url: string; uploaderName: string; createdAt: string }
+
+// Socket.IO events sent by the server.
+export type ServerToClientEvents = {
+  'photo:new': (photo: Photo) => void
+}
+
+// The client sends no events.
+export type ClientToServerEvents = Record<string, never>

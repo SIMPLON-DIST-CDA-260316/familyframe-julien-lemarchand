@@ -1,0 +1,20 @@
+meta {
+  name: familyframe
+}
+
+auth {
+  mode: none
+}
+
+docs {
+  Requêtes de l'API, avec leurs assertions. Prérequis : `server/.env` rempli
+  et l'API lancée (`pnpm dev`, port 3000).
+
+  Lancer toute la collection depuis la racine du dépôt : `pnpm test:bruno`.
+  Ou ouvrir le dossier `server/bruno/` dans l'application Bruno.
+
+  Les envois nominaux publient de vraies photos (Cloudinary + MongoDB) avec
+  le pseudo `bruno` : elles apparaissent sur le cadre.
+
+  Chemins `@file()` relatifs à la racine de la collection (`server/bruno/`).
+}

@@ -1,0 +1,24 @@
+meta {
+  name: Edge - sans fichier
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/photos
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  uploaderName: {{uploaderName}}
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq PHOTO_MISSING
+}
+
+docs {
+  EDGE → 400 PHOTO_MISSING, aucun fichier dans le champ photo.
+}
