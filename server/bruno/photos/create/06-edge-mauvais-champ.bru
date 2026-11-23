@@ -1,0 +1,25 @@
+meta {
+  name: Edge - fichier dans un autre champ
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/photos
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  nickname: {{nickname}}
+  image: @file(fixtures/photo.jpg) @contentType(image/jpeg)
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq UPLOAD_INVALID
+}
+
+docs {
+  EDGE → 400 UPLOAD_INVALID, Multer refuse un fichier hors du champ photo.
+}

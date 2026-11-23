@@ -1,0 +1,24 @@
+meta {
+  name: Edge - sans pseudo
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/photos
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  photo: @file(fixtures/photo.jpg) @contentType(image/jpeg)
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq NICKNAME_INVALID
+}
+
+docs {
+  EDGE → 400 NICKNAME_INVALID, le pseudo est obligatoire.
+}

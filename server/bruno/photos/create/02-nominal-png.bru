@@ -1,0 +1,25 @@
+meta {
+  name: Nominal - envoi d'une image PNG
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/photos
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  nickname: {{nickname}}
+  photo: @file(fixtures/photo.png) @contentType(image/png)
+}
+
+assert {
+  res.status: eq 201
+  res.body.url: endsWith .jpg
+}
+
+docs {
+  NOMINAL → 201. Le serveur réencode tout en JPEG : l'URL finit par `.jpg`.
+}

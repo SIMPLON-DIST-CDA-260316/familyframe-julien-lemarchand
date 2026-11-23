@@ -99,6 +99,7 @@ En cas d'erreur, l'API renvoie `{ "error": code }` ; le client traduit le code e
 - **TypeScript** partout : `tsx watch` en dev côté serveur, `tsc` pour le build ; `tsc -b` + Vite côté client.
 - **Biome** : lint, formatage et tri des imports (remplace ESLint + Prettier).
 - **lefthook** : `biome check` au pre-commit, **commitlint** au commit-msg.
+- **Bruno** (`server/bruno/`) : requêtes de l'API avec assertions, un dossier par endpoint, des fichiers `NN-nominal-…` / `NN-edge-…`. Lancées par `pnpm test:bruno` contre l'API démarrée (CLI via `pnpm dlx`, version figée, pas de dépendance).
 - **Hooks Claude Code** (`.claude/hooks/`) : garde-fous pour l'agent IA, testés avec `node:test`.
 
 ## Conteneurisation

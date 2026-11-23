@@ -1,0 +1,29 @@
+meta {
+  name: Nominal - les dernières photos
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/photos
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body: isArray
+  res.body.length: lte 20
+}
+
+script:post-response {
+  const dates = res.body.map((photo) => photo.createdAt)
+  const sorted = [...dates].sort().reverse()
+  test('plus récente en premier', () => {
+    expect(dates).to.eql(sorted)
+  })
+}
+
+docs {
+  NOMINAL → 200, au plus 20 photos, la plus récente en premier.
+}

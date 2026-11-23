@@ -1,0 +1,25 @@
+meta {
+  name: Edge - texte déguisé en JPEG
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/api/photos
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  nickname: {{nickname}}
+  photo: @file(fixtures/pas-une-image.jpg) @contentType(image/jpeg)
+}
+
+assert {
+  res.status: eq 422
+  res.body.error: eq IMAGE_UNREADABLE
+}
+
+docs {
+  EDGE → 422 IMAGE_UNREADABLE. Le type annoncé est image/jpeg, mais Sharp ne peut pas décoder le fichier : le type déclaré par le client ne suffit pas.
+}

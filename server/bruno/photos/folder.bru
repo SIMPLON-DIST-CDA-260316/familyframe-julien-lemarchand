@@ -1,0 +1,11 @@
+meta {
+  name: photos
+}
+
+docs {
+  Une photo renvoyée par l'API : `{ id, url, nickname, createdAt }`
+  (`createdAt` en ISO 8601). Une erreur : `{ error }`, un code
+  (`NICKNAME_INVALID`, `PHOTO_MISSING`, `UPLOAD_INVALID`, `PHOTO_TOO_LARGE`,
+  `FORMAT_UNSUPPORTED`, `IMAGE_UNREADABLE`, `SERVER_ERROR`) que le client
+  traduit en français.
+}

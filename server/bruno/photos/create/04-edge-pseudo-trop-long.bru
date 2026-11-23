@@ -1,0 +1,25 @@
+meta {
+  name: Edge - pseudo de plus de 30 caractères
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/photos
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  nickname: abcdefghijklmnopqrstuvwxyz01234
+  photo: @file(fixtures/photo.jpg) @contentType(image/jpeg)
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq NICKNAME_INVALID
+}
+
+docs {
+  EDGE → 400 NICKNAME_INVALID, 31 caractères pour 30 max.
+}
