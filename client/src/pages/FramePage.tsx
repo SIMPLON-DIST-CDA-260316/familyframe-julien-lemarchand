@@ -43,8 +43,9 @@ export default function FramePage(): JSX.Element {
   const photos = usePhotoFeed()
   const isActive = useIdle(CONTROLS_HIDE_DELAY_MS)
   const isLibraryActive = useIdle(LIBRARY_IDLE_DELAY_MS)
-  const selection = useFrameSelection(photos, isActive)
   const settings = useSlideshowSettings()
+  // A paused photo was chosen by someone: a new arrival raises the badge instead of replacing it.
+  const selection = useFrameSelection(photos, isActive || !settings.isPlaying)
 
   function startSlideshow(): void {
     selection.startSlideshow()

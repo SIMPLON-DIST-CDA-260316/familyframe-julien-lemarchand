@@ -183,7 +183,7 @@ Run: `gh stack submit --auto`, then `gh pr edit <N> --body-file <file>` with a F
   - `LibraryScreen({ photos: Photo[], currentId: string, onOpenPhoto: (id: string) => void, onStartSlideshow: () => void })`.
   - `SlideshowScreen({ photos: Photo[], currentPhoto: Photo, selection: FrameSelection, isActive: boolean, settings: SlideshowSettings })`.
 
-- [ ] **Step 1: Create the stack layer**
+- [x] **Step 1: Create the stack layer**
 
 Run: `gh stack add feat/frame-library-mode`
 Expected: `✓ Created and checked out branch "feat/frame-library-mode"`
@@ -786,8 +786,9 @@ export default function FramePage(): JSX.Element {
   const photos = usePhotoFeed()
   const isActive = useIdle(CONTROLS_HIDE_DELAY_MS)
   const isLibraryActive = useIdle(LIBRARY_IDLE_DELAY_MS)
-  const selection = useFrameSelection(photos, isActive)
   const settings = useSlideshowSettings()
+  // A paused photo was chosen by someone: a new arrival raises the badge instead of replacing it.
+  const selection = useFrameSelection(photos, isActive || !settings.isPlaying)
 
   function startSlideshow(): void {
     selection.startSlideshow()
@@ -1820,3 +1821,4 @@ Run: `gh stack submit --auto`, then `gh pr edit <N> --body-file <file>`. French 
 Format: `date · task/step · what the plan said · what was done · why`.
 
 - 2026-11-23 · Task 2/Step 1 · create the layer with `gh stack add feat/frame-library-mode` · not run by the Task 2 implementer: the branch already existed and was checked out by the controller · layer already created, step left unchecked for the controller to confirm.
+- 2026-11-23 · Task 2 review · `useFrameSelection(photos, isActive)`: an unattended arrival replaced a paused photo (directly, or through the idle jump 4 s after the badge) · `useFrameSelection(photos, isActive || !settings.isPlaying)`, Task 2 block amended · spec says a paused slideshow "stays paused on its photo"; author chose "stay on the photo" (badge raised) over "jump to the new one"
