@@ -1,13 +1,13 @@
 ---
 plan: backend-layers-errors
-status: in-progress
+status: in-review
 spec: docs/superpowers/specs/2026-11-23-backend-layers-errors-design.md
 branch: refactor/error-handling (PR A), refactor/photos-repository (PR B), refactor/photos-layers (PR C)
 worktree: false
 tasks_total: 8
-tasks_done: 5
-current_task: 6
-last_commit: 7db516a
+tasks_done: 8
+current_task: —
+last_commit: 906142d
 last_updated: 2026-11-23
 ---
 
@@ -611,7 +611,7 @@ Message: `refactor(server): move the photo upload config to its own file`.
 
 ## PR C: service, controller, routes (branch `refactor/photos-layers`, base `refactor/photos-repository`)
 
-- [ ] `git switch -c refactor/photos-layers` from the tip of `refactor/photos-repository`.
+- [x] `git switch -c refactor/photos-layers` from the tip of `refactor/photos-repository`.
 
 ### Task 6: Photos service
 
@@ -632,7 +632,7 @@ Message: `refactor(server): move the photo upload config to its own file`.
   - `createPhotosService(deps: PhotosServiceDeps): PhotosService`
   - `createPhotosRouter(io, service: PhotosService): Router` (temporary signature, replaced in Task 7)
 
-- [ ] **Step 1: Create `server/src/features/photos/photos.service.ts`**
+- [x] **Step 1: Create `server/src/features/photos/photos.service.ts`**
 
 ```ts
 import { AppError } from '../../errors/app-error.js'
@@ -710,7 +710,7 @@ export function createPhotosService({
 }
 ```
 
-- [ ] **Step 2: Reduce `server/src/photos.ts` to HTTP + Socket.IO**
+- [x] **Step 2: Reduce `server/src/photos.ts` to HTTP + Socket.IO**
 
 Replace the whole file with:
 
@@ -757,7 +757,7 @@ export function createPhotosRouter(
 }
 ```
 
-- [ ] **Step 3: Wire the service in `server/src/app.ts`**
+- [x] **Step 3: Wire the service in `server/src/app.ts`**
 
 ```ts
 import { createPhotosRepository } from './features/photos/photos.repository.js'
@@ -776,12 +776,12 @@ const service = createPhotosService({ repository, toFrameJpeg, uploadImage })
 
 Route line: `app.use('/api/photos', createPhotosRouter(io, service))`.
 
-- [ ] **Step 4: Run all gates**
+- [x] **Step 4: Run all gates**
 
 Run: `pnpm check && pnpm typecheck && pnpm test:bruno`
 Expected: green; Bruno `11 (11 Passed)`, `26/26`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Message: `refactor(server): extract photos service` — body: business rules (uploader name, file, mimetype, readable image) live in the service, which knows neither Express nor Socket.IO; its dependencies are injected by `app.ts`.
 
@@ -802,7 +802,7 @@ Message: `refactor(server): extract photos service` — body: business rules (up
   - `createPhotosController(service: PhotosService, io: Server<ClientToServerEvents, ServerToClientEvents>): PhotosController`
   - `createPhotosRouter(controller: PhotosController): Router` (final signature)
 
-- [ ] **Step 1: Create `server/src/features/photos/photos.controller.ts`**
+- [x] **Step 1: Create `server/src/features/photos/photos.controller.ts`**
 
 ```ts
 import type { Request, Response } from 'express'
@@ -849,7 +849,7 @@ export function createPhotosController(
 }
 ```
 
-- [ ] **Step 2: Create `server/src/features/photos/photos.routes.ts`**
+- [x] **Step 2: Create `server/src/features/photos/photos.routes.ts`**
 
 ```ts
 import { Router } from 'express'
@@ -864,13 +864,13 @@ export function createPhotosRouter(controller: PhotosController): Router {
 }
 ```
 
-- [ ] **Step 3: Delete `server/src/photos.ts`**
+- [x] **Step 3: Delete `server/src/photos.ts`**
 
 ```bash
 git rm server/src/photos.ts
 ```
 
-- [ ] **Step 4: Final wiring in `server/src/app.ts`**
+- [x] **Step 4: Final wiring in `server/src/app.ts`**
 
 Replace the whole file with:
 
@@ -913,12 +913,12 @@ export function createApp(io: Server<ClientToServerEvents, ServerToClientEvents>
 }
 ```
 
-- [ ] **Step 5: Run all gates**
+- [x] **Step 5: Run all gates**
 
 Run: `pnpm check && pnpm typecheck && pnpm build && pnpm test:bruno`
 Expected: green; Bruno `11 (11 Passed)`, `26/26`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 Message: `refactor(server): split photos routes and controller` — body: routes only declare paths and the upload middleware; the controller reads the request, maps to the DTO, broadcasts and answers; `photos.ts` is gone.
 
@@ -928,7 +928,7 @@ Message: `refactor(server): split photos routes and controller` — body: routes
 
 - Modify: `ARCHITECTURE.md` (section "Serveur : app et processus")
 
-- [ ] **Step 1: Add a "Couches du backend" subsection after "Serveur : app et processus"**
+- [x] **Step 1: Add a "Couches du backend" subsection after "Serveur : app et processus"**
 
 ```markdown
 ## Couches du backend
@@ -950,17 +950,17 @@ Une feature par dossier (`server/src/features/photos/`), un fichier par couche :
 
 Run `pnpm check:fix`.
 
-- [ ] **Step 2: Manual browser check** (dev server running)
+- [x] **Step 2: Manual browser check** (dev server running)
 
 On `http://localhost:5180`: upload a JPEG → "Photo envoyée !" and the `/frame` tab updates live; upload a GIF → "Format non pris en charge : JPEG, PNG ou WebP uniquement."
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 Message: `docs(architecture): describe the backend layers and error flow`.
 
 ### PR C delivery
 
-- [ ] `git push -u origin refactor/photos-layers`, then `gh pr create --draft --base refactor/photos-repository --title "refactor(server): split photos into service, controller and routes" --body-file <file>` (French body; stacked on PR B; what was run, including the manual check).
+- [x] `git push -u origin refactor/photos-layers`, then `gh pr create --draft --base refactor/photos-repository --title "refactor(server): split photos into service, controller and routes" --body-file <file>` (French body; stacked on PR B; what was run, including the manual check).
 - [ ] Merge order when the author asks: retarget B to `develop`, merge A; rebase B with `--onto`, author force-pushes; retarget C, merge B; same for C.
 
 ---
@@ -968,3 +968,4 @@ Message: `docs(architecture): describe the backend layers and error flow`.
 ## Drift Log
 
 Format: `date · task/step · what the plan said · what was done · why`.
+- 2026-11-23 · Task 8 / Step 2 · manual browser check on :5180 · scripted equivalent through the Vite proxy: socket.io-client listening for `photo:new` + curl uploads; JPEG → 201 and broadcast received, GIF → 415 `FORMAT_UNSUPPORTED` · same network path as the browser without driving the UI; the French copy is unchanged client code, left to the author's browser review
