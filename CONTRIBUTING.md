@@ -12,6 +12,16 @@
   5. merge, puis suppression de la branche.
 - Livraison : PR `develop` → `main`.
 
+## Langue
+
+Le public premier d'un texte décide de sa langue :
+
+| Public         | Langue   | Exemples                                                                                       |
+| -------------- | -------- | ---------------------------------------------------------------------------------------------- |
+| humain         | français | `README.md`, `ARCHITECTURE.md`, `CONTRIBUTING.md`, corps des PR, docs du brief, textes de l'UI |
+| agent IA       | anglais  | `AGENTS.md`, `CLAUDE.md`, `.claude/` (hooks, settings), specs et plans `docs/superpowers/`     |
+| code et outils | anglais  | identifiants, commentaires, messages de commit, logs                                           |
+
 ## Commits
 
 Format [Conventional Commits](https://www.conventionalcommits.org/fr/), **en anglais** :
