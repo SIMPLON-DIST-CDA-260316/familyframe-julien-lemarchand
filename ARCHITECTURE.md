@@ -60,6 +60,7 @@ En cas d'erreur, l'API renvoie `{ "error": code }` ; le client traduit le code e
 | pseudo absent, vide ou de plus de 30 caractères         | 400    | `UPLOADER_NAME_INVALID` |
 | aucun fichier                                           | 400    | `PHOTO_MISSING`         |
 | autre erreur Multer (mauvais champ, plusieurs fichiers) | 400    | `UPLOAD_INVALID`        |
+| route inconnue                                          | 404    | `ROUTE_NOT_FOUND`       |
 | fichier de plus de 10 Mo                                | 413    | `PHOTO_TOO_LARGE`       |
 | type autre que JPEG, PNG ou WebP                        | 415    | `FORMAT_UNSUPPORTED`    |
 | image illisible par Sharp                               | 422    | `IMAGE_UNREADABLE`      |

@@ -3,6 +3,7 @@ export type ApiErrorCode =
   | 'UPLOADER_NAME_INVALID'
   | 'PHOTO_MISSING'
   | 'UPLOAD_INVALID'
+  | 'ROUTE_NOT_FOUND'
   | 'PHOTO_TOO_LARGE'
   | 'FORMAT_UNSUPPORTED'
   | 'IMAGE_UNREADABLE'
@@ -12,6 +13,7 @@ const ERROR_MESSAGES: Record<ApiErrorCode, string> = {
   UPLOADER_NAME_INVALID: 'Indiquez un pseudo (30 caractères maximum).',
   PHOTO_MISSING: 'Prenez ou choisissez une photo.',
   UPLOAD_INVALID: 'Envoi invalide : une seule photo à la fois.',
+  ROUTE_NOT_FOUND: "Cette adresse n'existe pas sur le serveur.",
   PHOTO_TOO_LARGE: 'La photo est trop lourde (10 Mo maximum).',
   FORMAT_UNSUPPORTED: 'Format non pris en charge : JPEG, PNG ou WebP uniquement.',
   IMAGE_UNREADABLE: "Ce fichier n'est pas une image lisible.",

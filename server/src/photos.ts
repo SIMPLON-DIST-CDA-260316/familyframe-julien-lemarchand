@@ -1,17 +1,12 @@
 import type { Photo as PhotoRow } from '@prisma/client'
-import { type Response, Router } from 'express'
+import { Router } from 'express'
 import multer from 'multer'
 import type { Server } from 'socket.io'
 import { uploadImage } from './cloudinary.js'
 import { prisma } from './db.js'
+import { AppError } from './errors/app-error.js'
 import { toFrameJpeg } from './image.js'
-import type {
-  ApiError,
-  ApiErrorCode,
-  ClientToServerEvents,
-  Photo,
-  ServerToClientEvents,
-} from './types.js'
+import type { ClientToServerEvents, Photo, ServerToClientEvents } from './types.js'
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024
 const MAX_UPLOADER_NAME_LENGTH = 30
@@ -23,11 +18,6 @@ const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: MAX_FILE_SIZE, files: 1 },
 })
-
-export function sendError(res: Response, status: number, code: ApiErrorCode): void {
-  const body: ApiError = { error: code }
-  res.status(status).json(body)
-}
 
 // cloudinaryId stays on the server.
 function toPhotoDto(row: PhotoRow): Photo {
@@ -51,30 +41,26 @@ export function createPhotosRouter(io: Server<ClientToServerEvents, ServerToClie
     const rawUploaderName: unknown = req.body?.uploaderName
     const uploaderName = typeof rawUploaderName === 'string' ? rawUploaderName.trim() : ''
     if (uploaderName.length === 0 || uploaderName.length > MAX_UPLOADER_NAME_LENGTH) {
-      sendError(res, 400, 'UPLOADER_NAME_INVALID')
-      return
+      throw new AppError('UPLOADER_NAME_INVALID')
     }
 
     if (!req.file) {
-      sendError(res, 400, 'PHOTO_MISSING')
-      return
+      throw new AppError('PHOTO_MISSING')
     }
 
     // Cheap first filter: the browser's mimetype can lie, sharp checks for real.
     if (!ALLOWED_TYPES.includes(req.file.mimetype)) {
-      sendError(res, 415, 'FORMAT_UNSUPPORTED')
-      return
+      throw new AppError('FORMAT_UNSUPPORTED')
     }
 
     let jpeg: Buffer
     try {
       jpeg = await toFrameJpeg(req.file.buffer)
     } catch {
-      sendError(res, 422, 'IMAGE_UNREADABLE')
-      return
+      throw new AppError('IMAGE_UNREADABLE')
     }
 
-    // Cloudinary or database errors reach the error handler in app.ts.
+    // Cloudinary or database errors reach the error handler as 500s.
     const image = await uploadImage(jpeg)
     let row: PhotoRow
     try {
