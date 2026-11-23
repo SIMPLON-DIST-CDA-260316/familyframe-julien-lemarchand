@@ -9,8 +9,9 @@ import { useLeavingPhoto } from '@/hooks/useLeavingPhoto.ts'
 import { useSlideshow } from '@/hooks/useSlideshow.ts'
 import type { Photo } from '@/photo.ts'
 
-// Embla's default (25) is a quick flick; a frame on a wall should glide.
-const GLIDING_SLIDE = { duration: 45 }
+// Embla's default (25) is a quick flick; a frame on a wall should glide. Loop: after the oldest
+// photo the newest comes in from the right, like any other next photo.
+const GLIDING_LOOP = { duration: 45, loop: true }
 
 type PhotoViewProps = {
   photos: Photo[]
@@ -41,7 +42,7 @@ export function PhotoView({
     // clip, not hidden: the scaled backdrop overflows, and a hidden box can still be scrolled.
     <div className="relative isolate h-svh overflow-clip">
       {currentPhoto && <PhotoBackdrop key={currentPhoto.id} url={currentPhoto.thumbnailUrl} />}
-      <Carousel setApi={setApi} opts={GLIDING_SLIDE}>
+      <Carousel setApi={setApi} opts={GLIDING_LOOP}>
         <CarouselContent>
           {photos.map((photo) => (
             <PhotoSlide
