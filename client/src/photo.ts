@@ -11,6 +11,7 @@ export type Photo = {
 
 export type ServerToClientEvents = {
   'photo:new': (photo: Photo) => void
+  'photo:deleted': (id: string) => void
 }
 
 export function isPhoto(value: unknown): value is Photo {

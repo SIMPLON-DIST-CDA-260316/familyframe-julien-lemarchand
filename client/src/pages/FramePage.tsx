@@ -1,5 +1,7 @@
 import { type JSX, useEffect, useState } from 'react'
 import { io, type Socket } from 'socket.io-client'
+import { errorMessage } from '../api.ts'
+import { Button } from '../components/ui/button.tsx'
 import { isPhoto, type Photo, type ServerToClientEvents } from '../photo.ts'
 
 // The frame is a screen on a wall: dark keeps the photos in front.
@@ -7,6 +9,29 @@ const FRAME_CLASSES = 'dark min-h-svh bg-background p-4 text-foreground'
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleString('fr-FR')
+}
+
+// The list is not touched here: the server's photo:deleted reaches every frame, this one included.
+async function deletePhoto({ id, uploaderName }: Photo): Promise<void> {
+  if (!window.confirm(`Supprimer la photo envoyée par ${uploaderName} ?`)) return
+  try {
+    const res = await fetch(`/api/photos/${id}`, { method: 'DELETE' })
+    if (!res.ok) {
+      // Not JSON when the dev proxy answers for a stopped API.
+      const data: unknown = await res.json().catch(() => null)
+      window.alert(errorMessage(data))
+    }
+  } catch {
+    window.alert(errorMessage(null))
+  }
+}
+
+function DeleteButton({ photo }: { photo: Photo }): JSX.Element {
+  return (
+    <Button variant="destructive" size="xs" onClick={() => deletePhoto(photo)}>
+      Supprimer
+    </Button>
+  )
 }
 
 export default function FramePage(): JSX.Element {
@@ -47,6 +72,14 @@ export default function FramePage(): JSX.Element {
       )
     })
 
+    socket.on('photo:deleted', (deletedId) => {
+      if (typeof deletedId !== 'string') {
+        console.error('Unexpected photo:deleted payload from the API')
+        return
+      }
+      setPhotos((current) => current.filter(({ id }) => id !== deletedId))
+    })
+
     return () => {
       socket.disconnect()
     }
@@ -78,6 +111,7 @@ export default function FramePage(): JSX.Element {
           <span className="font-medium text-foreground">{latest.uploaderName}</span> ·{' '}
           {formatDate(latest.createdAt)}
         </figcaption>
+        <DeleteButton photo={latest} />
       </figure>
 
       {others.length > 0 && (
@@ -92,6 +126,7 @@ export default function FramePage(): JSX.Element {
                 decoding="async"
               />
               <span className="text-xs text-muted-foreground">{photo.uploaderName}</span>
+              <DeleteButton photo={photo} />
             </li>
           ))}
         </ul>
