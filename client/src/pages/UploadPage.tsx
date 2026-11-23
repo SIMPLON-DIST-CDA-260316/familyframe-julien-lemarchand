@@ -1,4 +1,5 @@
 import { type ChangeEvent, type JSX, type SubmitEvent, useEffect, useState } from 'react'
+import { errorMessage, UNAUTHORIZED_STATUS } from '@/api.ts'
 import { useAuth } from '@/auth/AuthContext.ts'
 import { LogoutButton } from '@/components/auth/LogoutButton.tsx'
 import { Alert, AlertDescription } from '@/components/ui/alert.tsx'
@@ -13,7 +14,6 @@ import {
 } from '@/components/ui/card.tsx'
 import { Input } from '@/components/ui/input.tsx'
 import { Label } from '@/components/ui/label.tsx'
-import { errorMessage, UNAUTHORIZED_STATUS } from '../api.ts'
 
 type Status = 'idle' | 'sending' | 'success' | 'error'
 

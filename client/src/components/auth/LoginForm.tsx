@@ -18,6 +18,7 @@ export function LoginForm({ onLogin }: LoginFormProps): JSX.Element {
   // On success the provider sets the user and LoginPage redirects: nothing to do here.
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault()
+    setError('')
     setIsSending(true)
     const result = await onLogin(email, password)
     if (!result.isSuccess) {
