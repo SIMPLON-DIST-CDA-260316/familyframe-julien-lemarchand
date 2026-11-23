@@ -45,6 +45,13 @@ Format [Conventional Commits](https://www.conventionalcommits.org/fr/), **en ang
 - Le corps explique **pourquoi** et **comment vérifier**. Les détails déjà dans une issue ou un doc sont liés, pas recopiés.
 - Indiquer ce qui a **réellement** été lancé (commandes, tests manuels) : un badge CI vert ne dit pas ce qui a été testé.
 
+## Hooks Git
+
+Installés automatiquement par `pnpm install` ([lefthook](https://lefthook.dev), voir `lefthook.yml`) :
+
+- **pre-commit** : `biome check` sur les fichiers indexés (vérifie sans corriger : lancer `pnpm check:fix`).
+- **commit-msg** : [commitlint](https://commitlint.js.org) refuse un message hors Conventional Commits.
+
 ## Avant de pousser
 
 ```bash
