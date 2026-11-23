@@ -24,7 +24,10 @@ export function useFrameSelection(photos: Photo[], isActive: boolean): FrameSele
     if (isActive) {
       // Someone is looking: keep their photo on screen.
       setSelectedId((id) => id ?? previousNewestId)
-      setNewPhotoCount((count) => count + 1)
+      // A refetch after a reconnect can bring several photos at once.
+      const previousNewestIndex = photos.findIndex(({ id }) => id === previousNewestId)
+      const arrivedCount = Math.max(previousNewestIndex, 1)
+      setNewPhotoCount((count) => count + arrivedCount)
       return
     }
     showNewest()
