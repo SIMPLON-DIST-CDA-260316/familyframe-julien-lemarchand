@@ -17,8 +17,11 @@ export function useLeavingPhoto(api: CarouselApi, currentId: string): string | n
     const carousel = api
     const clearLeaving = (): void => setLeavingId(null)
     carousel.on('settle', clearLeaving)
+    // A photo prepended at the current position re-inits Embla without any glide, so no settle.
+    carousel.on('reInit', clearLeaving)
     return () => {
       carousel.off('settle', clearLeaving)
+      carousel.off('reInit', clearLeaving)
     }
   }, [api])
 
