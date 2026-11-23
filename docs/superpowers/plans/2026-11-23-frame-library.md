@@ -5,7 +5,7 @@ spec: docs/superpowers/specs/2026-11-23-frame-library-design.md
 branch: docs/frame-library-design (stack, see Git strategy)
 worktree: true
 tasks_total: 4
-tasks_done: 3
+tasks_done: 4
 current_task: 4
 last_commit: —
 last_updated: 2026-11-23
@@ -1791,7 +1791,7 @@ git commit -F <scratchpad>/commit-library-list.txt
 
 Message: `feat(client): show the library as a list, remembered per device`
 
-- [ ] **Step 9: Manual check in Chrome (controller)**
+- [x] **Step 9: Manual check in Chrome (controller)**
 
 On `http://localhost:5181/frame`:
 
@@ -1829,3 +1829,4 @@ Format: `date · task/step · what the plan said · what was done · why`.
 - 2026-11-24 · Task 3 review · `pointer-events-auto` on the full-width bar rows blocked swipes beside the buttons · row `pointer-events-none`, `*:pointer-events-auto` on its children when visible · a touch frame shows the bars on first touch, so every later swipe crossed them
 - 2026-11-24 · Task 3 review · ArrowRight on a "Vitesse" item also moved the carousel · `useCarouselArrowKeys` skips when `isOverlayOpen()` · Minor, one line
 - 2026-11-24 · Task 3 Chrome check · "`PhotoCaption.tsx` unchanged": a long name slid under the centred pill · name `max-w-[calc(50%-6rem)] text-balance`, wraps instead · spec: the bar must not hide the name or date
+- 2026-11-24 · Task 4 review · `storeLayout` comment "the choice still holds until the page reloads" · "until the library closes" · `LibraryScreen` unmounts during the slideshow, so with blocked storage the choice ends there; the grid fallback is what the spec asks
