@@ -5,9 +5,9 @@ spec: docs/superpowers/specs/2026-11-23-backend-layers-errors-design.md
 branch: refactor/error-handling (PR A), refactor/photos-repository (PR B), refactor/photos-layers (PR C)
 worktree: false
 tasks_total: 8
-tasks_done: 2
-current_task: 3
-last_commit: 6887e6d
+tasks_done: 5
+current_task: 6
+last_commit: 7db516a
 last_updated: 2026-11-23
 ---
 
@@ -431,13 +431,13 @@ Message: `feat(server): answer unknown routes with ROUTE_NOT_FOUND` — body: un
 
 - [x] Commit this plan on the branch: `docs: add backend layers and error handling plan`.
 - [x] `pnpm build` green.
-- [ ] `git push -u origin refactor/error-handling`, then `gh pr create --draft --base develop --title "refactor(server): centralize error handling" --body-file <file>` (French body: why, what, what was run, stacked PRs B and C to follow).
+- [x] `git push -u origin refactor/error-handling`, then `gh pr create --draft --base develop --title "refactor(server): centralize error handling" --body-file <file>` (French body: why, what, what was run, stacked PRs B and C to follow).
 
 ---
 
 ## PR B: lib and repository (branch `refactor/photos-repository`, base `refactor/error-handling`)
 
-- [ ] `git switch -c refactor/photos-repository` from the tip of `refactor/error-handling`.
+- [x] `git switch -c refactor/photos-repository` from the tip of `refactor/error-handling`.
 
 ### Task 3: Move db, cloudinary and image to lib/
 
@@ -453,7 +453,7 @@ Message: `feat(server): answer unknown routes with ROUTE_NOT_FOUND` — body: un
 
 - Produces: `prisma` from `server/src/lib/db.ts`; `uploadImage(jpeg: Buffer): Promise<UploadedImage>` and `type UploadedImage = { url: string; cloudinaryId: string }` from `server/src/lib/cloudinary.ts`; `toFrameJpeg(input: Buffer): Promise<Buffer>` from `server/src/lib/image.ts`. Contents unchanged.
 
-- [ ] **Step 1: Move the files**
+- [x] **Step 1: Move the files**
 
 ```bash
 mkdir -p server/src/lib
@@ -462,18 +462,18 @@ git mv server/src/cloudinary.ts server/src/lib/cloudinary.ts
 git mv server/src/image.ts server/src/lib/image.ts
 ```
 
-- [ ] **Step 2: Fix the import paths**
+- [x] **Step 2: Fix the import paths**
 
 - `server/src/lib/cloudinary.ts`: `import { config } from './config.js'` → `import { config } from '../config.js'`
 - `server/src/server.ts`: `import { prisma } from './db.js'` → `import { prisma } from './lib/db.js'`
 - `server/src/photos.ts`: `'./cloudinary.js'` → `'./lib/cloudinary.js'`, `'./db.js'` → `'./lib/db.js'`, `'./image.js'` → `'./lib/image.js'`
 
-- [ ] **Step 3: Run all gates**
+- [x] **Step 3: Run all gates**
 
 Run: `pnpm check && pnpm typecheck && pnpm test:bruno`
 Expected: green; Bruno `11 (11 Passed)`, `26/26`.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 Message: `refactor(server): move db, cloudinary and image to lib/`.
 
@@ -495,7 +495,7 @@ Message: `refactor(server): move db, cloudinary and image to lib/`.
   - `createPhotosRepository(prisma: PrismaClient): PhotosRepository`
   - `createPhotosRouter(io, repository: PhotosRepository): Router` (temporary signature, replaced in Task 7)
 
-- [ ] **Step 1: Create `server/src/features/photos/photos.repository.ts`**
+- [x] **Step 1: Create `server/src/features/photos/photos.repository.ts`**
 
 ```ts
 import type { Photo, PrismaClient } from '@prisma/client'
@@ -517,7 +517,7 @@ export function createPhotosRepository(prisma: PrismaClient): PhotosRepository {
 }
 ```
 
-- [ ] **Step 2: Make `server/src/photos.ts` use the repository**
+- [x] **Step 2: Make `server/src/photos.ts` use the repository**
 
 - Remove `import type { Photo as PhotoRow } from '@prisma/client'` and `import { prisma } from './lib/db.js'`.
 - Add `import type { PhotoRecord, PhotosRepository } from './features/photos/photos.repository.js'`.
@@ -544,7 +544,7 @@ try {
 const photo = toPhotoDto(record)
 ```
 
-- [ ] **Step 3: Wire it in `server/src/app.ts`**
+- [x] **Step 3: Wire it in `server/src/app.ts`**
 
 ```ts
 import { createPhotosRepository } from './features/photos/photos.repository.js'
@@ -555,12 +555,12 @@ import { prisma } from './lib/db.js'
 app.use('/api/photos', createPhotosRouter(io, createPhotosRepository(prisma)))
 ```
 
-- [ ] **Step 4: Run all gates**
+- [x] **Step 4: Run all gates**
 
 Run: `pnpm check && pnpm typecheck && pnpm test:bruno`
 Expected: green; Bruno `11 (11 Passed)`, `26/26`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Message: `refactor(server): add photos repository` — body: only the repository talks to Prisma; it is created in `app.ts` and passed to the router.
 
@@ -575,7 +575,7 @@ Message: `refactor(server): add photos repository` — body: only the repository
 
 - Produces: `upload` (a `multer.Multer` instance) from `photos.upload.ts`.
 
-- [ ] **Step 1: Create `server/src/features/photos/photos.upload.ts`**
+- [x] **Step 1: Create `server/src/features/photos/photos.upload.ts`**
 
 ```ts
 import multer from 'multer'
@@ -589,23 +589,23 @@ export const upload = multer({
 })
 ```
 
-- [ ] **Step 2: Use it in `server/src/photos.ts`**
+- [x] **Step 2: Use it in `server/src/photos.ts`**
 
 Remove `import multer from 'multer'`, `MAX_FILE_SIZE` and the `upload` constant with its comment. Add `import { upload } from './features/photos/photos.upload.js'`.
 
-- [ ] **Step 3: Run all gates**
+- [x] **Step 3: Run all gates**
 
 Run: `pnpm check && pnpm typecheck && pnpm test:bruno`
 Expected: green; Bruno `11 (11 Passed)`, `26/26` (`07-edge-format-gif`, `06-edge-mauvais-champ` exercise Multer).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 Message: `refactor(server): move the photo upload config to its own file`.
 
 ### PR B delivery
 
-- [ ] `pnpm build` green.
-- [ ] `git push -u origin refactor/photos-repository`, then `gh pr create --draft --base refactor/error-handling --title "refactor(server): add photos repository and lib folder" --body-file <file>` (French body; state that it is stacked on PR A and must be retargeted to `develop` before PR A is merged).
+- [x] `pnpm build` green.
+- [x] `git push -u origin refactor/photos-repository`, then `gh pr create --draft --base refactor/error-handling --title "refactor(server): add photos repository and lib folder" --body-file <file>` (French body; state that it is stacked on PR A and must be retargeted to `develop` before PR A is merged).
 
 ---
 
