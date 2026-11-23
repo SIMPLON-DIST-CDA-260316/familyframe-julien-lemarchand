@@ -873,7 +873,7 @@ Message: `feat(client): open the frame on a photo library that launches the slid
 
 Renames and deletions are already staged by `git mv` / `git rm`: `git add` only lists files that exist.
 
-- [ ] **Step 12: Manual check in Chrome (controller)**
+- [x] **Step 12: Manual check in Chrome (controller)**
 
 On `http://localhost:5181/frame`, with at least three photos:
 
