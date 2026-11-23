@@ -76,7 +76,7 @@ export function createPhotosRouter(io: Server<ClientToServerEvents, ServerToClie
       return
     }
 
-    // Cloudinary or database errors go to the error handler in index.ts (500).
+    // Cloudinary or database errors go to the error handler in app.ts (500).
     const image = await uploadImage(jpeg)
     let row: PhotoRow
     try {
