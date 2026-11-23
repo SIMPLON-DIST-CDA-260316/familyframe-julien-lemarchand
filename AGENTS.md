@@ -5,6 +5,7 @@ Instructions pour les agents IA (Claude Code, Codex…) qui travaillent sur ce d
 Contexte, stack, commandes et conventions : lire d'abord ces fichiers, ils ne sont pas répétés ici.
 
 - @README.md
+- @ARCHITECTURE.md
 - @CONTRIBUTING.md
 
 ## Points d'attention
