@@ -20,6 +20,9 @@ export default function FramePage(): JSX.Element {
         const data: unknown = await res.json()
         if (Array.isArray(data) && data.every(isPhoto)) {
           setPhotos(data)
+        } else {
+          // Client and API images out of sync: say so instead of waiting forever.
+          console.error('Unexpected photos payload from the API')
         }
       } catch (error) {
         console.error('Could not load photos', error)
@@ -33,6 +36,11 @@ export default function FramePage(): JSX.Element {
     socket.on('connect', loadPhotos)
 
     socket.on('photo:new', (photo) => {
+      // Socket.IO types are a promise, not a check.
+      if (!isPhoto(photo)) {
+        console.error('Unexpected photo:new payload from the API')
+        return
+      }
       // The fetch and the event can bring the same photo.
       setPhotos((current) =>
         current.some(({ id }) => id === photo.id) ? current : [photo, ...current],
