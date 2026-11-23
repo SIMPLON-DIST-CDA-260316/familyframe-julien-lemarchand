@@ -7,8 +7,6 @@
     "moduleResolution": "nodenext",
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
-    "rootDir": "src",
-    "outDir": "dist",
     "strict": true,
     "skipLibCheck": true,
     "sourceMap": true,
@@ -18,5 +16,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": ["src", "prisma"]
 }
