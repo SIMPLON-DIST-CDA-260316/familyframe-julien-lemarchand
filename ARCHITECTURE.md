@@ -37,10 +37,10 @@ Le détail des fichiers n'est pas listé ici : il change trop vite pour rester j
 
 ## Pages
 
-| Chemin   | Page                                                                                                                                              |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/`      | envoi : pseudo (mémorisé dans `localStorage`), « Prendre une photo » ou « Choisir une image »                                                     |
-| `/frame` | cadre : bibliothèque des photos en vignettes, chacune avec « Supprimer » ; « Lancer le diaporama » ou une minute sans activité lance le diaporama |
+| Chemin   | Page                                                                                                                                                                                        |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`      | envoi : pseudo (mémorisé dans `localStorage`), « Prendre une photo » ou « Choisir une image »                                                                                               |
+| `/frame` | cadre : bibliothèque des photos en vignettes ou en liste (choix mémorisé par appareil), chacune avec « Supprimer » ; « Lancer le diaporama » ou une minute sans activité lance le diaporama |
 
 Le routage est fait côté navigateur (`react-router`). En production (J2), le serveur qui sert le client devra donc renvoyer `index.html` pour `/frame` (« SPA fallback »), sinon un rechargement de la page donne une 404.
 

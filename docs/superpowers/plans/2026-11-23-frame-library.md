@@ -1506,7 +1506,7 @@ Run: `gh stack submit --auto`, then `gh pr edit <N> --body-file <file>`. French 
 Run: `gh stack add feat/frame-library-list`
 Expected: `✓ Created and checked out branch "feat/frame-library-list"`
 
-- [ ] **Step 2: Remember the layout per device**
+- [x] **Step 2: Remember the layout per device**
 
 Create `client/src/hooks/useLibraryLayout.ts`:
 
@@ -1553,7 +1553,7 @@ export function useLibraryLayout(): [LibraryLayout, (layout: LibraryLayout) => v
 }
 ```
 
-- [ ] **Step 3: Write the ▦ | ☰ toggle**
+- [x] **Step 3: Write the ▦ | ☰ toggle**
 
 Create `client/src/components/frame/LayoutToggle.tsx`:
 
@@ -1593,7 +1593,7 @@ export function LayoutToggle({ layout, onLayoutChange }: LayoutToggleProps): JSX
 }
 ```
 
-- [ ] **Step 4: Write the list and its row**
+- [x] **Step 4: Write the list and its row**
 
 Create `client/src/components/frame/PhotoListRow.tsx`:
 
@@ -1679,7 +1679,7 @@ export function PhotoList({ photos, currentId, onSelect }: PhotoListProps): JSX.
 }
 ```
 
-- [ ] **Step 5: Wire the toggle into the header and the screen**
+- [x] **Step 5: Wire the toggle into the header and the screen**
 
 Replace the whole content of `client/src/components/frame/LibraryHeader.tsx`:
 
@@ -1766,7 +1766,7 @@ export function LibraryScreen({
 }
 ```
 
-- [ ] **Step 6: Update the Pages table in `ARCHITECTURE.md`**
+- [x] **Step 6: Update the Pages table in `ARCHITECTURE.md`**
 
 Replace the table under `## Pages` (as left by Task 2) with
 
@@ -1777,12 +1777,12 @@ Replace the table under `## Pages` (as left by Task 2) with
 | `/frame` | cadre : bibliothèque des photos en vignettes ou en liste (choix mémorisé par appareil), chacune avec « Supprimer » ; « Lancer le diaporama » ou une minute sans activité lance le diaporama |
 ```
 
-- [ ] **Step 7: Check, typecheck, build**
+- [x] **Step 7: Check, typecheck, build**
 
 Run: `pnpm check`, then `pnpm typecheck`, then `pnpm build`
 Expected: Biome `No fixes applied.`, `client typecheck: Done`, Vite `✓ built in …`.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add client/src/hooks/useLibraryLayout.ts client/src/components/frame/LayoutToggle.tsx client/src/components/frame/PhotoList.tsx client/src/components/frame/PhotoListRow.tsx client/src/components/frame/LibraryHeader.tsx client/src/components/frame/LibraryScreen.tsx ARCHITECTURE.md
