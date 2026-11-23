@@ -1,8 +1,8 @@
-import { type JSX, useEffect, useState } from 'react'
-import { io, type Socket } from 'socket.io-client'
-import { errorMessage } from '../api.ts'
-import { Button } from '../components/ui/button.tsx'
-import { isPhoto, type Photo, type ServerToClientEvents } from '../photo.ts'
+import type { JSX } from 'react'
+import { errorMessage } from '@/api.ts'
+import { Button } from '@/components/ui/button.tsx'
+import { usePhotoFeed } from '@/hooks/usePhotoFeed.ts'
+import type { Photo } from '@/photo.ts'
 
 // The frame is a screen on a wall: dark keeps the photos in front.
 const FRAME_CLASSES = 'dark min-h-svh bg-background p-4 text-foreground'
@@ -36,50 +36,7 @@ function DeleteButton({ photo }: { photo: Photo }): JSX.Element {
 }
 
 export default function FramePage(): JSX.Element {
-  // Newest first, like GET /api/photos.
-  const [photos, setPhotos] = useState<Photo[]>([])
-
-  useEffect(() => {
-    async function loadPhotos(): Promise<void> {
-      try {
-        const res = await fetch('/api/photos')
-        const data: unknown = await res.json()
-        if (Array.isArray(data) && data.every(isPhoto)) {
-          setPhotos(data)
-        } else {
-          // Client and API images out of sync: say so instead of waiting forever.
-          console.error('Unexpected photos payload from the API')
-        }
-      } catch (error) {
-        console.error('Could not load photos', error)
-      }
-    }
-
-    // Same origin: Vite proxies /socket.io to the API.
-    const socket: Socket<ServerToClientEvents> = io()
-
-    // Reconnections too: catches photos sent while offline.
-    socket.on('connect', loadPhotos)
-
-    socket.on('photo:new', (photo) => {
-      // Socket.IO types are a promise, not a check.
-      if (!isPhoto(photo)) {
-        console.error('Unexpected photo:new payload from the API')
-        return
-      }
-      // The fetch and the event can bring the same photo.
-      setPhotos((current) =>
-        current.some(({ id }) => id === photo.id) ? current : [photo, ...current],
-      )
-    })
-
-    // Reload rather than drop one photo: the next photo beyond the 20 latest fills the gap.
-    socket.on('photo:deleted', loadPhotos)
-
-    return () => {
-      socket.disconnect()
-    }
-  }, [])
+  const photos = usePhotoFeed()
 
   if (photos.length === 0) {
     return (
