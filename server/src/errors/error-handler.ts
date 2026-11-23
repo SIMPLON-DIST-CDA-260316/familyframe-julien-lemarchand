@@ -8,6 +8,9 @@ const HTTP_STATUS_BY_CODE: Record<ApiErrorCode, number> = {
   UPLOADER_NAME_INVALID: 400,
   PHOTO_MISSING: 400,
   UPLOAD_INVALID: 400,
+  BODY_INVALID: 400,
+  UNAUTHENTICATED: 401,
+  INVALID_CREDENTIALS: 401,
   ROUTE_NOT_FOUND: 404,
   PHOTO_NOT_FOUND: 404,
   PHOTO_TOO_LARGE: 413,
@@ -16,12 +19,25 @@ const HTTP_STATUS_BY_CODE: Record<ApiErrorCode, number> = {
   SERVER_ERROR: 500,
 }
 
+// body-parser tags its JSON syntax errors with this type; express.json() runs on the auth routes.
+function isMalformedJson(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'type' in error &&
+    error.type === 'entity.parse.failed'
+  )
+}
+
 function toErrorCode(error: unknown): ApiErrorCode {
   if (error instanceof AppError) {
     return error.code
   }
   if (error instanceof multer.MulterError) {
     return error.code === 'LIMIT_FILE_SIZE' ? 'PHOTO_TOO_LARGE' : 'UPLOAD_INVALID'
+  }
+  if (isMalformedJson(error)) {
+    return 'BODY_INVALID'
   }
   return 'SERVER_ERROR'
 }

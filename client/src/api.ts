@@ -3,6 +3,9 @@ export type ApiErrorCode =
   | 'UPLOADER_NAME_INVALID'
   | 'PHOTO_MISSING'
   | 'UPLOAD_INVALID'
+  | 'BODY_INVALID'
+  | 'UNAUTHENTICATED'
+  | 'INVALID_CREDENTIALS'
   | 'ROUTE_NOT_FOUND'
   | 'PHOTO_NOT_FOUND'
   | 'PHOTO_TOO_LARGE'
@@ -14,6 +17,9 @@ const ERROR_MESSAGES: Record<ApiErrorCode, string> = {
   UPLOADER_NAME_INVALID: 'Indiquez un pseudo (30 caractères maximum).',
   PHOTO_MISSING: 'Prenez ou choisissez une photo.',
   UPLOAD_INVALID: 'Envoi invalide : une seule photo à la fois.',
+  BODY_INVALID: 'Requête invalide. Rechargez la page et réessayez.',
+  UNAUTHENTICATED: 'Votre session a expiré. Reconnectez-vous.',
+  INVALID_CREDENTIALS: 'E-mail ou mot de passe incorrect.',
   ROUTE_NOT_FOUND: "Cette adresse n'existe pas sur le serveur.",
   PHOTO_NOT_FOUND: 'Cette photo a déjà été supprimée.',
   PHOTO_TOO_LARGE: 'La photo est trop lourde (10 Mo maximum).',

@@ -39,6 +39,28 @@ describe('toErrorResponse', () => {
     })
   })
 
+  it('maps a malformed JSON body to BODY_INVALID', () => {
+    const parseError = Object.assign(new SyntaxError('Unexpected end of JSON input'), {
+      type: 'entity.parse.failed',
+    })
+
+    expect(toErrorResponse(parseError)).toEqual({ status: 400, body: { error: 'BODY_INVALID' } })
+  })
+
+  it('answers a request without a valid session with 401', () => {
+    expect(toErrorResponse(new AppError('UNAUTHENTICATED'))).toEqual({
+      status: 401,
+      body: { error: 'UNAUTHENTICATED' },
+    })
+  })
+
+  it('answers wrong credentials with 401', () => {
+    expect(toErrorResponse(new AppError('INVALID_CREDENTIALS'))).toEqual({
+      status: 401,
+      body: { error: 'INVALID_CREDENTIALS' },
+    })
+  })
+
   it('hides the details of an unexpected error', () => {
     expect(toErrorResponse(new Error('mongodb://admin:secret@cluster'))).toEqual({
       status: 500,

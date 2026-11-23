@@ -5,6 +5,9 @@ export type ApiErrorCode =
   | 'UPLOADER_NAME_INVALID'
   | 'PHOTO_MISSING'
   | 'UPLOAD_INVALID'
+  | 'BODY_INVALID'
+  | 'UNAUTHENTICATED'
+  | 'INVALID_CREDENTIALS'
   | 'ROUTE_NOT_FOUND'
   | 'PHOTO_NOT_FOUND'
   | 'PHOTO_TOO_LARGE'
@@ -13,6 +16,16 @@ export type ApiErrorCode =
   | 'SERVER_ERROR'
 
 export type ApiError = { error: ApiErrorCode }
+
+export type UserRole = 'member' | 'admin'
+
+// What the API says about a user: never the password hash.
+export type PublicUser = {
+  id: string
+  email: string
+  displayName: string
+  role: UserRole
+}
 
 // createdAt is an ISO 8601 string: JSON has no dates.
 export type Photo = {
