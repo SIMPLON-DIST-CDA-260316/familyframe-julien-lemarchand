@@ -40,6 +40,8 @@ export function useFrameSelection(photos: Photo[], isActive: boolean): FrameSele
     // undefined: the first load, nothing arrived.
     if (shownNewestId !== undefined) handleArrival(shownNewestId)
   }
+  // Nobody is looking any more: show what arrived meanwhile.
+  if (!isActive && newPhotoCount > 0) showNewest()
 
   function showNewest(): void {
     setSelectedId(null)
