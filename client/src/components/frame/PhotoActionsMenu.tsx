@@ -1,5 +1,5 @@
 import { EllipsisIcon, Trash2Icon } from 'lucide-react'
-import { type JSX, useRef, useState } from 'react'
+import { type JSX, type ReactNode, useRef, useState } from 'react'
 import { DeletePhotoDialog } from '@/components/frame/DeletePhotoDialog.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import {
@@ -14,9 +14,16 @@ type PhotoActionsMenuProps = {
   photo: Photo
   label: string
   className?: string
+  // Items above "Supprimer": the slideshow adds its speed.
+  children?: ReactNode
 }
 
-export function PhotoActionsMenu({ photo, label, className }: PhotoActionsMenuProps): JSX.Element {
+export function PhotoActionsMenu({
+  photo,
+  label,
+  className,
+  children,
+}: PhotoActionsMenuProps): JSX.Element {
   const [photoToDelete, setPhotoToDelete] = useState<Photo | null>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
 
@@ -42,6 +49,7 @@ export function PhotoActionsMenu({ photo, label, className }: PhotoActionsMenuPr
         </DropdownMenuTrigger>
         {/* `dark`: the menu portals to body, outside the frame's dark <main>. */}
         <DropdownMenuContent align="end" className="dark">
+          {children}
           <DropdownMenuItem variant="destructive" onSelect={() => setPhotoToDelete(photo)}>
             <Trash2Icon />
             Supprimer
