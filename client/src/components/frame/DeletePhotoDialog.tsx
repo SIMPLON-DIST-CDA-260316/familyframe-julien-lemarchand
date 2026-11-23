@@ -16,14 +16,19 @@ type DeletePhotoDialogProps = {
   // The photo picked when the dialog opened: the slideshow may move on while it stays open.
   photo: Photo | null
   onClose: () => void
+  onCloseAutoFocus: (event: Event) => void
 }
 
-export function DeletePhotoDialog({ photo, onClose }: DeletePhotoDialogProps): JSX.Element | null {
+export function DeletePhotoDialog({
+  photo,
+  onClose,
+  onCloseAutoFocus,
+}: DeletePhotoDialogProps): JSX.Element | null {
   if (!photo) return null
   return (
     <AlertDialog open onOpenChange={onClose}>
       {/* `dark`: the dialog portals to body, outside the frame's dark <main>. */}
-      <AlertDialogContent className="dark">
+      <AlertDialogContent className="dark" onCloseAutoFocus={onCloseAutoFocus}>
         <AlertDialogHeader>
           <AlertDialogTitle>Supprimer cette photo ?</AlertDialogTitle>
           <AlertDialogDescription>
