@@ -19,11 +19,13 @@ export function useFrameSelection(photos: Photo[], isActive: boolean): FrameSele
   const [newPhotoCount, setNewPhotoCount] = useState(0)
   const newestId = photos.at(0)?.id
   const [shownNewestId, setShownNewestId] = useState(newestId)
+  // The pinned photo may have been deleted: fall back to the newest.
+  const pinnedId = photos.find(({ id }) => id === selectedId)?.id
 
   function handleArrival(previousNewestId: string): void {
     if (isActive) {
       // Someone is looking: keep their photo on screen.
-      setSelectedId((id) => id ?? previousNewestId)
+      setSelectedId(pinnedId ?? previousNewestId)
       // A refetch after a reconnect can bring several photos at once.
       const previousNewestIndex = photos.findIndex(({ id }) => id === previousNewestId)
       const arrivedCount = Math.max(previousNewestIndex, 1)
@@ -37,8 +39,10 @@ export function useFrameSelection(photos: Photo[], isActive: boolean): FrameSele
   // before pinning the viewed one back.
   if (newestId !== shownNewestId) {
     setShownNewestId(newestId)
-    // undefined: the first load, nothing arrived.
-    if (shownNewestId !== undefined) handleArrival(shownNewestId)
+    // undefined: the first load, nothing arrived. A previous newest missing from the list was deleted.
+    if (shownNewestId !== undefined && photos.some(({ id }) => id === shownNewestId)) {
+      handleArrival(shownNewestId)
+    }
   }
   // Nobody is looking any more: show what arrived meanwhile.
   if (!isActive && newPhotoCount > 0) showNewest()
@@ -65,7 +69,7 @@ export function useFrameSelection(photos: Photo[], isActive: boolean): FrameSele
 
   return {
     view,
-    currentId: selectedId ?? newestId,
+    currentId: pinnedId ?? newestId,
     newPhotoCount,
     setView,
     selectPhoto,
