@@ -1,4 +1,5 @@
-import type { JSX } from 'react'
+import { type JSX, useRef } from 'react'
+import { useDragScroll } from '@/hooks/useDragScroll.ts'
 import { cn } from '@/lib/utils.ts'
 import type { Photo } from '@/photo.ts'
 
@@ -27,6 +28,9 @@ export function PhotoStrip({
   currentId,
   onSelect,
 }: PhotoStripProps): JSX.Element {
+  const listRef = useRef<HTMLUListElement>(null)
+  useDragScroll(listRef)
+
   return (
     // Kept mounted so it can slide out. The height glides too, carrying the bar above it along;
     // clip, not hidden: a hidden box is a scroll container that scrollIntoView would move.
@@ -39,8 +43,9 @@ export function PhotoStrip({
     >
       <div className="min-h-0 overflow-clip">
         <ul
+          ref={listRef}
           className={cn(
-            'pointer-events-auto flex items-center gap-3 overflow-x-auto px-6 pt-2 pb-6 transition-[opacity,translate] duration-500 ease-in-out [scrollbar-width:none] motion-reduce:transition-none [&::-webkit-scrollbar]:hidden',
+            'pointer-events-auto flex cursor-grab items-center select-none active:cursor-grabbing gap-3 overflow-x-auto px-6 pt-2 pb-6 transition-[opacity,translate] duration-500 ease-in-out [scrollbar-width:none] motion-reduce:transition-none [&::-webkit-scrollbar]:hidden',
             isVisible ? 'opacity-100' : 'translate-y-full opacity-0',
           )}
         >
@@ -63,6 +68,8 @@ export function PhotoStrip({
                   alt={`Envoyée par ${photo.uploaderName}`}
                   loading="lazy"
                   decoding="async"
+                  // The browser's own image drag would steal the mouse from the strip's scroll.
+                  draggable={false}
                 />
               </button>
             </li>
