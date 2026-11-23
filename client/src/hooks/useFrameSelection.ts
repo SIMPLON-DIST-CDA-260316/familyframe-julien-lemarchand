@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { FrameView } from '@/components/frame/FrameControls.tsx'
+import type { FrameView } from '@/components/frame/ViewToggles.tsx'
 import type { Photo } from '@/photo.ts'
 
 type FrameSelection = {
