@@ -63,6 +63,8 @@ export default function FramePage(): JSX.Element {
           className="h-[70vh] w-full object-contain"
           src={latest.url}
           alt={`Envoyée par ${latest.uploaderName}`}
+          // The photo people look at: ahead of the thumbnails.
+          fetchPriority="high"
         />
         <figcaption className="text-sm text-muted-foreground">
           <span className="font-medium text-foreground">{latest.uploaderName}</span> ·{' '}
@@ -76,8 +78,10 @@ export default function FramePage(): JSX.Element {
             <li key={photo.id} className="flex flex-col items-center gap-1">
               <img
                 className="size-32 rounded-lg object-cover"
-                src={photo.url}
+                src={photo.thumbnailUrl}
                 alt={`Envoyée par ${photo.uploaderName}`}
+                loading="lazy"
+                decoding="async"
               />
               <span className="text-xs text-muted-foreground">{photo.uploaderName}</span>
             </li>
