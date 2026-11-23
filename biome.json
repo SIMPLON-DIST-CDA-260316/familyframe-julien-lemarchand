@@ -27,6 +27,12 @@
       "preset": "recommended"
     }
   },
+  "overrides": [
+    {
+      "includes": ["client/src/components/ui/carousel.tsx"],
+      "linter": { "rules": { "a11y": { "useSemanticElements": "off" } } }
+    }
+  ],
   "css": {
     "parser": {
       "tailwindDirectives": true
