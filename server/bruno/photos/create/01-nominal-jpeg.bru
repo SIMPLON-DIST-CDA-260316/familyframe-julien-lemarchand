@@ -40,6 +40,17 @@ script:post-response {
       expect(image.headers['content-type']).to.match(/^image\//)
     }
   })
+  test('URL signées : une transformation modifiée est refusée', async () => {
+    expect(url).to.match(/\/s--[\w-]+--\//)
+    expect(thumbnailUrl).to.match(/\/s--[\w-]+--\//)
+    const tampered = thumbnailUrl.replace('w_640', 'w_641')
+    // Bruno's axios throws on 4xx even with validateStatus: read the status from the error.
+    const status = await axios.get(tampered).then(
+      (image) => image.status,
+      (error) => error.response?.status,
+    )
+    expect(status).to.equal(401)
+  })
 }
 
 docs {
@@ -47,4 +58,9 @@ docs {
   serveur envoie des URL prêtes, `url` (photo entière) et `thumbnailUrl`
   (miniature), toutes deux en `f_auto,q_auto`. Le test télécharge les deux
   URL : une transformation refusée par Cloudinary ferait échouer le test.
+
+  Les URL sont signées (`s--…--`). Le test de l'URL modifiée suppose
+  « Strict transformations » activé dans la console Cloudinary (Settings →
+  Security) : sans ce réglage, Cloudinary accepte n'importe quelle
+  transformation et le test échoue.
 }

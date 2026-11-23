@@ -24,7 +24,7 @@ Architecture, parcours d'une photo et choix techniques : [`ARCHITECTURE.md`](ARC
 
 ## Démarrage (local, sans Docker)
 
-**Prérequis :** Node.js ≥ 24 (voir `.nvmrc`), pnpm 10 (`corepack enable`), un cluster MongoDB Atlas, un compte Cloudinary (le serveur refuse de démarrer sans ses trois variables).
+**Prérequis :** Node.js ≥ 24 (voir `.nvmrc`), pnpm 10 (`corepack enable`), un cluster MongoDB Atlas, un compte Cloudinary (le serveur refuse de démarrer sans ses trois variables), avec « Strict transformations » activé dans Settings → Security (sinon un test Bruno échoue, voir [ARCHITECTURE.md](ARCHITECTURE.md)).
 
 ```bash
 pnpm install                         # installe tout le workspace + génère le client Prisma
