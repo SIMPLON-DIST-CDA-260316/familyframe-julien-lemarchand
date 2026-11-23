@@ -3,27 +3,27 @@ import { errorMessage } from '../api.ts'
 
 type Status = 'idle' | 'sending' | 'success' | 'error'
 
-const NICKNAME_KEY = 'familyframe.nickname'
+const UPLOADER_NAME_KEY = 'familyframe.uploaderName'
 
 // localStorage can be unavailable (private browsing, blocked storage): never let it crash the page.
-function loadNickname(): string {
+function loadUploaderName(): string {
   try {
-    return localStorage.getItem(NICKNAME_KEY) ?? ''
+    return localStorage.getItem(UPLOADER_NAME_KEY) ?? ''
   } catch {
     return ''
   }
 }
 
-function saveNickname(nickname: string): void {
+function saveUploaderName(uploaderName: string): void {
   try {
-    localStorage.setItem(NICKNAME_KEY, nickname)
+    localStorage.setItem(UPLOADER_NAME_KEY, uploaderName)
   } catch {
     // Not saved: the relative will type it again next time.
   }
 }
 
 export default function UploadPage(): JSX.Element {
-  const [nickname, setNickname] = useState(loadNickname)
+  const [uploaderName, setUploaderName] = useState(loadUploaderName)
   const [file, setFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [status, setStatus] = useState<Status>('idle')
@@ -42,9 +42,9 @@ export default function UploadPage(): JSX.Element {
     return () => URL.revokeObjectURL(url)
   }, [file])
 
-  function handleNicknameChange(event: ChangeEvent<HTMLInputElement>): void {
-    setNickname(event.target.value)
-    saveNickname(event.target.value)
+  function handleUploaderNameChange(event: ChangeEvent<HTMLInputElement>): void {
+    setUploaderName(event.target.value)
+    saveUploaderName(event.target.value)
   }
 
   function handleFileChange(event: ChangeEvent<HTMLInputElement>): void {
@@ -57,7 +57,7 @@ export default function UploadPage(): JSX.Element {
     if (!file) return
 
     const body = new FormData()
-    body.append('nickname', nickname)
+    body.append('uploaderName', uploaderName)
     body.append('photo', file)
 
     setStatus('sending')
@@ -86,7 +86,7 @@ export default function UploadPage(): JSX.Element {
       <form onSubmit={handleSubmit}>
         <label>
           Pseudo
-          <input value={nickname} onChange={handleNicknameChange} required maxLength={30} />
+          <input value={uploaderName} onChange={handleUploaderNameChange} required maxLength={30} />
         </label>
 
         <label>

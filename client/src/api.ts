@@ -1,7 +1,7 @@
 // Error codes returned by the API as { "error": code }.
 // Duplicated from server/src/types.ts on purpose (see the comment there): keep both in sync.
 export type ApiErrorCode =
-  | 'NICKNAME_INVALID'
+  | 'UPLOADER_NAME_INVALID'
   | 'PHOTO_MISSING'
   | 'UPLOAD_INVALID'
   | 'PHOTO_TOO_LARGE'
@@ -10,7 +10,7 @@ export type ApiErrorCode =
   | 'SERVER_ERROR'
 
 const ERROR_MESSAGES: Record<ApiErrorCode, string> = {
-  NICKNAME_INVALID: 'Indiquez un pseudo (30 caractères maximum).',
+  UPLOADER_NAME_INVALID: 'Indiquez un pseudo (30 caractères maximum).',
   PHOTO_MISSING: 'Prenez ou choisissez une photo.',
   UPLOAD_INVALID: 'Envoi invalide : une seule photo à la fois.',
   PHOTO_TOO_LARGE: 'La photo est trop lourde (10 Mo maximum).',

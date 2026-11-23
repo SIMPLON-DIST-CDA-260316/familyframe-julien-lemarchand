@@ -11,13 +11,13 @@ post {
 }
 
 body:multipart-form {
-  nickname: {{nickname}}
+  uploaderName: {{uploaderName}}
   photo: @file(fixtures/photo.jpg) @contentType(image/jpeg)
 }
 
 assert {
   res.status: eq 201
-  res.body.nickname: eq {{nickname}}
+  res.body.uploaderName: eq {{uploaderName}}
   res.body.url: contains res.cloudinary.com
   res.body.id: isString
   res.body.cloudinaryId: isUndefined

@@ -55,9 +55,9 @@ export default function FramePage(): JSX.Element {
   return (
     <main className="frame">
       <figure className="frame-latest">
-        <img src={latest.url} alt={`Envoyée par ${latest.nickname}`} />
+        <img src={latest.url} alt={`Envoyée par ${latest.uploaderName}`} />
         <figcaption>
-          {latest.nickname} · {formatDate(latest.createdAt)}
+          {latest.uploaderName} · {formatDate(latest.createdAt)}
         </figcaption>
       </figure>
 
@@ -65,8 +65,8 @@ export default function FramePage(): JSX.Element {
         <ul className="frame-thumbs">
           {others.map((photo) => (
             <li key={photo.id}>
-              <img src={photo.url} alt={`Envoyée par ${photo.nickname}`} />
-              <span>{photo.nickname}</span>
+              <img src={photo.url} alt={`Envoyée par ${photo.uploaderName}`} />
+              <span>{photo.uploaderName}</span>
             </li>
           ))}
         </ul>

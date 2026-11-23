@@ -11,15 +11,15 @@ post {
 }
 
 body:multipart-form {
-  nickname: abcdefghijklmnopqrstuvwxyz01234
+  uploaderName: abcdefghijklmnopqrstuvwxyz01234
   photo: @file(fixtures/photo.jpg) @contentType(image/jpeg)
 }
 
 assert {
   res.status: eq 400
-  res.body.error: eq NICKNAME_INVALID
+  res.body.error: eq UPLOADER_NAME_INVALID
 }
 
 docs {
-  EDGE → 400 NICKNAME_INVALID, 31 caractères pour 30 max.
+  EDGE → 400 UPLOADER_NAME_INVALID, 31 caractères pour 30 max.
 }

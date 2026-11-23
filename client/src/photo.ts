@@ -1,7 +1,7 @@
 // Duplicated from server/src/types.ts on purpose (see the comment there): keep both in sync.
 
 // A photo as sent by the API and over Socket.IO. createdAt is an ISO 8601 string.
-export type Photo = { id: string; url: string; nickname: string; createdAt: string }
+export type Photo = { id: string; url: string; uploaderName: string; createdAt: string }
 
 // Socket.IO events sent by the server.
 export type ServerToClientEvents = {
@@ -17,8 +17,8 @@ export function isPhoto(value: unknown): value is Photo {
     typeof value.id === 'string' &&
     'url' in value &&
     typeof value.url === 'string' &&
-    'nickname' in value &&
-    typeof value.nickname === 'string' &&
+    'uploaderName' in value &&
+    typeof value.uploaderName === 'string' &&
     'createdAt' in value &&
     typeof value.createdAt === 'string'
   )

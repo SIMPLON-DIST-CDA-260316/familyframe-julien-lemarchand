@@ -3,7 +3,7 @@ meta {
 }
 
 docs {
-  `POST /api/photos`, multipart : `nickname` (1 à 30 caractères après trim)
+  `POST /api/photos`, multipart : `uploaderName` (1 à 30 caractères après trim)
   et `photo` (un fichier JPEG, PNG ou WebP, 10 Mo max).
 
   Non couvert ici : le 413 `PHOTO_TOO_LARGE` demande un fichier de plus de

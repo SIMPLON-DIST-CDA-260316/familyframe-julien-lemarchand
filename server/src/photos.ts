@@ -14,7 +14,7 @@ import type {
 } from './types.js'
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10 MB
-const MAX_NICKNAME_LENGTH = 30
+const MAX_UPLOADER_NAME_LENGTH = 30
 const MAX_PHOTOS = 20 // latest photos returned by GET (pagination in J5)
 const ALLOWED_TYPES: string[] = ['image/jpeg', 'image/png', 'image/webp']
 
@@ -34,7 +34,7 @@ function toPhotoDto(row: PhotoRow): Photo {
   return {
     id: row.id,
     url: row.url,
-    nickname: row.nickname,
+    uploaderName: row.uploaderName,
     createdAt: row.createdAt.toISOString(),
   }
 }
@@ -50,10 +50,10 @@ export function createPhotosRouter(io: Server<ClientToServerEvents, ServerToClie
 
   router.post('/', upload.single('photo'), async (req, res) => {
     // req.body is filled by multer with the text fields of the form.
-    const rawNickname: unknown = req.body?.nickname
-    const nickname = typeof rawNickname === 'string' ? rawNickname.trim() : ''
-    if (nickname.length === 0 || nickname.length > MAX_NICKNAME_LENGTH) {
-      sendError(res, 400, 'NICKNAME_INVALID')
+    const rawUploaderName: unknown = req.body?.uploaderName
+    const uploaderName = typeof rawUploaderName === 'string' ? rawUploaderName.trim() : ''
+    if (uploaderName.length === 0 || uploaderName.length > MAX_UPLOADER_NAME_LENGTH) {
+      sendError(res, 400, 'UPLOADER_NAME_INVALID')
       return
     }
 
@@ -80,7 +80,7 @@ export function createPhotosRouter(io: Server<ClientToServerEvents, ServerToClie
     const image = await uploadImage(jpeg)
     let row: PhotoRow
     try {
-      row = await prisma.photo.create({ data: { ...image, nickname } })
+      row = await prisma.photo.create({ data: { ...image, uploaderName } })
     } catch (error) {
       console.error(`Photo saved on Cloudinary but not in the database: ${image.cloudinaryId}`)
       throw error

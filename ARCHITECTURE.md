@@ -45,25 +45,25 @@ Le routage est fait côté navigateur (`react-router`). En production (J2), le s
 
 ## API
 
-| Route              | Réponse                                                                          |
-| ------------------ | -------------------------------------------------------------------------------- |
-| `GET /api/health`  | `200 { "status": "ok" }` (servira de healthcheck Docker en J2)                   |
-| `GET /api/photos`  | `200 Photo[]`, les 20 plus récentes en premier                                   |
-| `POST /api/photos` | `multipart/form-data` avec `nickname` (texte) et `photo` (fichier) → `201 Photo` |
+| Route              | Réponse                                                                              |
+| ------------------ | ------------------------------------------------------------------------------------ |
+| `GET /api/health`  | `200 { "status": "ok" }` (servira de healthcheck Docker en J2)                       |
+| `GET /api/photos`  | `200 Photo[]`, les 20 plus récentes en premier                                       |
+| `POST /api/photos` | `multipart/form-data` avec `uploaderName` (texte) et `photo` (fichier) → `201 Photo` |
 
-Une `Photo` vaut `{ id, url, nickname, createdAt }` (`createdAt` en ISO 8601). L'identifiant Cloudinary reste côté serveur.
+Une `Photo` vaut `{ id, url, uploaderName, createdAt }` (`createdAt` en ISO 8601). L'identifiant Cloudinary reste côté serveur.
 
 En cas d'erreur, l'API renvoie `{ "error": code }` ; le client traduit le code en message français :
 
-| Cas                                                     | Statut | `error`              |
-| ------------------------------------------------------- | ------ | -------------------- |
-| pseudo absent, vide ou de plus de 30 caractères         | 400    | `NICKNAME_INVALID`   |
-| aucun fichier                                           | 400    | `PHOTO_MISSING`      |
-| autre erreur Multer (mauvais champ, plusieurs fichiers) | 400    | `UPLOAD_INVALID`     |
-| fichier de plus de 10 Mo                                | 413    | `PHOTO_TOO_LARGE`    |
-| type autre que JPEG, PNG ou WebP                        | 415    | `FORMAT_UNSUPPORTED` |
-| image illisible par Sharp                               | 422    | `IMAGE_UNREADABLE`   |
-| toute autre erreur (Cloudinary, base)                   | 500    | `SERVER_ERROR`       |
+| Cas                                                     | Statut | `error`                 |
+| ------------------------------------------------------- | ------ | ----------------------- |
+| pseudo absent, vide ou de plus de 30 caractères         | 400    | `UPLOADER_NAME_INVALID` |
+| aucun fichier                                           | 400    | `PHOTO_MISSING`         |
+| autre erreur Multer (mauvais champ, plusieurs fichiers) | 400    | `UPLOAD_INVALID`        |
+| fichier de plus de 10 Mo                                | 413    | `PHOTO_TOO_LARGE`       |
+| type autre que JPEG, PNG ou WebP                        | 415    | `FORMAT_UNSUPPORTED`    |
+| image illisible par Sharp                               | 422    | `IMAGE_UNREADABLE`      |
+| toute autre erreur (Cloudinary, base)                   | 500    | `SERVER_ERROR`          |
 
 ## Temps réel
 
