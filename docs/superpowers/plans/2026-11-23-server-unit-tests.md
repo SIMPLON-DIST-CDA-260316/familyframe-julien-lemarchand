@@ -5,9 +5,9 @@ spec: docs/superpowers/specs/2026-11-23-server-unit-tests-design.md
 branch: test/vitest-setup (PR A), test/photos-service (PR B), refactor/photos-service-names (PR C)
 worktree: false
 tasks_total: 3
-tasks_done: 1
-current_task: 2
-last_commit: 1acfa34
+tasks_done: 2
+current_task: 3
+last_commit: 4bf9c25
 last_updated: 2026-11-23
 ---
 
@@ -241,7 +241,7 @@ git commit -F <file>   # docs: document the unit tests
 
 ## PR B: photos service tests (branch `test/photos-service`, base `test/vitest-setup`)
 
-- [ ] `gh stack add test/photos-service` (creates the branch on top of `test/vitest-setup` and checks it out).
+- [x] `gh stack add test/photos-service` (creates the branch on top of `test/vitest-setup` and checks it out).
 
 ### Task 2: Photos service tests
 
@@ -256,7 +256,7 @@ git commit -F <file>   # docs: document the unit tests
 
 The service already exists: these are characterization tests, they pass on the first run. Step 3 proves they can fail.
 
-- [ ] **Step 1: Write the tests**
+- [x] **Step 1: Write the tests**
 
 Create `server/src/features/photos/photos.service.test.ts`:
 
@@ -396,22 +396,22 @@ describe('listLatest', () => {
 })
 ```
 
-- [ ] **Step 2: Run them**
+- [x] **Step 2: Run them**
 
 Run: `pnpm test`
 Expected: PASS, `2 passed` files, `19 passed` tests (6 error-handler + 13 service: nominal, 30 characters, 5 invalid names, missing file, GIF, sharp, Cloudinary, database, listLatest).
 
-- [ ] **Step 3: Prove a test can fail**
+- [x] **Step 3: Prove a test can fail**
 
 Temporarily change `MAX_UPLOADER_NAME_LENGTH` in `photos.service.ts` from `30` to `31`. Run `pnpm test`.
 Expected: FAIL on `rejects a name that is 31 characters long`. Revert the change (`git checkout -- server/src/features/photos/photos.service.ts`), run `pnpm test` again: PASS.
 
-- [ ] **Step 4: Run all gates**
+- [x] **Step 4: Run all gates**
 
 Run: `pnpm check && pnpm typecheck && pnpm build && pnpm test:bruno`
 Expected: green; Bruno `11 (11 Passed)`, `26/26`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add server/src/features/photos/photos.service.test.ts
@@ -420,7 +420,7 @@ git commit -F <file>   # test(server): unit test the photos service
 
 ### PR B delivery
 
-- [ ] Tick Task 2 and update the frontmatter; commit `docs: track PR B progress in the unit tests plan`.
+- [x] Tick Task 2 and update the frontmatter; commit `docs: track PR B progress in the unit tests plan`.
 
 ---
 
