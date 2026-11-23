@@ -72,7 +72,6 @@ En dev, Vite proxifie `/api` et `/socket.io` vers l'API : le front n'appelle que
 | `pnpm --filter server db:push`   | synchronise le schéma Prisma avec MongoDB |
 | `pnpm --filter server db:studio` | explorateur de données Prisma Studio      |
 
-## Workflow Git
+## Contribuer
 
-- `main` : version livrée. `develop` : branche d'intégration (par défaut).
-- Push direct interdit sur les deux : on travaille sur une branche (`feat/…`, `fix/…`, `chore/…`) et on ouvre une PR vers `develop`.
+Git flow, conventions de commit et de PR : voir [`CONTRIBUTING.md`](CONTRIBUTING.md).
