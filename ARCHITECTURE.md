@@ -98,6 +98,28 @@ Une feature par dossier (`server/src/features/photos/`), un fichier par couche :
 - `server/src/lib/` regroupe les clients techniques : Prisma (`db.ts`), Cloudinary, sharp (`image.ts`).
 - **Erreurs** : le service lève une `AppError` portant un code ; le contrôleur n'a pas de try/catch (Express 5 transmet les rejets). Une route inconnue tombe sur `errors/not-found.ts` (monté après les routes), qui lève `ROUTE_NOT_FOUND`. `errors/error-handler.ts` est le seul endroit qui écrit une réponse d'erreur, avec un statut tiré d'un `Record` exhaustif sur les codes. Une erreur de sharp devient `IMAGE_UNREADABLE` (faute de l'utilisateur) ; une erreur de Cloudinary ou de Prisma reste une 500.
 
+## Logs
+
+- Le serveur écrit **une ligne par événement sur la sortie standard**, via `server/src/lib/logger.ts` (fait maison, sans dépendance). C'est ce que `docker logs` affiche.
+- **Format** : JSON par défaut, filtrable (`{"time":"…","level":"info","event":"photo.created","photoId":"…"}`) ; `LOG_FORMAT=pretty` en dev donne `14:37:17 INFO  photo.created photoId=…`. Une `Error` est écrite avec son nom, son message et sa pile.
+- **Niveaux** : `info` < `warn` < `error` ; `LOG_LEVEL` fixe le niveau minimum écrit.
+- **Noms d'événements stables** `domaine.action` : on filtre sur le nom (`docker logs <conteneur> | grep photo.`), pas sur un texte qui change à chaque reformulation.
+- **Pas de données personnelles** : jamais le pseudo, seulement des identifiants (`photoId`, `cloudinaryId`, `socketId`) ; les chemins sans leur query string.
+- Le service photos reçoit le logger par injection ; le reste du serveur importe `logger`.
+
+| Événement                                                   | Niveau                        | Écrit par                                                 |
+| ----------------------------------------------------------- | ----------------------------- | --------------------------------------------------------- |
+| `db.connected` / `db.unreachable`                           | info / error                  | `server.ts`, ping au démarrage                            |
+| `server.started`                                            | info                          | `server.ts`                                               |
+| `socket.connected` / `socket.disconnected`                  | info                          | `server.ts`                                               |
+| `http.request`                                              | info, warn (4xx), error (5xx) | `lib/request-logger.ts`, sauf `/api/health`               |
+| `photo.created`                                             | info                          | service photos                                            |
+| `photo.unreadable`                                          | warn                          | service photos, erreur de sharp                           |
+| `photo.orphaned`                                            | error                         | service photos : image sur Cloudinary, absente de la base |
+| `server.error`                                              | error                         | `errors/error-handler.ts`, pour chaque 500                |
+| `server.stopping` / `server.stopped` / `server.stop_failed` | info / info / error           | `server.ts`, à l'arrêt                                    |
+| `process.crashed`                                           | error                         | `server.ts`, exception ou rejet non géré, puis arrêt      |
+
 ## Réseau en développement
 
 | Service       | Port | Rôle                                                 |
