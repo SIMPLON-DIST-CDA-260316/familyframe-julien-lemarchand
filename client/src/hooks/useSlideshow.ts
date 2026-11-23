@@ -10,7 +10,7 @@ export function useSlideshow(api: CarouselApi, intervalMs: number | null): void 
     if (!api || intervalMs === null) return
     const carousel = api
     const advance = (): void => {
-      // Past the oldest photo, start again from the newest.
+      // The carousel loops; with too few photos to loop, Embla stops at the oldest one.
       if (carousel.canScrollNext()) carousel.scrollNext()
       else carousel.scrollTo(0)
     }

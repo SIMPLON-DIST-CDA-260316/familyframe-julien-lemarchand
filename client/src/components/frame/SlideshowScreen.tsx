@@ -43,13 +43,13 @@ export function SlideshowScreen({
         onCurrentChange={selection.selectPhoto}
       >
         <SlideshowBottomBar isVisible={isActive} settings={settings} />
-        {settings.isStripVisible && (
-          <PhotoStrip
-            photos={photos}
-            currentId={currentPhoto.id}
-            onSelect={selection.selectPhoto}
-          />
-        )}
+        <PhotoStrip
+          // At rest the photo stands alone: the strip steps aside with the buttons.
+          isVisible={settings.isStripVisible && isActive}
+          photos={photos}
+          currentId={currentPhoto.id}
+          onSelect={selection.selectPhoto}
+        />
       </PhotoView>
       <NewPhotosBadge count={selection.newPhotoCount} onSelect={selection.showNewest} />
     </>

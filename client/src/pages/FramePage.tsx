@@ -68,7 +68,11 @@ export default function FramePage(): JSX.Element {
 
   const isSlideshow = selection.mode === 'slideshow'
   return (
-    <main className={cn(FRAME_CLASSES, isSlideshow && !isActive && 'cursor-none')}>
+    // data-idle: the slideshow's shade reads it from CSS, without one more prop down the tree.
+    <main
+      data-idle={isSlideshow && !isActive}
+      className={cn('group/frame', FRAME_CLASSES, isSlideshow && !isActive && 'cursor-none')}
+    >
       {isSlideshow ? (
         <SlideshowScreen
           photos={photos}
