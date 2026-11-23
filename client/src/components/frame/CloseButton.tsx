@@ -1,5 +1,6 @@
 import { XIcon } from 'lucide-react'
 import type { JSX } from 'react'
+import { GLASS_BUTTON_CLASSES } from '@/components/frame/controlClasses.ts'
 import { Button } from '@/components/ui/button.tsx'
 
 type CloseButtonProps = {
@@ -13,7 +14,7 @@ export function CloseButton({ onClose }: CloseButtonProps): JSX.Element {
       size="icon-sm"
       onClick={onClose}
       aria-label="Fermer le diaporama"
-      className="rounded-full text-white/80"
+      className={GLASS_BUTTON_CLASSES}
     >
       <XIcon />
     </Button>

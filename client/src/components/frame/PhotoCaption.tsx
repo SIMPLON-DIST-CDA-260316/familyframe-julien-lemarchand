@@ -19,7 +19,8 @@ function formatDate(iso: string): string {
 export function PhotoCaption({ photo }: PhotoCaptionProps): JSX.Element {
   return (
     <div className="px-10 pt-24 pb-8 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-700">
-      <p className="text-3xl font-medium tracking-tight text-white drop-shadow-md">
+      {/* Stops short of the centred transport pill: a long name wraps instead of sliding under it. */}
+      <p className="max-w-[calc(50%-6rem)] text-3xl font-medium tracking-tight text-balance text-white drop-shadow-md">
         {photo.uploaderName}
       </p>
       <p className="mt-1 text-base text-white/70 tabular-nums">{formatDate(photo.createdAt)}</p>

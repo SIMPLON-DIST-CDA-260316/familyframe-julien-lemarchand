@@ -1,8 +1,7 @@
-import { type JSX, useState } from 'react'
+import { type JSX, type ReactNode, useState } from 'react'
 import { PhotoBackdrop } from '@/components/frame/PhotoBackdrop.tsx'
 import { PhotoCaption } from '@/components/frame/PhotoCaption.tsx'
 import { PhotoSlide } from '@/components/frame/PhotoSlide.tsx'
-import { PhotoStrip } from '@/components/frame/PhotoStrip.tsx'
 import { Carousel, type CarouselApi, CarouselContent } from '@/components/ui/carousel.tsx'
 import { useCarouselArrowKeys } from '@/hooks/useCarouselArrowKeys.ts'
 import { useCarouselPhoto } from '@/hooks/useCarouselPhoto.ts'
@@ -16,18 +15,19 @@ const GLIDING_SLIDE = { duration: 45 }
 type PhotoViewProps = {
   photos: Photo[]
   currentId: string
-  isStripVisible: boolean
   // null: no automatic advance.
   autoAdvanceMs: number | null
   onCurrentChange: (id: string) => void
+  // Under the caption, inside the carousel: the ‹ › buttons need its context.
+  children: ReactNode
 }
 
 export function PhotoView({
   photos,
   currentId,
-  isStripVisible,
   autoAdvanceMs,
   onCurrentChange,
+  children,
 }: PhotoViewProps): JSX.Element {
   const [api, setApi] = useState<CarouselApi>()
   useCarouselPhoto({ api, photos, currentId, onCurrentChange })
@@ -52,13 +52,12 @@ export function PhotoView({
             />
           ))}
         </CarouselContent>
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-black/75 via-black/30 to-transparent">
+          {currentPhoto && <PhotoCaption key={currentPhoto.id} photo={currentPhoto} />}
+          {/* The bottom bar sits on top of this box: just above the strip when it is open. */}
+          <div className="relative">{children}</div>
+        </div>
       </Carousel>
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-black/75 via-black/30 to-transparent">
-        {currentPhoto && <PhotoCaption key={currentPhoto.id} photo={currentPhoto} />}
-        {isStripVisible && (
-          <PhotoStrip photos={photos} currentId={currentId} onSelect={onCurrentChange} />
-        )}
-      </div>
     </div>
   )
 }

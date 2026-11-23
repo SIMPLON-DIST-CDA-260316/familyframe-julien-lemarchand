@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import type { CarouselApi } from '@/components/ui/carousel.tsx'
+import { isOverlayOpen } from '@/hooks/useIdle.ts'
 
 export function useCarouselArrowKeys(api: CarouselApi): void {
   useEffect(() => {
@@ -8,7 +9,8 @@ export function useCarouselArrowKeys(api: CarouselApi): void {
 
     function handleKeyDown(event: KeyboardEvent): void {
       // A focused carousel already moved and prevented the default.
-      if (event.defaultPrevented) return
+      // An open menu uses the arrows itself: the photo behind it must stay put.
+      if (event.defaultPrevented || isOverlayOpen()) return
       if (event.key === 'ArrowLeft') carousel.scrollPrev()
       if (event.key === 'ArrowRight') carousel.scrollNext()
     }
