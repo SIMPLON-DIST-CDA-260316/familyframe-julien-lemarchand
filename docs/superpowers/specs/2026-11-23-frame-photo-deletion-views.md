@@ -33,6 +33,6 @@ The two trash buttons are replaced by an ellipsis button that opens an actions m
 
 - **Why:** the tile trash was invisible (opacity 0) but still tappable on touch, so a stray tap could start a deletion; and `window.confirm` blocks the whole page, frame included.
 - **Dialog outside the menu:** `PhotoActionsMenu` owns the dialog state and renders `DeletePhotoDialog` next to the menu, so closing the menu does not unmount it.
-- **Photo kept at selection:** the dialog holds the photo picked in the menu, not the current one. The slideshow can advance while the dialog stays open, and it must not delete another photo than the one chosen.
+- **Photo kept at selection:** the dialog holds the photo picked in the menu, not the current one: a safety net, so a dialog can never delete another photo than the one chosen.
 - **Dark colours:** `theme.ts` follows the system scheme, so `<html>` can be light, and Radix portals render in `body`, outside the frame's dark `<main>`. The menu and dialog content get `className="dark"`: the shadcn tokens are defined on `.dark`, which applies to the element itself.
-- **Limitation:** the frame goes idle 4 s after the last pointer or key event, even with a menu or dialog open: the pill hides and the slideshow may advance behind the dialog. Keeping the frame active would need shared state between the dialog and `useIdleControls`; not built.
+- **Frame kept active:** while a menu (`role="menu"`) or the dialog (`role="alertdialog"`) is open, `useIdleControls` postpones going idle. A DOM check rather than shared state: both portal outside the React tree of the frame, and one query is simpler to explain than a context. The pill stays shown and the slideshow does not change the photo behind the dialog.
