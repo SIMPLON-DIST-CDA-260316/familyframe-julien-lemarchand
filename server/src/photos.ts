@@ -1,10 +1,9 @@
-import type { Photo as PhotoRow } from '@prisma/client'
 import { Router } from 'express'
 import multer from 'multer'
 import type { Server } from 'socket.io'
 import { AppError } from './errors/app-error.js'
+import type { PhotoRecord, PhotosRepository } from './features/photos/photos.repository.js'
 import { uploadImage } from './lib/cloudinary.js'
-import { prisma } from './lib/db.js'
 import { toFrameJpeg } from './lib/image.js'
 import type { ClientToServerEvents, Photo, ServerToClientEvents } from './types.js'
 
@@ -20,21 +19,24 @@ const upload = multer({
 })
 
 // cloudinaryId stays on the server.
-function toPhotoDto(row: PhotoRow): Photo {
+function toPhotoDto(record: PhotoRecord): Photo {
   return {
-    id: row.id,
-    url: row.url,
-    uploaderName: row.uploaderName,
-    createdAt: row.createdAt.toISOString(),
+    id: record.id,
+    url: record.url,
+    uploaderName: record.uploaderName,
+    createdAt: record.createdAt.toISOString(),
   }
 }
 
-export function createPhotosRouter(io: Server<ClientToServerEvents, ServerToClientEvents>): Router {
+export function createPhotosRouter(
+  io: Server<ClientToServerEvents, ServerToClientEvents>,
+  repository: PhotosRepository,
+): Router {
   const router = Router()
 
   router.get('/', async (_req, res) => {
-    const rows = await prisma.photo.findMany({ orderBy: { createdAt: 'desc' }, take: MAX_PHOTOS })
-    res.json(rows.map(toPhotoDto))
+    const records = await repository.findLatest(MAX_PHOTOS)
+    res.json(records.map(toPhotoDto))
   })
 
   router.post('/', upload.single('photo'), async (req, res) => {
@@ -62,15 +64,15 @@ export function createPhotosRouter(io: Server<ClientToServerEvents, ServerToClie
 
     // Cloudinary or database errors reach the error handler as 500s.
     const image = await uploadImage(jpeg)
-    let row: PhotoRow
+    let record: PhotoRecord
     try {
-      row = await prisma.photo.create({ data: { ...image, uploaderName } })
+      record = await repository.create({ ...image, uploaderName })
     } catch (error) {
       console.error(`Photo saved on Cloudinary but not in the database: ${image.cloudinaryId}`)
       throw error
     }
 
-    const photo = toPhotoDto(row)
+    const photo = toPhotoDto(record)
     io.emit('photo:new', photo)
     res.status(201).json(photo)
   })
