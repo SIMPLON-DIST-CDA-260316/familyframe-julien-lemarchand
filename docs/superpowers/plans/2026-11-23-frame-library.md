@@ -1,14 +1,14 @@
 ---
 plan: frame-library
-status: in_progress
+status: done
 spec: docs/superpowers/specs/2026-11-23-frame-library-design.md
 branch: docs/frame-library-design (stack, see Git strategy)
 worktree: true
 tasks_total: 4
 tasks_done: 4
-current_task: 4
-last_commit: —
-last_updated: 2026-11-23
+current_task: —
+last_commit: 9a972e8
+last_updated: 2026-11-24
 ---
 
 # Frame Photo Library Implementation Plan
@@ -144,7 +144,7 @@ Message: `docs: plan the frame photo library and slideshow mode`
 Run: `gh stack init --base develop docs/frame-library-design`
 Expected: the existing branch is adopted as layer 1, based on `develop`.
 
-- [ ] **Step 3: Submit and write the PR body (controller, after review)**
+- [x] **Step 3: Submit and write the PR body (controller, after review)**
 
 Run: `gh stack submit --auto`, then `gh pr edit <N> --body-file <file>` with a French body (Pourquoi / Ce qui change / Vérifier) that links the spec and the plan.
 
@@ -888,7 +888,7 @@ On `http://localhost:5181/frame`, with at least three photos:
 9. In the library, scroll with the mouse wheel every ~20 s without moving the pointer for over a minute: no launch.
 10. In the slideshow, keep moving and send a photo (`curl` above): the badge shows, as today. ✕: no badge in the library. Send another photo: it appears first in the grid, the ring stays where it was, no badge.
 
-- [ ] **Step 13: Submit and write the PR body**
+- [x] **Step 13: Submit and write the PR body**
 
 Run: `gh stack submit --auto`, then `gh pr edit <N> --body-file <file>`. French body:
 
@@ -1468,7 +1468,7 @@ On `http://localhost:5181/frame`, click "Lancer le diaporama":
 10. Send a photo while moving: the badge shows top centre, above the top bar, and works.
 11. Reduced motion emulated: the bars appear and vanish without sliding.
 
-- [ ] **Step 11: Submit and write the PR body**
+- [x] **Step 11: Submit and write the PR body**
 
 Run: `gh stack submit --auto`, then `gh pr edit <N> --body-file <file>`. French body:
 
@@ -1501,7 +1501,7 @@ Run: `gh stack submit --auto`, then `gh pr edit <N> --body-file <file>`. French 
   - `LibraryHeader({ photoCount, layout, onLayoutChange, onStartSlideshow })`.
   - `LibraryScreen`: same four props as Task 2.
 
-- [ ] **Step 1: Create the stack layer**
+- [x] **Step 1: Create the stack layer**
 
 Run: `gh stack add feat/frame-library-list`
 Expected: `✓ Created and checked out branch "feat/frame-library-list"`
@@ -1805,7 +1805,7 @@ On `http://localhost:5181/frame`:
 8. Tab: the row button then its ⋯, for each row; focus ring visible. DevTools Accessibility: the toggle items are named "Miniatures" / "Liste" with their pressed state.
 9. Hands off for 60 s on the list: the slideshow starts on the newest photo.
 
-- [ ] **Step 10: Submit and write the PR body**
+- [x] **Step 10: Submit and write the PR body**
 
 Run: `gh stack submit --auto`, then `gh pr edit <N> --body-file <file>`. French body:
 
@@ -1830,3 +1830,8 @@ Format: `date · task/step · what the plan said · what was done · why`.
 - 2026-11-24 · Task 3 review · ArrowRight on a "Vitesse" item also moved the carousel · `useCarouselArrowKeys` skips when `isOverlayOpen()` · Minor, one line
 - 2026-11-24 · Task 3 Chrome check · "`PhotoCaption.tsx` unchanged": a long name slid under the centred pill · name `max-w-[calc(50%-6rem)] text-balance`, wraps instead · spec: the bar must not hide the name or date
 - 2026-11-24 · Task 4 review · `storeLayout` comment "the choice still holds until the page reloads" · "until the library closes" · `LibraryScreen` unmounts during the slideshow, so with blocked storage the choice ends there; the grid fallback is what the spec asks
+- 2026-11-24 · Task 4 / Step 1 · implementer runs `gh stack add feat/frame-library-list` · the controller ran it before dispatch · the branch had to exist for the brief
+- 2026-11-24 · After Task 4 (author's feedback, new layer `feat/frame-slideshow-motion`) · past the oldest photo, `useSlideshow` rewound to the newest through every photo, from the left · Embla `loop: true`: the newest comes in from the right; ‹ › stay enabled; the rewind stays as a fallback when there are too few photos to loop · "the loop must be invisible, the new photo always comes from the right"
+- 2026-11-24 · After Task 4 (author's feedback) · the strip mounted and unmounted at once, the bar above it jumped · strip kept mounted, slides up and down, its height glides (`grid-template-rows`), inert when hidden · "appears from the bottom, disappears to the bottom, softer transition"
+- 2026-11-24 · After Task 4 (author's feedback) · the strip and the bottom shade stayed at rest · both hide with the controls; FramePage sets `data-idle`, the shade reads it from CSS · "look at the photo without visual alteration"; closes Minor 7 of the per-task reviews
+- 2026-11-24 · After Task 4 (author's feedback) · the strip only scrolled by touch · `useDragScroll`: eased wheel scroll and mouse drag, a drag does not open a thumbnail · "scroll the strip, swipe with the mouse or the finger, jump to a photo far away", then "the scroll must be smooth"
