@@ -3,6 +3,7 @@ import { ContactSheet } from '@/components/frame/ContactSheet.tsx'
 import { FrameControls } from '@/components/frame/FrameControls.tsx'
 import { NewPhotosBadge } from '@/components/frame/NewPhotosBadge.tsx'
 import { PhotoView } from '@/components/frame/PhotoView.tsx'
+import { ViewToggles } from '@/components/frame/ViewToggles.tsx'
 import { useFrameSelection } from '@/hooks/useFrameSelection.ts'
 import { useIdleControls } from '@/hooks/useIdleControls.ts'
 import { usePhotoFeed } from '@/hooks/usePhotoFeed.ts'
@@ -41,14 +42,14 @@ export default function FramePage(): JSX.Element {
       ) : (
         <ContactSheet photos={photos} onSelect={selection.openPhoto} />
       )}
-      {isActive && (
-        <FrameControls
+      <FrameControls isVisible={isActive}>
+        <ViewToggles
           view={selection.view}
           isStripVisible={isStripVisible}
           onViewChange={selection.setView}
           onStripVisibleChange={setIsStripVisible}
         />
-      )}
+      </FrameControls>
       {selection.newPhotoCount > 0 && (
         <NewPhotosBadge count={selection.newPhotoCount} onSelect={selection.showNewest} />
       )}

@@ -1,56 +1,23 @@
-import { GalleryHorizontalIcon, ImageIcon, LayoutGridIcon } from 'lucide-react'
-import type { JSX } from 'react'
-import { Toggle } from '@/components/ui/toggle.tsx'
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group.tsx'
-
-export type FrameView = 'photo' | 'contact-sheet'
-
-function isFrameView(value: string): value is FrameView {
-  return value === 'photo' || value === 'contact-sheet'
-}
+import type { JSX, ReactNode } from 'react'
+import { cn } from '@/lib/utils.ts'
 
 type FrameControlsProps = {
-  view: FrameView
-  isStripVisible: boolean
-  onViewChange: (view: FrameView) => void
-  onStripVisibleChange: (isVisible: boolean) => void
+  isVisible: boolean
+  children: ReactNode
 }
 
-export function FrameControls({
-  view,
-  isStripVisible,
-  onViewChange,
-  onStripVisibleChange,
-}: FrameControlsProps): JSX.Element {
+export function FrameControls({ isVisible, children }: FrameControlsProps): JSX.Element {
   return (
-    <div className="fixed top-4 right-4 flex items-center gap-2 rounded-lg bg-background/80 p-1 backdrop-blur">
-      <ToggleGroup
-        type="single"
-        variant="outline"
-        value={view}
-        // Radix sends '' when the pressed item is clicked again: keep the current view.
-        onValueChange={(value) => {
-          if (isFrameView(value)) onViewChange(value)
-        }}
-        aria-label="Affichage"
-      >
-        <ToggleGroupItem value="photo">
-          <ImageIcon /> Photo
-        </ToggleGroupItem>
-        <ToggleGroupItem value="contact-sheet">
-          <LayoutGridIcon /> Pellicule
-        </ToggleGroupItem>
-      </ToggleGroup>
-      {view === 'photo' && (
-        <Toggle
-          variant="outline"
-          pressed={isStripVisible}
-          onPressedChange={onStripVisibleChange}
-          aria-label="Bandeau de vignettes"
-        >
-          <GalleryHorizontalIcon />
-        </Toggle>
+    <div
+      // Kept mounted so the hide can animate; inert keeps hidden buttons out of focus and clicks.
+      inert={!isVisible}
+      className={cn(
+        'fixed top-4 right-4 flex items-center gap-2 rounded-lg bg-background/80 p-1 backdrop-blur',
+        'transition-[opacity,translate] duration-300 ease-out motion-reduce:transition-none',
+        isVisible ? 'opacity-100' : 'pointer-events-none -translate-y-2 opacity-0',
       )}
+    >
+      {children}
     </div>
   )
 }
