@@ -17,10 +17,11 @@ body:multipart-form {
 
 assert {
   res.status: eq 201
-  res.body.url: endsWith .jpg
+  res.body.url: isString
 }
 
 docs {
-  NOMINAL → 201. Le serveur réencode tout en JPEG : l'URL finit par `.jpg`.
-  Cloudinary peut quand même livrer du WebP grâce à `f_auto`.
+  NOMINAL → 201, le PNG est accepté. Le réencodage en JPEG n'est pas visible
+  ici : l'URL finit toujours par `.jpg`, c'est le format de repli de
+  `f_auto`. `photos.service.test.ts` vérifie que le PNG passe par `toFrameJpeg`.
 }

@@ -33,7 +33,7 @@ Le détail des fichiers n'est pas listé ici : il change trop vite pour rester j
 4. L'image réencodée est envoyée à **Cloudinary**, dans le dossier `familyframe`.
 5. **Prisma** enregistre dans MongoDB l'URL, l'identifiant Cloudinary, le pseudo et la date.
 6. Le serveur émet un événement **Socket.IO** ; le cadre affiche la nouvelle photo sans rechargement.
-7. À l'affichage, le serveur construit deux URL Cloudinary depuis l'identifiant : la photo entière et une miniature carrée de 400 px recadrée sur le sujet (`c_fill,g_auto`). Les deux portent `f_auto,q_auto` : Cloudinary livre du WebP si le navigateur l'accepte et que c'est plus léger, sinon du JPEG. Une seule image est stockée.
+7. À l'affichage, le serveur construit deux URL Cloudinary depuis l'identifiant : la photo entière et une miniature carrée de 640 px recadrée sur le sujet (`c_fill,g_auto`). Les deux portent `f_auto,q_auto` : Cloudinary livre du WebP si le navigateur l'accepte et que c'est plus léger, sinon du JPEG. Une seule image est stockée.
 
 ## Pages
 

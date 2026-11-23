@@ -9,8 +9,8 @@ cloudinary.config({
   analytics: false,
 })
 
-// Covers a 200 CSS px cell on a 2x screen.
-const THUMBNAIL_SIZE = 400
+// Covers a contact sheet cell (up to about 320 CSS px) on a 2x screen.
+const THUMBNAIL_SIZE = 640
 
 // Decided per request: WebP when the browser takes it and it is lighter, else JPEG.
 // Compression is picked from the image content.
