@@ -487,7 +487,7 @@ git commit -F <file>   # refactor(server): clarify the photos service names
 
 ### PR C delivery
 
-- [ ] Tick Task 3 and update the frontmatter (`status: in-review`); commit `docs: track PR C progress in the unit tests plan`.
+- [x] Tick Task 3 and update the frontmatter (`status: in-review`); commit `docs: track PR C progress in the unit tests plan`.
 - [ ] `gh stack submit --auto` (pushes the three branches, opens draft PRs), then `gh pr edit` each one:
   - A: `test(server): set up Vitest and unit test the error responses`
   - B: `test(server): unit test the photos service`
@@ -501,3 +501,4 @@ git commit -F <file>   # refactor(server): clarify the photos service names
 ## Drift Log
 
 Format: `date · task/step · what the plan said · what was done · why`.
+- 2026-11-23 · final review · docs listed in Task 1 were AGENTS.md and README.md · also added `pnpm test` to the CONTRIBUTING.md push checklist and Vitest to ARCHITECTURE.md "Outillage" (commit on PR A) · the final review found the checklist contradicted the spec's gate; with no CI it is the only enforcement
