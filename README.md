@@ -6,13 +6,13 @@ Projet de formation **Concepteur Développeur d'Applications** (Simplon), axé s
 
 ## Stack
 
-| Couche | Technologies |
-| --- | --- |
-| Frontend | pnpm, React, Vite |
-| Backend | Node.js, Express, Socket.IO |
-| Données | MongoDB Atlas, Prisma |
-| Images | Multer, Sharp, Cloudinary |
-| DevOps | Docker, Docker Compose, CI (optionnelle) |
+| Couche   | Technologies                             |
+| -------- | ---------------------------------------- |
+| Frontend | pnpm, React, Vite                        |
+| Backend  | Node.js, Express, Socket.IO              |
+| Données  | MongoDB Atlas, Prisma                    |
+| Images   | Multer, Sharp, Cloudinary                |
+| DevOps   | Docker, Docker Compose, CI (optionnelle) |
 
 ## Parcours d'une photo
 

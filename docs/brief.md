@@ -193,17 +193,17 @@ La réussite du projet repose sur la qualité technique, la fiabilité, la repro
 
 ## Compétences visées
 
-| Bloc | Compétence | Niveau |
-| --- | --- | --- |
-| Transverse | C1. Planifier le travail à effectuer individuellement | 3 |
-| Transverse | C2. Contribuer au pilotage de l'organisation du travail individuel et collectif | 3 |
-| Transverse | C4. Rechercher de façon méthodique une ou des solutions au problème rencontré | 2 |
-| CDA | C1. Installer et configurer son environnement de travail en fonction du projet | 3 |
-| CDA | C2. Développer des interfaces utilisateur | 3 |
-| CDA | C3. Développer des composants métier | 3 |
-| CDA | C8. Développer des composants d'accès aux données | 3 |
-| CDA | C9. Préparer et exécuter les plans de tests | 1 |
-| CDA | C10. Préparer et documenter le déploiement d'une application | 1 |
-| CDA | C11. Contribuer à la mise en production dans une démarche DevOps | 1 |
-| DevOps | C1. Créer un environnement de développement | 1 |
-| DevOps | C4. Créer une chaîne d'intégration continue | 1 |
+| Bloc       | Compétence                                                                      | Niveau |
+| ---------- | ------------------------------------------------------------------------------- | ------ |
+| Transverse | C1. Planifier le travail à effectuer individuellement                           | 3      |
+| Transverse | C2. Contribuer au pilotage de l'organisation du travail individuel et collectif | 3      |
+| Transverse | C4. Rechercher de façon méthodique une ou des solutions au problème rencontré   | 2      |
+| CDA        | C1. Installer et configurer son environnement de travail en fonction du projet  | 3      |
+| CDA        | C2. Développer des interfaces utilisateur                                       | 3      |
+| CDA        | C3. Développer des composants métier                                            | 3      |
+| CDA        | C8. Développer des composants d'accès aux données                               | 3      |
+| CDA        | C9. Préparer et exécuter les plans de tests                                     | 1      |
+| CDA        | C10. Préparer et documenter le déploiement d'une application                    | 1      |
+| CDA        | C11. Contribuer à la mise en production dans une démarche DevOps                | 1      |
+| DevOps     | C1. Créer un environnement de développement                                     | 1      |
+| DevOps     | C4. Créer une chaîne d'intégration continue                                     | 1      |
