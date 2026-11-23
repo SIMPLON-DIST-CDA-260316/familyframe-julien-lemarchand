@@ -23,7 +23,7 @@ function storeLayout(layout: LibraryLayout): void {
   try {
     localStorage.setItem(STORAGE_KEY, layout)
   } catch {
-    // Not remembered on this device: the choice still holds until the page reloads.
+    // Not remembered on this device: the choice holds until the library closes.
   }
 }
 
