@@ -33,6 +33,15 @@ Voir [`CONTRIBUTING.md`](CONTRIBUTING.md) : git flow, Conventional Commits (en a
 - **Commits atomiques** : une préoccupation par commit, chaque commit passe `pnpm check` et `pnpm typecheck`. Commiter au fil de l'eau, pas en fin de tâche.
 - Jamais de push direct sur `main` ou `develop` (protégées) : branche + PR vers `develop`.
 
+## Docs de travail
+
+Specs, plans et notes produits avec l'IA sont versionnés, nommés `YYYY-MM-DD-<sujet>.md` :
+
+- `docs/superpowers/specs/` : conception validée avant d'implémenter ;
+- `docs/superpowers/plans/` : plan d'implémentation découpé en étapes.
+
+Ils servent de trace des décisions et de l'usage de l'IA pour l'analyse réflexive du brief. Un doc est daté du jour de sa création et n'est pas réécrit après coup : une décision qui change donne un nouveau doc.
+
 ## Règles de conduite
 
 1. **Ambiguïté → demander.** Ne pas deviner une intention ; poser la question avant d'écrire du code.
