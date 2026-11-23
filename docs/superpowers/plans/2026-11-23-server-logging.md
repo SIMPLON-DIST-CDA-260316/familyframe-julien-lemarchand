@@ -1,13 +1,13 @@
 ---
 plan: server-logging
-status: draft
+status: done
 spec: docs/superpowers/specs/2026-11-23-server-logging-design.md
 branch: feat/server-logger (PR A), feat/server-event-logs (PR B), fix/server-logging-guards (PR C)
 worktree: false
 tasks_total: 4
-tasks_done: 0
+tasks_done: 4
 current_task: —
-last_commit: —
+last_commit: 37e914a
 last_updated: 2026-11-23
 ---
 
@@ -115,7 +115,7 @@ last_updated: 2026-11-23
   export const logger: Logger
   ```
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `server/src/lib/logger.test.ts`:
 
@@ -224,12 +224,12 @@ describe('readLogSettings', () => {
 })
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `pnpm test`
 Expected: FAIL, `logger.test.ts` cannot resolve `./logger.js`.
 
-- [ ] **Step 3: Write the logger**
+- [x] **Step 3: Write the logger**
 
 Create `server/src/lib/logger.ts`:
 
@@ -335,12 +335,12 @@ export const logger: Logger = createLogger({
 })
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `pnpm test`
 Expected: PASS, 30 tests (21 existing + 9 new).
 
-- [ ] **Step 5: Check and commit the logger**
+- [x] **Step 5: Check and commit the logger**
 
 Run: `pnpm check && pnpm typecheck` (if Biome reformats, `pnpm check:fix` then `pnpm check`).
 
@@ -351,7 +351,7 @@ git commit -F <message-file>
 
 Message: `feat(server): add a structured logger` + attribution lines.
 
-- [ ] **Step 6: Document the two variables**
+- [x] **Step 6: Document the two variables**
 
 Append to the example file without reading it (the dotenv guard blocks reader commands on it):
 
@@ -368,7 +368,7 @@ In `ARCHITECTURE.md`, section `## Configuration`, insert after the first bullet 
 - `LOG_LEVEL` (`info`, `warn`, `error` ; défaut `info`) et `LOG_FORMAT` (`json`, `pretty` ; défaut `json`) sont facultatives et lues dans `server/src/lib/logger.ts`, pas dans `config.ts` : les tests importent le logger sans fournir les secrets. Une valeur inconnue empêche le démarrage.
 ```
 
-- [ ] **Step 7: Run the task gates and commit the docs**
+- [x] **Step 7: Run the task gates and commit the docs**
 
 Run: `pnpm check && pnpm typecheck && pnpm test && pnpm build && pnpm test:bruno`
 Expected: all green; Bruno unchanged (nothing uses the logger yet).
@@ -394,7 +394,7 @@ Message: `docs: document the log settings` + attribution lines.
 - Consumes: `import { type Logger, logger } from '../../lib/logger.js'` (Task 1).
 - Produces: `PhotosServiceDeps` gains `logger: Logger`. `createPhotosService({ repository, toFrameJpeg, uploadImage, logger })`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Replace `server/src/features/photos/photos.service.test.ts` with:
 
@@ -562,12 +562,12 @@ describe('listLatest', () => {
 })
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `pnpm test`
 Expected: FAIL on `logs the created photo…`, `…logs the sharp error`, `logs the orphaned Cloudinary image…` (logger never called). `pnpm typecheck` may also complain that `logger` is not in `PhotosServiceDeps` until Step 3.
 
-- [ ] **Step 3: Log from the service**
+- [x] **Step 3: Log from the service**
 
 Replace `server/src/features/photos/photos.service.ts` with (the inner helpers move to module level to keep the factory under 30 lines):
 
@@ -681,12 +681,12 @@ In `ARCHITECTURE.md`, section `## Couches du backend`, update the factory exampl
 - Les dépendances sont passées par des fonctions-fabriques (`createPhotosService({ repository, toFrameJpeg, uploadImage, logger })`), assemblées dans `app.ts` : un test peut fournir de fausses implémentations.
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `pnpm test`
 Expected: PASS, 31 tests (30 + the new `logs the created photo…`).
 
-- [ ] **Step 5: Run the task gates and commit**
+- [x] **Step 5: Run the task gates and commit**
 
 Run: `pnpm check && pnpm typecheck && pnpm build`, wait ~3 s for the API to reload, then `pnpm test:bruno`.
 Expected: all green, Bruno unchanged.
@@ -715,7 +715,7 @@ Message: `feat(server): log photo events from the service` + attribution lines.
 
 No unit test (spec: Express plumbing and process lifecycle). The gates and the manual check below cover them.
 
-- [ ] **Step 1: Write the request logger**
+- [x] **Step 1: Write the request logger**
 
 Create `server/src/lib/request-logger.ts`:
 
@@ -780,7 +780,7 @@ git commit -F <message-file>
 
 Message: `feat(server): log each finished HTTP request` + attribution lines.
 
-- [ ] **Step 2: Log server errors and the process lifecycle**
+- [x] **Step 2: Log server errors and the process lifecycle**
 
 In `server/src/errors/error-handler.ts`, add `import { logger } from '../lib/logger.js'` and replace `errorHandler` with:
 
@@ -876,7 +876,7 @@ git commit -F <message-file>
 
 Message: `feat(server): log server errors and the process lifecycle` + attribution lines.
 
-- [ ] **Step 3: Describe the logs**
+- [x] **Step 3: Describe the logs**
 
 In `ARCHITECTURE.md`, insert a new section right before `## Réseau en développement`:
 
@@ -914,7 +914,7 @@ git commit -F <message-file>
 
 Message: `docs: describe the server logs` + attribution lines.
 
-- [ ] **Step 4: Manual check (controller or author, not the implementer)**
+- [x] **Step 4: Manual check (controller or author, not the implementer)**
 
 The implementer cannot see the running API's output. After the task review, in a terminal running `pnpm dev` with `LOG_FORMAT=pretty`: one upload from the client, one unknown route (`/api/nope`), `Ctrl+C`. Expected lines: `db.connected`, `server.started`, `socket.connected`, `http.request` (201 info, 404 warn), `photo.created`, `server.stopping`, `server.stopped`. Repeat once with `LOG_FORMAT=json`. Note in the Drift Log any line lost at exit (Windows pipes may drop the last write before `process.exit`).
 
@@ -933,7 +933,7 @@ The implementer cannot see the running API's output. After the task review, in a
 - Consumes: Tasks 1-3 (no `console` left in `server/src`).
 - Produces: nothing new.
 
-- [ ] **Step 1: Forbid console in the server**
+- [x] **Step 1: Forbid console in the server**
 
 In `biome.json`, add a top-level `overrides` key after `"linter"`:
 
@@ -975,7 +975,7 @@ git commit -F <message-file>
 
 Message: `chore: forbid console in the server code` + attribution lines.
 
-- [ ] **Step 2: Write the failing Bruno request**
+- [x] **Step 2: Write the failing Bruno request**
 
 Create `server/bruno/photos/create/09-edge-json-malforme.bru`:
 
@@ -1013,14 +1013,14 @@ docs {
 Run: `pnpm test:bruno`
 Expected: FAIL on `Edge - JSON malformé` only, status 500 (the JSON parser throws a `SyntaxError` the error handler does not know).
 
-- [ ] **Step 3: Remove the JSON parser**
+- [x] **Step 3: Remove the JSON parser**
 
 In `server/src/app.ts`, delete the line `app.use(express.json())`. The `express` default import stays (it builds the app).
 
 Wait ~3 s for the API to reload, then run: `pnpm test:bruno`
 Expected: PASS, every request including `Edge - JSON malformé` (400 `UPLOADER_NAME_INVALID`: the controller reads `req.body?.uploaderName`, undefined without a parser).
 
-- [ ] **Step 4: Run the task gates and commit**
+- [x] **Step 4: Run the task gates and commit**
 
 Run: `pnpm check && pnpm typecheck && pnpm test && pnpm build`
 Expected: all green.
@@ -1037,3 +1037,12 @@ Message: `fix(server): stop parsing JSON bodies no route reads` + attribution li
 ## Drift Log
 
 Format: `date · task/step · what the plan said · what was done · why`.
+
+- 2026-11-23 · Task 1 / Step 7 · `pnpm test:bruno` all green · 10/11: `photos/create/01-nominal-jpeg` failed with a 401 on the delivery-URL assertion · Cloudinary "Strict transformations" was turned on while develop still served unsigned URLs; the logger was not imported at runtime yet, so the failure was not ours. It went away after the rebase below.
+- 2026-11-23 · between Tasks 3 and 4 · stack based on develop 933965e · `gh stack rebase` onto develop a5c48c5 (#30, signed Cloudinary URLs); no conflicts, gates green, Bruno 11/11 · another session merged #30 and asked for the rebase. Task commits were renamed: logger 978e43a, docs a512d89, service f2f45b2, request d56faa9, lifecycle 92872c6, docs fc1c9d8.
+- 2026-11-23 · Task 3 / Step 4 · manual check of every line in pretty and JSON · partial check by the controller on a second instance (port 3001, `LOG_FORMAT=pretty`): db.connected, server.started, http.request (404 warn, 200, 201, 422 warn), photo.created, photo.unreadable seen; `/api/health` skipped; query string stripped · SIGINT cannot be sent to a Node process from the agent's shell on Windows. Still to check by the author: socket.connected / socket.disconnected, server.stopping / server.stopped on Ctrl+C, one run with `LOG_FORMAT=json`. Step left unchecked.
+- 2026-11-23 · Task 4 / Step 3 · "every request" · Bruno 12/12 (the 11 existing requests + `09-edge-json-malforme`) · the count in the spec (11) predates the new request.
+- 2026-11-23 · Tasks 1-4 · commits end with the session's attribution lines · implementer commits carry `Co-Authored-By: Claude Haiku 4.5` (the model that wrote them) · the PRs are squash-merged, so the squash messages carry the final attribution.
+- 2026-11-23 · final review · — · Minor findings deferred (not fixed in this stack): double Ctrl+C runs `shutdown` twice (pre-existing); data keys `time`/`level`/`event` could override the fixed fields; `JSON.stringify` throws on circular or BigInt data; errors from libraries (Prisma, Cloudinary) are logged as received and may echo their inputs; `finish` does not fire on an aborted request; a well-formed JSON POST now answers `UPLOADER_NAME_INVALID` instead of `PHOTO_MISSING` (same 400) · out of the spec's scope; left for the author to triage.
+- 2026-11-23 · after the final review · stack based on develop a5c48c5; catalog without deletion · rebased onto develop b225a39 (#38, photo deletion). Conflicts in `photos.service.ts`, its test, `app.ts` and ARCHITECTURE resolved by the controller: `deleteImage` and `logger` both injected; the `console.error` of `deletePhoto` became `photo.orphaned` (same meaning: an image on Cloudinary with no record), helper `deleteStoredImage` at module level; new event `photo.deleted` (info, `photoId`, `cloudinaryId`), mirroring `photo.created`; the #38 tests moved from a `console` spy to the logger fake, plus one test for `photo.deleted`. ARCHITECTURE catalog updated in its own commit on PR B · #38 added a `console.error` that the `noConsole` rule of PR C would have rejected after merge. 39 unit tests.
+- 2026-11-23 · Task 3 / Step 4 · manual check of every line · completed by the author. Under `pnpm dev` (pretty, then JSON): socket.connected / socket.disconnected (reasons `client namespace disconnect`, `transport close`, `ping timeout`), http.request (304, 201), photo.created and server.stopping seen, but **server.stopped missing**. With node run directly (no pnpm, no tsx watch), Ctrl+C prints server.stopping then server.stopped · on Windows, Ctrl+C reaches pnpm, tsx watch and node at once; pnpm returns the prompt before node finishes, so its last lines are not shown. The code is fine: in Docker, node runs alone and receives the SIGTERM of `docker stop`. No code change; step checked.
