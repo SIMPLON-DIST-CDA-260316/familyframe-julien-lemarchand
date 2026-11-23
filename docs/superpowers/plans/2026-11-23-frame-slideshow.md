@@ -516,3 +516,5 @@ Run: `gh stack submit --auto`, then `gh pr edit <N> --body-file <file>` (French:
 ## Drift Log
 
 Format: `date · task/step · what the plan said · what was done · why`.
+- 2026-11-23 · Task 3 review · the interval runs from the last tick · it restarts on Embla's `reInit`, fired when a photo arrives · otherwise a photo arriving just before a tick left the screen after a few seconds; user approved; verified an arrival at 4.0 s → next advance at 14.1 s
+- 2026-11-23 · Task 3 final review · rewinding from the oldest to the newest glides across every slide · kept · acceptable with 20 photos at most
