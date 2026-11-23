@@ -87,6 +87,15 @@ describe('createPhoto', () => {
     expect(deps.toFrameJpeg).not.toHaveBeenCalled()
   })
 
+  it.each(['image/png', 'image/webp'])('accepts %s', async (mimetype) => {
+    const deps = makeDeps()
+    const file: UploadedFile = { buffer: Buffer.from('image'), mimetype }
+
+    await createPhotosService(deps).createPhoto({ uploaderName: 'Mamie', file })
+
+    expect(deps.toFrameJpeg).toHaveBeenCalledWith(file.buffer)
+  })
+
   it('turns an image sharp cannot read into IMAGE_UNREADABLE', async () => {
     const deps = makeDeps()
     deps.toFrameJpeg.mockRejectedValue(new Error('Input buffer contains unsupported image format'))
