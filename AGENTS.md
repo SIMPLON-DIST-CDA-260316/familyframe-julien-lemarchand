@@ -25,6 +25,7 @@ Run from the repo root with `pnpm <script>`. Source of truth, the root package.j
 
 - **Atomic commits**, made as you go: one concern each, each passing `pnpm check` and `pnpm typecheck`.
 - **API change → Bruno**: a new or changed endpoint updates `server/bruno/<resource>/<endpoint>/` in the same commit; `pnpm test:bruno` needs the API running.
+- **Business rule change → unit test**: a rule changed in a service (or in `toErrorResponse`) updates its colocated `*.test.ts` in the same commit; `pnpm test` runs them, no API needed.
 - **No "done" without proof**: run the relevant check and quote its output.
 - **No new dependency without approval**: check what is installed first.
 - **Code rules** (comments, naming, size limits, logging) live in `.claude/rules/`: read them before editing `src/`.

@@ -24,6 +24,13 @@ function toErrorCode(error: unknown): ApiErrorCode {
   return 'SERVER_ERROR'
 }
 
+export type ErrorResponse = { status: number; body: ApiError }
+
+export function toErrorResponse(error: unknown): ErrorResponse {
+  const code = toErrorCode(error)
+  return { status: HTTP_STATUS_BY_CODE[code], body: { error: code } }
+}
+
 // Express spots an error handler by its 4 parameters.
 export function errorHandler(
   error: unknown,
@@ -31,10 +38,9 @@ export function errorHandler(
   res: Response,
   _next: NextFunction,
 ): void {
-  const code = toErrorCode(error)
-  if (code === 'SERVER_ERROR') {
+  const { status, body } = toErrorResponse(error)
+  if (status === HTTP_STATUS_BY_CODE.SERVER_ERROR) {
     console.error(error)
   }
-  const body: ApiError = { error: code }
-  res.status(HTTP_STATUS_BY_CODE[code]).json(body)
+  res.status(status).json(body)
 }
