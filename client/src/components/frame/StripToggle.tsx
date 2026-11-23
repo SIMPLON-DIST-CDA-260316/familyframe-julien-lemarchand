@@ -1,6 +1,6 @@
 import { GalleryHorizontalIcon } from 'lucide-react'
 import type { JSX } from 'react'
-import { PILL_TOGGLE_CLASSES } from '@/components/frame/pillToggleClasses.ts'
+import { GLASS_BUTTON_CLASSES } from '@/components/frame/controlClasses.ts'
 import { Toggle } from '@/components/ui/toggle.tsx'
 
 type StripToggleProps = {
@@ -19,7 +19,7 @@ export function StripToggle({
       aria-label="Bandeau de vignettes"
       // An icon alone is a riddle: the tooltip names it.
       title="Vignettes"
-      className={PILL_TOGGLE_CLASSES}
+      className={GLASS_BUTTON_CLASSES}
     >
       <GalleryHorizontalIcon />
     </Toggle>

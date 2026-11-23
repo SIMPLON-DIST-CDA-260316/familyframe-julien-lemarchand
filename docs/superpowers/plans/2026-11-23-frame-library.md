@@ -929,12 +929,12 @@ Run: `gh stack submit --auto`, then `gh pr edit <N> --body-file <file>`. French 
   - `PhotoView({ photos, currentId, autoAdvanceMs, onCurrentChange, children: ReactNode })`: `isStripVisible` removed.
   - `SlideshowScreen`: same five props as Task 2.
 
-- [ ] **Step 1: Create the stack layer**
+- [x] **Step 1: Create the stack layer**
 
 Run: `gh stack add feat/frame-slideshow-layout`
 Expected: `✓ Created and checked out branch "feat/frame-slideshow-layout"`
 
-- [ ] **Step 2: Let `PhotoActionsMenu` take extra items**
+- [x] **Step 2: Let `PhotoActionsMenu` take extra items**
 
 In `client/src/components/frame/PhotoActionsMenu.tsx`, replace
 
@@ -1004,7 +1004,7 @@ git commit -F <scratchpad>/commit-actions-children.txt
 
 Message: `refactor(client): let the photo actions menu take extra items`
 
-- [ ] **Step 3: Turn the pill into bars: `ControlsBar` and the class strings**
+- [x] **Step 3: Turn the pill into bars: `ControlsBar` and the class strings**
 
 Run: `git mv client/src/components/frame/FrameControls.tsx client/src/components/frame/ControlsBar.tsx`
 Run: `git mv client/src/components/frame/pillToggleClasses.ts client/src/components/frame/controlClasses.ts`
@@ -1127,7 +1127,7 @@ export function CloseButton({ onClose }: CloseButtonProps): JSX.Element {
 
 `size-11` and `rounded-full` in the class strings override the variants' `size-7` and `rounded-[…]` (`cn` merges Tailwind conflicts, the last one wins).
 
-- [ ] **Step 4: Write the ⋯ menu with its "Vitesse" submenu**
+- [x] **Step 4: Write the ⋯ menu with its "Vitesse" submenu**
 
 Create `client/src/components/frame/SlideshowMenu.tsx`:
 
@@ -1193,7 +1193,7 @@ export function SlideshowMenu({
 }
 ```
 
-- [ ] **Step 5: Write the two bars**
+- [x] **Step 5: Write the two bars**
 
 Create `client/src/components/frame/SlideshowTopBar.tsx`:
 
@@ -1296,7 +1296,7 @@ export function SlideshowBottomBar({ isVisible, settings }: SlideshowBottomBarPr
 
 `static` overrides the generated `absolute`; the generated `-left-12` / `-right-12` then have no effect. The French `aria-label` replaces the generated English `sr-only` text as the accessible name.
 
-- [ ] **Step 6: Give `PhotoView` a slot inside the carousel**
+- [x] **Step 6: Give `PhotoView` a slot inside the carousel**
 
 Replace the whole content of `client/src/components/frame/PhotoView.tsx`:
 
@@ -1368,7 +1368,7 @@ export function PhotoView({
 
 The overlay is positioned against the `<Carousel>` root (`relative`, as tall as its `h-svh` slides), so it still sits at the bottom of the screen.
 
-- [ ] **Step 7: Rewrite `SlideshowScreen` with the bars, delete the pill parts**
+- [x] **Step 7: Rewrite `SlideshowScreen` with the bars, delete the pill parts**
 
 Replace the whole content of `client/src/components/frame/SlideshowScreen.tsx`:
 
@@ -1438,12 +1438,12 @@ Run: `git rm client/src/components/frame/PhotoControls.tsx client/src/components
 Run: `git grep -n -E "FrameControls|pillToggleClasses|PILL_TOGGLE_CLASSES|PhotoControls|SlideshowControls|ControlsDivider" -- client/src`
 Expected: no output (exit code 1).
 
-- [ ] **Step 8: Check, typecheck, build**
+- [x] **Step 8: Check, typecheck, build**
 
 Run: `pnpm check`, then `pnpm typecheck`, then `pnpm build`
 Expected: Biome `No fixes applied.`, `client typecheck: Done`, Vite `✓ built in …`.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add client/src/components/frame/ControlsBar.tsx client/src/components/frame/controlClasses.ts client/src/components/frame/StripToggle.tsx client/src/components/frame/CloseButton.tsx client/src/components/frame/SlideshowMenu.tsx client/src/components/frame/SlideshowTopBar.tsx client/src/components/frame/SlideshowBottomBar.tsx client/src/components/frame/PhotoView.tsx client/src/components/frame/SlideshowScreen.tsx
@@ -1822,3 +1822,6 @@ Format: `date · task/step · what the plan said · what was done · why`.
 
 - 2026-11-23 · Task 2/Step 1 · create the layer with `gh stack add feat/frame-library-mode` · not run by the Task 2 implementer: the branch already existed and was checked out by the controller · layer already created, step left unchecked for the controller to confirm.
 - 2026-11-23 · Task 2 review · `useFrameSelection(photos, isActive)`: an unattended arrival replaced a paused photo (directly, or through the idle jump 4 s after the badge) · `useFrameSelection(photos, isActive || !settings.isPlaying)`, Task 2 block amended · spec says a paused slideshow "stays paused on its photo"; author chose "stay on the photo" (badge raised) over "jump to the new one"
+- 2026-11-23 · Task 3/Step 1 · create the layer with `gh stack add feat/frame-slideshow-layout` · not run by the Task 3 implementer: the branch was created and checked out by the controller · ticked only.
+- 2026-11-23 · Task 3/Steps 10-11 · manual Chrome check and submit · not done by the Task 3 implementer: left to the controller (no dev server started, no gh stack/push) · steps left unchecked.
+- 2026-11-23 · Task 3/Step 9 · files as written in the brief · Biome (`check:fix`) joined the `<ControlsBar edge="top" ...>` opening tag in `SlideshowTopBar.tsx` onto one line · formatter only, no behaviour change.
