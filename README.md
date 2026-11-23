@@ -41,15 +41,15 @@ Depuis un smartphone sur le même réseau : `http://<ip-du-pc>:5180`.
 
 ### Scripts racine
 
-| Script                           | Rôle                                      |
-| -------------------------------- | ----------------------------------------- |
-| `pnpm dev`                       | client + serveur en mode watch            |
-| `pnpm build`                     | build des deux packages                   |
-| `pnpm typecheck`                 | vérification TypeScript                   |
-| `pnpm check` / `pnpm check:fix`  | lint + format + tri des imports (Biome)   |
-| `pnpm test:hooks`                | tests des hooks Claude Code               |
-| `pnpm --filter server db:push`   | synchronise le schéma Prisma avec MongoDB |
-| `pnpm --filter server db:studio` | explorateur de données Prisma Studio      |
+| Script                          | Rôle                                      |
+| ------------------------------- | ----------------------------------------- |
+| `pnpm dev`                      | client + serveur en mode watch            |
+| `pnpm build`                    | build des deux packages                   |
+| `pnpm typecheck`                | vérification TypeScript                   |
+| `pnpm check` / `pnpm check:fix` | lint + format + tri des imports (Biome)   |
+| `pnpm test:hooks`               | tests des hooks Claude Code               |
+| `pnpm db:push`                  | synchronise le schéma Prisma avec MongoDB |
+| `pnpm db:studio`                | explorateur de données Prisma Studio      |
 
 ## Contribuer
 
