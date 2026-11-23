@@ -49,6 +49,7 @@ Depuis un smartphone sur le même réseau : `http://<ip-du-pc>:5180` (le pare-fe
 | `pnpm build`                    | build des deux packages                   |
 | `pnpm typecheck`                | vérification TypeScript                   |
 | `pnpm check` / `pnpm check:fix` | lint + format + tri des imports (Biome)   |
+| `pnpm test`                     | tests unitaires du serveur (Vitest)       |
 | `pnpm test:hooks`               | tests des hooks Claude Code               |
 | `pnpm test:bruno`               | requêtes Bruno contre l'API lancée        |
 | `pnpm db:push`                  | synchronise le schéma Prisma avec MongoDB |
