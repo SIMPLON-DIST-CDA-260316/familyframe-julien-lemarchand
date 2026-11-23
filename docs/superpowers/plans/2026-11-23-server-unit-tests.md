@@ -1,13 +1,13 @@
 ---
 plan: server-unit-tests
-status: in-progress
+status: in-review
 spec: docs/superpowers/specs/2026-11-23-server-unit-tests-design.md
 branch: test/vitest-setup (PR A), test/photos-service (PR B), refactor/photos-service-names (PR C)
 worktree: false
 tasks_total: 3
-tasks_done: 2
-current_task: 3
-last_commit: 4bf9c25
+tasks_done: 3
+current_task: —
+last_commit: 8004ec0
 last_updated: 2026-11-23
 ---
 
@@ -426,7 +426,7 @@ git commit -F <file>   # test(server): unit test the photos service
 
 ## PR C: readability fixes (branch `refactor/photos-service-names`, base `test/photos-service`)
 
-- [ ] `gh stack add refactor/photos-service-names`.
+- [x] `gh stack add refactor/photos-service-names`.
 
 ### Task 3: Clarify the photos service names
 
@@ -439,11 +439,11 @@ git commit -F <file>   # test(server): unit test the photos service
 - Consumes: the service as it is; `photos.service.test.ts` from Task 2, which must pass **unmodified**.
 - Produces: same exports, same behavior. Private names change: `checkFile` → `parseFile`, inner `toJpeg` → `convertToFrameJpeg`.
 
-- [ ] **Step 1: Rename `checkFile` to `parseFile`**
+- [x] **Step 1: Rename `checkFile` to `parseFile`**
 
 In `server/src/features/photos/photos.service.ts`, rename the function `checkFile` to `parseFile` (declaration only for now; the call site changes in Step 3).
 
-- [ ] **Step 2: Rename the inner `toJpeg` to `convertToFrameJpeg`**
+- [x] **Step 2: Rename the inner `toJpeg` to `convertToFrameJpeg`**
 
 ```ts
   async function convertToFrameJpeg(input: Buffer): Promise<Buffer> {
@@ -455,7 +455,7 @@ In `server/src/features/photos/photos.service.ts`, rename the function `checkFil
   }
 ```
 
-- [ ] **Step 3: Give the file check its own line**
+- [x] **Step 3: Give the file check its own line**
 
 Replace the first lines of `createPhoto`:
 
@@ -472,13 +472,13 @@ with:
     const jpeg = await convertToFrameJpeg(validFile.buffer)
 ```
 
-- [ ] **Step 4: Run all gates**
+- [x] **Step 4: Run all gates**
 
 Run: `git diff --stat -- server/src/features/photos/photos.service.test.ts` → expected: empty (tests untouched).
 Run: `pnpm test && pnpm check && pnpm typecheck && pnpm build && pnpm test:bruno`
 Expected: Vitest `19 passed`; green; Bruno `11 (11 Passed)`, `26/26`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add server/src/features/photos/photos.service.ts
