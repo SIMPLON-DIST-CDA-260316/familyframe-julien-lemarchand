@@ -18,6 +18,13 @@ describe('toErrorResponse', () => {
     })
   })
 
+  it('answers an unknown photo with 404', () => {
+    expect(toErrorResponse(new AppError('PHOTO_NOT_FOUND'))).toEqual({
+      status: 404,
+      body: { error: 'PHOTO_NOT_FOUND' },
+    })
+  })
+
   it('maps a file over the size limit to PHOTO_TOO_LARGE', () => {
     expect(toErrorResponse(new multer.MulterError('LIMIT_FILE_SIZE'))).toEqual({
       status: 413,

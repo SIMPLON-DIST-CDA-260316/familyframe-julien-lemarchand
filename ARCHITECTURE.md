@@ -46,11 +46,12 @@ Le routage est fait côté navigateur (`react-router`). En production (J2), le s
 
 ## API
 
-| Route              | Réponse                                                                              |
-| ------------------ | ------------------------------------------------------------------------------------ |
-| `GET /api/health`  | `200 { "status": "ok" }` (servira de healthcheck Docker en J2)                       |
-| `GET /api/photos`  | `200 Photo[]`, les 20 plus récentes en premier                                       |
-| `POST /api/photos` | `multipart/form-data` avec `uploaderName` (texte) et `photo` (fichier) → `201 Photo` |
+| Route                    | Réponse                                                                                  |
+| ------------------------ | ---------------------------------------------------------------------------------------- |
+| `GET /api/health`        | `200 { "status": "ok" }` (servira de healthcheck Docker en J2)                           |
+| `GET /api/photos`        | `200 Photo[]`, les 20 plus récentes en premier                                           |
+| `POST /api/photos`       | `multipart/form-data` avec `uploaderName` (texte) et `photo` (fichier) → `201 Photo`     |
+| `DELETE /api/photos/:id` | `204` sans corps ; supprime l'enregistrement puis l'image Cloudinary (cache CDN compris) |
 
 Une `Photo` vaut `{ id, url, thumbnailUrl, uploaderName, createdAt }` (`createdAt` en ISO 8601). L'identifiant Cloudinary reste côté serveur : le client reçoit des URL prêtes à l'emploi.
 
@@ -62,6 +63,7 @@ En cas d'erreur, l'API renvoie `{ "error": code }` ; le client traduit le code e
 | aucun fichier                                           | 400    | `PHOTO_MISSING`         |
 | autre erreur Multer (mauvais champ, plusieurs fichiers) | 400    | `UPLOAD_INVALID`        |
 | route inconnue                                          | 404    | `ROUTE_NOT_FOUND`       |
+| photo inconnue, ou id qui n'est pas un ObjectId         | 404    | `PHOTO_NOT_FOUND`       |
 | fichier de plus de 10 Mo                                | 413    | `PHOTO_TOO_LARGE`       |
 | type autre que JPEG, PNG ou WebP                        | 415    | `FORMAT_UNSUPPORTED`    |
 | image illisible par Sharp                               | 422    | `IMAGE_UNREADABLE`      |
@@ -69,7 +71,7 @@ En cas d'erreur, l'API renvoie `{ "error": code }` ; le client traduit le code e
 
 ## Temps réel
 
-- Un seul événement, du serveur vers les clients : `photo:new`, avec la `Photo` créée, diffusé à tous (`io.emit`).
+- Deux événements, du serveur vers les clients, diffusés à tous (`io.emit`) : `photo:new` avec la `Photo` créée, `photo:deleted` avec l'id de la photo supprimée.
 - Le cadre recharge la liste à chaque connexion Socket.IO, reconnexions comprises : une photo envoyée pendant une coupure n'est pas perdue.
 - Les types partagés (`Photo`, codes d'erreur, événements) sont dupliqués entre `server/src/types.ts` et `client/src` : un package commun compliquerait les builds Docker.
 

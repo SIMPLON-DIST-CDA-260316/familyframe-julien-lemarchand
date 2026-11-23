@@ -1,0 +1,20 @@
+meta {
+  name: Edge - photo déjà supprimée
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{baseUrl}}/api/photos/{{createdPhotoId}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq PHOTO_NOT_FOUND
+}
+
+docs {
+  EDGE → 404 `PHOTO_NOT_FOUND` : le même id, une seconde fois.
+}

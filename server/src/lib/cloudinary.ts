@@ -27,6 +27,11 @@ export async function uploadImage(jpeg: Buffer): Promise<UploadedImage> {
   return { url: result.secure_url, cloudinaryId: result.public_id }
 }
 
+// invalidate: the CDN would otherwise keep serving the cached derived images.
+export async function deleteImage(cloudinaryId: string): Promise<void> {
+  await cloudinary.uploader.destroy(cloudinaryId, { invalidate: true })
+}
+
 // The .jpg extension is the fallback format: f_auto overrides it when WebP wins.
 // Signed: with strict transformations on, Cloudinary refuses any other transformation,
 // so nobody can spend our quota by editing the URL.

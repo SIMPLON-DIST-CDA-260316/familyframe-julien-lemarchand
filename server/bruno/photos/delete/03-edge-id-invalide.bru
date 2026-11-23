@@ -1,0 +1,21 @@
+meta {
+  name: Edge - id qui n'est pas un ObjectId
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{baseUrl}}/api/photos/pas-un-id
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq PHOTO_NOT_FOUND
+}
+
+docs {
+  EDGE → 404 `PHOTO_NOT_FOUND`, pas une 500 : le service vérifie le format
+  avant d'interroger MongoDB.
+}

@@ -8,6 +8,7 @@ import type { PhotosService } from './photos.service.js'
 export type PhotosController = {
   list: (req: Request, res: Response) => Promise<void>
   create: (req: Request, res: Response) => Promise<void>
+  remove: (req: Request<{ id: string }>, res: Response) => Promise<void>
 }
 
 // cloudinaryId stays on the server: the client gets ready-made URLs.
@@ -38,6 +39,12 @@ export function createPhotosController(
       const photo = toPhotoDto(record)
       io.emit('photo:new', photo)
       res.status(201).json(photo)
+    },
+
+    async remove(req, res) {
+      await service.deletePhoto(req.params.id)
+      io.emit('photo:deleted', req.params.id)
+      res.status(204).end()
     },
   }
 }

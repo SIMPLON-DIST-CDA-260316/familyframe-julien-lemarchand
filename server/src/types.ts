@@ -6,6 +6,7 @@ export type ApiErrorCode =
   | 'PHOTO_MISSING'
   | 'UPLOAD_INVALID'
   | 'ROUTE_NOT_FOUND'
+  | 'PHOTO_NOT_FOUND'
   | 'PHOTO_TOO_LARGE'
   | 'FORMAT_UNSUPPORTED'
   | 'IMAGE_UNREADABLE'
@@ -24,6 +25,7 @@ export type Photo = {
 
 export type ServerToClientEvents = {
   'photo:new': (photo: Photo) => void
+  'photo:deleted': (id: string) => void
 }
 
 export type ClientToServerEvents = Record<string, never>

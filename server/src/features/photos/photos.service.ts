@@ -5,6 +5,7 @@ import type { PhotoRecord, PhotosRepository } from './photos.repository.js'
 const MAX_UPLOADER_NAME_LENGTH = 30
 const LATEST_PHOTOS_LIMIT = 20
 const ALLOWED_TYPES: string[] = ['image/jpeg', 'image/png', 'image/webp']
+const OBJECT_ID_PATTERN = /^[0-9a-f]{24}$/i
 
 export type UploadedFile = { buffer: Buffer; mimetype: string }
 
@@ -14,11 +15,13 @@ export type PhotosServiceDeps = {
   repository: PhotosRepository
   toFrameJpeg: (input: Buffer) => Promise<Buffer>
   uploadImage: (jpeg: Buffer) => Promise<UploadedImage>
+  deleteImage: (cloudinaryId: string) => Promise<void>
 }
 
 export type PhotosService = {
   listLatest: () => Promise<PhotoRecord[]>
   createPhoto: (input: NewPhotoInput) => Promise<PhotoRecord>
+  deletePhoto: (id: string) => Promise<void>
 }
 
 function parseUploaderName(rawUploaderName: unknown): string {
@@ -40,10 +43,19 @@ function parseFile(file: UploadedFile | undefined): UploadedFile {
   return file
 }
 
+// Prisma fails on an id that is not an ObjectId: that would be a 500, not a 404.
+function parsePhotoId(id: string): string {
+  if (!OBJECT_ID_PATTERN.test(id)) {
+    throw new AppError('PHOTO_NOT_FOUND')
+  }
+  return id
+}
+
 export function createPhotosService({
   repository,
   toFrameJpeg,
   uploadImage,
+  deleteImage,
 }: PhotosServiceDeps): PhotosService {
   async function convertToFrameJpeg(input: Buffer): Promise<Buffer> {
     try {
@@ -67,8 +79,27 @@ export function createPhotosService({
     }
   }
 
+  // Database first: it decides what the frame shows. A Cloudinary failure after
+  // that only leaves an orphan image, so the deletion still succeeds.
+  async function deletePhoto(id: string): Promise<void> {
+    const record = await repository.findById(parsePhotoId(id))
+    if (!record) {
+      throw new AppError('PHOTO_NOT_FOUND')
+    }
+    await repository.deleteById(record.id)
+    try {
+      await deleteImage(record.cloudinaryId)
+    } catch (error: unknown) {
+      console.error(
+        `Photo deleted from the database but not from Cloudinary: ${record.cloudinaryId}`,
+        error,
+      )
+    }
+  }
+
   return {
     listLatest: () => repository.findLatest(LATEST_PHOTOS_LIMIT),
     createPhoto,
+    deletePhoto,
   }
 }
