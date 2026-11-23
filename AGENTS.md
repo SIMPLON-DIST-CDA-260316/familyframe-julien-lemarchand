@@ -27,6 +27,7 @@ Run from the repo root with `pnpm <script>`. Source of truth, the root package.j
 - **API change → Bruno**: a new or changed endpoint updates `server/bruno/<resource>/<endpoint>/` in the same commit; `pnpm test:bruno` needs the API running.
 - **No "done" without proof**: run the relevant check and quote its output.
 - **No new dependency without approval**: check what is installed first.
+- **Code rules** (comments, naming, size limits, logging) live in `.claude/rules/`: read them before editing `src/`.
 - Specs and plans go in `docs/superpowers/{specs,plans}/YYYY-MM-DD-<topic>.md` (English). They record decisions and AI usage for the reflective analysis: never rewrite one, add a new doc when a decision changes.
 
 ## TypeScript

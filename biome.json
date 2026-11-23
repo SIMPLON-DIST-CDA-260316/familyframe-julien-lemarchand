@@ -7,7 +7,7 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!client/public"]
+    "includes": ["**", "!client/public", "!.claude/rules"]
   },
   "formatter": {
     "enabled": true,
