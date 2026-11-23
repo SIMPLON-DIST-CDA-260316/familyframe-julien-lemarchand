@@ -21,3 +21,8 @@ A deletion removes a photo the selection may still point to, so three cases need
 1. **The pinned photo is deleted:** `selectedId` is only used while `photos` still contains it, otherwise `currentId` falls back to the newest.
 2. **The newest photo is deleted:** `newestId` changes without any arrival. It counts as an arrival only if the previous newest is still in `photos`, otherwise it is just recorded. No pin, no badge.
 3. **Every photo is deleted:** `currentId` becomes `undefined` and `FramePage` renders `EmptyFrame`. Nothing to add.
+
+## Known limitations
+
+- **Delete and arrival in the same reconnect refetch:** if the newest photo is deleted while another arrives during a disconnect, the refetch shows no previous newest, so the new photo counts as no arrival: an active viewer jumps to it, with no badge and no pin. Rare, accepted.
+- **Badge count after deleting an unseen photo:** the count is not lowered. Clicking the badge still shows the real newest photo.
