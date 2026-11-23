@@ -1,5 +1,9 @@
 import { type ChangeEvent, type JSX, type SubmitEvent, useEffect, useState } from 'react'
+import { Alert, AlertDescription } from '@/components/ui/alert.tsx'
 import { Button } from '@/components/ui/button.tsx'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.tsx'
+import { Input } from '@/components/ui/input.tsx'
+import { Label } from '@/components/ui/label.tsx'
 import { errorMessage } from '../api.ts'
 
 type Status = 'idle' | 'sending' | 'success' | 'error'
@@ -82,49 +86,73 @@ export default function UploadPage(): JSX.Element {
   }
 
   return (
-    <main className="upload">
-      <h1>FamilyFrame</h1>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Pseudo
-          <input
-            value={uploaderName}
-            onChange={handleUploaderNameChange}
-            required
-            maxLength={MAX_UPLOADER_NAME_LENGTH}
-          />
-        </label>
+    <main className="mx-auto max-w-md px-4 py-10">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-xl">FamilyFrame</CardTitle>
+          <CardDescription>Envoyez une photo au cadre de la famille.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="uploader-name">Pseudo</Label>
+              <Input
+                id="uploader-name"
+                value={uploaderName}
+                onChange={handleUploaderNameChange}
+                required
+                maxLength={MAX_UPLOADER_NAME_LENGTH}
+              />
+            </div>
 
-        <label>
-          Prendre une photo
-          <input
-            key={`camera-${inputsKey}`}
-            type="file"
-            accept="image/*"
-            capture="environment"
-            onChange={handleFileChange}
-          />
-        </label>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="camera-photo">Prendre une photo</Label>
+              <Input
+                id="camera-photo"
+                key={`camera-${inputsKey}`}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={handleFileChange}
+              />
+            </div>
 
-        <label>
-          Choisir une image
-          <input
-            key={`gallery-${inputsKey}`}
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-          />
-        </label>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="gallery-photo">Choisir une image</Label>
+              <Input
+                id="gallery-photo"
+                key={`gallery-${inputsKey}`}
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+              />
+            </div>
 
-        {previewUrl && <img className="preview" src={previewUrl} alt="Aperçu avant envoi" />}
+            {previewUrl && (
+              <img
+                className="max-h-[40vh] w-full rounded-lg object-contain"
+                src={previewUrl}
+                alt="Aperçu avant envoi"
+              />
+            )}
 
-        <Button type="submit" disabled={!file || status === 'sending'}>
-          {status === 'sending' ? 'Envoi…' : 'Envoyer'}
-        </Button>
-      </form>
+            <Button type="submit" size="lg" disabled={!file || status === 'sending'}>
+              {status === 'sending' ? 'Envoi…' : 'Envoyer'}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
 
-      {status === 'success' && <p>Photo envoyée !</p>}
-      {status === 'error' && <p role="alert">{error}</p>}
+      {status === 'success' && (
+        <Alert className="mt-4">
+          <AlertDescription>Photo envoyée !</AlertDescription>
+        </Alert>
+      )}
+      {status === 'error' && (
+        <Alert variant="destructive" className="mt-4">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
     </main>
   )
 }
