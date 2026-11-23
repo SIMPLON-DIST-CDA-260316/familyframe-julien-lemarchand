@@ -29,9 +29,19 @@ Architecture, parcours d'une photo et choix techniques : [`ARCHITECTURE.md`](ARC
 ```bash
 pnpm install                         # installe tout le workspace + génère le client Prisma
 cp server/.env.example server/.env   # puis renseigner DATABASE_URL et les 3 variables Cloudinary
-pnpm db:push                         # crée la collection et les index dans MongoDB
+pnpm db:push                         # crée les collections et les index dans MongoDB
+pnpm db:seed                         # vide la base et crée les deux comptes de test
 pnpm dev                             # lance client et serveur en parallèle
 ```
+
+Comptes de test créés par `pnpm db:seed` (**développement uniquement**, mots de passe publics) :
+
+| Rôle   | E-mail                    | Mot de passe             |
+| ------ | ------------------------- | ------------------------ |
+| admin  | `admin@familyframe.test`  | `admin-familyframe-dev`  |
+| membre | `membre@familyframe.test` | `membre-familyframe-dev` |
+
+Le seed efface toutes les photos, sessions et comptes avant de recréer ces deux comptes (les images restent sur Cloudinary, sans référence). Il refuse de tourner avec `NODE_ENV=production`.
 
 | Service       | URL                         |
 | ------------- | --------------------------- |
@@ -43,17 +53,18 @@ Depuis un smartphone sur le même réseau : `http://<ip-du-pc>:5180` (le pare-fe
 
 ### Scripts racine
 
-| Script                          | Rôle                                      |
-| ------------------------------- | ----------------------------------------- |
-| `pnpm dev`                      | client + serveur en mode watch            |
-| `pnpm build`                    | build des deux packages                   |
-| `pnpm typecheck`                | vérification TypeScript                   |
-| `pnpm check` / `pnpm check:fix` | lint + format + tri des imports (Biome)   |
-| `pnpm test`                     | tests unitaires du serveur (Vitest)       |
-| `pnpm test:hooks`               | tests des hooks Claude Code               |
-| `pnpm test:bruno`               | requêtes Bruno contre l'API lancée        |
-| `pnpm db:push`                  | synchronise le schéma Prisma avec MongoDB |
-| `pnpm db:studio`                | explorateur de données Prisma Studio      |
+| Script                          | Rôle                                                            |
+| ------------------------------- | --------------------------------------------------------------- |
+| `pnpm dev`                      | client + serveur en mode watch                                  |
+| `pnpm build`                    | build des deux packages                                         |
+| `pnpm typecheck`                | vérification TypeScript                                         |
+| `pnpm check` / `pnpm check:fix` | lint + format + tri des imports (Biome)                         |
+| `pnpm test`                     | tests unitaires du serveur (Vitest)                             |
+| `pnpm test:hooks`               | tests des hooks Claude Code                                     |
+| `pnpm test:bruno`               | requêtes Bruno contre l'API lancée                              |
+| `pnpm db:push`                  | synchronise le schéma Prisma avec MongoDB                       |
+| `pnpm db:seed`                  | vide la base et crée les comptes de test (refusé en production) |
+| `pnpm db:studio`                | explorateur de données Prisma Studio                            |
 
 ## Contribuer
 
