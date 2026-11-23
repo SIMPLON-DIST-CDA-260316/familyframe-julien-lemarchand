@@ -183,12 +183,12 @@ Run: `gh stack submit --auto`, then `gh pr edit <N> --body-file <file>` with a F
   - `LibraryScreen({ photos: Photo[], currentId: string, onOpenPhoto: (id: string) => void, onStartSlideshow: () => void })`.
   - `SlideshowScreen({ photos: Photo[], currentPhoto: Photo, selection: FrameSelection, isActive: boolean, settings: SlideshowSettings })`.
 
-- [ ] **Step 1: Create the stack layer**
+- [x] **Step 1: Create the stack layer**
 
 Run: `gh stack add feat/frame-library-mode`
 Expected: `✓ Created and checked out branch "feat/frame-library-mode"`
 
-- [ ] **Step 2: Turn `useIdleControls` into `useIdle(delayMs)`**
+- [x] **Step 2: Turn `useIdleControls` into `useIdle(delayMs)`**
 
 Do not start a dev server: the controller runs it (see Dev environment).
 
@@ -289,7 +289,7 @@ git commit -F <scratchpad>/commit-use-idle.txt
 
 Message: `refactor(client): turn useIdleControls into useIdle(delayMs)`, body: `Starts active so a long delay is counted from the page load; wheel counts as activity.`
 
-- [ ] **Step 3: Rename the contact sheet to `PhotoGrid`**
+- [x] **Step 3: Rename the contact sheet to `PhotoGrid`**
 
 Run: `git mv client/src/components/frame/ContactSheet.tsx client/src/components/frame/PhotoGrid.tsx`
 Run: `git mv client/src/components/frame/ContactSheetTile.tsx client/src/components/frame/PhotoGridTile.tsx`
@@ -409,7 +409,7 @@ git commit -F <scratchpad>/commit-photo-grid.txt
 
 Message: `refactor(client): rename the contact sheet to PhotoGrid`
 
-- [ ] **Step 4: Swap `view` for `mode` in `useFrameSelection`**
+- [x] **Step 4: Swap `view` for `mode` in `useFrameSelection`**
 
 Replace the whole content of `client/src/hooks/useFrameSelection.ts`:
 
@@ -510,7 +510,7 @@ export function useFrameSelection(photos: Photo[], isActive: boolean): FrameSele
 }
 ```
 
-- [ ] **Step 5: Write the three small hooks**
+- [x] **Step 5: Write the three small hooks**
 
 Create `client/src/hooks/useOnIdle.ts`:
 
@@ -586,7 +586,7 @@ export function useSlideshowSettings(): SlideshowSettings {
 }
 ```
 
-- [ ] **Step 6: Write the close button and the library**
+- [x] **Step 6: Write the close button and the library**
 
 Create `client/src/components/frame/CloseButton.tsx`:
 
@@ -676,7 +676,7 @@ export function LibraryScreen({
 }
 ```
 
-- [ ] **Step 7: Write the slideshow screen (today's pill, minus the switch, plus ✕)**
+- [x] **Step 7: Write the slideshow screen (today's pill, minus the switch, plus ✕)**
 
 Create `client/src/components/frame/SlideshowScreen.tsx`:
 
@@ -736,7 +736,7 @@ export function SlideshowScreen({
 
 `slideshow={settings}` passes more fields than `SlideshowControls` reads; it type-checks (a variable, not an object literal) and `PhotoControls` is deleted in Task 3.
 
-- [ ] **Step 8: Rewrite `FramePage` around the two screens, delete `ViewToggles`**
+- [x] **Step 8: Rewrite `FramePage` around the two screens, delete `ViewToggles`**
 
 Replace the whole content of `client/src/pages/FramePage.tsx`:
 
@@ -786,8 +786,9 @@ export default function FramePage(): JSX.Element {
   const photos = usePhotoFeed()
   const isActive = useIdle(CONTROLS_HIDE_DELAY_MS)
   const isLibraryActive = useIdle(LIBRARY_IDLE_DELAY_MS)
-  const selection = useFrameSelection(photos, isActive)
   const settings = useSlideshowSettings()
+  // A paused photo was chosen by someone: a new arrival raises the badge instead of replacing it.
+  const selection = useFrameSelection(photos, isActive || !settings.isPlaying)
 
   function startSlideshow(): void {
     selection.startSlideshow()
@@ -836,7 +837,7 @@ export default function FramePage(): JSX.Element {
 
 Run: `git rm client/src/components/frame/ViewToggles.tsx`
 
-- [ ] **Step 9: Update the Pages table in `ARCHITECTURE.md`**
+- [x] **Step 9: Update the Pages table in `ARCHITECTURE.md`**
 
 Replace the table under `## Pages`:
 
@@ -856,12 +857,12 @@ with
 | `/frame` | cadre : bibliothèque des photos en vignettes, chacune avec « Supprimer » ; « Lancer le diaporama » ou une minute sans activité lance le diaporama |
 ```
 
-- [ ] **Step 10: Check, typecheck, build**
+- [x] **Step 10: Check, typecheck, build**
 
 Run: `pnpm check`, then `pnpm typecheck`, then `pnpm build`
 Expected: Biome `No fixes applied.`, `client typecheck: Done`, Vite `✓ built in …`.
 
-- [ ] **Step 11: Commit**
+- [x] **Step 11: Commit**
 
 ```bash
 git add client/src/hooks/useFrameSelection.ts client/src/hooks/useOnIdle.ts client/src/hooks/useEscapeToClose.ts client/src/hooks/useSlideshowSettings.ts client/src/components/frame/CloseButton.tsx client/src/components/frame/LibraryHeader.tsx client/src/components/frame/LibraryScreen.tsx client/src/components/frame/SlideshowScreen.tsx client/src/pages/FramePage.tsx ARCHITECTURE.md
@@ -872,7 +873,7 @@ Message: `feat(client): open the frame on a photo library that launches the slid
 
 Renames and deletions are already staged by `git mv` / `git rm`: `git add` only lists files that exist.
 
-- [ ] **Step 12: Manual check in Chrome (controller)**
+- [x] **Step 12: Manual check in Chrome (controller)**
 
 On `http://localhost:5181/frame`, with at least three photos:
 
@@ -1818,3 +1819,6 @@ Run: `gh stack submit --auto`, then `gh pr edit <N> --body-file <file>`. French 
 ## Drift Log
 
 Format: `date · task/step · what the plan said · what was done · why`.
+
+- 2026-11-23 · Task 2/Step 1 · create the layer with `gh stack add feat/frame-library-mode` · not run by the Task 2 implementer: the branch already existed and was checked out by the controller · layer already created, step left unchecked for the controller to confirm.
+- 2026-11-23 · Task 2 review · `useFrameSelection(photos, isActive)`: an unattended arrival replaced a paused photo (directly, or through the idle jump 4 s after the badge) · `useFrameSelection(photos, isActive || !settings.isPlaying)`, Task 2 block amended · spec says a paused slideshow "stays paused on its photo"; author chose "stay on the photo" (badge raised) over "jump to the new one"
