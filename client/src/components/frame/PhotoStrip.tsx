@@ -9,7 +9,7 @@ type PhotoStripProps = {
 
 export function PhotoStrip({ photos, currentId, onSelect }: PhotoStripProps): JSX.Element {
   return (
-    <ul className="flex h-[20svh] items-center gap-2 overflow-x-auto px-4">
+    <ul className="pointer-events-auto flex items-center gap-2 overflow-x-auto px-4 pb-4">
       {photos.map((photo) => (
         <li key={photo.id} className="shrink-0">
           <button

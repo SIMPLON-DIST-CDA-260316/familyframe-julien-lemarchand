@@ -12,7 +12,7 @@ import { DEFAULT_SLIDESHOW_INTERVAL_MS } from '@/hooks/useSlideshow.ts'
 import { cn } from '@/lib/utils.ts'
 
 // The frame is a screen on a wall: dark keeps the photos in front.
-const FRAME_CLASSES = 'dark min-h-svh bg-background text-foreground'
+const FRAME_CLASSES = 'dark min-h-svh bg-frame-background text-foreground'
 
 function EmptyFrame(): JSX.Element {
   return (
