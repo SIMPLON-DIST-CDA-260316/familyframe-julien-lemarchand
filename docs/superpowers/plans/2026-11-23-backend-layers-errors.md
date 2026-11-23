@@ -1,13 +1,13 @@
 ---
 plan: backend-layers-errors
-status: draft
+status: in-progress
 spec: docs/superpowers/specs/2026-11-23-backend-layers-errors-design.md
 branch: refactor/error-handling (PR A), refactor/photos-repository (PR B), refactor/photos-layers (PR C)
 worktree: false
 tasks_total: 8
-tasks_done: 0
-current_task: —
-last_commit: —
+tasks_done: 2
+current_task: 3
+last_commit: 6887e6d
 last_updated: 2026-11-23
 ---
 
@@ -76,7 +76,7 @@ The branch exists and already holds the spec commit (`f646463`).
 - Consumes: `ApiErrorCode`, `ApiError` from `server/src/types.ts`.
 - Produces: `class AppError extends Error { readonly code: ApiErrorCode }` (constructor `new AppError(code: ApiErrorCode)`); `errorHandler(error: unknown, req: Request, res: Response, next: NextFunction): void`.
 
-- [ ] **Step 1: Create `server/src/errors/app-error.ts`**
+- [x] **Step 1: Create `server/src/errors/app-error.ts`**
 
 ```ts
 import type { ApiErrorCode } from '../types.js'
@@ -92,7 +92,7 @@ export class AppError extends Error {
 }
 ```
 
-- [ ] **Step 2: Create `server/src/errors/error-handler.ts`**
+- [x] **Step 2: Create `server/src/errors/error-handler.ts`**
 
 ```ts
 import type { NextFunction, Request, Response } from 'express'
@@ -136,7 +136,7 @@ export function errorHandler(
 }
 ```
 
-- [ ] **Step 3: Use it in `server/src/app.ts`**
+- [x] **Step 3: Use it in `server/src/app.ts`**
 
 Replace the whole file with:
 
@@ -167,7 +167,7 @@ export function createApp(io: Server<ClientToServerEvents, ServerToClientEvents>
 }
 ```
 
-- [ ] **Step 4: Make `server/src/photos.ts` throw instead of answering**
+- [x] **Step 4: Make `server/src/photos.ts` throw instead of answering**
 
 Replace the whole file with:
 
@@ -253,17 +253,17 @@ export function createPhotosRouter(io: Server<ClientToServerEvents, ServerToClie
 }
 ```
 
-- [ ] **Step 5: Run the checks**
+- [x] **Step 5: Run the checks**
 
 Run: `pnpm check && pnpm typecheck`
 Expected: `No fixes applied.` / both typechecks `Done`. If Biome reformats, run `pnpm check:fix` and re-run.
 
-- [ ] **Step 6: Run Bruno against the running API**
+- [x] **Step 6: Run Bruno against the running API**
 
 Run: `pnpm test:bruno`
 Expected: `Status ✓ PASS`, `Requests 10 (10 Passed)`, `Assertions 24/24`. The 400/415/422 cases now go through `errorHandler`.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add server/src/errors server/src/app.ts server/src/photos.ts
@@ -290,7 +290,7 @@ Message: `refactor(server): centralize error handling with AppError` — body: r
 - Consumes: `AppError` (Task 1), `errorHandler` (Task 1).
 - Produces: `notFound(): never`; `ApiErrorCode` gains `'ROUTE_NOT_FOUND'`.
 
-- [ ] **Step 1: Write the Bruno request first (it must fail)**
+- [x] **Step 1: Write the Bruno request first (it must fail)**
 
 `server/bruno/not-found/folder.bru`:
 
@@ -329,12 +329,12 @@ docs {
 }
 ```
 
-- [ ] **Step 2: Run Bruno to see it fail**
+- [x] **Step 2: Run Bruno to see it fail**
 
 Run: `pnpm test:bruno`
 Expected: FAIL on `Edge - route inconnue` (`res.body.error` undefined: Express answers its HTML 404). The 10 other requests pass.
 
-- [ ] **Step 3: Add the code to the server union**
+- [x] **Step 3: Add the code to the server union**
 
 In `server/src/types.ts`, the union becomes:
 
@@ -350,12 +350,12 @@ export type ApiErrorCode =
   | 'SERVER_ERROR'
 ```
 
-- [ ] **Step 4: Run typecheck to see the exhaustive Record catch it**
+- [x] **Step 4: Run typecheck to see the exhaustive Record catch it**
 
 Run: `pnpm typecheck`
 Expected: FAIL in `server/src/errors/error-handler.ts`: property `ROUTE_NOT_FOUND` is missing in `HTTP_STATUS_BY_CODE`.
 
-- [ ] **Step 5: Map it to 404**
+- [x] **Step 5: Map it to 404**
 
 In `server/src/errors/error-handler.ts`, `HTTP_STATUS_BY_CODE` becomes:
 
@@ -372,7 +372,7 @@ const HTTP_STATUS_BY_CODE: Record<ApiErrorCode, number> = {
 }
 ```
 
-- [ ] **Step 6: Create `server/src/errors/not-found.ts`**
+- [x] **Step 6: Create `server/src/errors/not-found.ts`**
 
 ```ts
 import { AppError } from './app-error.js'
@@ -382,7 +382,7 @@ export function notFound(): never {
 }
 ```
 
-- [ ] **Step 7: Mount it in `server/src/app.ts`, after the routes and before the error handler**
+- [x] **Step 7: Mount it in `server/src/app.ts`, after the routes and before the error handler**
 
 ```ts
 import { notFound } from './errors/not-found.js'
@@ -395,7 +395,7 @@ app.use(notFound)
 app.use(errorHandler)
 ```
 
-- [ ] **Step 8: Add the client copy and its French message**
+- [x] **Step 8: Add the client copy and its French message**
 
 In `client/src/api.ts`, add `| 'ROUTE_NOT_FOUND'` after `'UPLOAD_INVALID'` in the union, and in `ERROR_MESSAGES`, after `UPLOAD_INVALID`:
 
@@ -403,7 +403,7 @@ In `client/src/api.ts`, add `| 'ROUTE_NOT_FOUND'` after `'UPLOAD_INVALID'` in th
   ROUTE_NOT_FOUND: "Cette adresse n'existe pas sur le serveur.",
 ```
 
-- [ ] **Step 9: Document the code in `ARCHITECTURE.md`**
+- [x] **Step 9: Document the code in `ARCHITECTURE.md`**
 
 In the error table, after the `UPLOAD_INVALID` row:
 
@@ -413,12 +413,12 @@ In the error table, after the `UPLOAD_INVALID` row:
 
 Then run `pnpm check:fix` (Biome realigns the Markdown table).
 
-- [ ] **Step 10: Run all gates**
+- [x] **Step 10: Run all gates**
 
 Run: `pnpm check && pnpm typecheck && pnpm test:bruno`
 Expected: checks green; Bruno `Requests 11 (11 Passed)`, `Assertions 26/26`.
 
-- [ ] **Step 11: Commit**
+- [x] **Step 11: Commit**
 
 ```bash
 git add server/src/errors server/src/types.ts server/src/app.ts client/src/api.ts server/bruno/not-found ARCHITECTURE.md
@@ -429,8 +429,8 @@ Message: `feat(server): answer unknown routes with ROUTE_NOT_FOUND` — body: un
 
 ### PR A delivery
 
-- [ ] Commit this plan on the branch: `docs: add backend layers and error handling plan`.
-- [ ] `pnpm build` green.
+- [x] Commit this plan on the branch: `docs: add backend layers and error handling plan`.
+- [x] `pnpm build` green.
 - [ ] `git push -u origin refactor/error-handling`, then `gh pr create --draft --base develop --title "refactor(server): centralize error handling" --body-file <file>` (French body: why, what, what was run, stacked PRs B and C to follow).
 
 ---
