@@ -11,11 +11,9 @@ Simplon school brief: a connected photo frame. **The learning goal is containeri
 
 ## Commands
 
-- `pnpm dev`: client + server in watch mode
-- `pnpm check:fix`: Biome lint/format/imports (CI-equivalent check: `pnpm check`)
-- `pnpm typecheck` / `pnpm build`
-- `pnpm test:hooks`: tests for `.claude/hooks/`
-- `pnpm --filter server db:push`: sync the Prisma schema to MongoDB
+Run from the repo root with `pnpm <script>`. Source of truth, the root package.json:
+
+@package.json
 
 ## Pitfalls
 
