@@ -1,6 +1,6 @@
-import { GalleryHorizontalIcon, ImageIcon, LayoutGridIcon } from 'lucide-react'
+import { ImageIcon, LayoutGridIcon } from 'lucide-react'
 import type { JSX } from 'react'
-import { Toggle } from '@/components/ui/toggle.tsx'
+import { PILL_TOGGLE_CLASSES } from '@/components/frame/pillToggleClasses.ts'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group.tsx'
 
 export type FrameView = 'photo' | 'contact-sheet'
@@ -11,46 +11,26 @@ function isFrameView(value: string): value is FrameView {
 
 type ViewTogglesProps = {
   view: FrameView
-  isStripVisible: boolean
   onViewChange: (view: FrameView) => void
-  onStripVisibleChange: (isVisible: boolean) => void
 }
 
-export function ViewToggles({
-  view,
-  isStripVisible,
-  onViewChange,
-  onStripVisibleChange,
-}: ViewTogglesProps): JSX.Element {
+export function ViewToggles({ view, onViewChange }: ViewTogglesProps): JSX.Element {
   return (
-    <>
-      <ToggleGroup
-        type="single"
-        variant="outline"
-        value={view}
-        // Radix sends '' when the pressed item is clicked again: keep the current view.
-        onValueChange={(value) => {
-          if (isFrameView(value)) onViewChange(value)
-        }}
-        aria-label="Affichage"
-      >
-        <ToggleGroupItem value="photo">
-          <ImageIcon /> Photo
-        </ToggleGroupItem>
-        <ToggleGroupItem value="contact-sheet">
-          <LayoutGridIcon /> Pellicule
-        </ToggleGroupItem>
-      </ToggleGroup>
-      {view === 'photo' && (
-        <Toggle
-          variant="outline"
-          pressed={isStripVisible}
-          onPressedChange={onStripVisibleChange}
-          aria-label="Bandeau de vignettes"
-        >
-          <GalleryHorizontalIcon />
-        </Toggle>
-      )}
-    </>
+    <ToggleGroup
+      type="single"
+      value={view}
+      // Radix sends '' when the pressed item is clicked again: keep the current view.
+      onValueChange={(value) => {
+        if (isFrameView(value)) onViewChange(value)
+      }}
+      aria-label="Affichage"
+    >
+      <ToggleGroupItem value="photo" className={PILL_TOGGLE_CLASSES}>
+        <ImageIcon /> Photo
+      </ToggleGroupItem>
+      <ToggleGroupItem value="contact-sheet" className={PILL_TOGGLE_CLASSES}>
+        <LayoutGridIcon /> Pellicule
+      </ToggleGroupItem>
+    </ToggleGroup>
   )
 }

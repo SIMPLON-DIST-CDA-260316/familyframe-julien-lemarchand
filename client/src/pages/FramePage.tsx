@@ -1,9 +1,11 @@
 import { type JSX, useState } from 'react'
 import { ContactSheet } from '@/components/frame/ContactSheet.tsx'
+import { ControlsDivider } from '@/components/frame/ControlsDivider.tsx'
 import { FrameControls } from '@/components/frame/FrameControls.tsx'
 import { NewPhotosBadge } from '@/components/frame/NewPhotosBadge.tsx'
 import { PhotoView } from '@/components/frame/PhotoView.tsx'
 import { SlideshowControls } from '@/components/frame/SlideshowControls.tsx'
+import { StripToggle } from '@/components/frame/StripToggle.tsx'
 import { ViewToggles } from '@/components/frame/ViewToggles.tsx'
 import { useFrameSelection } from '@/hooks/useFrameSelection.ts'
 import { useIdleControls } from '@/hooks/useIdleControls.ts'
@@ -49,19 +51,19 @@ export default function FramePage(): JSX.Element {
         <ContactSheet photos={photos} onSelect={selection.openPhoto} />
       )}
       <FrameControls isVisible={isActive}>
-        <ViewToggles
-          view={selection.view}
-          isStripVisible={isStripVisible}
-          onViewChange={selection.setView}
-          onStripVisibleChange={setIsStripVisible}
-        />
+        <ViewToggles view={selection.view} onViewChange={selection.setView} />
         {selection.view === 'photo' && (
-          <SlideshowControls
-            isPlaying={isPlaying}
-            intervalMs={intervalMs}
-            onPlayingChange={setIsPlaying}
-            onIntervalChange={setIntervalMs}
-          />
+          <>
+            <ControlsDivider />
+            <StripToggle isStripVisible={isStripVisible} onStripVisibleChange={setIsStripVisible} />
+            <ControlsDivider />
+            <SlideshowControls
+              isPlaying={isPlaying}
+              intervalMs={intervalMs}
+              onPlayingChange={setIsPlaying}
+              onIntervalChange={setIntervalMs}
+            />
+          </>
         )}
       </FrameControls>
       {selection.newPhotoCount > 0 && (
