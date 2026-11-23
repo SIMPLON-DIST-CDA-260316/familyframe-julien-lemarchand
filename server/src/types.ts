@@ -14,7 +14,13 @@ export type ApiErrorCode =
 export type ApiError = { error: ApiErrorCode }
 
 // createdAt is an ISO 8601 string: JSON has no dates.
-export type Photo = { id: string; url: string; uploaderName: string; createdAt: string }
+export type Photo = {
+  id: string
+  url: string
+  thumbnailUrl: string
+  uploaderName: string
+  createdAt: string
+}
 
 export type ServerToClientEvents = {
   'photo:new': (photo: Photo) => void

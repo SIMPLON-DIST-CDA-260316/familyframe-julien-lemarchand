@@ -22,8 +22,14 @@ script:post-response {
   test('plus récente en premier', () => {
     expect(dates).to.eql(sorted)
   })
+  test('chaque photo a sa miniature', () => {
+    for (const photo of res.body) {
+      expect(photo.thumbnailUrl).to.contain('c_fill,g_auto')
+    }
+  })
 }
 
 docs {
-  NOMINAL → 200, au plus 20 photos, la plus récente en premier.
+  NOMINAL → 200, au plus 20 photos, la plus récente en premier, chacune avec
+  `url` et `thumbnailUrl`.
 }

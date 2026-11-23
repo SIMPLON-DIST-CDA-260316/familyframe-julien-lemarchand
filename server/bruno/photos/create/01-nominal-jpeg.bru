@@ -23,6 +23,28 @@ assert {
   res.body.cloudinaryId: isUndefined
 }
 
+script:post-response {
+  const axios = require('axios')
+  const { url, thumbnailUrl } = res.body
+  test('format et compression choisis par Cloudinary', () => {
+    expect(url).to.contain('f_auto,q_auto')
+    expect(thumbnailUrl).to.contain('f_auto,q_auto')
+  })
+  test('miniature carrée de 640 px, recadrée sur le sujet', () => {
+    expect(thumbnailUrl).to.contain('c_fill,g_auto,h_640,w_640')
+  })
+  test('les deux URL livrent une image, en WebP pour un navigateur qui l\'accepte', async () => {
+    for (const imageUrl of [url, thumbnailUrl]) {
+      const image = await axios.get(imageUrl, { headers: { Accept: 'image/webp,*/*' } })
+      expect(image.status).to.equal(200)
+      expect(image.headers['content-type']).to.match(/^image\//)
+    }
+  })
+}
+
 docs {
-  NOMINAL → 201 avec la photo créée. `cloudinaryId` n'est pas exposé.
+  NOMINAL → 201 avec la photo créée. `cloudinaryId` n'est pas exposé : le
+  serveur envoie des URL prêtes, `url` (photo entière) et `thumbnailUrl`
+  (miniature), toutes deux en `f_auto,q_auto`. Le test télécharge les deux
+  URL : une transformation refusée par Cloudinary ferait échouer le test.
 }
