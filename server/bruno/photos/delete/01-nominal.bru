@@ -14,6 +14,13 @@ assert {
   res.status: eq 204
 }
 
+script:pre-request {
+  // Without it the request hits /api/photos/ and fails with a misleading status.
+  if (!bru.getVar('createdPhotoId')) {
+    throw new Error('createdPhotoId absent : lancer le dossier photos en entier, create/01 doit passer')
+  }
+}
+
 script:post-response {
   const axios = require('axios')
   test('la photo ne figure plus dans la liste', async () => {
