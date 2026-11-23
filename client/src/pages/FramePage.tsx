@@ -1,9 +1,9 @@
 import { ImagesIcon } from 'lucide-react'
 import { type JSX, useState } from 'react'
-import { ContactSheet } from '@/components/frame/ContactSheet.tsx'
 import { FrameControls } from '@/components/frame/FrameControls.tsx'
 import { NewPhotosBadge } from '@/components/frame/NewPhotosBadge.tsx'
 import { PhotoControls } from '@/components/frame/PhotoControls.tsx'
+import { PhotoGrid } from '@/components/frame/PhotoGrid.tsx'
 import { PhotoView } from '@/components/frame/PhotoView.tsx'
 import { ViewToggles } from '@/components/frame/ViewToggles.tsx'
 import { useFrameSelection } from '@/hooks/useFrameSelection.ts'
@@ -63,7 +63,7 @@ export default function FramePage(): JSX.Element {
           onCurrentChange={selection.selectPhoto}
         />
       ) : (
-        <ContactSheet photos={photos} currentId={currentPhoto.id} onSelect={selection.openPhoto} />
+        <PhotoGrid photos={photos} currentId={currentPhoto.id} onSelect={selection.openPhoto} />
       )}
       <FrameControls isVisible={isActive}>
         <ViewToggles view={selection.view} onViewChange={selection.setView} />

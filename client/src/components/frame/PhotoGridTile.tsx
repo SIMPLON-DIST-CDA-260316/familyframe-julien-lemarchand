@@ -2,17 +2,13 @@ import type { JSX } from 'react'
 import { PhotoActionsMenu } from '@/components/frame/PhotoActionsMenu.tsx'
 import type { Photo } from '@/photo.ts'
 
-type ContactSheetTileProps = {
+type PhotoGridTileProps = {
   photo: Photo
   isCurrent: boolean
   onSelect: (id: string) => void
 }
 
-export function ContactSheetTile({
-  photo,
-  isCurrent,
-  onSelect,
-}: ContactSheetTileProps): JSX.Element {
+export function PhotoGridTile({ photo, isCurrent, onSelect }: PhotoGridTileProps): JSX.Element {
   return (
     // The ellipsis is a sibling of the tile button: a button cannot hold a button.
     <li className="group/tile relative">
