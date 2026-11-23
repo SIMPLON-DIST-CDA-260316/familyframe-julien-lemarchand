@@ -1,16 +1,16 @@
 import { type JSX, useState } from 'react'
+import { PhotoBackdrop } from '@/components/frame/PhotoBackdrop.tsx'
+import { PhotoCaption } from '@/components/frame/PhotoCaption.tsx'
+import { PhotoSlide } from '@/components/frame/PhotoSlide.tsx'
 import { PhotoStrip } from '@/components/frame/PhotoStrip.tsx'
-import {
-  Carousel,
-  type CarouselApi,
-  CarouselContent,
-  CarouselItem,
-} from '@/components/ui/carousel.tsx'
+import { Carousel, type CarouselApi, CarouselContent } from '@/components/ui/carousel.tsx'
 import { useCarouselArrowKeys } from '@/hooks/useCarouselArrowKeys.ts'
 import { useCarouselPhoto } from '@/hooks/useCarouselPhoto.ts'
 import { useSlideshow } from '@/hooks/useSlideshow.ts'
-import { cn } from '@/lib/utils.ts'
 import type { Photo } from '@/photo.ts'
+
+// Embla's default (25) is a quick flick; a frame on a wall should glide.
+const GLIDING_SLIDE = { duration: 45 }
 
 type PhotoViewProps = {
   photos: Photo[]
@@ -19,10 +19,6 @@ type PhotoViewProps = {
   // null: no automatic advance.
   autoAdvanceMs: number | null
   onCurrentChange: (id: string) => void
-}
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleString('fr-FR')
 }
 
 export function PhotoView({
@@ -36,30 +32,25 @@ export function PhotoView({
   useCarouselPhoto({ api, photos, currentId, onCurrentChange })
   useCarouselArrowKeys(api)
   useSlideshow(api, autoAdvanceMs)
+  const currentPhoto = photos.find(({ id }) => id === currentId)
 
   return (
-    <div className="flex h-svh flex-col">
-      <Carousel setApi={setApi} className="min-h-0 flex-1">
+    // clip, not hidden: the scaled backdrop overflows, and a hidden box can still be scrolled.
+    <div className="relative isolate h-svh overflow-clip">
+      {currentPhoto && <PhotoBackdrop key={currentPhoto.id} url={currentPhoto.thumbnailUrl} />}
+      <Carousel setApi={setApi} opts={GLIDING_SLIDE}>
         <CarouselContent>
           {photos.map((photo) => (
-            <CarouselItem key={photo.id} className="relative">
-              <img
-                className={cn('w-full object-contain', isStripVisible ? 'h-[80svh]' : 'h-svh')}
-                src={photo.url}
-                alt={`Envoyée par ${photo.uploaderName}`}
-                // The photo people look at: ahead of the other slides.
-                fetchPriority={photo.id === currentId ? 'high' : 'auto'}
-              />
-              <p className="absolute bottom-4 left-8 rounded-md bg-black/60 px-2 py-1 text-sm text-white">
-                {photo.uploaderName} · {formatDate(photo.createdAt)}
-              </p>
-            </CarouselItem>
+            <PhotoSlide key={photo.id} photo={photo} isCurrent={photo.id === currentId} />
           ))}
         </CarouselContent>
       </Carousel>
-      {isStripVisible && (
-        <PhotoStrip photos={photos} currentId={currentId} onSelect={onCurrentChange} />
-      )}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-black/75 via-black/30 to-transparent">
+        {currentPhoto && <PhotoCaption key={currentPhoto.id} photo={currentPhoto} />}
+        {isStripVisible && (
+          <PhotoStrip photos={photos} currentId={currentId} onSelect={onCurrentChange} />
+        )}
+      </div>
     </div>
   )
 }
