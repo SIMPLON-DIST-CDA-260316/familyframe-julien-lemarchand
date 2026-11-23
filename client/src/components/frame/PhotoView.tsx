@@ -6,6 +6,7 @@ import { PhotoStrip } from '@/components/frame/PhotoStrip.tsx'
 import { Carousel, type CarouselApi, CarouselContent } from '@/components/ui/carousel.tsx'
 import { useCarouselArrowKeys } from '@/hooks/useCarouselArrowKeys.ts'
 import { useCarouselPhoto } from '@/hooks/useCarouselPhoto.ts'
+import { useLeavingPhoto } from '@/hooks/useLeavingPhoto.ts'
 import { useSlideshow } from '@/hooks/useSlideshow.ts'
 import type { Photo } from '@/photo.ts'
 
@@ -32,6 +33,8 @@ export function PhotoView({
   useCarouselPhoto({ api, photos, currentId, onCurrentChange })
   useCarouselArrowKeys(api)
   useSlideshow(api, autoAdvanceMs)
+  // The outgoing photo keeps its zoom while it slides out, instead of snapping back.
+  const leavingId = useLeavingPhoto(api, currentId)
   const currentPhoto = photos.find(({ id }) => id === currentId)
 
   return (
@@ -41,7 +44,12 @@ export function PhotoView({
       <Carousel setApi={setApi} opts={GLIDING_SLIDE}>
         <CarouselContent>
           {photos.map((photo) => (
-            <PhotoSlide key={photo.id} photo={photo} isCurrent={photo.id === currentId} />
+            <PhotoSlide
+              key={photo.id}
+              photo={photo}
+              isCurrent={photo.id === currentId}
+              isZooming={photo.id === currentId || photo.id === leavingId}
+            />
           ))}
         </CarouselContent>
       </Carousel>

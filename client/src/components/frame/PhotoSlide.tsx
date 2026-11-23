@@ -6,9 +6,10 @@ import type { Photo } from '@/photo.ts'
 type PhotoSlideProps = {
   photo: Photo
   isCurrent: boolean
+  isZooming: boolean
 }
 
-export function PhotoSlide({ photo, isCurrent }: PhotoSlideProps): JSX.Element {
+export function PhotoSlide({ photo, isCurrent, isZooming }: PhotoSlideProps): JSX.Element {
   return (
     <CarouselItem
       // The Ken Burns zoom must not spill onto the neighbouring slide.
@@ -17,8 +18,8 @@ export function PhotoSlide({ photo, isCurrent }: PhotoSlideProps): JSX.Element {
       <img
         className={cn(
           'h-svh w-full object-contain drop-shadow-2xl',
-          // Only the photo on screen drifts, so each photo starts its zoom when it arrives.
-          isCurrent && 'motion-safe:animate-ken-burns',
+          // Each photo starts its zoom when it arrives.
+          isZooming && 'motion-safe:animate-ken-burns',
         )}
         src={photo.url}
         alt={`Envoyée par ${photo.uploaderName}`}
