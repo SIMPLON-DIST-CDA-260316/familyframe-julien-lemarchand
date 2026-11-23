@@ -1,36 +1,37 @@
 # AGENTS.md
 
-- @README.md
-- @ARCHITECTURE.md
-- @CONTRIBUTING.md
+Human docs (French), read them when the task needs them: [README.md](README.md) (setup, scripts), [ARCHITECTURE.md](ARCHITECTURE.md) (photo flow, dev networking, config, data), [CONTRIBUTING.md](CONTRIBUTING.md) (git flow, commits, PRs, language rule).
 
-## Key points
+## Project
 
-- **Learning goal**: containerization (Docker, Compose), not application complexity. The author must be able to understand and explain the code: prefer the simple, readable solution over the clever one.
-- **Prisma stays on v6**: do not suggest upgrading (MongoDB is not supported in 7+).
-- **Atomic commits**, made as you go, each one passing `pnpm check` and `pnpm typecheck`.
+Simplon school brief: a connected photo frame. **The learning goal is containerization (Docker, Compose)**, not app complexity. The author must be able to explain every line: prefer simple, readable code over clever code.
 
-## Working docs
+- `client/`: React + Vite (TS). Dev server on **5180** (`strictPort`), proxies `/api` and `/socket.io` to the API.
+- `server/`: Express 5 + Socket.IO + Prisma (TS). API on **3000**. Env loaded by Node `--env-file`, validated in `server/src/config.ts`.
 
-Specs, plans and notes produced with AI are versioned and named `YYYY-MM-DD-<topic>.md`:
+## Commands
 
-- `docs/superpowers/specs/`: design validated before implementing;
-- `docs/superpowers/plans/`: implementation plan broken into steps.
+- `pnpm dev`: client + server in watch mode
+- `pnpm check:fix`: Biome lint/format/imports (CI-equivalent check: `pnpm check`)
+- `pnpm typecheck` / `pnpm build`
+- `pnpm test:hooks`: tests for `.claude/hooks/`
+- `pnpm --filter server db:push`: sync the Prisma schema to MongoDB
 
-They record decisions and AI usage for the brief's reflective analysis. A doc is dated the day it is created and not rewritten afterwards: a changed decision gets a new doc.
+## Pitfalls
 
-## Behaviour rules
+- **Prisma stays on v6**: v7+ does not support MongoDB. Do not suggest upgrading.
+- The `.env` read guard matches on command text: a command containing both a reader word (`grep`, `cat`…) and `.env`, such as an inline commit message, is blocked. Pass long text through a file (`git commit -F`).
+- `git commit` runs Biome (pre-commit) and commitlint (commit-msg). A failing hook means the commit did not happen.
 
-1. **Ambiguous → ask.** Do not guess intent; ask before writing code.
-2. **Plan before any multi-step task**, and present the plan.
-3. **Surgical diffs**: touch only what the task requires, no opportunistic refactors or speculative code.
-4. **No "done" without proof**: run the check (check, typecheck, build, test, HTTP request…) and quote its output.
-5. **No new dependency without approval**: check what is already installed first, then ask.
-6. **Secrets**: never read, print or log the contents of a `.env` file (a hook blocks reads). Point to `server/.env.example` instead.
-7. **Debugging**: restate the symptom, list likely causes with a confidence level, verify before fixing.
+## Working rules
+
+- **Atomic commits**, made as you go: one concern each, each passing `pnpm check` and `pnpm typecheck`.
+- **No "done" without proof**: run the relevant check and quote its output.
+- **No new dependency without approval**: check what is installed first.
+- Specs and plans go in `docs/superpowers/{specs,plans}/YYYY-MM-DD-<topic>.md` (English). They record decisions and AI usage for the reflective analysis: never rewrite one, add a new doc when a decision changes.
 
 ## TypeScript
 
-- No `any` and no `as` casts to silence the compiler: type it properly or validate at runtime.
+- No `as` casts to silence the compiler: type properly or validate at runtime.
 - Explicit return types on exported functions.
 - Literal unions rather than `enum`.
