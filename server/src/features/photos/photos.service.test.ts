@@ -1,4 +1,5 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+import type { Logger } from '../../lib/logger.js'
 import type { PhotoRecord, PhotosRepository } from './photos.repository.js'
 import { createPhotosService, type PhotosServiceDeps, type UploadedFile } from './photos.service.js'
 
@@ -26,12 +27,13 @@ function makeDeps() {
     toFrameJpeg: vi.fn<PhotosServiceDeps['toFrameJpeg']>().mockResolvedValue(FRAME_JPEG),
     uploadImage: vi.fn<PhotosServiceDeps['uploadImage']>().mockResolvedValue(IMAGE),
     deleteImage: vi.fn<PhotosServiceDeps['deleteImage']>().mockResolvedValue(undefined),
+    logger: {
+      info: vi.fn<Logger['info']>(),
+      warn: vi.fn<Logger['warn']>(),
+      error: vi.fn<Logger['error']>(),
+    },
   }
 }
-
-afterEach(() => {
-  vi.restoreAllMocks()
-})
 
 describe('createPhoto', () => {
   it('saves the uploaded image with the trimmed name and returns the record', async () => {
@@ -46,6 +48,18 @@ describe('createPhoto', () => {
     expect(deps.toFrameJpeg).toHaveBeenCalledWith(JPEG_FILE.buffer)
     expect(deps.uploadImage).toHaveBeenCalledWith(FRAME_JPEG)
     expect(deps.repository.create).toHaveBeenCalledWith({ ...IMAGE, uploaderName: 'Mamie' })
+  })
+
+  it('logs the created photo by its identifiers, never by its uploader name', async () => {
+    const deps = makeDeps()
+
+    await createPhotosService(deps).createPhoto({ uploaderName: 'Mamie', file: JPEG_FILE })
+
+    expect(deps.logger.info).toHaveBeenCalledWith('photo.created', {
+      photoId: RECORD.id,
+      cloudinaryId: RECORD.cloudinaryId,
+    })
+    expect(JSON.stringify(deps.logger.info.mock.calls)).not.toContain('Mamie')
   })
 
   it('accepts a 30-character name', async () => {
@@ -98,14 +112,16 @@ describe('createPhoto', () => {
     expect(deps.toFrameJpeg).toHaveBeenCalledWith(file.buffer)
   })
 
-  it('turns an image sharp cannot read into IMAGE_UNREADABLE', async () => {
+  it('turns an image sharp cannot read into IMAGE_UNREADABLE and logs the sharp error', async () => {
     const deps = makeDeps()
-    deps.toFrameJpeg.mockRejectedValue(new Error('Input buffer contains unsupported image format'))
+    const sharpError = new Error('Input buffer contains unsupported image format')
+    deps.toFrameJpeg.mockRejectedValue(sharpError)
 
     await expect(
       createPhotosService(deps).createPhoto({ uploaderName: 'Mamie', file: JPEG_FILE }),
     ).rejects.toMatchObject({ code: 'IMAGE_UNREADABLE' })
     expect(deps.uploadImage).not.toHaveBeenCalled()
+    expect(deps.logger.warn).toHaveBeenCalledWith('photo.unreadable', { error: sharpError })
   })
 
   it('lets a Cloudinary failure through unchanged', async () => {
@@ -123,12 +139,15 @@ describe('createPhoto', () => {
     const deps = makeDeps()
     const databaseError = new Error('database is down')
     deps.repository.create.mockRejectedValue(databaseError)
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined)
 
     await expect(
       createPhotosService(deps).createPhoto({ uploaderName: 'Mamie', file: JPEG_FILE }),
     ).rejects.toBe(databaseError)
-    expect(consoleError).toHaveBeenCalledWith(expect.stringContaining(IMAGE.cloudinaryId))
+    expect(deps.logger.error).toHaveBeenCalledWith('photo.orphaned', {
+      cloudinaryId: IMAGE.cloudinaryId,
+      error: databaseError,
+    })
+    expect(deps.logger.info).not.toHaveBeenCalled()
   })
 })
 
@@ -155,6 +174,17 @@ describe('deletePhoto', () => {
     expect(deps.repository.deleteById.mock.invocationCallOrder[0]).toBeLessThan(
       deps.deleteImage.mock.invocationCallOrder[0],
     )
+  })
+
+  it('logs the deleted photo by its identifiers', async () => {
+    const deps = makeDeps()
+
+    await createPhotosService(deps).deletePhoto(RECORD.id)
+
+    expect(deps.logger.info).toHaveBeenCalledWith('photo.deleted', {
+      photoId: RECORD.id,
+      cloudinaryId: RECORD.cloudinaryId,
+    })
   })
 
   it('returns the stored id when the URL has it in upper case', async () => {
@@ -186,14 +216,14 @@ describe('deletePhoto', () => {
 
   it('still succeeds when Cloudinary fails, and logs the orphaned image', async () => {
     const deps = makeDeps()
-    deps.deleteImage.mockRejectedValue(new Error('Cloudinary is down'))
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    const cloudinaryError = new Error('Cloudinary is down')
+    deps.deleteImage.mockRejectedValue(cloudinaryError)
 
     await expect(createPhotosService(deps).deletePhoto(RECORD.id)).resolves.toBe(RECORD.id)
-    expect(consoleError).toHaveBeenCalledWith(
-      expect.stringContaining(IMAGE.cloudinaryId),
-      expect.any(Error),
-    )
+    expect(deps.logger.error).toHaveBeenCalledWith('photo.orphaned', {
+      cloudinaryId: IMAGE.cloudinaryId,
+      error: cloudinaryError,
+    })
   })
 
   it('lets a database failure through without touching Cloudinary', async () => {
