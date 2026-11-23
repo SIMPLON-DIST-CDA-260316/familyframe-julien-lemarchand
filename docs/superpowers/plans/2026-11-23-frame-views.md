@@ -30,6 +30,7 @@ last_updated: 2026-11-23
 - Generated shadcn files in `client/src/components/ui/` stay as generated, only formatted by Biome.
 - TypeScript rules (AGENTS.md): no `as` casts (including `as const`), explicit return types on exported functions, literal unions rather than `enum`.
 - Code rules (`.claude/rules/`): comment why, never what; no file-summary comments; booleans prefixed `is`/`has`/`should`; callback params named after the item; no magic numbers; one responsibility per file; max 30 lines per function, 5 params.
+- Author decision (2026-11-23): handler functions nested in a hook or component count as their own functions. `FramePage` in Task 4 (transitional) and `useFrameSelection` in Task 5 exceed 30 lines with them included: tolerated.
 - UI text in French, code and docs in English.
 - No API change: Bruno collection untouched.
 - Every commit passes `pnpm check` and `pnpm typecheck`; every task ends with `pnpm build` green and the manual check of its task in Chrome.
@@ -950,3 +951,5 @@ Stop the 5181 Vite server (see "Dev environment"), set `status: in-review` in th
 ## Drift Log
 
 <!-- date · task/step · what the plan said · what was done · why -->
+
+- 2026-11-23 · pre-flight · plan code exceeds the 30-line rule in `FramePage` (Task 4) and `useFrameSelection` (Task 5) · author chose to tolerate it, added to Global Constraints · keeps the plan's simple structure
