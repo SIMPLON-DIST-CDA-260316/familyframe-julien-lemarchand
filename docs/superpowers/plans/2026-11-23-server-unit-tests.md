@@ -1,13 +1,13 @@
 ---
 plan: server-unit-tests
-status: draft
+status: in-progress
 spec: docs/superpowers/specs/2026-11-23-server-unit-tests-design.md
 branch: test/vitest-setup (PR A), test/photos-service (PR B), refactor/photos-service-names (PR C)
 worktree: false
 tasks_total: 3
-tasks_done: 0
-current_task: —
-last_commit: —
+tasks_done: 1
+current_task: 2
+last_commit: 1acfa34
 last_updated: 2026-11-23
 ---
 
@@ -70,12 +70,12 @@ The stack and branch exist (`gh stack init test/vitest-setup`) and already hold 
 - Consumes: `AppError` (`server/src/errors/app-error.ts`, `new AppError(code: ApiErrorCode)`, `readonly code`), `ApiError = { error: ApiErrorCode }` (`server/src/types.ts`), the private `toErrorCode` and `HTTP_STATUS_BY_CODE` in `error-handler.ts`.
 - Produces: `export type ErrorResponse = { status: number; body: ApiError }` and `export function toErrorResponse(error: unknown): ErrorResponse` in `error-handler.ts`; `errorHandler` keeps its signature. Root `pnpm test` runs the server unit tests.
 
-- [ ] **Step 1: Add Vitest**
+- [x] **Step 1: Add Vitest**
 
 Run from the repo root: `pnpm --filter server add -D vitest@^5.1.1`
 Expected: `server/package.json` gets `"vitest": "^5.1.1"` in `devDependencies`; `pnpm-lock.yaml` updated.
 
-- [ ] **Step 2: Scripts and build config**
+- [x] **Step 2: Scripts and build config**
 
 In `server/package.json` `scripts`, replace `"build": "tsc"` with `"build": "tsc -p tsconfig.build.json"`, and add after `typecheck`:
 
@@ -102,14 +102,14 @@ In the root `package.json` `scripts`, add after `"check:fix"`:
 Run: `pnpm build`
 Expected: both packages `Done`.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add server/package.json server/tsconfig.build.json package.json pnpm-lock.yaml
 git commit -F <file>   # build(server): add Vitest and keep tests out of the build
 ```
 
-- [ ] **Step 4: Write the failing test**
+- [x] **Step 4: Write the failing test**
 
 Create `server/src/errors/error-handler.test.ts`:
 
@@ -161,12 +161,12 @@ describe('toErrorResponse', () => {
 })
 ```
 
-- [ ] **Step 5: Run it to see it fail**
+- [x] **Step 5: Run it to see it fail**
 
 Run: `pnpm test`
 Expected: FAIL, `toErrorResponse` is not exported (`is not a function` or a missing export error). `pnpm typecheck` also fails on the missing export.
 
-- [ ] **Step 6: Extract `toErrorResponse`**
+- [x] **Step 6: Extract `toErrorResponse`**
 
 In `server/src/errors/error-handler.ts`, replace everything from the `// Express spots an error handler by its 4 parameters.` comment to the end of the file with:
 
@@ -195,21 +195,21 @@ export function errorHandler(
 
 The imports at the top stay as they are (`ApiError` is still used).
 
-- [ ] **Step 7: Run all gates**
+- [x] **Step 7: Run all gates**
 
 Run: `pnpm test && pnpm check && pnpm typecheck && pnpm build && pnpm test:bruno`
 Expected: Vitest `6 passed`; Biome no fixes; both typechecks `Done`; both builds `Done`; Bruno `11 (11 Passed)`, `26/26`.
 Run: `ls server/dist/errors`
 Expected: no `error-handler.test.js`.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add server/src/errors/error-handler.ts server/src/errors/error-handler.test.ts
 git commit -F <file>   # test(server): unit test the error responses
 ```
 
-- [ ] **Step 9: Document**
+- [x] **Step 9: Document**
 
 In `AGENTS.md`, under `## Working rules`, add after the `**API change → Bruno**` line:
 
@@ -226,7 +226,7 @@ In `README.md`, in the scripts table, add after the `pnpm check` row (keep the c
 Run: `pnpm check:fix && pnpm check`
 Expected: no remaining issues.
 
-- [ ] **Step 10: Commit**
+- [x] **Step 10: Commit**
 
 ```bash
 git add AGENTS.md README.md
@@ -235,7 +235,7 @@ git commit -F <file>   # docs: document the unit tests
 
 ### PR A delivery
 
-- [ ] Tick Task 1 in this plan and update the frontmatter; commit `docs: track PR A progress in the unit tests plan`.
+- [x] Tick Task 1 in this plan and update the frontmatter; commit `docs: track PR A progress in the unit tests plan`.
 
 ---
 
