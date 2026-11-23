@@ -31,3 +31,19 @@ io.on('connection', (socket) => {
 httpServer.listen(config.port, () => {
   console.log(`API listening on http://localhost:${config.port}`)
 })
+
+// Clean stop: Ctrl+C sends SIGINT, `docker stop` sends SIGTERM.
+async function shutdown(signal: NodeJS.Signals): Promise<void> {
+  console.log(`${signal} received, shutting down`)
+  try {
+    await io.close() // disconnects the sockets and closes the HTTP server
+    await prisma.$disconnect()
+    process.exit(0)
+  } catch (error) {
+    console.error('Error while shutting down:', error)
+    process.exit(1)
+  }
+}
+
+process.on('SIGINT', shutdown)
+process.on('SIGTERM', shutdown)
