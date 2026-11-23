@@ -69,6 +69,7 @@ En dev, Vite proxifie `/api` et `/socket.io` vers l'API : le front n'appelle que
 | `pnpm build`                     | build des deux packages                   |
 | `pnpm typecheck`                 | vérification TypeScript                   |
 | `pnpm check` / `pnpm check:fix`  | lint + format + tri des imports (Biome)   |
+| `pnpm test:hooks`                | tests des hooks Claude Code               |
 | `pnpm --filter server db:push`   | synchronise le schéma Prisma avec MongoDB |
 | `pnpm --filter server db:studio` | explorateur de données Prisma Studio      |
 
