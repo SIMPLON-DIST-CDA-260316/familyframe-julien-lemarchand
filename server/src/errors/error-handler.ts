@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from 'express'
 import multer from 'multer'
+import { logger } from '../lib/logger.js'
 import type { ApiError, ApiErrorCode } from '../types.js'
 import { AppError } from './app-error.js'
 
@@ -35,13 +36,13 @@ export function toErrorResponse(error: unknown): ErrorResponse {
 // Express spots an error handler by its 4 parameters.
 export function errorHandler(
   error: unknown,
-  _req: Request,
+  req: Request,
   res: Response,
   _next: NextFunction,
 ): void {
   const { status, body } = toErrorResponse(error)
   if (status === HTTP_STATUS_BY_CODE.SERVER_ERROR) {
-    console.error(error)
+    logger.error('server.error', { error, method: req.method, path: req.path })
   }
   res.status(status).json(body)
 }
