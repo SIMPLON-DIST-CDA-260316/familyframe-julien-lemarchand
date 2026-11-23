@@ -28,6 +28,13 @@ export function SlideshowScreen({
 
   return (
     <>
+      {/* First in the DOM: Tab reaches ✕ and ⋯ before the transport. */}
+      <SlideshowTopBar
+        isVisible={isActive}
+        photo={currentPhoto}
+        settings={settings}
+        onClose={selection.closeSlideshow}
+      />
       <PhotoView
         photos={photos}
         currentId={currentPhoto.id}
@@ -44,12 +51,6 @@ export function SlideshowScreen({
           />
         )}
       </PhotoView>
-      <SlideshowTopBar
-        isVisible={isActive}
-        photo={currentPhoto}
-        settings={settings}
-        onClose={selection.closeSlideshow}
-      />
       <NewPhotosBadge count={selection.newPhotoCount} onSelect={selection.showNewest} />
     </>
   )

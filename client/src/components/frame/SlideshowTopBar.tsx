@@ -20,7 +20,11 @@ export function SlideshowTopBar({
 }: SlideshowTopBarProps): JSX.Element {
   return (
     // ✕ top left, where photo viewers put it; the actions on the photo top right.
-    <ControlsBar edge="top" isVisible={isVisible} className="fixed inset-x-0 top-0 justify-between">
+    <ControlsBar
+      edge="top"
+      isVisible={isVisible}
+      className="fixed inset-x-0 top-0 z-10 justify-between"
+    >
       <CloseButton onClose={onClose} />
       <SlideshowMenu
         photo={photo}
