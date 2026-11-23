@@ -1,5 +1,5 @@
 import type { JSX } from 'react'
-import { TileDeleteButton } from '@/components/frame/TileDeleteButton.tsx'
+import { PhotoActionsMenu } from '@/components/frame/PhotoActionsMenu.tsx'
 import type { Photo } from '@/photo.ts'
 
 type ContactSheetTileProps = {
@@ -14,7 +14,7 @@ export function ContactSheetTile({
   onSelect,
 }: ContactSheetTileProps): JSX.Element {
   return (
-    // The trash is a sibling of the tile button: a button cannot hold a button.
+    // The ellipsis is a sibling of the tile button: a button cannot hold a button.
     <li className="group/tile relative">
       <button
         type="button"
@@ -33,7 +33,11 @@ export function ContactSheetTile({
           {photo.uploaderName}
         </span>
       </button>
-      <TileDeleteButton photo={photo} />
+      <PhotoActionsMenu
+        photo={photo}
+        label={`Actions sur la photo envoyée par ${photo.uploaderName}`}
+        className="absolute top-2 right-2 rounded-full bg-black/55 text-white/80 backdrop-blur-sm hover:bg-black/75 hover:text-white dark:hover:bg-black/75"
+      />
     </li>
   )
 }

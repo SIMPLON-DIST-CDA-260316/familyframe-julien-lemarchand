@@ -2,9 +2,8 @@ import { errorMessage } from '@/api.ts'
 import type { Photo } from '@/photo.ts'
 
 // The list is not touched here: the server's photo:deleted reaches every frame, this one included.
-// No pending state on the buttons: kept minimal, see the frame deletion spec.
-export async function deletePhoto({ id, uploaderName }: Photo): Promise<void> {
-  if (!window.confirm(`Supprimer la photo envoyée par ${uploaderName} ?`)) return
+// The confirmation lives in DeletePhotoDialog; no pending state, see the frame deletion spec.
+export async function deletePhoto({ id }: Photo): Promise<void> {
   try {
     const res = await fetch(`/api/photos/${id}`, { method: 'DELETE' })
     if (!res.ok) {

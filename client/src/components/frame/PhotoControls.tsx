@@ -1,6 +1,6 @@
 import type { ComponentProps, JSX } from 'react'
 import { ControlsDivider } from '@/components/frame/ControlsDivider.tsx'
-import { DeletePhotoButton } from '@/components/frame/DeletePhotoButton.tsx'
+import { PhotoActionsMenu } from '@/components/frame/PhotoActionsMenu.tsx'
 import { SlideshowControls } from '@/components/frame/SlideshowControls.tsx'
 import { StripToggle } from '@/components/frame/StripToggle.tsx'
 import type { Photo } from '@/photo.ts'
@@ -26,7 +26,11 @@ export function PhotoControls({
       <ControlsDivider />
       <SlideshowControls {...slideshow} />
       <ControlsDivider />
-      <DeletePhotoButton photo={photo} />
+      <PhotoActionsMenu
+        photo={photo}
+        label="Actions sur la photo"
+        className="rounded-full text-white/80"
+      />
     </>
   )
 }

@@ -26,3 +26,13 @@ A deletion removes a photo the selection may still point to, so three cases need
 
 - **Delete and arrival in the same reconnect refetch:** if the newest photo is deleted while another arrives during a disconnect, the refetch shows no previous newest, so the new photo counts as no arrival: an active viewer jumps to it, with no badge and no pin. Rare, accepted.
 - **Badge count after deleting an unseen photo:** the count is not lowered. Clicking the badge still shows the real newest photo.
+
+## Actions menu and confirmation modal (user's decision, replaces the trash buttons)
+
+The two trash buttons are replaced by an ellipsis button that opens an actions menu holding "Supprimer". It opens a confirmation modal (title, uploader name, "Annuler" / "Supprimer") instead of `window.confirm`. The ellipsis is used in both places, the controls pill and the contact-sheet tiles, and is always visible on tiles.
+
+- **Why:** the tile trash was invisible (opacity 0) but still tappable on touch, so a stray tap could start a deletion; and `window.confirm` blocks the whole page, frame included.
+- **Dialog outside the menu:** `PhotoActionsMenu` owns the dialog state and renders `DeletePhotoDialog` next to the menu, so closing the menu does not unmount it.
+- **Photo kept at selection:** the dialog holds the photo picked in the menu, not the current one. The slideshow can advance while the dialog stays open, and it must not delete another photo than the one chosen.
+- **Dark colours:** `theme.ts` follows the system scheme, so `<html>` can be light, and Radix portals render in `body`, outside the frame's dark `<main>`. The menu and dialog content get `className="dark"`: the shadcn tokens are defined on `.dark`, which applies to the element itself.
+- **Limitation:** the frame goes idle 4 s after the last pointer or key event, even with a menu or dialog open: the pill hides and the slideshow may advance behind the dialog. Keeping the frame active would need shared state between the dialog and `useIdleControls`; not built.
