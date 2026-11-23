@@ -1,9 +1,9 @@
 import cors from 'cors'
-import express, { type Express, type NextFunction, type Request, type Response } from 'express'
-import multer from 'multer'
+import express, { type Express } from 'express'
 import type { Server } from 'socket.io'
 import { config } from './config.js'
-import { createPhotosRouter, sendError } from './photos.js'
+import { errorHandler } from './errors/error-handler.js'
+import { createPhotosRouter } from './photos.js'
 import type { ClientToServerEvents, ServerToClientEvents } from './types.js'
 
 export function createApp(io: Server<ClientToServerEvents, ServerToClientEvents>): Express {
@@ -18,19 +18,7 @@ export function createApp(io: Server<ClientToServerEvents, ServerToClientEvents>
 
   app.use('/api/photos', createPhotosRouter(io))
 
-  // Express spots an error handler by its 4 parameters.
-  app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
-    if (error instanceof multer.MulterError) {
-      if (error.code === 'LIMIT_FILE_SIZE') {
-        sendError(res, 413, 'PHOTO_TOO_LARGE')
-      } else {
-        sendError(res, 400, 'UPLOAD_INVALID')
-      }
-      return
-    }
-    console.error(error)
-    sendError(res, 500, 'SERVER_ERROR')
-  })
+  app.use(errorHandler)
 
   return app
 }
