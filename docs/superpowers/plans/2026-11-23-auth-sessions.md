@@ -1,13 +1,13 @@
 ---
 plan: auth-sessions
-status: draft
+status: done
 spec: docs/superpowers/specs/2026-11-23-auth-sessions-design.md
 branch: feat/auth-accounts (PR A), feat/auth-sessions (PR B), feat/auth-guard (PR C), feat/client-login (PR D)
 worktree: false
 tasks_total: 13
-tasks_done: 0
+tasks_done: 13
 current_task: —
-last_commit: —
+last_commit: 4a39ac0
 last_updated: 2026-11-24
 ---
 
@@ -131,12 +131,12 @@ Checked in the sources of `@usebruno/cli@4.2.0` (pnpm dlx cache) and by running 
   export function verifyPassword(hash: string, plain: string): Promise<boolean>
   ```
 
-- [ ] **Step 1: Add the dependency**
+- [x] **Step 1: Add the dependency**
 
 Run from the repo root: `pnpm --filter server add argon2@^0.45.2`
 Expected: `server/package.json` `dependencies` gains `"argon2": "^0.45.2"`; pnpm prints a warning that the build script of `argon2` was ignored.
 
-- [ ] **Step 2: Record that the build script is not needed**
+- [x] **Step 2: Record that the build script is not needed**
 
 In `pnpm-workspace.yaml`, append after the `onlyBuiltDependencies` list:
 
@@ -154,7 +154,7 @@ Expected: no "ignored build scripts" warning for argon2.
 Run: `pnpm --filter server exec node --input-type=module -e "import { hash, verify } from 'argon2'; console.log(await verify(await hash('x'), 'x'))"`
 Expected: `true`. If it fails with "No native build was found", move `argon2` from `ignoredBuiltDependencies` to `onlyBuiltDependencies`, run `pnpm install` again, and log it in the Drift Log.
 
-- [ ] **Step 3: Write the failing tests**
+- [x] **Step 3: Write the failing tests**
 
 Create `server/src/lib/password.test.ts`:
 
@@ -190,12 +190,12 @@ describe('verifyPassword', () => {
 })
 ```
 
-- [ ] **Step 4: Run them to verify they fail**
+- [x] **Step 4: Run them to verify they fail**
 
 Run: `pnpm test`
 Expected: FAIL, `password.test.ts` cannot resolve `./password.js`.
 
-- [ ] **Step 5: Implement**
+- [x] **Step 5: Implement**
 
 Create `server/src/lib/password.ts`:
 
@@ -218,7 +218,7 @@ export function verifyPassword(passwordHash: string, plain: string): Promise<boo
 }
 ```
 
-- [ ] **Step 6: Run the tests and the gates**
+- [x] **Step 6: Run the tests and the gates**
 
 Run: `pnpm test`
 Expected: PASS, `Tests  43 passed (43)` (39 before + 4).
@@ -226,7 +226,7 @@ Expected: PASS, `Tests  43 passed (43)` (39 before + 4).
 Run: `pnpm check && pnpm typecheck && pnpm build`
 Expected: all green.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add server/package.json pnpm-lock.yaml pnpm-workspace.yaml server/src/lib/password.ts server/src/lib/password.test.ts
@@ -250,7 +250,7 @@ Message: `feat(server): hash passwords with argon2` + attribution lines. Body: o
 - Consumes: `hashPassword` (Task 1), `prisma` (`server/src/lib/db.ts`), `logger` (`server/src/lib/logger.ts`).
 - Produces: Prisma models `User` (`id`, `email`, `displayName`, `passwordHash`, `role: Role`, `createdAt`, `sessions`) and `Session` (`id`, `tokenHash`, `userId`, `user`, `expiresAt`, `createdAt`); Prisma type `Role = 'member' | 'admin'`; `pnpm db:seed`; the two seeded accounts of the Global Constraints.
 
-- [ ] **Step 1: Add the models**
+- [x] **Step 1: Add the models**
 
 In `server/prisma/schema.prisma`, after the `datasource` block and before `model Photo`, add:
 
@@ -287,7 +287,7 @@ model Session {
 Run: `pnpm --filter server db:generate`
 Expected: `Generated Prisma Client`.
 
-- [ ] **Step 2: Typecheck `prisma/` too**
+- [x] **Step 2: Typecheck `prisma/` too**
 
 Replace `server/tsconfig.json` with (only `rootDir`/`outDir` removed and `prisma` added to `include`):
 
@@ -331,7 +331,7 @@ Replace `server/tsconfig.build.json` with:
 Run: `pnpm typecheck && pnpm build && ls server/dist/server.js`
 Expected: green, and `server/dist/server.js` exists (the build layout did not change).
 
-- [ ] **Step 3: Write the seed**
+- [x] **Step 3: Write the seed**
 
 Create `server/prisma/seed.ts`:
 
@@ -385,7 +385,7 @@ try {
 }
 ```
 
-- [ ] **Step 4: Add the scripts**
+- [x] **Step 4: Add the scripts**
 
 In `server/package.json` `scripts`, after `"db:studio"`, add:
 
@@ -399,7 +399,7 @@ In the root `package.json` `scripts`, after `"db:push"`, add:
     "db:seed": "pnpm --filter server db:seed",
 ```
 
-- [ ] **Step 5: Push the schema and run the seed**
+- [x] **Step 5: Push the schema and run the seed**
 
 Run: `pnpm db:push`
 Expected: `Your database indexes are now in sync with your Prisma schema` (new collections `User`, `Session`, unique indexes on `email` and `tokenHash`).
@@ -412,7 +412,7 @@ Expected: one `seed.refused` line (level error), then `exit=1` (pnpm may print i
 
 Optional check with `pnpm db:studio`: two users, `passwordHash` starting with `$argon2id$`, no photos, no sessions.
 
-- [ ] **Step 6: Document in the README**
+- [x] **Step 6: Document in the README**
 
 In `README.md`, section `## Démarrage (local, sans Docker)`, replace the code block with:
 
@@ -446,7 +446,7 @@ In the `### Scripts racine` table, after the `pnpm db:push` row, add:
 Run: `pnpm check`
 Expected: green (Biome formats Markdown tables? It does not check `.md` content beyond the staged-file hook: if the pre-commit hook rejects `README.md`, run `pnpm exec biome format --write README.md`).
 
-- [ ] **Step 7: Run the gates and commit (two commits)**
+- [x] **Step 7: Run the gates and commit (two commits)**
 
 Run: `pnpm check && pnpm typecheck && pnpm test && pnpm build`
 Expected: all green, `Tests  43 passed (43)`.
@@ -491,7 +491,7 @@ Message: `docs: document the seed and the test accounts` + attribution lines.
   export function readSessionToken(cookieHeader: string | undefined): string | null
   ```
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `server/src/lib/session-token.test.ts`:
 
@@ -544,12 +544,12 @@ describe('generateToken', () => {
 })
 ```
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `pnpm test`
 Expected: FAIL, `session-token.test.ts` cannot resolve `./session-token.js`.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Create `server/src/lib/session-token.ts`:
 
@@ -585,7 +585,7 @@ export function readSessionToken(cookieHeader: string | undefined): string | nul
 }
 ```
 
-- [ ] **Step 4: Run the tests and the gates**
+- [x] **Step 4: Run the tests and the gates**
 
 Run: `pnpm test`
 Expected: PASS, `Tests  51 passed (51)`.
@@ -593,7 +593,7 @@ Expected: PASS, `Tests  51 passed (51)`.
 Run: `pnpm check && pnpm typecheck && pnpm build`
 Expected: all green.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add server/src/lib/session-token.ts server/src/lib/session-token.test.ts
@@ -623,7 +623,7 @@ Message: `feat(server): add the session token helpers` + attribution lines.
   ```
   `toErrorResponse` maps `BODY_INVALID` → 400, `UNAUTHENTICATED` → 401, `INVALID_CREDENTIALS` → 401, and any error with `type === 'entity.parse.failed'` (body-parser's JSON syntax error) → `BODY_INVALID`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 In `server/src/errors/error-handler.test.ts`, add inside `describe('toErrorResponse', ...)`, after the `maps any other Multer error to UPLOAD_INVALID` test:
 
@@ -651,12 +651,12 @@ In `server/src/errors/error-handler.test.ts`, add inside `describe('toErrorRespo
   })
 ```
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `pnpm typecheck`
 Expected: FAIL, `'UNAUTHENTICATED'` and `'INVALID_CREDENTIALS'` are not assignable to `ApiErrorCode`.
 
-- [ ] **Step 3: Add the codes and the user type**
+- [x] **Step 3: Add the codes and the user type**
 
 In `server/src/types.ts`, replace the `ApiErrorCode` union with:
 
@@ -690,7 +690,7 @@ export type PublicUser = {
 }
 ```
 
-- [ ] **Step 4: Map them in the error handler**
+- [x] **Step 4: Map them in the error handler**
 
 In `server/src/errors/error-handler.ts`, replace `HTTP_STATUS_BY_CODE` with:
 
@@ -733,7 +733,7 @@ In `toErrorCode`, before the final `return 'SERVER_ERROR'`, add:
   }
 ```
 
-- [ ] **Step 5: Keep the client copy in sync**
+- [x] **Step 5: Keep the client copy in sync**
 
 In `client/src/api.ts`, replace the `ApiErrorCode` union with the exact same union as in Step 3, and replace `ERROR_MESSAGES` with:
 
@@ -754,7 +754,7 @@ const ERROR_MESSAGES: Record<ApiErrorCode, string> = {
 }
 ```
 
-- [ ] **Step 6: Run the tests and the gates**
+- [x] **Step 6: Run the tests and the gates**
 
 Run: `pnpm test`
 Expected: PASS, `Tests  54 passed (54)`.
@@ -762,7 +762,7 @@ Expected: PASS, `Tests  54 passed (54)`.
 Run: `pnpm check && pnpm typecheck && pnpm build`
 Expected: all green.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add server/src/types.ts server/src/errors/error-handler.ts server/src/errors/error-handler.test.ts client/src/api.ts
@@ -819,7 +819,7 @@ Message: `feat(server): add the auth error codes and the public user type` + att
   export function createAuthService(deps: AuthServiceDeps): AuthService
   ```
 
-- [ ] **Step 1: Write the repository**
+- [x] **Step 1: Write the repository**
 
 Create `server/src/features/auth/auth.repository.ts`:
 
@@ -866,7 +866,7 @@ export function createAuthRepository(prisma: PrismaClient): AuthRepository {
 Run: `pnpm typecheck`
 Expected: green (the repository has no test: it is the only Prisma access, like `photos.repository.ts`).
 
-- [ ] **Step 2: Write the failing service tests**
+- [x] **Step 2: Write the failing service tests**
 
 Create `server/src/features/auth/auth.service.test.ts`:
 
@@ -1140,12 +1140,12 @@ describe('authenticateAndSlide', () => {
 })
 ```
 
-- [ ] **Step 3: Run them to verify they fail**
+- [x] **Step 3: Run them to verify they fail**
 
 Run: `pnpm test`
 Expected: FAIL, `auth.service.test.ts` cannot resolve `./auth.service.js`.
 
-- [ ] **Step 4: Implement the service**
+- [x] **Step 4: Implement the service**
 
 Create `server/src/features/auth/auth.service.ts`:
 
@@ -1293,7 +1293,7 @@ export function createAuthService(deps: AuthServiceDeps): AuthService {
 }
 ```
 
-- [ ] **Step 5: Run the tests and the gates**
+- [x] **Step 5: Run the tests and the gates**
 
 Run: `pnpm test`
 Expected: PASS, `Test Files  6 passed (6)`, `Tests  76 passed (76)` (54 + 22).
@@ -1301,7 +1301,7 @@ Expected: PASS, `Test Files  6 passed (6)`, `Tests  76 passed (76)` (54 + 22).
 Run: `pnpm check && pnpm typecheck && pnpm build`
 Expected: all green. If `pnpm check` reorders imports, run `pnpm check:fix` and re-run.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add server/src/features/auth/auth.repository.ts server/src/features/auth/auth.service.ts server/src/features/auth/auth.service.test.ts
@@ -1343,7 +1343,7 @@ Message: `feat(server): add the auth service` + attribution lines. Body: one lin
   HTTP: `POST /api/auth/login` (JSON `{ email, password }`) → `200 { user }` + `Set-Cookie: ff_session=…`; `POST /api/auth/logout` → `204`, clears the cookie, also without a session; `GET /api/auth/me` → `200 { user }` or `401 UNAUTHENTICATED`. Malformed JSON → `400 BODY_INVALID`.
   Bruno: runtime variable `sessionCookie` (`ff_session=<hex>`), sent by `collection.bru` as `Cookie` to every request; environment variables `memberEmail`, `memberPassword`, `memberDisplayName`.
 
-- [ ] **Step 1: Write the Bruno requests (the failing tests)**
+- [x] **Step 1: Write the Bruno requests (the failing tests)**
 
 In `server/package.json`, replace the `test:bruno` script with:
 
@@ -1816,12 +1816,12 @@ docs {
 }
 ```
 
-- [ ] **Step 2: Run Bruno to verify the auth requests fail**
+- [x] **Step 2: Run Bruno to verify the auth requests fail**
 
 Run: `pnpm test:bruno` (API running)
 Expected: the `auth/` requests run **first** (check the order in the output) and fail with 404 `ROUTE_NOT_FOUND` (except the two "logout" requests asserting only 204 also fail with 404); the 15 existing requests still pass. If `auth/` does not run first, stop and log it in the Drift Log (the folder order assumption is wrong).
 
-- [ ] **Step 3: Add `isProduction` to the config**
+- [x] **Step 3: Add `isProduction` to the config**
 
 In `server/src/config.ts`, add inside `config`, after `clientOrigin`:
 
@@ -1829,7 +1829,7 @@ In `server/src/config.ts`, add inside `config`, after `clientOrigin`:
   isProduction: process.env.NODE_ENV === 'production',
 ```
 
-- [ ] **Step 4: Write the cookie helpers**
+- [x] **Step 4: Write the cookie helpers**
 
 Create `server/src/features/auth/auth.cookie.ts`:
 
@@ -1857,7 +1857,7 @@ export function clearSessionCookie(res: Response): void {
 }
 ```
 
-- [ ] **Step 5: Write the middleware**
+- [x] **Step 5: Write the middleware**
 
 Create `server/src/features/auth/auth.middleware.ts`:
 
@@ -1904,7 +1904,7 @@ export function currentUser(req: Request): PublicUser {
 
 Express 5 forwards a rejected promise from a middleware to the error handler, like it does for the photos controller: no try/catch.
 
-- [ ] **Step 6: Write the controller and the routes**
+- [x] **Step 6: Write the controller and the routes**
 
 Create `server/src/features/auth/auth.controller.ts`:
 
@@ -1962,7 +1962,7 @@ export function createAuthRouter(controller: AuthController, requireAuth: Reques
 }
 ```
 
-- [ ] **Step 7: Wire the app and the server**
+- [x] **Step 7: Wire the app and the server**
 
 Replace `server/src/app.ts` with:
 
@@ -2052,7 +2052,7 @@ const authService = assembleAuthService()
 const httpServer = createServer(createApp(io, authService))
 ```
 
-- [ ] **Step 8: Run Bruno and the gates**
+- [x] **Step 8: Run Bruno and the gates**
 
 Wait ~3 s for `tsx watch` to reload. Run: `pnpm test:bruno`
 Expected: 25 requests, all pass (10 in `auth/` first, then the 15 existing ones).
@@ -2064,7 +2064,7 @@ Expected: all green, `Tests  76 passed (76)`. If Biome flags the `namespace` in 
 
 Manual check of the logs (API terminal, pretty format): after a Bruno run, `auth.login_succeeded userId=…` (twice), `auth.login_failed` (twice, no data), `auth.logged_out userId=…` (once). No email, password or token anywhere.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add server/src/config.ts server/src/app.ts server/src/server.ts server/src/features/auth/auth.cookie.ts server/src/features/auth/auth.middleware.ts server/src/features/auth/auth.controller.ts server/src/features/auth/auth.routes.ts server/package.json server/bruno/collection.bru server/bruno/environments/Local.bru server/bruno/auth
@@ -2091,7 +2091,7 @@ Message: `feat(server): add the login, logout and me routes` + attribution lines
 - Consumes: `createRequireAuth` (Task 6), the Bruno `sessionCookie` variable (Task 6).
 - Produces: every `/api/photos` route answers `401 UNAUTHENTICATED` without a valid session; `req.user` is set for the photos controller (used by Task 8).
 
-- [ ] **Step 1: Write the failing Bruno request**
+- [x] **Step 1: Write the failing Bruno request**
 
 Create `server/bruno/photos/list/02-edge-sans-cookie.bru`:
 
@@ -2155,12 +2155,12 @@ docs {
 }
 ```
 
-- [ ] **Step 2: Run Bruno to verify it fails**
+- [x] **Step 2: Run Bruno to verify it fails**
 
 Run: `pnpm test:bruno`
 Expected: FAIL on `photos/list/02-edge-sans-cookie` only (200 instead of 401); 25 others pass.
 
-- [ ] **Step 3: Guard the photos router**
+- [x] **Step 3: Guard the photos router**
 
 In `server/src/app.ts`, in `createApp`, replace `app.use('/api/photos', assemblePhotosRouter(io))` with:
 
@@ -2168,7 +2168,7 @@ In `server/src/app.ts`, in `createApp`, replace `app.use('/api/photos', assemble
   app.use('/api/photos', requireAuth, assemblePhotosRouter(io))
 ```
 
-- [ ] **Step 4: Run Bruno and the gates**
+- [x] **Step 4: Run Bruno and the gates**
 
 Wait ~3 s. Run: `pnpm test:bruno`
 Expected: 26 requests, all pass (the photos requests carry the cookie; `create/09` still answers `UPLOADER_NAME_INVALID`: it reaches the route, which still validates the pseudo first).
@@ -2178,7 +2178,7 @@ Expected: all green.
 
 Manual check: `curl -s http://localhost:3000/api/photos` → `{"error":"UNAUTHENTICATED"}`; `curl -s http://localhost:3000/api/health` → `{"status":"ok"}` (still public).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add server/src/app.ts server/bruno/photos/list/02-edge-sans-cookie.bru server/bruno/photos/delete/01-nominal.bru server/bruno/photos/folder.bru
@@ -2208,7 +2208,7 @@ Message: `feat(server): require a session on the photo routes` + attribution lin
   ```
   `POST /api/photos` takes only the `photo` file; the `uploaderName` of the created photo is the user's `displayName`. `UPLOADER_NAME_INVALID` no longer exists.
 
-- [ ] **Step 1: Update the Bruno requests (the failing tests)**
+- [x] **Step 1: Update the Bruno requests (the failing tests)**
 
 Delete the two pseudo requests:
 
@@ -2308,12 +2308,12 @@ In `server/bruno/collection.bru` `docs`, replace the paragraph about nominal upl
   du membre de test (`Membre`) : elles apparaissent sur le cadre.
 ```
 
-- [ ] **Step 2: Run Bruno to verify it fails**
+- [x] **Step 2: Run Bruno to verify it fails**
 
 Run: `pnpm test:bruno`
 Expected: FAIL on `create/01`, `create/02`, `create/07`, `create/08` and `create/09` with 400 `UPLOADER_NAME_INVALID` (the pseudo is still required); the others pass. 24 requests in total.
 
-- [ ] **Step 3: Update the service tests**
+- [x] **Step 3: Update the service tests**
 
 In `server/src/features/photos/photos.service.test.ts`:
 
@@ -2343,7 +2343,7 @@ Every other test already passes `uploaderName: 'Mamie'` and stays.
 Run: `pnpm typecheck`
 Expected: green (tests passing a string still match `uploaderName: unknown`); `pnpm test` → PASS with `Tests  70 passed (70)` (76 − 6): the removed tests described the old rule.
 
-- [ ] **Step 4: Take the name from the user**
+- [x] **Step 4: Take the name from the user**
 
 In `server/src/features/photos/photos.service.ts`:
 
@@ -2377,14 +2377,14 @@ and replace the body of `create` with:
     },
 ```
 
-- [ ] **Step 5: Remove the unreachable code**
+- [x] **Step 5: Remove the unreachable code**
 
 In `server/src/types.ts`, remove the line `  | 'UPLOADER_NAME_INVALID'` from `ApiErrorCode`. In `server/src/errors/error-handler.ts`, remove `  UPLOADER_NAME_INVALID: 400,` from `HTTP_STATUS_BY_CODE`. In `client/src/api.ts`, remove the same union member and the `UPLOADER_NAME_INVALID` message.
 
 Run: `pnpm typecheck`
 Expected: green (the exhaustive `Record<ApiErrorCode, …>` maps would fail if a copy were left behind).
 
-- [ ] **Step 6: Run Bruno and the gates**
+- [x] **Step 6: Run Bruno and the gates**
 
 Wait ~3 s. Run: `pnpm test:bruno`
 Expected: 24 requests, all pass.
@@ -2392,7 +2392,7 @@ Expected: 24 requests, all pass.
 Run: `pnpm check && pnpm typecheck && pnpm test && pnpm build`
 Expected: all green, `Tests  70 passed (70)`.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add -A server/bruno server/src/features/photos server/src/types.ts server/src/errors/error-handler.ts client/src/api.ts
@@ -2424,7 +2424,7 @@ Message: `feat(server): name the uploader after the logged-in user` + attributio
   ```
   A handshake without a valid session gets `connect_error` with message `UNAUTHENTICATED` (used by Task 12). An accepted socket has `socket.data.userId` and is in room `user:<id>`.
 
-- [ ] **Step 1: Write the failing manual check**
+- [x] **Step 1: Write the failing manual check**
 
 The repo has no Socket.IO test harness; this script is the check. With the API running, from the `client/` directory (it has `socket.io-client`):
 
@@ -2434,7 +2434,7 @@ cd client && node --input-type=module -e "import { io } from 'socket.io-client';
 
 Expected now: `connected` (no auth yet): the check fails.
 
-- [ ] **Step 2: Declare the socket types**
+- [x] **Step 2: Declare the socket types**
 
 Create `server/src/lib/socket-types.ts`:
 
@@ -2459,7 +2459,7 @@ export type SocketMiddleware = Parameters<SocketServer['use']>[0]
 
 In `server/src/app.ts` and `server/src/features/photos/photos.controller.ts`, replace every `Server<ClientToServerEvents, ServerToClientEvents>` type with `SocketServer` (import `type { SocketServer } from './lib/socket-types.js'`, resp. `'../../lib/socket-types.js'`), and remove the imports that become unused (`Server` from `socket.io`, `ClientToServerEvents`, `ServerToClientEvents`; the controller still imports `Photo` from `types.js`).
 
-- [ ] **Step 3: Write the middleware**
+- [x] **Step 3: Write the middleware**
 
 Create `server/src/features/auth/auth.socket.ts`:
 
@@ -2496,7 +2496,7 @@ export function createSocketAuth(service: AuthService): SocketMiddleware {
 }
 ```
 
-- [ ] **Step 4: Plug it into the server**
+- [x] **Step 4: Plug it into the server**
 
 In `server/src/server.ts`:
 
@@ -2533,7 +2533,7 @@ io.on('connection', (socket) => {
 
 `authService` is already declared above (Task 6), before `httpServer`.
 
-- [ ] **Step 5: Run the manual check again**
+- [x] **Step 5: Run the manual check again**
 
 Wait ~3 s. Run the Step 1 command again.
 Expected: `refused: UNAUTHENTICATED`.
@@ -2547,12 +2547,12 @@ cd client && node --input-type=module -e "import { io } from 'socket.io-client';
 
 Expected: `connected`, and in the API terminal `socket.connected socketId=… userId=…` then `socket.disconnected … userId=… reason=…`.
 
-- [ ] **Step 6: Run the gates**
+- [x] **Step 6: Run the gates**
 
 Run: `pnpm check && pnpm typecheck && pnpm test && pnpm build && pnpm test:bruno`
 Expected: all green, Bruno 24/24.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add server/src/lib/socket-types.ts server/src/features/auth/auth.socket.ts server/src/server.ts server/src/app.ts server/src/features/photos/photos.controller.ts
@@ -2572,7 +2572,7 @@ Message: `feat(server): require a session on Socket.IO` + attribution lines. Bod
 - Consumes: the behavior of Tasks 1-9.
 - Produces: an "Authentification" section and up-to-date API, errors, real-time, layers, logs, configuration, data, tooling and containerization sections.
 
-- [ ] **Step 1: Parcours d'une photo**
+- [x] **Step 1: Parcours d'une photo**
 
 In `## Parcours d'une photo`, replace steps 1, 3 and 5 with:
 
@@ -2588,7 +2588,7 @@ In `## Parcours d'une photo`, replace steps 1, 3 and 5 with:
 5. **Prisma** enregistre dans MongoDB l'URL, l'identifiant Cloudinary, le nom d'affichage du compte (`uploaderName`) et la date.
 ```
 
-- [ ] **Step 2: API and errors**
+- [x] **Step 2: API and errors**
 
 Replace the `## API` route table with:
 
@@ -2626,7 +2626,7 @@ Replace the error table with:
 | toute autre erreur (Cloudinary, base)                   | 500    | `SERVER_ERROR`        |
 ```
 
-- [ ] **Step 3: The Authentification section**
+- [x] **Step 3: The Authentification section**
 
 Insert a new section right after `## API` (before `## Temps réel`):
 
@@ -2643,7 +2643,7 @@ Insert a new section right after `## API` (before `## Temps réel`):
 - **JSON** : `express.json()` n'est monté que sur `/api/auth`, les seules routes qui lisent du JSON ; un corps illisible répond `400 BODY_INVALID`.
 ```
 
-- [ ] **Step 4: Temps réel, couches, logs, configuration, données, outillage, conteneurisation**
+- [x] **Step 4: Temps réel, couches, logs, configuration, données, outillage, conteneurisation**
 
 In `## Temps réel`, add as the first bullet:
 
@@ -2701,7 +2701,7 @@ In `## Conteneurisation`, add to `Points déjà connus` :
 - **argon2** charge un binaire précompilé livré dans le paquet (Linux x64/arm64, glibc et musl, Windows x64) : son script de build reste bloqué par pnpm (`ignoredBuiltDependencies`). Comme Sharp, il doit être installé dans l'image, jamais copié depuis le `node_modules` Windows.
 ```
 
-- [ ] **Step 5: Check and commit**
+- [x] **Step 5: Check and commit**
 
 Run: `pnpm check`
 Expected: green (if the hook later rejects `ARCHITECTURE.md`, run `pnpm exec biome format --write ARCHITECTURE.md`).
@@ -2758,7 +2758,7 @@ Message: `docs: describe the authentication` + attribution lines.
   export function RequireAuth({ children }: { children: ReactNode }): ReactNode
   ```
 
-- [ ] **Step 1: The user type and the API calls**
+- [x] **Step 1: The user type and the API calls**
 
 Create `client/src/auth/user.ts`:
 
@@ -2846,7 +2846,7 @@ export async function postLogout(): Promise<void> {
 }
 ```
 
-- [ ] **Step 2: The context, the provider and the route guard**
+- [x] **Step 2: The context, the provider and the route guard**
 
 Create `client/src/auth/AuthContext.ts`:
 
@@ -2935,7 +2935,7 @@ export function RequireAuth({ children }: { children: ReactNode }): ReactNode {
 }
 ```
 
-- [ ] **Step 3: The login form and page**
+- [x] **Step 3: The login form and page**
 
 Create `client/src/components/auth/LoginForm.tsx`:
 
@@ -3057,7 +3057,7 @@ export default function LoginPage(): JSX.Element | null {
 }
 ```
 
-- [ ] **Step 4: The routes**
+- [x] **Step 4: The routes**
 
 Replace `client/src/App.tsx` with:
 
@@ -3114,7 +3114,7 @@ Manual, in a private window (no cookie), `pnpm dev` running:
 5. Visit `/login` while logged in → redirected to `/`.
 6. DevTools → Application → Cookies: `ff_session` is `HttpOnly`, `SameSite=Lax`, expires in ~90 days; `document.cookie` in the console does not show it.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add client/src/auth client/src/components/auth/LoginForm.tsx client/src/pages/LoginPage.tsx client/src/App.tsx
@@ -3137,7 +3137,7 @@ Message: `feat(client): add the login page and protect the pages` + attribution 
 - Consumes: `useAuth` (`user`, `logout`, `dropUser`) from Task 11; Socket.IO `connect_error` message `UNAUTHENTICATED` (Task 9); `POST /api/photos` without `uploaderName` (Task 8).
 - Produces: `export const UNAUTHORIZED_STATUS = 401` in `client/src/api.ts`; `LogoutButton`; an upload page without pseudo; a frame that returns to `/login` when the session ends.
 
-- [ ] **Step 1: The shared status and the logout button**
+- [x] **Step 1: The shared status and the logout button**
 
 In `client/src/api.ts`, after the `ERROR_MESSAGES` constant, add:
 
@@ -3165,7 +3165,7 @@ export function LogoutButton(): JSX.Element {
 }
 ```
 
-- [ ] **Step 2: The upload page**
+- [x] **Step 2: The upload page**
 
 Replace `client/src/pages/UploadPage.tsx` with:
 
@@ -3314,7 +3314,7 @@ export default function UploadPage(): JSX.Element {
 
 (Compared with the old file: the pseudo state, its `localStorage` helpers, its constant and its field are gone; `uploaderName` is no longer sent; the header shows the account name and the logout button; a 401 drops the user.)
 
-- [ ] **Step 3: The photo feed**
+- [x] **Step 3: The photo feed**
 
 Replace `client/src/hooks/usePhotoFeed.ts` with:
 
@@ -3407,7 +3407,7 @@ Manual (`pnpm dev`, logged in as the member):
 4. Expired session on an open frame: log in, open `/frame`, then in another terminal `pnpm db:seed` (wipes the sessions) and stop/start the API (`pnpm dev`) so the socket reconnects → the frame lands on `/login` (handshake refused with `UNAUTHENTICATED`, or the reload gets a 401).
 5. Same on `/`: after `pnpm db:seed`, an upload attempt lands on `/login`. Log in again afterwards (the seed recreated the accounts).
 
-- [ ] **Step 5: Commit (two commits)**
+- [x] **Step 5: Commit (two commits)**
 
 ```bash
 git add client/src/api.ts client/src/components/auth/LogoutButton.tsx client/src/pages/UploadPage.tsx
@@ -3434,7 +3434,7 @@ Message: `feat(client): send the frame back to login when the session ends` + at
 - Consumes: the behavior of Tasks 11-12.
 - Produces: docs matching the client.
 
-- [ ] **Step 1: README**
+- [x] **Step 1: README**
 
 In `README.md`, replace the intro sentence (first paragraph under the title) with:
 
@@ -3450,7 +3450,7 @@ In the services table, add after the `Cadre` row:
 
 and add below the table: `` Sans session, l'envoi et le cadre redirigent vers `/login` ; le cadre se connecte une fois avec un compte et reste connecté (session glissante de 90 jours). ``
 
-- [ ] **Step 2: ARCHITECTURE pages**
+- [x] **Step 2: ARCHITECTURE pages**
 
 In `ARCHITECTURE.md` `## Pages`, replace the table with:
 
@@ -3470,7 +3470,7 @@ Add after the table:
 
 In the `## Vue d'ensemble` paragraph, replace `Deux interfaces React (envoi, cadre)` with `Trois pages React (connexion, envoi, cadre)`, and in `## Organisation du dépôt` replace `` `client/` : les deux interfaces React (envoi, cadre), servies par Vite. `` with `` `client/` : les pages React (connexion, envoi, cadre), servies par Vite. ``
 
-- [ ] **Step 3: Check and commit**
+- [x] **Step 3: Check and commit**
 
 Run: `pnpm check`
 Expected: green (if the hook rejects a `.md` file, run `pnpm exec biome format --write README.md ARCHITECTURE.md`).
@@ -3486,10 +3486,10 @@ Message: `docs: describe the login page` + attribution lines.
 
 ## Final verification (controller)
 
-- [ ] `pnpm check && pnpm typecheck && pnpm build && pnpm test` on `feat/client-login`: green, `Tests  70 passed (70)`.
-- [ ] `pnpm test:bruno` against the running API: 24/24.
+- [x] `pnpm check && pnpm typecheck && pnpm build && pnpm test` on `feat/client-login`: green, `Tests  70 passed (70)`.
+- [x] `pnpm test:bruno` against the running API: 24/24.
 - [ ] The spec's manual scenario: `pnpm db:seed`, log in on `/login`, upload, the frame updates live, log out, `/frame` redirects to `/login`.
-- [ ] `git log --oneline develop..feat/client-login`: one concern per commit; no `.env` file in any diff (`git diff --stat develop..feat/client-login`).
+- [x] `git log --oneline develop..feat/client-login`: one concern per commit; no `.env` file in any diff (`git diff --stat develop..feat/client-login`).
 - [ ] Fresh-context review of the whole stack diff (`superpowers:requesting-code-review`), then `gh stack submit --auto` (draft PRs) and `gh stack view --json`.
 
 ---
@@ -3500,6 +3500,17 @@ Format: `date · task/step · what the plan said · what was done · why`.
 
 | Date | Task / step | Plan said | Done | Why |
 | ---- | ----------- | --------- | ---- | --- |
+| 2026-11-23 | Task 1 | `argon2` may need `onlyBuiltDependencies` | kept in `ignoredBuiltDependencies`: the prebuilt binary loads | argon2 0.45 ships prebuilds; no native build needed |
+| 2026-11-23 | Task 2 | `pnpm db:seed` on the dev database | run on the shared Atlas dev database; it wiped the photos of the other session working on the frame, which re-uploaded them | one dev database for both sessions |
+| 2026-11-23 | Task 6 | `extendSession` with `update` | `updateMany` (controller fix d4b1d27); Bruno `login/04` uses `{{memberEmail}}` (ebe89c9) | a session deleted by a concurrent logout made `update` throw P2025 |
+| 2026-11-23 | after Task 6 | stack based on develop at plan time | `gh stack rebase` onto develop f982944 (frame library, #40–#45); no conflicts | another session merged its frame stack |
+| 2026-11-23 | Tasks 6–9 | Bruno and manual checks against the API on port 3000 | the controller ran its test API on port 3001 (implementers 3002) with `--env-var baseUrl=...` | port 3000 belonged to the other session's API |
+| 2026-11-23 | Task 9 | socket middleware with `.then` | `await` in `try/catch`, `join`/`next` outside it (controller fix b9c91a2); docs list the handshake `SERVER_ERROR` (65e34de) | a throw after `next` hung the handshake |
+| 2026-11-24 | Task 13 | `/frame` row text from the plan | kept the current frame library description (controller amend, 2d506fd) | the plan text predates the frame library feature |
+| 2026-11-24 | Tasks 11–13 | — | implementer commits may carry the implementer model in `Co-Authored-By` | the PRs are squash-merged; the squash message carries the final attribution |
+| 2026-11-24 | final review | — | fix wave: frame reloads photos daily so its session slides (f28a0cb); `/api/auth/me` unreachable (network, 5xx, bad body) is retried every 5 s instead of sending the frame to `/login` (3da91bb); session check extracted so every function is ≤ 30 lines (f28a0cb, 4a39ac0); login error cleared on resubmit, `@/` import (4b85f63); docs paths, SPA fallback `/login`, `Secure` cookie note for J2 (2fd84e0) | two Important findings about an unattended frame, plus the 30-line rule |
+| 2026-11-24 | final review | — | deferred: logging in again leaves the previous session of that browser valid; an already-open socket is not re-checked when its session expires or is logged out (documented); blank page while the session check waits | out of this step's scope; left for the author to triage |
+| 2026-11-24 | Tasks 11–12, final verification | manual browser checks | not run by the agents: left unchecked for the author (login, logout, upload, live frame, `/frame` redirect, API down at boot then up) | the author tests the UI locally before merge |
 
 ---
 
