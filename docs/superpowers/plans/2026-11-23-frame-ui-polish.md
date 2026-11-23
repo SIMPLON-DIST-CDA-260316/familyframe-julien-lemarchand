@@ -1068,3 +1068,7 @@ Run: `gh stack submit --auto`, then `gh pr edit <N> --body-file <file>`. French 
 ## Drift Log
 
 Format: `date · task/step · what the plan said · what was done · why`.
+- 2026-11-23 · Task 2 manual check · check the backdrop and Ken Burns on 5181 · blocked: Cloudinary answered 401 for every transformed URL (strict transformations); resumed after develop's #30 signed the URLs, no code change · the account setting stays enabled
+- 2026-11-23 · Task 2 review · the zoom follows the current photo only · new `useLeavingPhoto` keeps it on the outgoing slide until Embla's `settle` · Chrome showed the outgoing slide shrink from 1599 to 1536 px while fully visible; user approved the fix
+- 2026-11-23 · Task 2 final review · `useLeavingPhoto` clears on `settle` · it also clears on `reInit` · a photo prepended at the current position re-inits Embla without a glide, so the previous newest kept its zoom
+- 2026-11-23 · Tasks 3–4 manual check · reduced motion and the empty frame · reduced motion checked in code only; the empty state was not tested live (needs an empty database)
