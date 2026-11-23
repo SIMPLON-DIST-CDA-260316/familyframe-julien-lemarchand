@@ -1,15 +1,9 @@
 import { Router } from 'express'
 import type { Server } from 'socket.io'
-import { AppError } from './errors/app-error.js'
-import type { PhotoRecord, PhotosRepository } from './features/photos/photos.repository.js'
+import type { PhotoRecord } from './features/photos/photos.repository.js'
+import type { PhotosService } from './features/photos/photos.service.js'
 import { upload } from './features/photos/photos.upload.js'
-import { uploadImage } from './lib/cloudinary.js'
-import { toFrameJpeg } from './lib/image.js'
 import type { ClientToServerEvents, Photo, ServerToClientEvents } from './types.js'
-
-const MAX_UPLOADER_NAME_LENGTH = 30
-const MAX_PHOTOS = 20
-const ALLOWED_TYPES: string[] = ['image/jpeg', 'image/png', 'image/webp']
 
 // cloudinaryId stays on the server.
 function toPhotoDto(record: PhotoRecord): Photo {
@@ -23,48 +17,20 @@ function toPhotoDto(record: PhotoRecord): Photo {
 
 export function createPhotosRouter(
   io: Server<ClientToServerEvents, ServerToClientEvents>,
-  repository: PhotosRepository,
+  service: PhotosService,
 ): Router {
   const router = Router()
 
   router.get('/', async (_req, res) => {
-    const records = await repository.findLatest(MAX_PHOTOS)
+    const records = await service.listLatest()
     res.json(records.map(toPhotoDto))
   })
 
   router.post('/', upload.single('photo'), async (req, res) => {
-    const rawUploaderName: unknown = req.body?.uploaderName
-    const uploaderName = typeof rawUploaderName === 'string' ? rawUploaderName.trim() : ''
-    if (uploaderName.length === 0 || uploaderName.length > MAX_UPLOADER_NAME_LENGTH) {
-      throw new AppError('UPLOADER_NAME_INVALID')
-    }
-
-    if (!req.file) {
-      throw new AppError('PHOTO_MISSING')
-    }
-
-    // Cheap first filter: the browser's mimetype can lie, sharp checks for real.
-    if (!ALLOWED_TYPES.includes(req.file.mimetype)) {
-      throw new AppError('FORMAT_UNSUPPORTED')
-    }
-
-    let jpeg: Buffer
-    try {
-      jpeg = await toFrameJpeg(req.file.buffer)
-    } catch {
-      throw new AppError('IMAGE_UNREADABLE')
-    }
-
-    // Cloudinary or database errors reach the error handler as 500s.
-    const image = await uploadImage(jpeg)
-    let record: PhotoRecord
-    try {
-      record = await repository.create({ ...image, uploaderName })
-    } catch (error) {
-      console.error(`Photo saved on Cloudinary but not in the database: ${image.cloudinaryId}`)
-      throw error
-    }
-
+    const record = await service.createPhoto({
+      uploaderName: req.body?.uploaderName,
+      file: req.file,
+    })
     const photo = toPhotoDto(record)
     io.emit('photo:new', photo)
     res.status(201).json(photo)
