@@ -12,6 +12,7 @@ function formatDate(iso: string): string {
 }
 
 // The list is not touched here: the server's photo:deleted reaches every frame, this one included.
+// No pending state on the button: kept minimal until the frame views rework (see the spec).
 async function deletePhoto({ id, uploaderName }: Photo): Promise<void> {
   if (!window.confirm(`Supprimer la photo envoyée par ${uploaderName} ?`)) return
   try {
@@ -72,13 +73,8 @@ export default function FramePage(): JSX.Element {
       )
     })
 
-    socket.on('photo:deleted', (deletedId) => {
-      if (typeof deletedId !== 'string') {
-        console.error('Unexpected photo:deleted payload from the API')
-        return
-      }
-      setPhotos((current) => current.filter(({ id }) => id !== deletedId))
-    })
+    // Reload rather than drop one photo: the next photo beyond the 20 latest fills the gap.
+    socket.on('photo:deleted', loadPhotos)
 
     return () => {
       socket.disconnect()
