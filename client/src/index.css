@@ -30,3 +30,45 @@ body {
   max-height: 40vh;
   object-fit: contain;
 }
+
+.frame {
+  padding: 1rem;
+}
+
+.frame-empty {
+  text-align: center;
+  margin-top: 40vh;
+}
+
+.frame-latest {
+  margin: 0 0 1rem;
+  text-align: center;
+}
+
+.frame-latest img {
+  width: 100%;
+  height: 70vh;
+  object-fit: contain;
+}
+
+.frame-thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.frame-thumbs li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.frame-thumbs img {
+  width: 8rem;
+  height: 8rem;
+  object-fit: cover;
+}
