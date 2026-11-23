@@ -1,6 +1,5 @@
 // Copy of server/src/types.ts, see why there. Keep both in sync.
 export type ApiErrorCode =
-  | 'UPLOADER_NAME_INVALID'
   | 'PHOTO_MISSING'
   | 'UPLOAD_INVALID'
   | 'BODY_INVALID'
@@ -14,7 +13,6 @@ export type ApiErrorCode =
   | 'SERVER_ERROR'
 
 const ERROR_MESSAGES: Record<ApiErrorCode, string> = {
-  UPLOADER_NAME_INVALID: 'Indiquez un pseudo (30 caractères maximum).',
   PHOTO_MISSING: 'Prenez ou choisissez une photo.',
   UPLOAD_INVALID: 'Envoi invalide : une seule photo à la fois.',
   BODY_INVALID: 'Requête invalide. Rechargez la page et réessayez.',

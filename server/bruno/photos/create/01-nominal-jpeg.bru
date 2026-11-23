@@ -11,13 +11,12 @@ post {
 }
 
 body:multipart-form {
-  uploaderName: {{uploaderName}}
   photo: @file(fixtures/photo.jpg) @contentType(image/jpeg)
 }
 
 assert {
   res.status: eq 201
-  res.body.uploaderName: eq {{uploaderName}}
+  res.body.uploaderName: eq {{memberDisplayName}}
   res.body.url: contains res.cloudinary.com
   res.body.id: isString
   res.body.cloudinaryId: isUndefined
@@ -56,8 +55,9 @@ script:post-response {
 }
 
 docs {
-  NOMINAL → 201 avec la photo créée. `cloudinaryId` n'est pas exposé : le
-  serveur envoie des URL prêtes, `url` (photo entière) et `thumbnailUrl`
+  NOMINAL → 201 avec la photo créée, au nom d'affichage du compte connecté
+  (`uploaderName`) : le client n'envoie plus de pseudo. `cloudinaryId` n'est
+  pas exposé : le serveur envoie des URL prêtes, `url` (photo entière) et `thumbnailUrl`
   (miniature), toutes deux en `f_auto,q_auto`. Le test télécharge les deux
   URL : une transformation refusée par Cloudinary ferait échouer le test.
 

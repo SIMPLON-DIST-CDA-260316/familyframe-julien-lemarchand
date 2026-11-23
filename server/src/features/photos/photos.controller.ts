@@ -2,6 +2,7 @@ import type { Request, Response } from 'express'
 import type { Server } from 'socket.io'
 import { deliveryUrls } from '../../lib/cloudinary.js'
 import type { ClientToServerEvents, Photo, ServerToClientEvents } from '../../types.js'
+import { currentUser } from '../auth/auth.middleware.js'
 import type { PhotoRecord } from './photos.repository.js'
 import type { PhotosService } from './photos.service.js'
 
@@ -33,7 +34,7 @@ export function createPhotosController(
 
     async create(req, res) {
       const record = await service.createPhoto({
-        uploaderName: req.body?.uploaderName,
+        uploaderName: currentUser(req).displayName,
         file: req.file,
       })
       const photo = toPhotoDto(record)

@@ -5,7 +5,6 @@ import type { ApiError, ApiErrorCode } from '../types.js'
 import { AppError } from './app-error.js'
 
 const HTTP_STATUS_BY_CODE: Record<ApiErrorCode, number> = {
-  UPLOADER_NAME_INVALID: 400,
   PHOTO_MISSING: 400,
   UPLOAD_INVALID: 400,
   BODY_INVALID: 400,

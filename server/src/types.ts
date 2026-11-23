@@ -2,7 +2,6 @@
 // Keep both copies in sync.
 
 export type ApiErrorCode =
-  | 'UPLOADER_NAME_INVALID'
   | 'PHOTO_MISSING'
   | 'UPLOAD_INVALID'
   | 'BODY_INVALID'

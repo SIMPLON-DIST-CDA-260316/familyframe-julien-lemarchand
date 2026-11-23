@@ -11,7 +11,7 @@ post {
 }
 
 body:multipart-form {
-  uploaderName: {{uploaderName}}
+  legende: une photo sans fichier
 }
 
 assert {
@@ -20,5 +20,6 @@ assert {
 }
 
 docs {
-  EDGE → 400 PHOTO_MISSING, aucun fichier dans le champ photo.
+  EDGE → 400 PHOTO_MISSING, un champ texte mais aucun fichier dans le champ
+  photo (le champ texte garde un corps multipart non vide ; le serveur l'ignore).
 }

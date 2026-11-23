@@ -12,8 +12,6 @@ const RECORD: PhotoRecord = {
   uploaderName: 'Mamie',
   createdAt: new Date('2026-11-23T10:00:00Z'),
 }
-const LONGEST_NAME = 'a'.repeat(30)
-const TOO_LONG_NAME = 'a'.repeat(31)
 const LATEST_PHOTOS_LIMIT = 20
 
 // Every dependency succeeds by default; each test breaks only the one it is about.
@@ -36,11 +34,11 @@ function makeDeps() {
 }
 
 describe('createPhoto', () => {
-  it('saves the uploaded image with the trimmed name and returns the record', async () => {
+  it('saves the uploaded image with the uploader name and returns the record', async () => {
     const deps = makeDeps()
 
     const record = await createPhotosService(deps).createPhoto({
-      uploaderName: '  Mamie  ',
+      uploaderName: 'Mamie',
       file: JPEG_FILE,
     })
 
@@ -60,29 +58,6 @@ describe('createPhoto', () => {
       cloudinaryId: RECORD.cloudinaryId,
     })
     expect(JSON.stringify(deps.logger.info.mock.calls)).not.toContain('Mamie')
-  })
-
-  it('accepts a 30-character name', async () => {
-    const deps = makeDeps()
-
-    await createPhotosService(deps).createPhoto({ uploaderName: LONGEST_NAME, file: JPEG_FILE })
-
-    expect(deps.repository.create).toHaveBeenCalledWith({ ...IMAGE, uploaderName: LONGEST_NAME })
-  })
-
-  it.each([
-    ['empty', ''],
-    ['only spaces', '   '],
-    ['31 characters long', TOO_LONG_NAME],
-    ['not a string', 42],
-    ['missing', undefined],
-  ])('rejects a name that is %s before any image work', async (_label, uploaderName) => {
-    const deps = makeDeps()
-
-    await expect(
-      createPhotosService(deps).createPhoto({ uploaderName, file: JPEG_FILE }),
-    ).rejects.toMatchObject({ code: 'UPLOADER_NAME_INVALID' })
-    expect(deps.toFrameJpeg).not.toHaveBeenCalled()
   })
 
   it('rejects a missing file', async () => {
