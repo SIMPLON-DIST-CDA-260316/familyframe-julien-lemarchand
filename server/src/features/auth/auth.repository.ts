@@ -23,10 +23,10 @@ export function createAuthRepository(prisma: PrismaClient): AuthRepository {
     createSession: async (session) => {
       await prisma.session.create({ data: session })
     },
+    // The many variants: a session already deleted by a concurrent logout is not an error.
     extendSession: async (id, expiresAt) => {
-      await prisma.session.update({ where: { id }, data: { expiresAt } })
+      await prisma.session.updateMany({ where: { id }, data: { expiresAt } })
     },
-    // deleteMany, not delete: a session already deleted by a concurrent logout is not an error.
     deleteSession: async (id) => {
       await prisma.session.deleteMany({ where: { id } })
     },
