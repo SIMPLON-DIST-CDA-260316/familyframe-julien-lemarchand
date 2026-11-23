@@ -4,6 +4,8 @@ import type { Server } from 'socket.io'
 import { config } from './config.js'
 import { errorHandler } from './errors/error-handler.js'
 import { notFound } from './errors/not-found.js'
+import { createPhotosRepository } from './features/photos/photos.repository.js'
+import { prisma } from './lib/db.js'
 import { createPhotosRouter } from './photos.js'
 import type { ClientToServerEvents, ServerToClientEvents } from './types.js'
 
@@ -17,7 +19,7 @@ export function createApp(io: Server<ClientToServerEvents, ServerToClientEvents>
     res.json({ status: 'ok' })
   })
 
-  app.use('/api/photos', createPhotosRouter(io))
+  app.use('/api/photos', createPhotosRouter(io, createPhotosRepository(prisma)))
 
   app.use(notFound)
   app.use(errorHandler)
