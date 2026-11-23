@@ -1,35 +1,24 @@
 import { type ChangeEvent, type JSX, type SubmitEvent, useEffect, useState } from 'react'
+import { useAuth } from '@/auth/AuthContext.ts'
+import { LogoutButton } from '@/components/auth/LogoutButton.tsx'
 import { Alert, AlertDescription } from '@/components/ui/alert.tsx'
 import { Button } from '@/components/ui/button.tsx'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.tsx'
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card.tsx'
 import { Input } from '@/components/ui/input.tsx'
 import { Label } from '@/components/ui/label.tsx'
-import { errorMessage } from '../api.ts'
+import { errorMessage, UNAUTHORIZED_STATUS } from '../api.ts'
 
 type Status = 'idle' | 'sending' | 'success' | 'error'
 
-const UPLOADER_NAME_KEY = 'familyframe.uploaderName'
-const MAX_UPLOADER_NAME_LENGTH = 30 // same limit as the API
-
-// localStorage throws in private browsing or when storage is blocked.
-function loadUploaderName(): string {
-  try {
-    return localStorage.getItem(UPLOADER_NAME_KEY) ?? ''
-  } catch {
-    return ''
-  }
-}
-
-function saveUploaderName(uploaderName: string): void {
-  try {
-    localStorage.setItem(UPLOADER_NAME_KEY, uploaderName)
-  } catch {
-    // Ignored: the relative types it again next time.
-  }
-}
-
 export default function UploadPage(): JSX.Element {
-  const [uploaderName, setUploaderName] = useState(loadUploaderName)
+  const { user, dropUser } = useAuth()
   const [file, setFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [status, setStatus] = useState<Status>('idle')
@@ -47,11 +36,6 @@ export default function UploadPage(): JSX.Element {
     return () => URL.revokeObjectURL(url)
   }, [file])
 
-  function handleUploaderNameChange(event: ChangeEvent<HTMLInputElement>): void {
-    setUploaderName(event.target.value)
-    saveUploaderName(event.target.value)
-  }
-
   function handleFileChange(event: ChangeEvent<HTMLInputElement>): void {
     setFile(event.target.files?.[0] ?? null)
     setStatus('idle')
@@ -62,12 +46,16 @@ export default function UploadPage(): JSX.Element {
     if (!file) return
 
     const body = new FormData()
-    body.append('uploaderName', uploaderName)
     body.append('photo', file)
 
     setStatus('sending')
     try {
       const res = await fetch('/api/photos', { method: 'POST', body })
+      // The session ended on the server: RequireAuth sends the user to /login.
+      if (res.status === UNAUTHORIZED_STATUS) {
+        dropUser()
+        return
+      }
       if (!res.ok) {
         // Not JSON when the dev proxy answers for a stopped API.
         const data: unknown = await res.json().catch(() => null)
@@ -90,21 +78,15 @@ export default function UploadPage(): JSX.Element {
       <Card>
         <CardHeader>
           <CardTitle className="text-xl">FamilyFrame</CardTitle>
-          <CardDescription>Envoyez une photo au cadre de la famille.</CardDescription>
+          <CardDescription>
+            Envoyez une photo au cadre de la famille, en tant que {user?.displayName}.
+          </CardDescription>
+          <CardAction>
+            <LogoutButton />
+          </CardAction>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="uploader-name">Pseudo</Label>
-              <Input
-                id="uploader-name"
-                value={uploaderName}
-                onChange={handleUploaderNameChange}
-                required
-                maxLength={MAX_UPLOADER_NAME_LENGTH}
-              />
-            </div>
-
             <div className="flex flex-col gap-2">
               <Label htmlFor="camera-photo">Prendre une photo</Label>
               <Input

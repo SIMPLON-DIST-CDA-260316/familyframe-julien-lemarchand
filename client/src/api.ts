@@ -26,6 +26,9 @@ const ERROR_MESSAGES: Record<ApiErrorCode, string> = {
   SERVER_ERROR: 'Le serveur a rencontré un problème. Réessayez plus tard.',
 }
 
+// UNAUTHENTICATED: the session ended on the server, the client drops its user.
+export const UNAUTHORIZED_STATUS = 401
+
 const GENERIC_MESSAGE = "L'opération a échoué. Vérifiez la connexion et réessayez."
 
 function isApiErrorCode(value: unknown): value is ApiErrorCode {
