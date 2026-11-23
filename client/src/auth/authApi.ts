@@ -1,4 +1,4 @@
-import { errorMessage } from '@/api.ts'
+import { errorMessage, UNAUTHORIZED_STATUS } from '@/api.ts'
 import { isPublicUser, type PublicUser } from '@/auth/user.ts'
 
 export type LoginResult =
@@ -13,14 +13,21 @@ function readUser(body: unknown): PublicUser | null {
   return null
 }
 
-// null also on a network failure: the login page is where the user can retry.
-export async function fetchCurrentUser(): Promise<PublicUser | null> {
+export type CurrentUserResult =
+  | { status: 'authenticated'; user: PublicUser }
+  | { status: 'unauthenticated' }
+  | { status: 'unreachable' }
+
+// Only a 401 means "no session": a network error or a 5xx must not send a frame with a valid cookie to /login.
+export async function fetchCurrentUser(): Promise<CurrentUserResult> {
   try {
     const res = await fetch('/api/auth/me')
-    if (!res.ok) return null
-    return readUser(await res.json())
+    if (res.status === UNAUTHORIZED_STATUS) return { status: 'unauthenticated' }
+    if (!res.ok) return { status: 'unreachable' }
+    const user = readUser(await res.json())
+    return user ? { status: 'authenticated', user } : { status: 'unreachable' }
   } catch {
-    return null
+    return { status: 'unreachable' }
   }
 }
 
