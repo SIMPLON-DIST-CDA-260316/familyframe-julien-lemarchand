@@ -18,7 +18,7 @@
   git push --force-with-lease
   ```
 
-- Livraison : PR `develop` → `main`.
+- Livraison : PR `develop` → `main` en **merge commit** (pas de squash ni de rebase). `main` et `develop` gardent ainsi un historique commun, et chaque livraison laisse un commit repérable sur `main`.
 
 ## Langue
 
