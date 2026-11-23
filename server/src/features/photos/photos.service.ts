@@ -1,5 +1,6 @@
 import { AppError } from '../../errors/app-error.js'
 import type { UploadedImage } from '../../lib/cloudinary.js'
+import type { Logger } from '../../lib/logger.js'
 import type { PhotoRecord, PhotosRepository } from './photos.repository.js'
 
 const MAX_UPLOADER_NAME_LENGTH = 30
@@ -16,6 +17,7 @@ export type PhotosServiceDeps = {
   toFrameJpeg: (input: Buffer) => Promise<Buffer>
   uploadImage: (jpeg: Buffer) => Promise<UploadedImage>
   deleteImage: (cloudinaryId: string) => Promise<void>
+  logger: Logger
 }
 
 export type PhotosService = {
@@ -51,50 +53,68 @@ function parsePhotoId(id: string): string {
   return id
 }
 
-export function createPhotosService({
-  repository,
-  toFrameJpeg,
-  uploadImage,
-  deleteImage,
-}: PhotosServiceDeps): PhotosService {
-  async function convertToFrameJpeg(input: Buffer): Promise<Buffer> {
-    try {
-      return await toFrameJpeg(input)
-    } catch {
-      throw new AppError('IMAGE_UNREADABLE')
-    }
+async function convertToFrameJpeg(
+  { toFrameJpeg, logger }: PhotosServiceDeps,
+  input: Buffer,
+): Promise<Buffer> {
+  try {
+    return await toFrameJpeg(input)
+  } catch (error) {
+    logger.warn('photo.unreadable', { error })
+    throw new AppError('IMAGE_UNREADABLE')
   }
+}
+
+async function saveRecord(
+  { repository, logger }: PhotosServiceDeps,
+  image: UploadedImage,
+  uploaderName: string,
+): Promise<PhotoRecord> {
+  try {
+    return await repository.create({ ...image, uploaderName })
+  } catch (error) {
+    // The image is on Cloudinary with no record pointing to it: its id is needed to clean up.
+    logger.error('photo.orphaned', { cloudinaryId: image.cloudinaryId, error })
+    throw error
+  }
+}
+
+// The record is already gone: a Cloudinary failure only leaves an orphan image,
+// so the deletion still succeeds.
+async function deleteStoredImage(
+  { deleteImage, logger }: PhotosServiceDeps,
+  cloudinaryId: string,
+): Promise<void> {
+  try {
+    await deleteImage(cloudinaryId)
+  } catch (error) {
+    logger.error('photo.orphaned', { cloudinaryId, error })
+  }
+}
+
+export function createPhotosService(deps: PhotosServiceDeps): PhotosService {
+  const { repository, uploadImage, logger } = deps
 
   async function createPhoto({ uploaderName, file }: NewPhotoInput): Promise<PhotoRecord> {
     const validUploaderName = parseUploaderName(uploaderName)
     const validFile = parseFile(file)
-    const jpeg = await convertToFrameJpeg(validFile.buffer)
+    const jpeg = await convertToFrameJpeg(deps, validFile.buffer)
     // Cloudinary and database failures are ours: they stay 500s.
     const image = await uploadImage(jpeg)
-    try {
-      return await repository.create({ ...image, uploaderName: validUploaderName })
-    } catch (error) {
-      console.error(`Photo saved on Cloudinary but not in the database: ${image.cloudinaryId}`)
-      throw error
-    }
+    const record = await saveRecord(deps, image, validUploaderName)
+    logger.info('photo.created', { photoId: record.id, cloudinaryId: record.cloudinaryId })
+    return record
   }
 
-  // Database first: it decides what the frame shows. A Cloudinary failure after
-  // that only leaves an orphan image, so the deletion still succeeds.
+  // Database first: it decides what the frame shows.
   // Returns the stored id: the one in the URL may differ in case.
   async function deletePhoto(id: string): Promise<string> {
     const record = await repository.deleteById(parsePhotoId(id))
     if (!record) {
       throw new AppError('PHOTO_NOT_FOUND')
     }
-    try {
-      await deleteImage(record.cloudinaryId)
-    } catch (error: unknown) {
-      console.error(
-        `Photo deleted from the database but not from Cloudinary: ${record.cloudinaryId}`,
-        error,
-      )
-    }
+    await deleteStoredImage(deps, record.cloudinaryId)
+    logger.info('photo.deleted', { photoId: record.id, cloudinaryId: record.cloudinaryId })
     return record.id
   }
 

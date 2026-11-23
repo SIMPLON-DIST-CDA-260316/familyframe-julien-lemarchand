@@ -11,15 +11,25 @@ import { createPhotosService } from './features/photos/photos.service.js'
 import { deleteImage, uploadImage } from './lib/cloudinary.js'
 import { prisma } from './lib/db.js'
 import { toFrameJpeg } from './lib/image.js'
+import { logger } from './lib/logger.js'
+import { requestLogger } from './lib/request-logger.js'
 import type { ClientToServerEvents, ServerToClientEvents } from './types.js'
 
 export function createApp(io: Server<ClientToServerEvents, ServerToClientEvents>): Express {
   const repository = createPhotosRepository(prisma)
-  const service = createPhotosService({ repository, toFrameJpeg, uploadImage, deleteImage })
+  const service = createPhotosService({
+    repository,
+    toFrameJpeg,
+    uploadImage,
+    deleteImage,
+    logger,
+  })
   const controller = createPhotosController(service, io)
 
   const app = express()
 
+  // First, so every request is timed and logged, 404s included.
+  app.use(requestLogger)
   app.use(cors({ origin: config.clientOrigin }))
   app.use(express.json())
 
