@@ -5,8 +5,8 @@ spec: docs/superpowers/specs/2026-11-23-frame-library-design.md
 branch: docs/frame-library-design (stack, see Git strategy)
 worktree: true
 tasks_total: 4
-tasks_done: 1
-current_task: 2
+tasks_done: 3
+current_task: 4
 last_commit: —
 last_updated: 2026-11-23
 ---
@@ -1452,7 +1452,7 @@ git commit -F <scratchpad>/commit-slideshow-layout.txt
 
 Message: `feat(client): place each slideshow control where it is expected`
 
-- [ ] **Step 10: Manual check in Chrome (controller)**
+- [x] **Step 10: Manual check in Chrome (controller)**
 
 On `http://localhost:5181/frame`, click "Lancer le diaporama":
 
@@ -1825,3 +1825,7 @@ Format: `date · task/step · what the plan said · what was done · why`.
 - 2026-11-23 · Task 3/Step 1 · create the layer with `gh stack add feat/frame-slideshow-layout` · not run by the Task 3 implementer: the branch was created and checked out by the controller · ticked only.
 - 2026-11-23 · Task 3/Steps 10-11 · manual Chrome check and submit · not done by the Task 3 implementer: left to the controller (no dev server started, no gh stack/push) · steps left unchecked.
 - 2026-11-23 · Task 3/Step 9 · files as written in the brief · Biome (`check:fix`) joined the `<ControlsBar edge="top" ...>` opening tag in `SlideshowTopBar.tsx` onto one line · formatter only, no behaviour change.
+- 2026-11-24 · Task 3 review · `SlideshowTopBar` rendered after `PhotoView`: Tab went ‹ ⏸ › ▤ before ✕ ⋯, failing Step 10 · top bar first in the DOM, `z-10` on it, `z-20` on the new-photos badge · the plan's own Tab order check
+- 2026-11-24 · Task 3 review · `pointer-events-auto` on the full-width bar rows blocked swipes beside the buttons · row `pointer-events-none`, `*:pointer-events-auto` on its children when visible · a touch frame shows the bars on first touch, so every later swipe crossed them
+- 2026-11-24 · Task 3 review · ArrowRight on a "Vitesse" item also moved the carousel · `useCarouselArrowKeys` skips when `isOverlayOpen()` · Minor, one line
+- 2026-11-24 · Task 3 Chrome check · "`PhotoCaption.tsx` unchanged": a long name slid under the centred pill · name `max-w-[calc(50%-6rem)] text-balance`, wraps instead · spec: the bar must not hide the name or date
