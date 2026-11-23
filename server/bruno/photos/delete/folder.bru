@@ -1,0 +1,13 @@
+meta {
+  name: delete
+  seq: 2
+}
+
+docs {
+  `DELETE /api/photos/:id` → 204 sans corps, et l'événement Socket.IO
+  `photo:deleted` (l'id) pour tous les cadres.
+
+  Ces requêtes suppriment la photo créée par `create/01` (variable
+  `createdPhotoId`) : lancer le dossier `photos` en entier, pas une requête
+  seule.
+}

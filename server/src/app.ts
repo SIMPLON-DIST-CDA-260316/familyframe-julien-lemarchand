@@ -8,14 +8,14 @@ import { createPhotosController } from './features/photos/photos.controller.js'
 import { createPhotosRepository } from './features/photos/photos.repository.js'
 import { createPhotosRouter } from './features/photos/photos.routes.js'
 import { createPhotosService } from './features/photos/photos.service.js'
-import { uploadImage } from './lib/cloudinary.js'
+import { deleteImage, uploadImage } from './lib/cloudinary.js'
 import { prisma } from './lib/db.js'
 import { toFrameJpeg } from './lib/image.js'
 import type { ClientToServerEvents, ServerToClientEvents } from './types.js'
 
 export function createApp(io: Server<ClientToServerEvents, ServerToClientEvents>): Express {
   const repository = createPhotosRepository(prisma)
-  const service = createPhotosService({ repository, toFrameJpeg, uploadImage })
+  const service = createPhotosService({ repository, toFrameJpeg, uploadImage, deleteImage })
   const controller = createPhotosController(service, io)
 
   const app = express()

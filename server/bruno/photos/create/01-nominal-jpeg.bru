@@ -26,6 +26,8 @@ assert {
 script:post-response {
   const axios = require('axios')
   const { url, thumbnailUrl } = res.body
+  // photos/delete deletes this photo: the JPEG one does not pile up run after run.
+  bru.setVar('createdPhotoId', res.body.id)
   test('format et compression choisis par Cloudinary', () => {
     expect(url).to.contain('f_auto,q_auto')
     expect(thumbnailUrl).to.contain('f_auto,q_auto')

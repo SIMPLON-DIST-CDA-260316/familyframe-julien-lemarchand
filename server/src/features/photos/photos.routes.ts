@@ -6,5 +6,6 @@ export function createPhotosRouter(controller: PhotosController): Router {
   const router = Router()
   router.get('/', controller.list)
   router.post('/', upload.single('photo'), controller.create)
+  router.delete('/:id', controller.remove)
   return router
 }

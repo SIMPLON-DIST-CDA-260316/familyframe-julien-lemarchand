@@ -21,9 +21,11 @@ function makeDeps() {
     repository: {
       findLatest: vi.fn<PhotosRepository['findLatest']>().mockResolvedValue([RECORD]),
       create: vi.fn<PhotosRepository['create']>().mockResolvedValue(RECORD),
+      deleteById: vi.fn<PhotosRepository['deleteById']>().mockResolvedValue(RECORD),
     },
     toFrameJpeg: vi.fn<PhotosServiceDeps['toFrameJpeg']>().mockResolvedValue(FRAME_JPEG),
     uploadImage: vi.fn<PhotosServiceDeps['uploadImage']>().mockResolvedValue(IMAGE),
+    deleteImage: vi.fn<PhotosServiceDeps['deleteImage']>().mockResolvedValue(undefined),
   }
 }
 
@@ -138,5 +140,68 @@ describe('listLatest', () => {
 
     expect(records).toEqual([RECORD])
     expect(deps.repository.findLatest).toHaveBeenCalledWith(LATEST_PHOTOS_LIMIT)
+  })
+})
+
+describe('deletePhoto', () => {
+  it('deletes the record, then its Cloudinary image, and returns the stored id', async () => {
+    const deps = makeDeps()
+
+    const deletedId = await createPhotosService(deps).deletePhoto(RECORD.id)
+
+    expect(deletedId).toBe(RECORD.id)
+    expect(deps.repository.deleteById).toHaveBeenCalledWith(RECORD.id)
+    expect(deps.deleteImage).toHaveBeenCalledWith(IMAGE.cloudinaryId)
+    expect(deps.repository.deleteById.mock.invocationCallOrder[0]).toBeLessThan(
+      deps.deleteImage.mock.invocationCallOrder[0],
+    )
+  })
+
+  it('returns the stored id when the URL has it in upper case', async () => {
+    const deps = makeDeps()
+
+    const deletedId = await createPhotosService(deps).deletePhoto(RECORD.id.toUpperCase())
+
+    expect(deletedId).toBe(RECORD.id)
+  })
+
+  it('rejects an id with no record, also when another request deleted it first', async () => {
+    const deps = makeDeps()
+    deps.repository.deleteById.mockResolvedValue(null)
+
+    await expect(createPhotosService(deps).deletePhoto(RECORD.id)).rejects.toMatchObject({
+      code: 'PHOTO_NOT_FOUND',
+    })
+    expect(deps.deleteImage).not.toHaveBeenCalled()
+  })
+
+  it('rejects an id that is not an ObjectId without querying the database', async () => {
+    const deps = makeDeps()
+
+    await expect(createPhotosService(deps).deletePhoto('abc')).rejects.toMatchObject({
+      code: 'PHOTO_NOT_FOUND',
+    })
+    expect(deps.repository.deleteById).not.toHaveBeenCalled()
+  })
+
+  it('still succeeds when Cloudinary fails, and logs the orphaned image', async () => {
+    const deps = makeDeps()
+    deps.deleteImage.mockRejectedValue(new Error('Cloudinary is down'))
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+
+    await expect(createPhotosService(deps).deletePhoto(RECORD.id)).resolves.toBe(RECORD.id)
+    expect(consoleError).toHaveBeenCalledWith(
+      expect.stringContaining(IMAGE.cloudinaryId),
+      expect.any(Error),
+    )
+  })
+
+  it('lets a database failure through without touching Cloudinary', async () => {
+    const deps = makeDeps()
+    const databaseError = new Error('database is down')
+    deps.repository.deleteById.mockRejectedValue(databaseError)
+
+    await expect(createPhotosService(deps).deletePhoto(RECORD.id)).rejects.toBe(databaseError)
+    expect(deps.deleteImage).not.toHaveBeenCalled()
   })
 })
