@@ -12,10 +12,22 @@ function newPhotosLabel(count: number): string {
 
 export function NewPhotosBadge({ count, onSelect }: NewPhotosBadgeProps): JSX.Element {
   return (
-    <Badge asChild className="fixed top-4 left-1/2 -translate-x-1/2 px-3 py-1 text-sm">
-      <button type="button" onClick={onSelect}>
-        {newPhotosLabel(count)}
-      </button>
-    </Badge>
+    // The live region stays mounted: screen readers only announce changes to one that exists.
+    <div aria-live="polite" className="fixed top-6 left-1/2 -translate-x-1/2">
+      {count > 0 && (
+        <Badge
+          asChild
+          className="h-auto gap-2 rounded-full bg-frame-accent px-5 py-2 text-base font-medium text-black shadow-2xl motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-top-4 motion-safe:duration-500"
+        >
+          <button type="button" onClick={onSelect}>
+            <span
+              aria-hidden
+              className="size-2 rounded-full bg-black/70 motion-safe:animate-pulse"
+            />
+            {newPhotosLabel(count)}
+          </button>
+        </Badge>
+      )}
+    </div>
   )
 }

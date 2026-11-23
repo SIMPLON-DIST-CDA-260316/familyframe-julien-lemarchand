@@ -1,3 +1,4 @@
+import { ImagesIcon } from 'lucide-react'
 import { type JSX, useState } from 'react'
 import { ContactSheet } from '@/components/frame/ContactSheet.tsx'
 import { ControlsDivider } from '@/components/frame/ControlsDivider.tsx'
@@ -18,10 +19,23 @@ const FRAME_CLASSES = 'dark min-h-svh bg-frame-background text-foreground'
 
 function EmptyFrame(): JSX.Element {
   return (
-    <main className={FRAME_CLASSES}>
-      <p className="pt-[40vh] text-center text-muted-foreground">
-        En attente de la première photo…
-      </p>
+    <main
+      className={cn(
+        FRAME_CLASSES,
+        'grid place-items-center bg-radial from-frame-accent/10 to-transparent to-70%',
+      )}
+    >
+      <div className="flex flex-col items-center gap-4 px-6 text-center">
+        <ImagesIcon
+          aria-hidden
+          className="size-16 text-frame-accent/80 motion-safe:animate-pulse"
+        />
+        <p className="text-3xl font-medium">En attente de la première photo…</p>
+        {/* A first visitor needs the way in, not only the news that the frame is empty. */}
+        <p className="text-lg text-muted-foreground">
+          Envoyez-en une depuis votre téléphone : {window.location.host}
+        </p>
+      </div>
     </main>
   )
 }
@@ -48,7 +62,11 @@ export default function FramePage(): JSX.Element {
           onCurrentChange={selection.selectPhoto}
         />
       ) : (
-        <ContactSheet photos={photos} onSelect={selection.openPhoto} />
+        <ContactSheet
+          photos={photos}
+          currentId={selection.currentId}
+          onSelect={selection.openPhoto}
+        />
       )}
       <FrameControls isVisible={isActive}>
         <ViewToggles view={selection.view} onViewChange={selection.setView} />
@@ -66,9 +84,7 @@ export default function FramePage(): JSX.Element {
           </>
         )}
       </FrameControls>
-      {selection.newPhotoCount > 0 && (
-        <NewPhotosBadge count={selection.newPhotoCount} onSelect={selection.showNewest} />
-      )}
+      <NewPhotosBadge count={selection.newPhotoCount} onSelect={selection.showNewest} />
     </main>
   )
 }
