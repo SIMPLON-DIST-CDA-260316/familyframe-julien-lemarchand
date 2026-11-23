@@ -5,8 +5,18 @@ import multer from 'multer'
 import { Server } from 'socket.io'
 import { config } from './config.js'
 import { createPhotosRouter, sendError } from './photos.js'
+import type { ClientToServerEvents, ServerToClientEvents } from './types.js'
 
 const app = express()
+const httpServer = createServer(app)
+const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpServer, {
+  cors: { origin: config.clientOrigin },
+})
+
+io.on('connection', (socket) => {
+  console.log(`socket connected: ${socket.id}`)
+})
+
 app.use(cors({ origin: config.clientOrigin }))
 app.use(express.json())
 
@@ -14,7 +24,7 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' })
 })
 
-app.use('/api/photos', createPhotosRouter())
+app.use('/api/photos', createPhotosRouter(io))
 
 // Error handler (4 arguments): Express 5 sends here the errors thrown by async routes.
 app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
@@ -28,13 +38,6 @@ app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
   }
   console.error(error)
   sendError(res, 500, 'SERVER_ERROR')
-})
-
-const httpServer = createServer(app)
-const io = new Server(httpServer, { cors: { origin: config.clientOrigin } })
-
-io.on('connection', (socket) => {
-  console.log(`socket connected: ${socket.id}`)
 })
 
 httpServer.listen(config.port, () => {

@@ -1,10 +1,17 @@
 import type { Photo as PhotoRow } from '@prisma/client'
 import { type Response, Router } from 'express'
 import multer from 'multer'
+import type { Server } from 'socket.io'
 import { uploadImage } from './cloudinary.js'
 import { prisma } from './db.js'
 import { toFrameJpeg } from './image.js'
-import type { ApiError, ApiErrorCode, Photo } from './types.js'
+import type {
+  ApiError,
+  ApiErrorCode,
+  ClientToServerEvents,
+  Photo,
+  ServerToClientEvents,
+} from './types.js'
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10 MB
 const MAX_NICKNAME_LENGTH = 30
@@ -32,7 +39,8 @@ function toPhotoDto(row: PhotoRow): Photo {
   }
 }
 
-export function createPhotosRouter(): Router {
+// io is passed in so the upload route can tell every open frame about the new photo.
+export function createPhotosRouter(io: Server<ClientToServerEvents, ServerToClientEvents>): Router {
   const router = Router()
 
   router.get('/', async (_req, res) => {
@@ -78,7 +86,9 @@ export function createPhotosRouter(): Router {
       throw error
     }
 
-    res.status(201).json(toPhotoDto(row))
+    const photo = toPhotoDto(row)
+    io.emit('photo:new', photo)
+    res.status(201).json(photo)
   })
 
   return router
