@@ -1,13 +1,22 @@
 import { PlayIcon } from 'lucide-react'
 import type { JSX } from 'react'
+import { LayoutToggle } from '@/components/frame/LayoutToggle.tsx'
 import { Button } from '@/components/ui/button.tsx'
+import type { LibraryLayout } from '@/hooks/useLibraryLayout.ts'
 
 type LibraryHeaderProps = {
   photoCount: number
+  layout: LibraryLayout
+  onLayoutChange: (layout: LibraryLayout) => void
   onStartSlideshow: () => void
 }
 
-export function LibraryHeader({ photoCount, onStartSlideshow }: LibraryHeaderProps): JSX.Element {
+export function LibraryHeader({
+  photoCount,
+  layout,
+  onLayoutChange,
+  onStartSlideshow,
+}: LibraryHeaderProps): JSX.Element {
   return (
     // z-10: the tiles come later in the page and are positioned, they would scroll over it.
     <header className="fixed inset-x-0 top-0 z-10 flex items-center gap-4 border-b border-white/10 bg-frame-background/80 px-8 py-4 backdrop-blur-xl">
@@ -22,6 +31,7 @@ export function LibraryHeader({ photoCount, onStartSlideshow }: LibraryHeaderPro
         <PlayIcon data-icon="inline-start" />
         Lancer le diaporama
       </Button>
+      <LayoutToggle layout={layout} onLayoutChange={onLayoutChange} />
     </header>
   )
 }
