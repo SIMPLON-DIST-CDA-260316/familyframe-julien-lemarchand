@@ -6,7 +6,6 @@ import { config } from './config.js'
 import { createPhotosRouter, sendError } from './photos.js'
 import type { ClientToServerEvents, ServerToClientEvents } from './types.js'
 
-// What the API does: middlewares, routes, errors. No port, no process handling (see server.ts).
 export function createApp(io: Server<ClientToServerEvents, ServerToClientEvents>): Express {
   const app = express()
 
@@ -19,7 +18,7 @@ export function createApp(io: Server<ClientToServerEvents, ServerToClientEvents>
 
   app.use('/api/photos', createPhotosRouter(io))
 
-  // Error handler (4 arguments): Express 5 sends here the errors thrown by async routes.
+  // Express spots an error handler by its 4 parameters.
   app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
     if (error instanceof multer.MulterError) {
       if (error.code === 'LIMIT_FILE_SIZE') {

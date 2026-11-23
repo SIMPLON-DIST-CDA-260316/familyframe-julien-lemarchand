@@ -5,10 +5,7 @@ import { config } from './config.js'
 import { prisma } from './db.js'
 import type { ClientToServerEvents, ServerToClientEvents } from './types.js'
 
-// How the API runs: HTTP server, Socket.IO, port. What it does lives in app.ts.
-
-// Fail fast: without this, a wrong DATABASE_URL only shows up on the first request.
-// A ping rather than $connect(): with MongoDB, $connect() succeeds without reaching the server.
+// Not $connect(): with MongoDB it succeeds without reaching the server.
 try {
   await prisma.$runCommandRaw({ ping: 1 })
 } catch (error) {
@@ -16,8 +13,7 @@ try {
   process.exit(1)
 }
 
-// The routes need io to broadcast, and io needs the HTTP server, which needs the app:
-// create io first, then attach it once the server exists.
+// Created before the HTTP server: the routes need it to broadcast.
 const io = new Server<ClientToServerEvents, ServerToClientEvents>({
   cors: { origin: config.clientOrigin },
 })
@@ -32,11 +28,11 @@ httpServer.listen(config.port, () => {
   console.log(`API listening on http://localhost:${config.port}`)
 })
 
-// Clean stop: Ctrl+C sends SIGINT, `docker stop` sends SIGTERM.
+// `docker stop` sends SIGTERM.
 async function shutdown(signal: NodeJS.Signals): Promise<void> {
   console.log(`${signal} received, shutting down`)
   try {
-    await io.close() // disconnects the sockets and closes the HTTP server
+    await io.close() // also closes the HTTP server
     await prisma.$disconnect()
     process.exit(0)
   } catch (error) {
