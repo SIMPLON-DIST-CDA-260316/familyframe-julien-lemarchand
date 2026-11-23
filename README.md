@@ -6,13 +6,13 @@ Projet de formation **Concepteur Développeur d'Applications** (Simplon), axé s
 
 ## Stack
 
-| Couche | Technologies |
-| --- | --- |
-| Frontend | pnpm, React, Vite |
-| Backend | Node.js, Express, Socket.IO |
-| Données | MongoDB Atlas, Prisma |
-| Images | Multer, Sharp, Cloudinary |
-| DevOps | Docker, Docker Compose, CI (optionnelle) |
+| Couche   | Technologies                             |
+| -------- | ---------------------------------------- |
+| Frontend | pnpm, React, Vite                        |
+| Backend  | Node.js, Express, Socket.IO              |
+| Données  | MongoDB Atlas, Prisma                    |
+| Images   | Multer, Sharp, Cloudinary                |
+| DevOps   | Docker, Docker Compose, CI (optionnelle) |
 
 ## Parcours d'une photo
 
@@ -29,6 +29,50 @@ Projet de formation **Concepteur Développeur d'Applications** (Simplon), axé s
 - [ ] **J2–J4** — Conteneurisation front/back, orchestration Docker Compose, variables d'environnement et secrets, documentation de démarrage
 - [ ] **J5** — Polish UX du cadre (dernière photo en avant, historique consultable, pseudo affiché)
 
-## Démarrage
+## Structure
 
-_À venir._
+```
+.
+├── client/   # React + Vite (TypeScript) — interfaces d'envoi et cadre
+├── server/   # Express + Socket.IO + Prisma (TypeScript) — API
+│   └── prisma/schema.prisma
+├── docs/     # Énoncé du brief
+└── biome.json, pnpm-workspace.yaml, …
+```
+
+Monorepo **pnpm workspaces**. Lint et formatage : **[Biome](https://biomejs.dev)** (remplace ESLint + Prettier).
+
+## Démarrage (local, sans Docker)
+
+**Prérequis :** Node.js ≥ 24 (voir `.nvmrc`), pnpm 10 (`corepack enable`), un cluster MongoDB Atlas.
+
+```bash
+pnpm install                         # installe tout le workspace + génère le client Prisma
+cp server/.env.example server/.env   # puis renseigner DATABASE_URL, Cloudinary…
+pnpm dev                             # lance client et serveur en parallèle
+```
+
+| Service       | URL                   |
+| ------------- | --------------------- |
+| Client (Vite) | http://localhost:5180 |
+| API (Express) | http://localhost:3000 |
+
+En dev, Vite proxifie `/api` et `/socket.io` vers l'API : le front n'appelle que sa propre origine. Le serveur Vite est exposé sur le réseau local (`host: true`) pour tester depuis un smartphone via l'IP du PC (`http://<ip-du-pc>:5180`).
+
+> **Prisma 6 :** MongoDB n'est pas encore supporté par Prisma 7+, le projet est volontairement fixé sur `prisma@6`.
+
+### Scripts racine
+
+| Script                           | Rôle                                      |
+| -------------------------------- | ----------------------------------------- |
+| `pnpm dev`                       | client + serveur en mode watch            |
+| `pnpm build`                     | build des deux packages                   |
+| `pnpm typecheck`                 | vérification TypeScript                   |
+| `pnpm check` / `pnpm check:fix`  | lint + format + tri des imports (Biome)   |
+| `pnpm --filter server db:push`   | synchronise le schéma Prisma avec MongoDB |
+| `pnpm --filter server db:studio` | explorateur de données Prisma Studio      |
+
+## Workflow Git
+
+- `main` : version livrée. `develop` : branche d'intégration (par défaut).
+- Push direct interdit sur les deux : on travaille sur une branche (`feat/…`, `fix/…`, `chore/…`) et on ouvre une PR vers `develop`.
