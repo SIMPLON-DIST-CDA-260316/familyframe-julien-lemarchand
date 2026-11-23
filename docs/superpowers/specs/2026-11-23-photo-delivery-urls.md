@@ -62,3 +62,26 @@ Each new transformation of an image counts against the Cloudinary plan's transfo
 | `thumbnailUrl` (400×400, `g_auto`) | WebP   | 10 KB  |
 
 The full photo stays JPEG: for this photo, WebP was heavier, so `f_auto` kept JPEG and `q_auto` saved 24 %. A thumbnail drops from 471 KB to 10 KB: the 20-photo grid goes from about 9 MB to about 200 KB.
+
+## Changes after the adversarial review
+
+- Date: 2026-11-23
+- AI usage: the author asked for an adversarial review. Claude Code ran two reviewers in fresh contexts (server/Cloudinary, client/integration), checked their findings and applied the ones below. These points supersede the sections above.
+
+| Finding                                                                                                                    | Change                                                                                                                                                            |
+| -------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| No 200 px cell exists. The planned contact sheet cells go up to about 320 CSS px, so 400 px looks soft on a 2× screen.     | **Thumbnail 640×640 px.** Measured on the same photo: 19 KB in WebP (10 KB at 400 px).                                                                            |
+| Bruno only checked URL substrings: a URL Cloudinary rejects would pass.                                                    | The create test downloads both URLs and expects an image. The list test checks every photo has a `thumbnailUrl`.                                                  |
+| The PNG test's `.jpg` ending proves nothing now: the server always asks for `.jpg`.                                        | Assertion and docs no longer claim it. The re-encoding goes through `toFrameJpeg`, which the service unit test checks.                                            |
+| New client + old API (one image rebuilt without the other in J2): `isPhoto` rejects every photo, the frame waits silently. | The frame logs an error when the API payload is rejected, and `photo:new` is checked too. No payload in the log: it holds the uploader's name.                    |
+| AVIF is not "Enterprise only".                                                                                             | Per Cloudinary's docs, it depends on the plan's billing metric: impression-based plans get AVIF in `f_auto`, bandwidth-based ones do not. Ours does not serve it. |
+| "Two variants per photo".                                                                                                  | Closer to two URLs × one variant per format served (JPEG, WebP): still small.                                                                                     |
+| The database `url` "does not change".                                                                                      | True, but nothing reads it any more: dead data. Kept for now, a candidate for removal.                                                                            |
+
+Not changed, noted:
+
+- **The conflict is with #23 and #24**, not #22: #23 rewrites `FramePage.tsx` into `PhotoView`, `PhotoStrip` and `ContactSheet`, which load `photo.url`. Resolving it by taking #23's version silently drops the thumbnails. When rebasing that stack: `PhotoStrip` and `ContactSheet` use `thumbnailUrl` with `loading="lazy"`, the current slide of `PhotoView` gets `fetchPriority="high"`.
+- **Unsigned URLs**: anyone who knows the cloud name can request other transformations and spend the quota. Not new (the old `url` exposed the same). Fix: Cloudinary's "strict transformations" setting, allowing exactly the two transformations used here.
+- **`v1` in the URLs**: the SDK adds it for public IDs inside a folder. Cloudinary ignores it to find the image; it only busts the CDN cache, which matters only when an image is overwritten. Uploads get random IDs, so never.
+- **The controller imports `deliveryUrls` directly** rather than by injection like `uploadImage`. Fine while the controller has no unit test.
+- **No unit test for `deliveryUrls`**: importing `lib/cloudinary.ts` requires the Cloudinary env variables. Bruno now downloads the URLs, which proves more than an exact string would.
