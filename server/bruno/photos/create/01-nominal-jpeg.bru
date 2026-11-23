@@ -20,9 +20,9 @@ assert {
   res.body.nickname: eq {{nickname}}
   res.body.url: contains res.cloudinary.com
   res.body.id: isString
-  res.body.publicId: isUndefined
+  res.body.cloudinaryId: isUndefined
 }
 
 docs {
-  NOMINAL → 201 avec la photo créée. `publicId` n'est pas exposé.
+  NOMINAL → 201 avec la photo créée. `cloudinaryId` n'est pas exposé.
 }

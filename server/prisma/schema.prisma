@@ -8,11 +8,11 @@ datasource db {
 }
 
 model Photo {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  url       String
-  publicId  String   @unique
-  nickname  String
-  createdAt DateTime @default(now())
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  url          String
+  cloudinaryId String   @unique
+  nickname     String
+  createdAt    DateTime @default(now())
 
   @@index([createdAt])
 }

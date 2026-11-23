@@ -29,7 +29,7 @@ export function sendError(res: Response, status: number, code: ApiErrorCode): vo
   res.status(status).json(body)
 }
 
-// Database row → DTO: publicId stays on the server.
+// Database row → DTO: cloudinaryId stays on the server.
 function toPhotoDto(row: PhotoRow): Photo {
   return {
     id: row.id,
@@ -82,7 +82,7 @@ export function createPhotosRouter(io: Server<ClientToServerEvents, ServerToClie
     try {
       row = await prisma.photo.create({ data: { ...image, nickname } })
     } catch (error) {
-      console.error(`Photo saved on Cloudinary but not in the database: ${image.publicId}`)
+      console.error(`Photo saved on Cloudinary but not in the database: ${image.cloudinaryId}`)
       throw error
     }
 
