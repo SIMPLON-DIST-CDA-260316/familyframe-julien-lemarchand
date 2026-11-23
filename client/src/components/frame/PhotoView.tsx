@@ -53,7 +53,12 @@ export function PhotoView({
             />
           ))}
         </CarouselContent>
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-black/75 via-black/30 to-transparent">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 isolate">
+          {/* The shade is there for the controls: at rest it fades out with them (FramePage sets data-idle). */}
+          <div
+            aria-hidden
+            className="absolute inset-0 -z-10 bg-linear-to-t from-black/75 via-black/30 to-transparent transition-opacity duration-500 motion-reduce:transition-none group-data-[idle=true]/frame:opacity-0"
+          />
           {currentPhoto && <PhotoCaption key={currentPhoto.id} photo={currentPhoto} />}
           {/* The bottom bar sits on top of this box: just above the strip when it is open. */}
           <div className="relative">{children}</div>

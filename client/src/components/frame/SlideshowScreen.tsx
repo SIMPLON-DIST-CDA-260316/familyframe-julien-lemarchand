@@ -44,7 +44,8 @@ export function SlideshowScreen({
       >
         <SlideshowBottomBar isVisible={isActive} settings={settings} />
         <PhotoStrip
-          isVisible={settings.isStripVisible}
+          // At rest the photo stands alone: the strip steps aside with the buttons.
+          isVisible={settings.isStripVisible && isActive}
           photos={photos}
           currentId={currentPhoto.id}
           onSelect={selection.selectPhoto}
