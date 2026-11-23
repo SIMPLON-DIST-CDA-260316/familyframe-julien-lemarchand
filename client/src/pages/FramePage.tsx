@@ -2,6 +2,9 @@ import { type JSX, useEffect, useState } from 'react'
 import { io, type Socket } from 'socket.io-client'
 import { isPhoto, type Photo, type ServerToClientEvents } from '../photo.ts'
 
+// The frame is a screen on a wall: dark keeps the photos in front.
+const FRAME_CLASSES = 'dark min-h-svh bg-background p-4 text-foreground'
+
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleString('fr-FR')
 }
@@ -43,8 +46,10 @@ export default function FramePage(): JSX.Element {
 
   if (photos.length === 0) {
     return (
-      <main className="frame">
-        <p className="frame-empty">En attente de la première photo…</p>
+      <main className={FRAME_CLASSES}>
+        <p className="mt-[40vh] text-center text-muted-foreground">
+          En attente de la première photo…
+        </p>
       </main>
     )
   }
@@ -52,20 +57,29 @@ export default function FramePage(): JSX.Element {
   const [latest, ...others] = photos
 
   return (
-    <main className="frame">
-      <figure className="frame-latest">
-        <img src={latest.url} alt={`Envoyée par ${latest.uploaderName}`} />
-        <figcaption>
-          {latest.uploaderName} · {formatDate(latest.createdAt)}
+    <main className={FRAME_CLASSES}>
+      <figure className="mb-6 flex flex-col items-center gap-2">
+        <img
+          className="h-[70vh] w-full object-contain"
+          src={latest.url}
+          alt={`Envoyée par ${latest.uploaderName}`}
+        />
+        <figcaption className="text-sm text-muted-foreground">
+          <span className="font-medium text-foreground">{latest.uploaderName}</span> ·{' '}
+          {formatDate(latest.createdAt)}
         </figcaption>
       </figure>
 
       {others.length > 0 && (
-        <ul className="frame-thumbs">
+        <ul className="flex flex-wrap justify-center gap-3">
           {others.map((photo) => (
-            <li key={photo.id}>
-              <img src={photo.url} alt={`Envoyée par ${photo.uploaderName}`} />
-              <span>{photo.uploaderName}</span>
+            <li key={photo.id} className="flex flex-col items-center gap-1">
+              <img
+                className="size-32 rounded-lg object-cover"
+                src={photo.url}
+                alt={`Envoyée par ${photo.uploaderName}`}
+              />
+              <span className="text-xs text-muted-foreground">{photo.uploaderName}</span>
             </li>
           ))}
         </ul>
