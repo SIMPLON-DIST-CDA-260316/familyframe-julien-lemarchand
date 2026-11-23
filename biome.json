@@ -7,7 +7,13 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!client/public", "!.claude/rules"]
+    "includes": [
+      "**",
+      "!client/public",
+      "!.claude/rules",
+      "!.claude/worktrees",
+      "!docs/superpowers/plans"
+    ]
   },
   "formatter": {
     "enabled": true,
