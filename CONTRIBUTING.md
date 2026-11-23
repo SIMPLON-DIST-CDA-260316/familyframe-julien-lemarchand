@@ -7,9 +7,17 @@
 - Parcours d'une modification :
   1. (optionnel) une issue décrit le besoin ;
   2. une branche `<type>/<sujet-court>` part de `develop` (ex. `feat/upload-photo`, `build/compose`) ;
-  3. commits atomiques ;
+  3. commits atomiques, pour faciliter la revue ;
   4. PR vers `develop`, ouverte en **draft** tant qu'elle n'est pas prête ; le corps se termine par `Closes #N` si une issue existe ;
-  5. merge, puis suppression de la branche.
+  5. **squash merge** : la PR devient un seul commit sur `develop`, dont le message est le titre de la PR. Puis suppression de la branche.
+- **PR empilées** (une PR qui part de la branche d'une autre) : une fois la PR de base squashée, ses commits n'existent plus sur `develop`. Rebaser la suivante dessus, puis la recibler vers `develop` :
+
+  ```bash
+  git fetch
+  git rebase --onto origin/develop <ancienne-base> <branche>
+  git push --force-with-lease
+  ```
+
 - Livraison : PR `develop` → `main`.
 
 ## Langue
@@ -51,7 +59,7 @@ Format [Conventional Commits](https://www.conventionalcommits.org/fr/), **en ang
 
 ## Pull Requests
 
-- Titre au format d'un commit.
+- Titre au format d'un commit : il devient le message du commit squashé sur `develop`.
 - Le corps explique **pourquoi** et **comment vérifier**. Les détails déjà dans une issue ou un doc sont liés, pas recopiés.
 - Indiquer ce qui a **réellement** été lancé (commandes, tests manuels) : un badge CI vert ne dit pas ce qui a été testé.
 
