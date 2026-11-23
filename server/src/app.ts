@@ -31,7 +31,6 @@ export function createApp(io: Server<ClientToServerEvents, ServerToClientEvents>
   // First, so every request is timed and logged, 404s included.
   app.use(requestLogger)
   app.use(cors({ origin: config.clientOrigin }))
-  app.use(express.json())
 
   app.get('/api/health', (_req, res) => {
     res.json({ status: 'ok' })

@@ -31,6 +31,16 @@
     {
       "includes": ["client/src/components/ui/carousel.tsx"],
       "linter": { "rules": { "a11y": { "useSemanticElements": "off" } } }
+    },
+    {
+      "includes": ["server/src/**"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "error"
+          }
+        }
+      }
     }
   ],
   "css": {

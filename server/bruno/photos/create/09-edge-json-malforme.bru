@@ -1,0 +1,28 @@
+meta {
+  name: Edge - JSON malformé
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/api/photos
+  body: text
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:text {
+  {"uploaderName": "Mamie"
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq UPLOADER_NAME_INVALID
+}
+
+docs {
+  EDGE → 400 UPLOADER_NAME_INVALID, un corps JSON n'est pas lu : la route attend du multipart.
+}
