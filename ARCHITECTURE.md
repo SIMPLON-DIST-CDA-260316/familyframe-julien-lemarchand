@@ -79,6 +79,22 @@ En cas d'erreur, l'API renvoie `{ "error": code }` ; le client traduit le code e
 - **Au démarrage**, un `ping` MongoDB : une base injoignable arrête le serveur tout de suite, au lieu d'échouer à la première requête.
 - **À l'arrêt** (`SIGINT` au Ctrl+C, `SIGTERM` au `docker stop`) : fermeture de Socket.IO et du serveur HTTP, puis déconnexion de Prisma.
 
+## Couches du backend
+
+Une feature par dossier (`server/src/features/photos/`), un fichier par couche :
+
+| Fichier                | Rôle                                                                                 |
+| ---------------------- | ------------------------------------------------------------------------------------ |
+| `photos.routes.ts`     | chemins et middleware d'upload, rien d'autre                                         |
+| `photos.upload.ts`     | configuration Multer : en mémoire, 10 Mo, un fichier                                 |
+| `photos.controller.ts` | lit la requête, appelle le service, convertit en DTO, diffuse `photo:new`, répond    |
+| `photos.service.ts`    | règles métier (pseudo, fichier, format, image lisible) ; ignore Express et Socket.IO |
+| `photos.repository.ts` | seul accès à Prisma                                                                  |
+
+- Les dépendances sont passées par des fonctions-fabriques (`createPhotosService({ repository, toFrameJpeg, uploadImage })`), assemblées dans `app.ts` : un test peut fournir de fausses implémentations.
+- `server/src/lib/` regroupe les clients techniques : Prisma (`db.ts`), Cloudinary, sharp (`image.ts`).
+- **Erreurs** : le service lève une `AppError` portant un code ; le contrôleur n'a pas de try/catch (Express 5 transmet les rejets). `errors/error-handler.ts` est le seul endroit qui écrit une réponse d'erreur, avec un statut tiré d'un `Record` exhaustif sur les codes. Une erreur de sharp devient `IMAGE_UNREADABLE` (faute de l'utilisateur) ; une erreur de Cloudinary ou de Prisma reste une 500.
+
 ## Réseau en développement
 
 | Service       | Port | Rôle                                                 |
