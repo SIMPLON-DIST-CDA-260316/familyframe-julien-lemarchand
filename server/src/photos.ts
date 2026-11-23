@@ -13,12 +13,12 @@ import type {
   ServerToClientEvents,
 } from './types.js'
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10 MB
+const MAX_FILE_SIZE = 10 * 1024 * 1024
 const MAX_UPLOADER_NAME_LENGTH = 30
-const MAX_PHOTOS = 20 // latest photos returned by GET (pagination in J5)
+const MAX_PHOTOS = 20
 const ALLOWED_TYPES: string[] = ['image/jpeg', 'image/png', 'image/webp']
 
-// Keep the file in memory (req.file.buffer): it goes to sharp, never to disk.
+// In memory: the file goes to sharp, never to disk.
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: MAX_FILE_SIZE, files: 1 },
@@ -29,7 +29,7 @@ export function sendError(res: Response, status: number, code: ApiErrorCode): vo
   res.status(status).json(body)
 }
 
-// Database row → DTO: cloudinaryId stays on the server.
+// cloudinaryId stays on the server.
 function toPhotoDto(row: PhotoRow): Photo {
   return {
     id: row.id,
@@ -39,7 +39,6 @@ function toPhotoDto(row: PhotoRow): Photo {
   }
 }
 
-// io is passed in so the upload route can tell every open frame about the new photo.
 export function createPhotosRouter(io: Server<ClientToServerEvents, ServerToClientEvents>): Router {
   const router = Router()
 
@@ -49,7 +48,6 @@ export function createPhotosRouter(io: Server<ClientToServerEvents, ServerToClie
   })
 
   router.post('/', upload.single('photo'), async (req, res) => {
-    // req.body is filled by multer with the text fields of the form.
     const rawUploaderName: unknown = req.body?.uploaderName
     const uploaderName = typeof rawUploaderName === 'string' ? rawUploaderName.trim() : ''
     if (uploaderName.length === 0 || uploaderName.length > MAX_UPLOADER_NAME_LENGTH) {
@@ -62,7 +60,7 @@ export function createPhotosRouter(io: Server<ClientToServerEvents, ServerToClie
       return
     }
 
-    // First filter on the mimetype declared by the browser (it can lie: sharp does the real check).
+    // Cheap first filter: the browser's mimetype can lie, sharp checks for real.
     if (!ALLOWED_TYPES.includes(req.file.mimetype)) {
       sendError(res, 415, 'FORMAT_UNSUPPORTED')
       return
@@ -76,7 +74,7 @@ export function createPhotosRouter(io: Server<ClientToServerEvents, ServerToClie
       return
     }
 
-    // Cloudinary or database errors go to the error handler in app.ts (500).
+    // Cloudinary or database errors reach the error handler in app.ts.
     const image = await uploadImage(jpeg)
     let row: PhotoRow
     try {
