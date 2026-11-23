@@ -953,3 +953,12 @@ Stop the 5181 Vite server (see "Dev environment"), set `status: in-review` in th
 <!-- date · task/step · what the plan said · what was done · why -->
 
 - 2026-11-23 · pre-flight · plan code exceeds the 30-line rule in `FramePage` (Task 4) and `useFrameSelection` (Task 5) · author chose to tolerate it, added to Global Constraints · keeps the plan's simple structure
+- 2026-11-23 · Task 2 · add the shadcn carousel as generated · `biome.json` turns off `a11y/useSemanticElements` for the whole `carousel.tsx` · the generated file uses `role="region"` and `role="group"` on divs; the file stays as generated rather than hand-edited
+- 2026-11-23 · Task 4 review · effect 1 of `useCarouselPhoto` in `useEffect`; the reviewer feared a one-frame flash on prepend · switched to `useLayoutEffect` (2864df1), then reverted (9d3e9dd) · in Chrome the layout effect shifted the pinned photo one older on prepend; the flash was never observed with `useEffect`
+- 2026-11-23 · Task 4 final review · effect 1 follows the parent's `currentId` · it also reacts to Embla's own moves (snap-back after a fast fling, strip jump); kept as is · harmless today, to revisit if a snap-back race shows up
+- 2026-11-23 · Task 4 → Task 5 · stabilise `onCurrentChange` in Task 5 · never done: the listener resubscribes on each render · Embla's `on`/`off` are cheap and no bug came from it
+- 2026-11-23 · Task 5 review · badge count +1 per change of the newest photo · counts the photos above the previous newest (`Math.max(previousNewestIndex, 1)`) · a refetch after a reconnect brings several photos at once; verified with two parallel uploads → "2 nouvelles photos"
+- 2026-11-23 · Task 5 final review · the badge waits while the frame is idle · `if (!isActive && newPhotoCount > 0) showNewest()` · user's choice: otherwise the new photo waited a whole slideshow loop
+- 2026-11-23 · rebase onto develop 933965e (#25 thumbnails) · strip and sheet read `url` · they read `thumbnailUrl` (lazy, async decoding); `usePhotoFeed` checks `photo:new` with `isPhoto` and logs unexpected payloads · adopt develop's optimised URLs
+- 2026-11-23 · rebase onto develop a5c48c5 (#30 signed URLs) · none · no conflict; it ended the Cloudinary 401s caused by strict transformations
+- 2026-11-23 · rebase onto develop b225a39 (#38 deletion) · none · `usePhotoFeed` reloads on `photo:deleted`; the #23 rewrite drops develop's delete button, which comes back in a new top layer (`feat/frame-photo-delete`, PR #39, see `docs/superpowers/specs/2026-11-23-frame-photo-deletion-views.md`)
