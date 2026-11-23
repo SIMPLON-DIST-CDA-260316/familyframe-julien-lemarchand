@@ -1,5 +1,4 @@
-// Error codes returned by the API as { "error": code }.
-// Duplicated from server/src/types.ts on purpose (see the comment there): keep both in sync.
+// Copy of server/src/types.ts, see why there. Keep both in sync.
 export type ApiErrorCode =
   | 'UPLOADER_NAME_INVALID'
   | 'PHOTO_MISSING'
@@ -25,7 +24,6 @@ function isApiErrorCode(value: unknown): value is ApiErrorCode {
   return typeof value === 'string' && Object.hasOwn(ERROR_MESSAGES, value)
 }
 
-// Turn an error response body (unknown shape) into a French message.
 export function errorMessage(body: unknown): string {
   if (typeof body === 'object' && body !== null && 'error' in body && isApiErrorCode(body.error)) {
     return ERROR_MESSAGES[body.error]

@@ -5,7 +5,7 @@ type Status = 'idle' | 'sending' | 'success' | 'error'
 
 const UPLOADER_NAME_KEY = 'familyframe.uploaderName'
 
-// localStorage can be unavailable (private browsing, blocked storage): never let it crash the page.
+// localStorage throws in private browsing or when storage is blocked.
 function loadUploaderName(): string {
   try {
     return localStorage.getItem(UPLOADER_NAME_KEY) ?? ''
@@ -18,7 +18,7 @@ function saveUploaderName(uploaderName: string): void {
   try {
     localStorage.setItem(UPLOADER_NAME_KEY, uploaderName)
   } catch {
-    // Not saved: the relative will type it again next time.
+    // Ignored: the relative types it again next time.
   }
 }
 
@@ -28,10 +28,9 @@ export default function UploadPage(): JSX.Element {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [status, setStatus] = useState<Status>('idle')
   const [error, setError] = useState('')
-  // Changing the key recreates the file inputs, which empties them after a successful upload.
+  // A new key remounts the file inputs, which empties them.
   const [inputsKey, setInputsKey] = useState(0)
 
-  // Local preview of the chosen file. The URL is revoked when the file changes or the page closes.
   useEffect(() => {
     if (!file) {
       setPreviewUrl(null)
@@ -64,7 +63,7 @@ export default function UploadPage(): JSX.Element {
     try {
       const res = await fetch('/api/photos', { method: 'POST', body })
       if (!res.ok) {
-        // The body may not be JSON (e.g. the dev proxy when the API is down).
+        // Not JSON when the dev proxy answers for a stopped API.
         const data: unknown = await res.json().catch(() => null)
         setError(errorMessage(data))
         setStatus('error')
@@ -74,7 +73,7 @@ export default function UploadPage(): JSX.Element {
       setFile(null)
       setInputsKey((key) => key + 1)
     } catch {
-      // Network failure: fetch itself rejected.
+      // fetch rejects only on network failure.
       setError(errorMessage(null))
       setStatus('error')
     }

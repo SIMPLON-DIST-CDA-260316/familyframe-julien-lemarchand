@@ -7,7 +7,7 @@ function formatDate(iso: string): string {
 }
 
 export default function FramePage(): JSX.Element {
-  // Newest first, as returned by GET /api/photos.
+  // Newest first, like GET /api/photos.
   const [photos, setPhotos] = useState<Photo[]>([])
 
   useEffect(() => {
@@ -23,15 +23,14 @@ export default function FramePage(): JSX.Element {
       }
     }
 
-    // Same origin as the page: the Vite dev server proxies /socket.io to the API.
+    // Same origin: Vite proxies /socket.io to the API.
     const socket: Socket<ServerToClientEvents> = io()
 
-    // On first connection and after each reconnection: (re)load the list,
-    // so photos sent while the frame was offline are not missed.
+    // Reconnections too: catches photos sent while offline.
     socket.on('connect', loadPhotos)
 
     socket.on('photo:new', (photo) => {
-      // Skip a photo already in the list (it can arrive both from the fetch and the event).
+      // The fetch and the event can bring the same photo.
       setPhotos((current) =>
         current.some((p) => p.id === photo.id) ? current : [photo, ...current],
       )

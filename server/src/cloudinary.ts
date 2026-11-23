@@ -9,8 +9,7 @@ cloudinary.config({
 
 export type UploadedImage = { url: string; cloudinaryId: string }
 
-// Send a JPEG to Cloudinary, in the "familyframe" folder.
-// The buffer is passed as a data URI: simpler than streaming, fine for files of 10 MB or less.
+// Data URI rather than a stream: simpler, and fine up to 10 MB.
 export async function uploadImage(jpeg: Buffer): Promise<UploadedImage> {
   const dataUri = `data:image/jpeg;base64,${jpeg.toString('base64')}`
   const result = await cloudinary.uploader.upload(dataUri, { folder: 'familyframe' })
