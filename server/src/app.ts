@@ -4,15 +4,20 @@ import type { Server } from 'socket.io'
 import { config } from './config.js'
 import { errorHandler } from './errors/error-handler.js'
 import { notFound } from './errors/not-found.js'
+import { createPhotosController } from './features/photos/photos.controller.js'
 import { createPhotosRepository } from './features/photos/photos.repository.js'
+import { createPhotosRouter } from './features/photos/photos.routes.js'
 import { createPhotosService } from './features/photos/photos.service.js'
 import { uploadImage } from './lib/cloudinary.js'
 import { prisma } from './lib/db.js'
 import { toFrameJpeg } from './lib/image.js'
-import { createPhotosRouter } from './photos.js'
 import type { ClientToServerEvents, ServerToClientEvents } from './types.js'
 
 export function createApp(io: Server<ClientToServerEvents, ServerToClientEvents>): Express {
+  const repository = createPhotosRepository(prisma)
+  const service = createPhotosService({ repository, toFrameJpeg, uploadImage })
+  const controller = createPhotosController(service, io)
+
   const app = express()
 
   app.use(cors({ origin: config.clientOrigin }))
@@ -22,10 +27,7 @@ export function createApp(io: Server<ClientToServerEvents, ServerToClientEvents>
     res.json({ status: 'ok' })
   })
 
-  const repository = createPhotosRepository(prisma)
-  const service = createPhotosService({ repository, toFrameJpeg, uploadImage })
-
-  app.use('/api/photos', createPhotosRouter(io, service))
+  app.use('/api/photos', createPhotosRouter(controller))
 
   app.use(notFound)
   app.use(errorHandler)
