@@ -17,26 +17,15 @@ Deux interfaces React (envoi, cadre) servies par le même client Vite, une API E
 
 > Seule la route `GET /api/health` existe aujourd'hui ; le reste du schéma décrit la cible du MVP (J1).
 
-## Structure du dépôt
-
-```
-.
-├── client/               # React + Vite (TS)
-│   ├── src/
-│   └── vite.config.ts    # proxy de dev vers l'API
-├── server/               # Express 5 + Socket.IO + Prisma (TS)
-│   ├── src/
-│   │   ├── index.ts      # serveur HTTP, Express, Socket.IO
-│   │   └── config.ts     # lecture et validation de l'environnement
-│   ├── prisma/schema.prisma
-│   └── .env.example
-├── docs/                 # énoncé du brief, docs de travail datés
-├── .claude/              # hooks Claude Code (versionnés)
-├── .github/              # template de PR
-└── biome.json, lefthook.yml, commitlint.config.mjs, pnpm-workspace.yaml
-```
+## Organisation du dépôt
 
 Monorepo **pnpm workspaces** : un lockfile unique, des scripts racine qui orchestrent les deux packages (`pnpm -r`).
+
+- `client/` : les deux interfaces React (envoi, cadre), servies par Vite.
+- `server/` : l'API Express, le serveur Socket.IO et l'accès aux données (Prisma).
+- `docs/` : énoncé du brief et docs de travail datés.
+
+Le détail des fichiers n'est pas listé ici : il change trop vite pour rester juste.
 
 ## Parcours d'une photo
 
