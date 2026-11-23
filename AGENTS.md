@@ -24,6 +24,7 @@ Le code doit rester compréhensible et explicable par son auteur : privilégier 
 | `pnpm check` / `pnpm check:fix` | Biome : lint, format, imports        |
 | `pnpm typecheck`                | TypeScript, les deux packages        |
 | `pnpm build`                    | build des deux packages              |
+| `pnpm test:hooks`               | tests des hooks Claude Code          |
 
 ## Conventions
 
