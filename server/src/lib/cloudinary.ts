@@ -28,8 +28,15 @@ export async function uploadImage(jpeg: Buffer): Promise<UploadedImage> {
 }
 
 // The .jpg extension is the fallback format: f_auto overrides it when WebP wins.
+// Signed: with strict transformations on, Cloudinary refuses any other transformation,
+// so nobody can spend our quota by editing the URL.
 function deliveryUrl(cloudinaryId: string, transformation: ImageTransformationOptions[]): string {
-  return cloudinary.url(cloudinaryId, { secure: true, format: 'jpg', transformation })
+  return cloudinary.url(cloudinaryId, {
+    secure: true,
+    format: 'jpg',
+    sign_url: true,
+    transformation,
+  })
 }
 
 // No resize for the full photo: sharp already capped it at upload.
