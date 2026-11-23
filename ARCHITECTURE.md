@@ -89,7 +89,7 @@ En cas d'erreur, l'API renvoie `{ "error": code }` ; le client traduit le code e
 
 ## Temps réel
 
-- **Connexion protégée** : un middleware `io.use` (`features/auth/auth.socket.ts`) lit le même cookie dans la requête de handshake et valide la session, sans glissement (pas de réponse HTTP pour porter un nouveau cookie). Sans session valide, la connexion est refusée avec l'erreur `UNAUTHENTICATED`, que le client traite comme une déconnexion. Chaque socket rejoint la room `user:<id>`, prête pour l'étape 2 ; les diffusions restent globales.
+- **Connexion protégée** : un middleware `io.use` (`features/auth/auth.socket.ts`) lit le même cookie dans la requête de handshake et valide la session, sans glissement (pas de réponse HTTP pour porter un nouveau cookie). Sans session valide, la connexion est refusée avec l'erreur `UNAUTHENTICATED`, que le client traite comme une déconnexion ; une panne de la base donne `SERVER_ERROR` (journalisée en `server.error`). Chaque socket rejoint la room `user:<id>`, prête pour l'étape 2 ; les diffusions restent globales.
 - Deux événements, du serveur vers les clients, diffusés à tous (`io.emit`) : `photo:new` avec la `Photo` créée, `photo:deleted` avec l'id de la photo supprimée.
 - Le cadre recharge la liste à chaque connexion Socket.IO, reconnexions comprises : une photo envoyée pendant une coupure n'est pas perdue.
 - Les types partagés (`Photo`, codes d'erreur, événements) sont dupliqués entre `server/src/types.ts` et `client/src` : un package commun compliquerait les builds Docker.
@@ -139,7 +139,7 @@ Une feature par dossier (`server/src/features/photos/`, `server/src/features/aut
 | `photo.created` / `photo.deleted`                           | info                          | service photos                                                                                               |
 | `photo.unreadable`                                          | warn                          | service photos, erreur de sharp                                                                              |
 | `photo.orphaned`                                            | error                         | service photos : image sur Cloudinary sans enregistrement en base (échec d'enregistrement ou de suppression) |
-| `server.error`                                              | error                         | `errors/error-handler.ts`, pour chaque 500                                                                   |
+| `server.error`                                              | error                         | `errors/error-handler.ts` (chaque 500), `auth.socket.ts` (handshake)                                         |
 | `server.stopping` / `server.stopped` / `server.stop_failed` | info / info / error           | `server.ts`, à l'arrêt                                                                                       |
 | `process.crashed`                                           | error                         | `server.ts`, exception ou rejet non géré, puis arrêt                                                         |
 
