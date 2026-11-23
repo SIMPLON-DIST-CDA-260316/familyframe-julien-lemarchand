@@ -61,7 +61,7 @@ export function createApp(
   })
 
   app.use('/api/auth', createAuthRouter(createAuthController(authService), requireAuth))
-  app.use('/api/photos', assemblePhotosRouter(io))
+  app.use('/api/photos', requireAuth, assemblePhotosRouter(io))
 
   app.use(notFound)
   app.use(errorHandler)

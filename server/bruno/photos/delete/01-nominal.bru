@@ -24,7 +24,10 @@ script:pre-request {
 script:post-response {
   const axios = require('axios')
   test('la photo ne figure plus dans la liste', async () => {
-    const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/photos`)
+    // A script request does not get the collection headers: send the session cookie itself.
+    const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/photos`, {
+      headers: { Cookie: bru.getVar('sessionCookie') },
+    })
     const ids = list.data.map(({ id }) => id)
     expect(ids).to.not.include(bru.getVar('createdPhotoId'))
   })

@@ -3,9 +3,12 @@ meta {
 }
 
 docs {
+  Toutes les routes demandent une session (cookie `ff_session`, envoyé par
+  `collection.bru`) : sans elle, 401 `UNAUTHENTICATED`.
+
   Une photo renvoyée par l'API : `{ id, url, thumbnailUrl, uploaderName, createdAt }`
   (`createdAt` en ISO 8601). Une erreur : `{ error }`, un code
-  (`UPLOADER_NAME_INVALID`, `PHOTO_MISSING`, `UPLOAD_INVALID`, `PHOTO_NOT_FOUND`, `PHOTO_TOO_LARGE`,
-  `FORMAT_UNSUPPORTED`, `IMAGE_UNREADABLE`, `SERVER_ERROR`) que le client
-  traduit en français.
+  (`UPLOADER_NAME_INVALID`, `PHOTO_MISSING`, `UPLOAD_INVALID`, `UNAUTHENTICATED`,
+  `PHOTO_NOT_FOUND`, `PHOTO_TOO_LARGE`, `FORMAT_UNSUPPORTED`, `IMAGE_UNREADABLE`,
+  `SERVER_ERROR`) que le client traduit en français.
 }
