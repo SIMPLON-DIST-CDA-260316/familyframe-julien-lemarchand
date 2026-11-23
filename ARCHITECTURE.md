@@ -13,13 +13,13 @@ flowchart LR
   frame -- "chargement des photos" --> api
 ```
 
-Deux interfaces React (envoi, cadre) servies par le même client Vite, une API Express qui porte aussi le serveur Socket.IO. Les images sont stockées sur Cloudinary ; MongoDB ne garde que les métadonnées.
+Trois pages React (connexion, envoi, cadre) servies par le même client Vite, une API Express qui porte aussi le serveur Socket.IO. Les images sont stockées sur Cloudinary ; MongoDB ne garde que les métadonnées.
 
 ## Organisation du dépôt
 
 Monorepo **pnpm workspaces** : un lockfile unique, des scripts racine qui orchestrent les deux packages (`pnpm -r`).
 
-- `client/` : les deux interfaces React (envoi, cadre), servies par Vite.
+- `client/` : les pages React (connexion, envoi, cadre), servies par Vite.
 - `server/` : l'API Express, le serveur Socket.IO et l'accès aux données (Prisma).
 - `docs/` : énoncé du brief et docs de travail datés.
 
@@ -39,10 +39,13 @@ Le détail des fichiers n'est pas listé ici : il change trop vite pour rester j
 
 | Chemin   | Page                                                                                                                                                                                        |
 | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/`      | envoi : pseudo (mémorisé dans `localStorage`), « Prendre une photo » ou « Choisir une image »                                                                                               |
+| `/login` | connexion : e-mail et mot de passe ; renvoie ensuite vers la page demandée                                                                                                                  |
+| `/`      | envoi : « Prendre une photo » ou « Choisir une image », au nom du compte connecté ; « Se déconnecter »                                                                                      |
 | `/frame` | cadre : bibliothèque des photos en vignettes ou en liste (choix mémorisé par appareil), chacune avec « Supprimer » ; « Lancer le diaporama » ou une minute sans activité lance le diaporama |
 
-Le routage est fait côté navigateur (`react-router`). En production (J2), le serveur qui sert le client devra donc renvoyer `index.html` pour `/frame` (« SPA fallback »), sinon un rechargement de la page donne une 404.
+`/` et `/frame` sont enveloppées dans `RequireAuth` (`client/src/auth/`) : sans utilisateur, redirection vers `/login` en gardant la page demandée. `AuthProvider` appelle `GET /api/auth/me` une fois au chargement (le cookie est `httpOnly`, seul le serveur sait qui est connecté) et oublie l'utilisateur quand l'API répond 401 ou que Socket.IO refuse la connexion (`UNAUTHENTICATED`).
+
+Le routage est fait côté navigateur (`react-router`). En production (J2), le serveur qui sert le client devra donc renvoyer `index.html` pour `/login` et `/frame` (« SPA fallback »), sinon un rechargement de la page donne une 404.
 
 ## API
 

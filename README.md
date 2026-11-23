@@ -1,6 +1,6 @@
 # FamilyFrame 🎄
 
-Cadre photo connecté pour les familles éloignées : un proche renseigne son pseudo, prend une photo depuis son smartphone, et elle apparaît en temps réel sur le cadre installé chez ses grands-parents — sans rechargement.
+Cadre photo connecté pour les familles éloignées : un proche se connecte à son compte, prend une photo depuis son smartphone, et elle apparaît en temps réel sur le cadre installé chez ses grands-parents — sans rechargement.
 
 Projet de formation **Concepteur Développeur d'Applications** (Simplon), axé sur la **conteneurisation avec Docker et Docker Compose**. Énoncé complet : [`docs/brief.md`](docs/brief.md).
 
@@ -45,9 +45,12 @@ Le seed efface toutes les photos, sessions et comptes avant de recréer ces deux
 
 | Service       | URL                         |
 | ------------- | --------------------------- |
+| Connexion     | http://localhost:5180/login |
 | Envoi         | http://localhost:5180       |
 | Cadre         | http://localhost:5180/frame |
 | API (Express) | http://localhost:3000       |
+
+Sans session, l'envoi et le cadre redirigent vers `/login` ; le cadre se connecte une fois avec un compte et reste connecté (session glissante de 90 jours).
 
 Depuis un smartphone sur le même réseau : `http://<ip-du-pc>:5180` (le pare-feu Windows doit autoriser Node sur les réseaux privés, et le Wi-Fi ne doit pas isoler les appareils entre eux).
 
