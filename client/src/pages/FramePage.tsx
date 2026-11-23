@@ -1,7 +1,9 @@
 import { type JSX, useState } from 'react'
 import { ContactSheet } from '@/components/frame/ContactSheet.tsx'
-import { FrameControls, type FrameView } from '@/components/frame/FrameControls.tsx'
+import { FrameControls } from '@/components/frame/FrameControls.tsx'
+import { NewPhotosBadge } from '@/components/frame/NewPhotosBadge.tsx'
 import { PhotoView } from '@/components/frame/PhotoView.tsx'
+import { useFrameSelection } from '@/hooks/useFrameSelection.ts'
 import { useIdleControls } from '@/hooks/useIdleControls.ts'
 import { usePhotoFeed } from '@/hooks/usePhotoFeed.ts'
 import { cn } from '@/lib/utils.ts'
@@ -22,42 +24,33 @@ function EmptyFrame(): JSX.Element {
 export default function FramePage(): JSX.Element {
   const photos = usePhotoFeed()
   const isActive = useIdleControls()
-  const [view, setView] = useState<FrameView>('photo')
-  // null follows the newest photo.
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const selection = useFrameSelection(photos, isActive)
   const [isStripVisible, setIsStripVisible] = useState(false)
 
-  const newestId = photos.at(0)?.id
-  if (newestId === undefined) return <EmptyFrame />
-
-  function selectPhoto(id: string): void {
-    setSelectedId(id === newestId ? null : id)
-  }
-
-  function openPhoto(id: string): void {
-    selectPhoto(id)
-    setView('photo')
-  }
+  if (selection.currentId === undefined) return <EmptyFrame />
 
   return (
     <main className={cn(FRAME_CLASSES, !isActive && 'cursor-none')}>
-      {view === 'photo' ? (
+      {selection.view === 'photo' ? (
         <PhotoView
           photos={photos}
-          currentId={selectedId ?? newestId}
+          currentId={selection.currentId}
           isStripVisible={isStripVisible}
-          onCurrentChange={selectPhoto}
+          onCurrentChange={selection.selectPhoto}
         />
       ) : (
-        <ContactSheet photos={photos} onSelect={openPhoto} />
+        <ContactSheet photos={photos} onSelect={selection.openPhoto} />
       )}
       {isActive && (
         <FrameControls
-          view={view}
+          view={selection.view}
           isStripVisible={isStripVisible}
-          onViewChange={setView}
+          onViewChange={selection.setView}
           onStripVisibleChange={setIsStripVisible}
         />
+      )}
+      {selection.newPhotoCount > 0 && (
+        <NewPhotosBadge count={selection.newPhotoCount} onSelect={selection.showNewest} />
       )}
     </main>
   )
