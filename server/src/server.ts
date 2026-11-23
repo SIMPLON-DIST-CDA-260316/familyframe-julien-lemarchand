@@ -2,7 +2,7 @@ import { createServer } from 'node:http'
 import { Server } from 'socket.io'
 import { createApp } from './app.js'
 import { config } from './config.js'
-import { prisma } from './db.js'
+import { prisma } from './lib/db.js'
 import type { ClientToServerEvents, ServerToClientEvents } from './types.js'
 
 // Not $connect(): with MongoDB it succeeds without reaching the server.

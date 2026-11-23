@@ -2,10 +2,10 @@ import type { Photo as PhotoRow } from '@prisma/client'
 import { Router } from 'express'
 import multer from 'multer'
 import type { Server } from 'socket.io'
-import { uploadImage } from './cloudinary.js'
-import { prisma } from './db.js'
 import { AppError } from './errors/app-error.js'
-import { toFrameJpeg } from './image.js'
+import { uploadImage } from './lib/cloudinary.js'
+import { prisma } from './lib/db.js'
+import { toFrameJpeg } from './lib/image.js'
 import type { ClientToServerEvents, Photo, ServerToClientEvents } from './types.js'
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024
