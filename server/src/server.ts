@@ -2,8 +2,10 @@ import { createServer } from 'node:http'
 import { Server } from 'socket.io'
 import { assembleAuthService, createApp } from './app.js'
 import { config } from './config.js'
+import { createSocketAuth } from './features/auth/auth.socket.js'
 import { prisma } from './lib/db.js'
 import { logger } from './lib/logger.js'
+import type { InterServerEvents, SocketData } from './lib/socket-types.js'
 import type { ClientToServerEvents, ServerToClientEvents } from './types.js'
 
 // Exit after logging: Docker restarts the container from a clean state.
@@ -25,17 +27,21 @@ try {
 }
 
 // Created before the HTTP server: the routes need it to broadcast.
-const io = new Server<ClientToServerEvents, ServerToClientEvents>({
+const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>({
   cors: { origin: config.clientOrigin },
 })
 const authService = assembleAuthService()
 const httpServer = createServer(createApp(io, authService))
 io.attach(httpServer)
 
+// Before 'connection': a socket without a valid session never connects.
+io.use(createSocketAuth(authService))
+
 io.on('connection', (socket) => {
-  logger.info('socket.connected', { socketId: socket.id })
+  const { userId } = socket.data
+  logger.info('socket.connected', { socketId: socket.id, userId })
   socket.on('disconnect', (reason) => {
-    logger.info('socket.disconnected', { socketId: socket.id, reason })
+    logger.info('socket.disconnected', { socketId: socket.id, userId, reason })
   })
 })
 

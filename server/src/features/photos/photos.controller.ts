@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express'
-import type { Server } from 'socket.io'
 import { deliveryUrls } from '../../lib/cloudinary.js'
-import type { ClientToServerEvents, Photo, ServerToClientEvents } from '../../types.js'
+import type { SocketServer } from '../../lib/socket-types.js'
+import type { Photo } from '../../types.js'
 import { currentUser } from '../auth/auth.middleware.js'
 import type { PhotoRecord } from './photos.repository.js'
 import type { PhotosService } from './photos.service.js'
@@ -22,10 +22,7 @@ function toPhotoDto(record: PhotoRecord): Photo {
   }
 }
 
-export function createPhotosController(
-  service: PhotosService,
-  io: Server<ClientToServerEvents, ServerToClientEvents>,
-): PhotosController {
+export function createPhotosController(service: PhotosService, io: SocketServer): PhotosController {
   return {
     async list(_req, res) {
       const records = await service.listLatest()

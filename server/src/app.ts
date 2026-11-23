@@ -1,6 +1,5 @@
 import cors from 'cors'
 import express, { type Express, type Router } from 'express'
-import type { Server } from 'socket.io'
 import { config } from './config.js'
 import { errorHandler } from './errors/error-handler.js'
 import { notFound } from './errors/not-found.js'
@@ -20,7 +19,7 @@ import { logger } from './lib/logger.js'
 import { verifyPassword } from './lib/password.js'
 import { requestLogger } from './lib/request-logger.js'
 import { generateToken, hashToken } from './lib/session-token.js'
-import type { ClientToServerEvents, ServerToClientEvents } from './types.js'
+import type { SocketServer } from './lib/socket-types.js'
 
 // Built outside createApp: server.ts also hands it to the Socket.IO middleware.
 export function assembleAuthService(): AuthService {
@@ -34,7 +33,7 @@ export function assembleAuthService(): AuthService {
   })
 }
 
-function assemblePhotosRouter(io: Server<ClientToServerEvents, ServerToClientEvents>): Router {
+function assemblePhotosRouter(io: SocketServer): Router {
   const service = createPhotosService({
     repository: createPhotosRepository(prisma),
     toFrameJpeg,
@@ -45,10 +44,7 @@ function assemblePhotosRouter(io: Server<ClientToServerEvents, ServerToClientEve
   return createPhotosRouter(createPhotosController(service, io))
 }
 
-export function createApp(
-  io: Server<ClientToServerEvents, ServerToClientEvents>,
-  authService: AuthService,
-): Express {
+export function createApp(io: SocketServer, authService: AuthService): Express {
   const requireAuth = createRequireAuth(authService)
   const app = express()
 
