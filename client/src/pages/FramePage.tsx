@@ -7,13 +7,15 @@ import { PhotoControls } from '@/components/frame/PhotoControls.tsx'
 import { PhotoView } from '@/components/frame/PhotoView.tsx'
 import { ViewToggles } from '@/components/frame/ViewToggles.tsx'
 import { useFrameSelection } from '@/hooks/useFrameSelection.ts'
-import { useIdleControls } from '@/hooks/useIdleControls.ts'
+import { useIdle } from '@/hooks/useIdle.ts'
 import { usePhotoFeed } from '@/hooks/usePhotoFeed.ts'
 import { DEFAULT_SLIDESHOW_INTERVAL_MS } from '@/hooks/useSlideshow.ts'
 import { cn } from '@/lib/utils.ts'
 
 // The frame is a screen on a wall: dark keeps the photos in front.
 const FRAME_CLASSES = 'dark min-h-svh bg-frame-background text-foreground'
+// The controls step aside quickly: the photo is what the wall is for.
+const CONTROLS_HIDE_DELAY_MS = 4000
 
 function EmptyFrame(): JSX.Element {
   return (
@@ -40,7 +42,7 @@ function EmptyFrame(): JSX.Element {
 
 export default function FramePage(): JSX.Element {
   const photos = usePhotoFeed()
-  const isActive = useIdleControls()
+  const isActive = useIdle(CONTROLS_HIDE_DELAY_MS)
   const selection = useFrameSelection(photos, isActive)
   const [isStripVisible, setIsStripVisible] = useState(false)
   const [isPlaying, setIsPlaying] = useState(true)
