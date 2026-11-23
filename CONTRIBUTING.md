@@ -79,7 +79,10 @@ Installés automatiquement par `pnpm install` ([lefthook](https://lefthook.dev),
 pnpm check
 pnpm typecheck
 pnpm build
+pnpm test         # tests unitaires du serveur, sans API
 pnpm test:bruno   # API lancée (pnpm dev)
 ```
 
 Un endpoint ajouté ou modifié met à jour son dossier `server/bruno/<ressource>/<endpoint>/` dans le même commit.
+
+Une règle métier modifiée dans un service (ou dans `toErrorResponse`) met à jour son `*.test.ts` dans le même commit.

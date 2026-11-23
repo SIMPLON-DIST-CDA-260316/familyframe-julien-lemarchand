@@ -120,9 +120,10 @@ Une feature par dossier (`server/src/features/photos/`), un fichier par couche :
 
 ## Outillage
 
-- **TypeScript** partout : `tsx watch` en dev côté serveur, `tsc` pour le build ; `tsc -b` + Vite côté client.
+- **TypeScript** partout : `tsx watch` en dev côté serveur, `tsc -p tsconfig.build.json` pour le build (sans les tests) ; `tsc -b` + Vite côté client.
 - **Biome** : lint, formatage et tri des imports (remplace ESLint + Prettier).
 - **lefthook** : `biome check` au pre-commit, **commitlint** au commit-msg.
+- **Vitest** : tests unitaires du serveur, colocalisés (`*.test.ts`), lancés par `pnpm test` sans API ; exclus du build par `server/tsconfig.build.json`.
 - **Bruno** (`server/bruno/`) : requêtes de l'API avec assertions, un dossier par endpoint, des fichiers `NN-nominal-…` / `NN-edge-…`. Lancées par `pnpm test:bruno` contre l'API démarrée (CLI via `pnpm dlx`, version figée, pas de dépendance).
 - **Hooks Claude Code** (`.claude/hooks/`) : garde-fous pour l'agent IA, testés avec `node:test`.
 
