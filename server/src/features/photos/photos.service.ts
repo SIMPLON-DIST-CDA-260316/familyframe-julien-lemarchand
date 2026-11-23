@@ -29,7 +29,7 @@ function parseUploaderName(rawUploaderName: unknown): string {
   return uploaderName
 }
 
-function checkFile(file: UploadedFile | undefined): UploadedFile {
+function parseFile(file: UploadedFile | undefined): UploadedFile {
   if (!file) {
     throw new AppError('PHOTO_MISSING')
   }
@@ -45,7 +45,7 @@ export function createPhotosService({
   toFrameJpeg,
   uploadImage,
 }: PhotosServiceDeps): PhotosService {
-  async function toJpeg(input: Buffer): Promise<Buffer> {
+  async function convertToFrameJpeg(input: Buffer): Promise<Buffer> {
     try {
       return await toFrameJpeg(input)
     } catch {
@@ -55,7 +55,8 @@ export function createPhotosService({
 
   async function createPhoto({ uploaderName, file }: NewPhotoInput): Promise<PhotoRecord> {
     const validUploaderName = parseUploaderName(uploaderName)
-    const jpeg = await toJpeg(checkFile(file).buffer)
+    const validFile = parseFile(file)
+    const jpeg = await convertToFrameJpeg(validFile.buffer)
     // Cloudinary and database failures are ours: they stay 500s.
     const image = await uploadImage(jpeg)
     try {
