@@ -14,33 +14,13 @@ Projet de formation **Concepteur Développeur d'Applications** (Simplon), axé s
 | Images   | Multer, Sharp, Cloudinary                |
 | DevOps   | Docker, Docker Compose, CI (optionnelle) |
 
-## Parcours d'une photo
-
-1. Le proche saisit son pseudo et prend / choisit une photo (interface React).
-2. L'image est envoyée à une route Express (Multer).
-3. Le serveur contrôle le fichier, le décode et le réencode avec Sharp.
-4. L'image est hébergée sur Cloudinary.
-5. URL, identifiant Cloudinary, pseudo et date sont enregistrés dans MongoDB.
-6. Socket.IO diffuse la nouvelle photo au cadre, qui l'affiche instantanément.
+Architecture, parcours d'une photo et choix techniques : [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 ## Feuille de route
 
 - [ ] **J1** — MVP fonctionnel en local, sans Docker
 - [ ] **J2–J4** — Conteneurisation front/back, orchestration Docker Compose, variables d'environnement et secrets, documentation de démarrage
 - [ ] **J5** — Polish UX du cadre (dernière photo en avant, historique consultable, pseudo affiché)
-
-## Structure
-
-```
-.
-├── client/   # React + Vite (TypeScript) — interfaces d'envoi et cadre
-├── server/   # Express + Socket.IO + Prisma (TypeScript) — API
-│   └── prisma/schema.prisma
-├── docs/     # Énoncé du brief
-└── biome.json, pnpm-workspace.yaml, …
-```
-
-Monorepo **pnpm workspaces**. Lint et formatage : **[Biome](https://biomejs.dev)** (remplace ESLint + Prettier).
 
 ## Démarrage (local, sans Docker)
 
@@ -57,22 +37,20 @@ pnpm dev                             # lance client et serveur en parallèle
 | Client (Vite) | http://localhost:5180 |
 | API (Express) | http://localhost:3000 |
 
-En dev, Vite proxifie `/api` et `/socket.io` vers l'API : le front n'appelle que sa propre origine. Le serveur Vite est exposé sur le réseau local (`host: true`) pour tester depuis un smartphone via l'IP du PC (`http://<ip-du-pc>:5180`).
-
-> **Prisma 6 :** MongoDB n'est pas encore supporté par Prisma 7+, le projet est volontairement fixé sur `prisma@6`.
+Depuis un smartphone sur le même réseau : `http://<ip-du-pc>:5180`.
 
 ### Scripts racine
 
-| Script                           | Rôle                                      |
-| -------------------------------- | ----------------------------------------- |
-| `pnpm dev`                       | client + serveur en mode watch            |
-| `pnpm build`                     | build des deux packages                   |
-| `pnpm typecheck`                 | vérification TypeScript                   |
-| `pnpm check` / `pnpm check:fix`  | lint + format + tri des imports (Biome)   |
-| `pnpm --filter server db:push`   | synchronise le schéma Prisma avec MongoDB |
-| `pnpm --filter server db:studio` | explorateur de données Prisma Studio      |
+| Script                          | Rôle                                      |
+| ------------------------------- | ----------------------------------------- |
+| `pnpm dev`                      | client + serveur en mode watch            |
+| `pnpm build`                    | build des deux packages                   |
+| `pnpm typecheck`                | vérification TypeScript                   |
+| `pnpm check` / `pnpm check:fix` | lint + format + tri des imports (Biome)   |
+| `pnpm test:hooks`               | tests des hooks Claude Code               |
+| `pnpm db:push`                  | synchronise le schéma Prisma avec MongoDB |
+| `pnpm db:studio`                | explorateur de données Prisma Studio      |
 
-## Workflow Git
+## Contribuer
 
-- `main` : version livrée. `develop` : branche d'intégration (par défaut).
-- Push direct interdit sur les deux : on travaille sur une branche (`feat/…`, `fix/…`, `chore/…`) et on ouvre une PR vers `develop`.
+Git flow, conventions de commit et de PR : voir [`CONTRIBUTING.md`](CONTRIBUTING.md).

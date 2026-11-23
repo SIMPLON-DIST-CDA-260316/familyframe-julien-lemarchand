@@ -1,0 +1,15 @@
+# Git hooks, installed by `pnpm install` (prepare script).
+min_version: 2.0.0
+
+pre-commit:
+  jobs:
+    - name: biome
+      glob: "*.{js,mjs,cjs,ts,tsx,json,jsonc,css,md}"
+      # Check only, no auto-fix: re-staging whole files would sweep in hunks
+      # deliberately left out with `git add -p`. Run `pnpm check:fix` instead.
+      run: pnpm exec biome check --no-errors-on-unmatched {staged_files}
+
+commit-msg:
+  jobs:
+    - name: commitlint
+      run: pnpm exec commitlint --edit {1}
