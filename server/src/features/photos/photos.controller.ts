@@ -42,8 +42,8 @@ export function createPhotosController(
     },
 
     async remove(req, res) {
-      await service.deletePhoto(req.params.id)
-      io.emit('photo:deleted', req.params.id)
+      const deletedId = await service.deletePhoto(req.params.id)
+      io.emit('photo:deleted', deletedId)
       res.status(204).end()
     },
   }

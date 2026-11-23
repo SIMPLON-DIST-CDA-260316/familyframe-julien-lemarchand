@@ -21,7 +21,7 @@ export type PhotosServiceDeps = {
 export type PhotosService = {
   listLatest: () => Promise<PhotoRecord[]>
   createPhoto: (input: NewPhotoInput) => Promise<PhotoRecord>
-  deletePhoto: (id: string) => Promise<void>
+  deletePhoto: (id: string) => Promise<string>
 }
 
 function parseUploaderName(rawUploaderName: unknown): string {
@@ -81,12 +81,12 @@ export function createPhotosService({
 
   // Database first: it decides what the frame shows. A Cloudinary failure after
   // that only leaves an orphan image, so the deletion still succeeds.
-  async function deletePhoto(id: string): Promise<void> {
-    const record = await repository.findById(parsePhotoId(id))
+  // Returns the stored id: the one in the URL may differ in case.
+  async function deletePhoto(id: string): Promise<string> {
+    const record = await repository.deleteById(parsePhotoId(id))
     if (!record) {
       throw new AppError('PHOTO_NOT_FOUND')
     }
-    await repository.deleteById(record.id)
     try {
       await deleteImage(record.cloudinaryId)
     } catch (error: unknown) {
@@ -95,6 +95,7 @@ export function createPhotosService({
         error,
       )
     }
+    return record.id
   }
 
   return {

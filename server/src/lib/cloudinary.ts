@@ -28,8 +28,12 @@ export async function uploadImage(jpeg: Buffer): Promise<UploadedImage> {
 }
 
 // invalidate: the CDN would otherwise keep serving the cached derived images.
+// destroy answers "not found" instead of failing: throw so the caller logs it.
 export async function deleteImage(cloudinaryId: string): Promise<void> {
-  await cloudinary.uploader.destroy(cloudinaryId, { invalidate: true })
+  const { result } = await cloudinary.uploader.destroy(cloudinaryId, { invalidate: true })
+  if (result !== 'ok') {
+    throw new Error(`Cloudinary destroy answered "${result}"`)
+  }
 }
 
 // The .jpg extension is the fallback format: f_auto overrides it when WebP wins.
