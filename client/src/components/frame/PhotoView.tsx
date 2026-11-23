@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/carousel.tsx'
 import { useCarouselArrowKeys } from '@/hooks/useCarouselArrowKeys.ts'
 import { useCarouselPhoto } from '@/hooks/useCarouselPhoto.ts'
+import { useSlideshow } from '@/hooks/useSlideshow.ts'
 import { cn } from '@/lib/utils.ts'
 import type { Photo } from '@/photo.ts'
 
@@ -15,6 +16,8 @@ type PhotoViewProps = {
   photos: Photo[]
   currentId: string
   isStripVisible: boolean
+  // null: no automatic advance.
+  autoAdvanceMs: number | null
   onCurrentChange: (id: string) => void
 }
 
@@ -26,11 +29,13 @@ export function PhotoView({
   photos,
   currentId,
   isStripVisible,
+  autoAdvanceMs,
   onCurrentChange,
 }: PhotoViewProps): JSX.Element {
   const [api, setApi] = useState<CarouselApi>()
   useCarouselPhoto({ api, photos, currentId, onCurrentChange })
   useCarouselArrowKeys(api)
+  useSlideshow(api, autoAdvanceMs)
 
   return (
     <div className="flex h-svh flex-col">
