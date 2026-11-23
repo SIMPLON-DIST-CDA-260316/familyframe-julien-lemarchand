@@ -107,18 +107,18 @@ Une feature par dossier (`server/src/features/photos/`), un fichier par couche :
 - **Pas de données personnelles** : jamais le pseudo, seulement des identifiants (`photoId`, `cloudinaryId`, `socketId`) ; les chemins sans leur query string.
 - Le service photos reçoit le logger par injection ; le reste du serveur importe `logger`.
 
-| Événement                                                   | Niveau                        | Écrit par                                                 |
-| ----------------------------------------------------------- | ----------------------------- | --------------------------------------------------------- |
-| `db.connected` / `db.unreachable`                           | info / error                  | `server.ts`, ping au démarrage                            |
-| `server.started`                                            | info                          | `server.ts`                                               |
-| `socket.connected` / `socket.disconnected`                  | info                          | `server.ts`                                               |
-| `http.request`                                              | info, warn (4xx), error (5xx) | `lib/request-logger.ts`, sauf `/api/health`               |
-| `photo.created`                                             | info                          | service photos                                            |
-| `photo.unreadable`                                          | warn                          | service photos, erreur de sharp                           |
-| `photo.orphaned`                                            | error                         | service photos : image sur Cloudinary, absente de la base |
-| `server.error`                                              | error                         | `errors/error-handler.ts`, pour chaque 500                |
-| `server.stopping` / `server.stopped` / `server.stop_failed` | info / info / error           | `server.ts`, à l'arrêt                                    |
-| `process.crashed`                                           | error                         | `server.ts`, exception ou rejet non géré, puis arrêt      |
+| Événement                                                   | Niveau                        | Écrit par                                                                                                    |
+| ----------------------------------------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `db.connected` / `db.unreachable`                           | info / error                  | `server.ts`, ping au démarrage                                                                               |
+| `server.started`                                            | info                          | `server.ts`                                                                                                  |
+| `socket.connected` / `socket.disconnected`                  | info                          | `server.ts`                                                                                                  |
+| `http.request`                                              | info, warn (4xx), error (5xx) | `lib/request-logger.ts`, sauf `/api/health`                                                                  |
+| `photo.created` / `photo.deleted`                           | info                          | service photos                                                                                               |
+| `photo.unreadable`                                          | warn                          | service photos, erreur de sharp                                                                              |
+| `photo.orphaned`                                            | error                         | service photos : image sur Cloudinary sans enregistrement en base (échec d'enregistrement ou de suppression) |
+| `server.error`                                              | error                         | `errors/error-handler.ts`, pour chaque 500                                                                   |
+| `server.stopping` / `server.stopped` / `server.stop_failed` | info / info / error           | `server.ts`, à l'arrêt                                                                                       |
+| `process.crashed`                                           | error                         | `server.ts`, exception ou rejet non géré, puis arrêt                                                         |
 
 ## Réseau en développement
 
