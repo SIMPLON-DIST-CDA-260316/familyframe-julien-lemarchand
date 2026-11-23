@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express'
 import type { Server } from 'socket.io'
+import { deliveryUrls } from '../../lib/cloudinary.js'
 import type { ClientToServerEvents, Photo, ServerToClientEvents } from '../../types.js'
 import type { PhotoRecord } from './photos.repository.js'
 import type { PhotosService } from './photos.service.js'
@@ -9,11 +10,11 @@ export type PhotosController = {
   create: (req: Request, res: Response) => Promise<void>
 }
 
-// cloudinaryId stays on the server.
+// cloudinaryId stays on the server: the client gets ready-made URLs.
 function toPhotoDto(record: PhotoRecord): Photo {
   return {
     id: record.id,
-    url: record.url,
+    ...deliveryUrls(record.cloudinaryId),
     uploaderName: record.uploaderName,
     createdAt: record.createdAt.toISOString(),
   }

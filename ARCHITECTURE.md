@@ -33,6 +33,7 @@ Le détail des fichiers n'est pas listé ici : il change trop vite pour rester j
 4. L'image réencodée est envoyée à **Cloudinary**, dans le dossier `familyframe`.
 5. **Prisma** enregistre dans MongoDB l'URL, l'identifiant Cloudinary, le pseudo et la date.
 6. Le serveur émet un événement **Socket.IO** ; le cadre affiche la nouvelle photo sans rechargement.
+7. À l'affichage, le serveur construit deux URL Cloudinary depuis l'identifiant : la photo entière et une miniature carrée de 400 px recadrée sur le sujet (`c_fill,g_auto`). Les deux portent `f_auto,q_auto` : Cloudinary livre du WebP si le navigateur l'accepte et que c'est plus léger, sinon du JPEG. Une seule image est stockée.
 
 ## Pages
 
@@ -51,7 +52,7 @@ Le routage est fait côté navigateur (`react-router`). En production (J2), le s
 | `GET /api/photos`  | `200 Photo[]`, les 20 plus récentes en premier                                       |
 | `POST /api/photos` | `multipart/form-data` avec `uploaderName` (texte) et `photo` (fichier) → `201 Photo` |
 
-Une `Photo` vaut `{ id, url, uploaderName, createdAt }` (`createdAt` en ISO 8601). L'identifiant Cloudinary reste côté serveur.
+Une `Photo` vaut `{ id, url, thumbnailUrl, uploaderName, createdAt }` (`createdAt` en ISO 8601). L'identifiant Cloudinary reste côté serveur : le client reçoit des URL prêtes à l'emploi.
 
 En cas d'erreur, l'API renvoie `{ "error": code }` ; le client traduit le code en message français :
 

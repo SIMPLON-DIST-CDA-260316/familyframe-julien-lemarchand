@@ -23,6 +23,19 @@ assert {
   res.body.cloudinaryId: isUndefined
 }
 
+script:post-response {
+  const { url, thumbnailUrl } = res.body
+  test('format et compression choisis par Cloudinary', () => {
+    expect(url).to.contain('f_auto,q_auto')
+    expect(thumbnailUrl).to.contain('f_auto,q_auto')
+  })
+  test('miniature carrée de 400 px, recadrée sur le sujet', () => {
+    expect(thumbnailUrl).to.contain('c_fill,g_auto,h_400,w_400')
+  })
+}
+
 docs {
-  NOMINAL → 201 avec la photo créée. `cloudinaryId` n'est pas exposé.
+  NOMINAL → 201 avec la photo créée. `cloudinaryId` n'est pas exposé : le
+  serveur envoie des URL prêtes, `url` (photo entière) et `thumbnailUrl`
+  (miniature), toutes deux en `f_auto,q_auto`.
 }
