@@ -1,6 +1,6 @@
 import { createServer } from 'node:http'
 import { Server } from 'socket.io'
-import { createApp } from './app.js'
+import { assembleAuthService, createApp } from './app.js'
 import { config } from './config.js'
 import { prisma } from './lib/db.js'
 import { logger } from './lib/logger.js'
@@ -28,7 +28,8 @@ try {
 const io = new Server<ClientToServerEvents, ServerToClientEvents>({
   cors: { origin: config.clientOrigin },
 })
-const httpServer = createServer(createApp(io))
+const authService = assembleAuthService()
+const httpServer = createServer(createApp(io, authService))
 io.attach(httpServer)
 
 io.on('connection', (socket) => {

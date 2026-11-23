@@ -14,7 +14,7 @@
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "db:seed": "tsx --env-file-if-exists=.env prisma/seed.ts",
-    "test:bruno": "cd bruno && pnpm dlx @usebruno/cli@4.2.0 run . -r --env Local",
+    "test:bruno": "cd bruno && pnpm dlx @usebruno/cli@4.2.0 run . -r --env Local --disable-cookies",
     "postinstall": "prisma generate"
   },
   "dependencies": {

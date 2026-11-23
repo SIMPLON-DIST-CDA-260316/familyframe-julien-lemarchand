@@ -1,0 +1,15 @@
+meta {
+  name: auth
+  seq: 1
+}
+
+docs {
+  Lancé avant les autres dossiers (`seq: 1`). `login/01` range le cookie de
+  session dans la variable `sessionCookie` ; `logout/` ferme cette session,
+  vérifie qu'elle ne sert plus, puis se reconnecte : les dossiers suivants
+  gardent une session valide.
+
+  Identifiants : ceux du membre créé par `pnpm db:seed`, dans
+  `environments/Local.bru`. Un utilisateur renvoyé par l'API vaut
+  `{ id, email, displayName, role }`, jamais le hash du mot de passe.
+}

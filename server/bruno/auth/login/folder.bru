@@ -1,0 +1,10 @@
+meta {
+  name: login
+  seq: 1
+}
+
+docs {
+  `POST /api/auth/login`, JSON `{ email, password }` → 200 `{ user }` et le
+  cookie `ff_session` (httpOnly, SameSite=Lax, 90 jours). E-mail inconnu et
+  mauvais mot de passe donnent la même réponse : 401 `INVALID_CREDENTIALS`.
+}

@@ -2,16 +2,25 @@ meta {
   name: familyframe
 }
 
+headers {
+  Cookie: {{sessionCookie}}
+}
+
 auth {
   mode: none
 }
 
 docs {
-  Requêtes de l'API, avec leurs assertions. Prérequis : `server/.env` rempli
-  et l'API lancée (`pnpm dev`, port 3000).
+  Requêtes de l'API, avec leurs assertions. Prérequis : `server/.env` rempli,
+  la base remplie par `pnpm db:seed` et l'API lancée (`pnpm dev`, port 3000).
 
   Lancer toute la collection depuis la racine du dépôt : `pnpm test:bruno`.
   Ou ouvrir le dossier `server/bruno/` dans l'application Bruno.
+
+  Session : le dossier `auth/` passe en premier et range le cookie de session
+  dans la variable `sessionCookie`, envoyée à toutes les requêtes par l'en-tête
+  `Cookie` ci-dessus. Le CLI tourne avec `--disable-cookies` : sa propre boîte
+  à cookies renverrait sinon la session même aux requêtes « sans cookie ».
 
   Les envois nominaux publient de vraies photos (Cloudinary + MongoDB) avec
   le pseudo `bruno` : elles apparaissent sur le cadre.
