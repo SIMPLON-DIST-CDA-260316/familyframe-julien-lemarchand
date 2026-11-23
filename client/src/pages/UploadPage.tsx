@@ -1,4 +1,5 @@
 import { type ChangeEvent, type JSX, type SubmitEvent, useEffect, useState } from 'react'
+import { Button } from '@/components/ui/button.tsx'
 import { errorMessage } from '../api.ts'
 
 type Status = 'idle' | 'sending' | 'success' | 'error'
@@ -117,9 +118,9 @@ export default function UploadPage(): JSX.Element {
 
         {previewUrl && <img className="preview" src={previewUrl} alt="Aperçu avant envoi" />}
 
-        <button type="submit" disabled={!file || status === 'sending'}>
+        <Button type="submit" disabled={!file || status === 'sending'}>
           {status === 'sending' ? 'Envoi…' : 'Envoyer'}
-        </button>
+        </Button>
       </form>
 
       {status === 'success' && <p>Photo envoyée !</p>}
