@@ -1,4 +1,5 @@
 import { AppError } from '../../errors/app-error.js'
+import { parseEmail } from '../../lib/email.js'
 import type { Logger } from '../../lib/logger.js'
 import type { CreatedInvitation, Invitation, InvitationStatus, PublicUser } from '../../types.js'
 import type {
@@ -9,9 +10,6 @@ import type {
 
 const DAY_MS = 24 * 60 * 60 * 1000
 export const INVITATION_DURATION_MS = 7 * DAY_MS
-// Loose on purpose: the admin types the address himself; this catches a missing @ or a
-// stray space without rejecting a real address.
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+$/
 // What generateToken produces: 32 random bytes in hex.
 const TOKEN_PATTERN = /^[0-9a-f]{64}$/
 // Shown on frames and next to shared photos: a bound keeps the layout.
@@ -39,18 +37,6 @@ export type InvitationsService = {
   createInvitation: (input: NewInvitationInput) => Promise<CreatedInvitation>
   listInvitations: () => Promise<Invitation[]>
   acceptInvitation: (acceptance: InvitationAcceptance) => Promise<PublicUser>
-}
-
-// Same normalization as login: the account created from the invitation logs in with it.
-function parseEmail(email: unknown): string {
-  if (typeof email !== 'string') {
-    throw new AppError('EMAIL_INVALID')
-  }
-  const normalizedEmail = email.trim().toLowerCase()
-  if (!EMAIL_PATTERN.test(normalizedEmail)) {
-    throw new AppError('EMAIL_INVALID')
-  }
-  return normalizedEmail
 }
 
 function parseDisplayName(displayName: unknown): string {
