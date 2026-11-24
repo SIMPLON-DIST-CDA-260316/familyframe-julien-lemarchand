@@ -1,9 +1,10 @@
-import { type ChangeEvent, type JSX, type SubmitEvent, useEffect, useState } from 'react'
+import { type ChangeEvent, type JSX, type SubmitEvent, useState } from 'react'
 import { useAuth } from '@/auth/AuthContext.ts'
 import { Alert, AlertDescription } from '@/components/ui/alert.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import { Input } from '@/components/ui/input.tsx'
 import { Label } from '@/components/ui/label.tsx'
+import { usePreviewUrl } from '@/hooks/usePreviewUrl.ts'
 import type { Photo } from '@/photo.ts'
 import { postPhoto } from '@/photosApi.ts'
 
@@ -39,22 +40,6 @@ type UploadFormState = {
   inputsKey: number
   handleFileChange: (event: ChangeEvent<HTMLInputElement>) => void
   handleSubmit: (event: SubmitEvent<HTMLFormElement>) => Promise<void>
-}
-
-function usePreviewUrl(file: File | null): string | null {
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (!file) {
-      setPreviewUrl(null)
-      return
-    }
-    const url = URL.createObjectURL(file)
-    setPreviewUrl(url)
-    return () => URL.revokeObjectURL(url)
-  }, [file])
-
-  return previewUrl
 }
 
 function usePhotoUpload(onUploaded: (photo: Photo) => void): PhotoUpload {
