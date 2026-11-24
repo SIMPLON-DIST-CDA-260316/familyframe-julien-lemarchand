@@ -1,5 +1,4 @@
 import { type JSX, type SubmitEvent, useState } from 'react'
-import { useNavigate } from 'react-router'
 import { useAuth } from '@/auth/AuthContext.ts'
 import { TextField } from '@/components/form/TextField.tsx'
 import { Alert, AlertDescription } from '@/components/ui/alert.tsx'
@@ -10,7 +9,6 @@ import { Button } from '@/components/ui/button.tsx'
 const DISPLAY_NAME_MAX_LENGTH = 50
 const PASSWORD_MIN_LENGTH = 12
 const PASSWORD_MAX_LENGTH = 128
-const HOME_PATH = '/'
 const PASSWORD_MISMATCH_MESSAGE = 'Les deux mots de passe ne correspondent pas.'
 
 type InviteFields = { displayName: string; password: string; confirmation: string }
@@ -27,6 +25,8 @@ type InviteFormState = {
 
 type InviteFieldsState = Pick<InviteFormState, 'fields' | 'setField'>
 
+type InviteFormProps = { token: string; onJoiningChange: (isJoining: boolean) => void }
+
 function useInviteFields(): InviteFieldsState {
   const [fields, setFields] = useState(EMPTY_FIELDS)
   const setField = (name: keyof InviteFields, value: string): void =>
@@ -34,9 +34,8 @@ function useInviteFields(): InviteFieldsState {
   return { fields, setField }
 }
 
-function useInviteForm(token: string): InviteFormState {
+function useInviteForm({ token, onJoiningChange }: InviteFormProps): InviteFormState {
   const { acceptInvitation } = useAuth()
-  const navigate = useNavigate()
   const { fields, setField } = useInviteFields()
   const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState('')
@@ -50,13 +49,12 @@ function useInviteForm(token: string): InviteFormState {
     }
     setError('')
     setIsSending(true)
+    // Raised before the request: when the user is set, the page already knows to go home.
+    onJoiningChange(true)
     const { displayName, password } = fields
     const result = await acceptInvitation({ token, displayName, password })
-    // Same render as the user being set: the "already logged in" card never flashes.
-    if (result.isSuccess) {
-      navigate(HOME_PATH, { replace: true })
-      return
-    }
+    if (result.isSuccess) return
+    onJoiningChange(false)
     setError(result.message)
     setIsSending(false)
   }
@@ -91,8 +89,8 @@ function PasswordFields({ fields, setField }: InviteFieldsState): JSX.Element {
   )
 }
 
-export function InviteForm({ token }: { token: string }): JSX.Element {
-  const { fields, setField, isSending, error, handleSubmit } = useInviteForm(token)
+export function InviteForm(props: InviteFormProps): JSX.Element {
+  const { fields, setField, isSending, error, handleSubmit } = useInviteForm(props)
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
