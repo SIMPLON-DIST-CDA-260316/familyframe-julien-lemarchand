@@ -32,7 +32,7 @@ script:post-response {
 }
 
 docs {
-  NOMINAL → 204 : le membre supprime le lien de `create/01`, une annulation
-  tant que `accept/` n'existe pas, un retrait d'ami ensuite : même requête.
+  NOMINAL → 204 : le membre supprime le lien de `create/01`, devenu une amitié
+  acceptée par `accept/03` : un retrait d'ami.
   Le script vérifie qu'aucune des trois listes de l'admin ne l'a plus.
 }

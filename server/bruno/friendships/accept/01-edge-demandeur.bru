@@ -1,0 +1,27 @@
+meta {
+  name: Edge - le demandeur accepte sa propre demande
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/friendships/{{friendshipId}}/accept
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('friendshipId')) {
+    throw new Error('friendshipId absent : lancer toute la collection, create/01 doit passer')
+  }
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq FRIENDSHIP_NOT_FOUND
+}
+
+docs {
+  EDGE → 404 FRIENDSHIP_NOT_FOUND : le membre a envoyé la demande, seul
+  l'admin, son destinataire, peut l'accepter.
+}

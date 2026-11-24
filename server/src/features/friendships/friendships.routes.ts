@@ -7,6 +7,7 @@ export function createFriendshipsRouter(controller: FriendshipsController): Rout
   router.use(express.json())
   router.get('/', controller.list)
   router.post('/', controller.request)
+  router.post('/:id/accept', controller.accept)
   router.delete('/:id', controller.remove)
   return router
 }

@@ -1,0 +1,28 @@
+meta {
+  name: Edge - id qui n'est pas un ObjectId
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/friendships/pas-un-id/accept
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('adminCookie')) {
+    throw new Error('adminCookie absent : lancer toute la collection, auth/login/05 doit passer')
+  }
+  req.setHeader('Cookie', bru.getVar('adminCookie'))
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq FRIENDSHIP_NOT_FOUND
+}
+
+docs {
+  EDGE → 404 FRIENDSHIP_NOT_FOUND, pas une 500 : le service vérifie le
+  format avant d'interroger MongoDB.
+}

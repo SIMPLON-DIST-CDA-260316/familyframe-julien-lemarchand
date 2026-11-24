@@ -1,0 +1,14 @@
+meta {
+  name: accept
+  seq: 3
+}
+
+docs {
+  `POST /api/friendships/:id/accept` → 200 `{ friendship }` : le
+  destinataire d'une demande en attente l'accepte, l'amitié devient
+  mutuelle. Une seule écriture filtrée sur `{ id, addresseeId, status:
+  'pending' }` : l'auteur de la demande, un tiers, une demande déjà
+  acceptée ou supprimée, un id mal formé répondent tous 404
+  `FRIENDSHIP_NOT_FOUND`. Après ce dossier, `delete/02` retire une amitié
+  acceptée.
+}
