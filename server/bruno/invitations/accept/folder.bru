@@ -1,0 +1,17 @@
+meta {
+  name: accept
+  seq: 3
+}
+
+docs {
+  `POST /api/invitations/accept`, JSON `{ token, displayName, password }`,
+  public → 201 `{ user }` et le cookie `ff_session` : le nouveau membre est
+  connecté comme après `/login`. Le jeton voyage dans le corps, jamais dans
+  le chemin : `http.request` écrit chaque chemin dans les logs.
+
+  Ordre des contrôles : le lien d'abord (forme, existence, déjà servi,
+  expiré), puis le nom (1 à 50 caractères), puis le mot de passe (12 à 128).
+  Toutes les requêtes partent sans cookie (`req.deleteHeader('Cookie')`) :
+  l'invité n'a pas encore de compte. `05` crée un compte à chaque lancement ;
+  ces comptes restent jusqu'au prochain `pnpm db:seed`.
+}

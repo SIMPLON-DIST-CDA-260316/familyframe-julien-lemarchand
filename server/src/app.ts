@@ -50,6 +50,7 @@ function assemblePhotosRouter(io: SocketServer): Router {
 }
 
 function assembleInvitationsRouter(
+  authService: AuthService,
   requireAuth: RequestHandler,
   requireAdmin: RequestHandler,
 ): Router {
@@ -61,7 +62,8 @@ function assembleInvitationsRouter(
     now: () => new Date(),
     logger,
   })
-  return createInvitationsRouter(createInvitationsController(service), requireAuth, requireAdmin)
+  const controller = createInvitationsController(service, authService)
+  return createInvitationsRouter(controller, requireAuth, requireAdmin)
 }
 
 export function createApp(io: SocketServer, authService: AuthService): Express {
@@ -79,7 +81,8 @@ export function createApp(io: SocketServer, authService: AuthService): Express {
 
   app.use('/api/auth', createAuthRouter(createAuthController(authService), requireAuth))
   app.use('/api/photos', requireAuth, assemblePhotosRouter(io))
-  app.use('/api/invitations', assembleInvitationsRouter(requireAuth, requireAdmin))
+  // Unlike photos, the router gets requireAuth itself: its accept route is public.
+  app.use('/api/invitations', assembleInvitationsRouter(authService, requireAuth, requireAdmin))
 
   app.use(notFound)
   app.use(errorHandler)

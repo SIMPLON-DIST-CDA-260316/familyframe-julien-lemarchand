@@ -1,0 +1,37 @@
+meta {
+  name: Edge - lien remplacé
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/invitations/accept
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "token": "{{replacedInviteToken}}",
+    "displayName": "Invitée",
+    "password": "invite-bruno-dev"
+  }
+}
+
+script:pre-request {
+  if (!bru.getVar('replacedInviteToken')) {
+    throw new Error('replacedInviteToken absent : lancer toute la collection, create/02 doit passer')
+  }
+  // The invitee has no session: collection.bru's cookie must not leave.
+  req.deleteHeader('Cookie')
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq INVITATION_NOT_FOUND
+}
+
+docs {
+  EDGE → 404 INVITATION_NOT_FOUND : le premier lien de `create/01`, remplacé
+  par `create/02`, n'existe plus.
+}

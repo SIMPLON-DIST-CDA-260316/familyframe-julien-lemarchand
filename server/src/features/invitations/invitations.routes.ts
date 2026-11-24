@@ -9,6 +9,9 @@ export function createInvitationsRouter(
   const router = Router()
   // A JSON route brings its own parser (see the logging spec).
   router.use(express.json())
+  // Public: the invitee has no account yet. The token travels in the body, never in the
+  // path, which the request log writes.
+  router.post('/accept', controller.accept)
   router.get('/', requireAuth, requireAdmin, controller.list)
   router.post('/', requireAuth, requireAdmin, controller.create)
   return router

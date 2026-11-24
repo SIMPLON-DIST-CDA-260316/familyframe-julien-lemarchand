@@ -1,0 +1,37 @@
+meta {
+  name: Edge - nom vide
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/invitations/accept
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "token": "{{inviteToken}}",
+    "displayName": "   ",
+    "password": "invite-bruno-dev"
+  }
+}
+
+script:pre-request {
+  if (!bru.getVar('inviteToken')) {
+    throw new Error('inviteToken absent : lancer toute la collection, create/02 doit passer')
+  }
+  // The invitee has no session: collection.bru's cookie must not leave.
+  req.deleteHeader('Cookie')
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq DISPLAY_NAME_INVALID
+}
+
+docs {
+  EDGE → 400 DISPLAY_NAME_INVALID : un nom fait d'espaces est vide une fois
+  nettoyé. Le lien reste valable : `05` s'en sert ensuite.
+}

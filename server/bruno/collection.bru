@@ -31,5 +31,9 @@ docs {
   suivant répond 409 `PHOTO_DUPLICATE` à `create/01` ; `pnpm db:seed` remet
   la base à zéro.
 
+  Chaque lancement crée aussi un compte membre à une adresse neuve
+  (`invitations/accept/05`, `invite-<horodatage>@familyframe.test`) : ces
+  comptes restent jusqu'au prochain `pnpm db:seed`.
+
   Chemins `@file()` relatifs à la racine de la collection (`server/bruno/`).
 }
