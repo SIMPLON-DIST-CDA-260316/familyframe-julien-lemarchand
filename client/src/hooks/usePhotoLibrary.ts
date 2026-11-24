@@ -17,6 +17,8 @@ export type PhotoLibrary = {
   photos: Photo[]
   hasMore: boolean
   isLoadingMore: boolean
+  // false until the first page arrives: an empty list then means an empty library.
+  isFirstPageLoaded: boolean
   loadMore: () => Promise<void>
   addPhoto: (photo: Photo) => void
 }
@@ -27,6 +29,10 @@ type NextPage = { cursor: string; loadId: number }
 type LibrarySetters = {
   setPhotos: Dispatch<SetStateAction<Photo[]>>
   setNextPage: Dispatch<SetStateAction<NextPage | null>>
+}
+
+type FirstPageSetters = LibrarySetters & {
+  setIsFirstPageLoaded: Dispatch<SetStateAction<boolean>>
 }
 
 type MoreSetters = LibrarySetters & {
@@ -40,7 +46,7 @@ function toNextPage(cursor: string | null, loadId: number): NextPage | null {
 // Each (re)connection starts over from the first page: simple, and catches what changed offline.
 function createFirstPageLoader(
   liveLoads: LiveLoads,
-  { setPhotos, setNextPage }: LibrarySetters,
+  { setPhotos, setNextPage, setIsFirstPageLoaded }: FirstPageSetters,
   dropUser: () => void,
 ): () => Promise<void> {
   return async () => {
@@ -51,6 +57,7 @@ function createFirstPageLoader(
     if (page === null || !liveLoads.isCurrent(loadId)) return
     setPhotos(liveLoads.withLiveChanges(page.photos))
     setNextPage(toNextPage(page.nextCursor, loadId))
+    setIsFirstPageLoaded(true)
   }
 }
 
@@ -78,7 +85,7 @@ function createMoreLoader(
 // Returns the cleanup that stops the socket and any load still running.
 function connectLibrary(
   liveLoads: LiveLoads,
-  setters: LibrarySetters,
+  setters: FirstPageSetters,
   dropUser: () => void,
 ): () => void {
   const { setPhotos } = setters
@@ -101,6 +108,20 @@ function connectLibrary(
   }
 }
 
+// The upload response and the photo:new event bring the same photo: withNewPhoto keeps one.
+function usePhotoAdder(
+  liveLoads: LiveLoads,
+  setPhotos: Dispatch<SetStateAction<Photo[]>>,
+): (photo: Photo) => void {
+  return useCallback(
+    (photo: Photo): void => {
+      liveLoads.rememberAdded(photo)
+      setPhotos((current) => withNewPhoto(current, photo))
+    },
+    [liveLoads, setPhotos],
+  )
+}
+
 export function usePhotoLibrary(): PhotoLibrary {
   const { dropUser } = useAuth()
   // useState keeps one instance across renders: its load bookkeeping must survive them.
@@ -108,9 +129,10 @@ export function usePhotoLibrary(): PhotoLibrary {
   const [photos, setPhotos] = useState<Photo[]>([])
   const [nextPage, setNextPage] = useState<NextPage | null>(null)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
+  const [isFirstPageLoaded, setIsFirstPageLoaded] = useState(false)
 
   useEffect(
-    () => connectLibrary(liveLoads, { setPhotos, setNextPage }, dropUser),
+    () => connectLibrary(liveLoads, { setPhotos, setNextPage, setIsFirstPageLoaded }, dropUser),
     [liveLoads, dropUser],
   )
 
@@ -120,14 +142,14 @@ export function usePhotoLibrary(): PhotoLibrary {
     return createMoreLoader(liveLoads, nextPage, setters, dropUser)
   }, [liveLoads, nextPage, dropUser])
 
-  // The upload response and the photo:new event bring the same photo: withNewPhoto keeps one.
-  const addPhoto = useCallback(
-    (photo: Photo): void => {
-      liveLoads.rememberAdded(photo)
-      setPhotos((current) => withNewPhoto(current, photo))
-    },
-    [liveLoads],
-  )
+  const addPhoto = usePhotoAdder(liveLoads, setPhotos)
 
-  return { photos, hasMore: nextPage !== null, isLoadingMore, loadMore, addPhoto }
+  return {
+    photos,
+    hasMore: nextPage !== null,
+    isLoadingMore,
+    isFirstPageLoaded,
+    loadMore,
+    addPhoto,
+  }
 }
