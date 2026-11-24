@@ -43,6 +43,8 @@ Comptes de test créés par `pnpm db:seed` (**développement uniquement**, mots 
 
 Le seed efface toutes les photos, sessions et comptes avant de recréer ces deux comptes (les images restent sur Cloudinary, sans référence). Il refuse de tourner avec `NODE_ENV=production`.
 
+Quand le schéma change sur une base qui contient déjà des photos, lancer `pnpm db:seed` **avant** `pnpm db:push` : un nouvel index unique ne peut pas se créer tant que d'anciennes photos n'ont pas les nouveaux champs.
+
 | Service       | URL                         |
 | ------------- | --------------------------- |
 | Connexion     | http://localhost:5180/login |
