@@ -4,14 +4,14 @@ import type { Photo } from '@/photo.ts'
 
 type PhotoListProps = {
   photos: Photo[]
-  currentId: string
+  // null on the library page: no photo is on screen there.
+  currentId: string | null
   onSelect: (id: string) => void
 }
 
 export function PhotoList({ photos, currentId, onSelect }: PhotoListProps): JSX.Element {
   return (
-    // pt-24 keeps the first row clear of the fixed library header.
-    <ul className="mx-auto flex max-w-3xl flex-col gap-1 p-8 pt-24">
+    <ul className="mx-auto flex max-w-3xl flex-col gap-1 p-8">
       {photos.map((photo) => (
         <PhotoListRow
           key={photo.id}

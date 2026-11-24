@@ -28,11 +28,14 @@ export function LibraryScreen({
         onLayoutChange={setLayout}
         onStartSlideshow={onStartSlideshow}
       />
-      {layout === 'grid' ? (
-        <PhotoGrid photos={photos} currentId={currentId} onSelect={onOpenPhoto} />
-      ) : (
-        <PhotoList photos={photos} currentId={currentId} onSelect={onOpenPhoto} />
-      )}
+      {/* With the grid's or list's own p-8, keeps the first row clear of the fixed header. */}
+      <div className="pt-16">
+        {layout === 'grid' ? (
+          <PhotoGrid photos={photos} currentId={currentId} onSelect={onOpenPhoto} />
+        ) : (
+          <PhotoList photos={photos} currentId={currentId} onSelect={onOpenPhoto} />
+        )}
+      </div>
     </>
   )
 }
