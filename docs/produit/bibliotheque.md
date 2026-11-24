@@ -101,7 +101,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 3. R-BIB-32 · La suppression est définitive : il n'y a ni corbeille ni annulation.
 4. R-BIB-33 · La photo disparaît aussitôt de la bibliothèque et du cadre, sur tous les appareils connectés au compte.
 5. R-BIB-34 · Supprimer une photo que l'on a envoyée à des amis ne la retire pas de leur bibliothèque ; supprimer une photo reçue ne la retire pas de celle de l'expéditeur (voir [partage.md](partage.md)).
-6. R-BIB-35 · Si la photo a déjà été supprimée ailleurs (sur un autre appareil), le motif s'affiche dans une notification en bas de l'écran, et non plus dans une fenêtre à fermer.
+6. R-BIB-35 · Si la photo a déjà été supprimée ailleurs (sur un autre appareil), le motif s'affiche dans une notification en bas de l'écran.
 
 **Messages affichés**
 
