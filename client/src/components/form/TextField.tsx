@@ -1,4 +1,5 @@
-import type { JSX } from 'react'
+import type { ChangeEvent, JSX } from 'react'
+import { PasswordInput } from '@/components/form/PasswordInput.tsx'
 import { Input } from '@/components/ui/input.tsx'
 import { Label } from '@/components/ui/label.tsx'
 
@@ -19,18 +20,25 @@ export function TextField({
   label,
   value,
   onChange,
+  type,
   ...inputProps
 }: TextFieldProps): JSX.Element {
+  const fieldProps = {
+    id,
+    value,
+    onChange: (event: ChangeEvent<HTMLInputElement>) => onChange(event.target.value),
+    required: true,
+    ...inputProps,
+  }
+
   return (
     <div className="flex flex-col gap-2">
       <Label htmlFor={id}>{label}</Label>
-      <Input
-        id={id}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        required
-        {...inputProps}
-      />
+      {type === 'password' ? (
+        <PasswordInput {...fieldProps} />
+      ) : (
+        <Input type={type} {...fieldProps} />
+      )}
     </div>
   )
 }

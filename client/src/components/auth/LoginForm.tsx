@@ -1,5 +1,6 @@
 import { type JSX, type SubmitEvent, useState } from 'react'
 import type { LoginResult } from '@/auth/authApi.ts'
+import { PasswordInput } from '@/components/form/PasswordInput.tsx'
 import { Alert, AlertDescription } from '@/components/ui/alert.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import { Input } from '@/components/ui/input.tsx'
@@ -43,9 +44,8 @@ export function LoginForm({ onLogin }: LoginFormProps): JSX.Element {
 
       <div className="flex flex-col gap-2">
         <Label htmlFor="password">Mot de passe</Label>
-        <Input
+        <PasswordInput
           id="password"
-          type="password"
           autoComplete="current-password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
