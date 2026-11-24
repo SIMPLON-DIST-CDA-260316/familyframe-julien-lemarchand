@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-// wheel: scrolling the library with a mouse wheel moves no pointer, yet someone is using it.
+// wheel: a mouse wheel moves no pointer, yet someone is at the screen.
 const ACTIVITY_EVENTS: (keyof WindowEventMap)[] = ['pointermove', 'pointerdown', 'keydown', 'wheel']
 
 // Someone reading the actions menu, the share or the delete dialog is still using the frame, even
@@ -12,8 +12,8 @@ export function isOverlayOpen(): boolean {
   return document.querySelector(overlaySelector) !== null
 }
 
-// Starts active: someone just opened the page, and the library must wait its full delay
-// before launching the slideshow.
+// Starts active: someone just opened the page, and the controls must wait their full delay
+// before hiding.
 export function useIdle(delayMs: number): boolean {
   const [isActive, setIsActive] = useState(true)
 

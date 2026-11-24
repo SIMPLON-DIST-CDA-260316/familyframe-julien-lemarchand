@@ -38,7 +38,7 @@ Comment on se déplace dans l'application, comment on choisit son thème, et les
 **Règles**
 
 1. R-APP-10 · Le rond affiche la première lettre du nom, en majuscule.
-2. R-APP-11 · La mention « Admin » s'affiche à côté du nom de l'administrateur, dans le menu du compte, dans le menu mobile et dans la vue bibliothèque du cadre.
+2. R-APP-11 · La mention « Admin » s'affiche à côté du nom de l'administrateur, dans le menu du compte et dans le menu mobile.
 
 **Messages affichés**
 

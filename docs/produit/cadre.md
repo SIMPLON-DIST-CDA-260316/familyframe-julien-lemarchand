@@ -19,7 +19,7 @@ Le cadre est la page à laisser affichée en plein écran sur l'appareil posé c
 5. R-CAD-05 · Le cadre recharge toutes ses photos une fois par jour. Cela garde sa connexion active (voir [comptes-et-connexion.md](comptes-et-connexion.md#rester-connecté)) : un cadre allumé en continu ne se déconnecte jamais.
 6. R-CAD-06 · Un cadre rallumé alors que le réseau n'est pas encore prêt attend et réessaie seul toutes les 5 secondes, sans afficher la page de connexion (R-CNX-16).
 7. R-CAD-07 · Si sa connexion au compte a expiré ou a été fermée, le cadre revient à la page de connexion : il faut se reconnecter sur l'appareil.
-8. R-CAD-08 · Tant qu'aucune photo n'est affichée (bibliothèque vide, ou pendant le tout premier chargement), le cadre montre un message d'attente avec l'adresse du site, pour inviter à envoyer une première photo.
+8. R-CAD-08 · Remplacée : le cadre distingue désormais le chargement de la bibliothèque vide ; seul le message « bibliothèque vide » montre l'adresse du site (R-CAD-55).
 9. R-CAD-53 · Le cadre n'affiche que le diaporama : les vignettes et la liste sont dans la bibliothèque.
 10. R-CAD-54 · Le diaporama ne démarre plus de lui-même après une minute : il est déjà la seule vue du cadre.
 11. R-CAD-55 · Sans photo à montrer, le cadre dit pourquoi : chargement en cours, aucune photo encore, ou chargement impossible ; il réessaie tout seul quand la connexion revient.

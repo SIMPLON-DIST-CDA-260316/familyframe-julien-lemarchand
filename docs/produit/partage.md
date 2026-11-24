@@ -47,7 +47,7 @@ Envoyer une photo à un ami la fait entrer dans sa bibliothèque et l'affiche au
 
 **Ce que l'on peut faire**
 
-- Dans le menu « … » d'une photo, choisir « Envoyer à un ami ». Ce menu existe dans la bibliothèque, dans la vue bibliothèque du cadre et dans le diaporama.
+- Dans le menu « … » d'une photo, choisir « Envoyer à un ami ». Ce menu existe dans la bibliothèque, sur une photo ouverte en grand et dans le diaporama.
 
 **Règles**
 

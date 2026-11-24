@@ -66,10 +66,10 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 2. R-BIB-21 · La bibliothèque affiche d'abord les 30 photos les plus récentes. « Charger plus » ajoute les 30 suivantes, et ainsi de suite ; le bouton disparaît quand toutes les photos sont affichées.
 3. R-BIB-22 · Les vignettes sont carrées : la photo est recadrée autour de son sujet principal. La photo entière reste visible en l'ouvrant.
 4. R-BIB-23 · En miniatures, chaque vignette est seule. En liste, chaque ligne montre la vignette, la date et l'heure d'ajout (par exemple « 24 nov. 2026, 14:05 ») et, pour une photo reçue, « Envoyée par » suivi du nom de l'expéditeur.
-5. R-BIB-24 · L'affichage choisi (miniatures ou liste) est retenu sur l'appareil et vaut aussi pour la vue bibliothèque du cadre. Par défaut : miniatures.
+5. R-BIB-24 · L'affichage choisi (miniatures ou liste) est retenu sur l'appareil Par défaut : miniatures.
 6. R-BIB-25 · Cliquer sur une photo l'ouvre en grand dans l'application.
 7. R-BIB-26 · La bibliothèque se met à jour seule : une photo ajoutée depuis un autre appareil ou reçue d'un ami apparaît en tête, une photo supprimée disparaît, sans recharger la page.
-8. R-BIB-27 · Après une coupure de réseau, la bibliothèque se recharge seule depuis le début dès que la connexion revient, pour rattraper ce qui a changé entre-temps.
+8. R-BIB-27 · Après une coupure de réseau, la bibliothèque se recharge seule depuis le début dès que la connexion revient, pour rattraper ce qui a changé entre-temps, sans revenir aux 30 premières photos.
 9. R-BIB-28 · La section « Ma bibliothèque » est toujours sombre, quel que soit le thème choisi, pour présenter les photos comme sur le cadre.
 10. R-BIB-29 · Pour l'administrateur, la carte « Vos proches » propose en plus « Inviter un proche sur FamilyFrame ».
 11. R-BIB-36 · La photo affiche sa date, et « Envoyée par » suivi du nom quand elle a été reçue.
@@ -99,7 +99,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 
 **Ce que l'on peut faire**
 
-- Depuis le menu « … » d'une photo (bibliothèque, vue bibliothèque du cadre ou diaporama), choisir « Supprimer », puis confirmer.
+- Depuis le menu « … » d'une photo (bibliothèque, photo ouverte en grand ou diaporama), choisir « Supprimer », puis confirmer.
 
 **Règles**
 
