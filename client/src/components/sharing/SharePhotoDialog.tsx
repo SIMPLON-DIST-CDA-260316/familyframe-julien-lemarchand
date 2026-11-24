@@ -1,6 +1,8 @@
-import type { JSX } from 'react'
+import { SearchIcon } from 'lucide-react'
+import { type JSX, useState } from 'react'
 import { Link } from 'react-router'
 import { FriendshipRow } from '@/components/friends/FriendshipRow.tsx'
+import { FRIEND_SEARCH_MIN_COUNT, filterFriends } from '@/components/sharing/friendSearch.ts'
 import { Alert, AlertDescription } from '@/components/ui/alert.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import {
@@ -12,6 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog.tsx'
+import { Input } from '@/components/ui/input.tsx'
 import type { Friendship } from '@/friendship.ts'
 import { type FriendShares, type ShareTarget, useFriendShares } from '@/hooks/useFriendShares.ts'
 import { useFriendships } from '@/hooks/useFriendships.ts'
@@ -87,13 +90,58 @@ type FriendListProps = {
 
 function FriendList({ friends, shares }: FriendListProps): JSX.Element {
   return (
-    <ul className="divide-y">
+    // Scrolls on its own: with many friends, the dialog still fits the screen.
+    <ul className="max-h-72 divide-y overflow-y-auto">
       {friends.map((friendship) => (
         <FriendshipRow key={friendship.id} friendship={friendship}>
           <ShareButton friendId={friendship.user.id} shares={shares} />
         </FriendshipRow>
       ))}
     </ul>
+  )
+}
+
+function FriendSearchField({
+  query,
+  onQueryChange,
+}: {
+  query: string
+  onQueryChange: (query: string) => void
+}): JSX.Element {
+  return (
+    <div className="relative">
+      <SearchIcon
+        aria-hidden
+        className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+      />
+      <Input
+        type="search"
+        className="pl-9"
+        placeholder="Rechercher un ami"
+        aria-label="Rechercher un ami"
+        value={query}
+        onChange={(event) => onQueryChange(event.target.value)}
+      />
+    </div>
+  )
+}
+
+function SearchableFriendList({ friends, shares }: FriendListProps): JSX.Element {
+  const [query, setQuery] = useState('')
+  const matchingFriends = filterFriends(friends, query)
+  return (
+    <>
+      {friends.length >= FRIEND_SEARCH_MIN_COUNT && (
+        <FriendSearchField query={query} onQueryChange={setQuery} />
+      )}
+      {matchingFriends.length === 0 ? (
+        <p className="text-sm text-muted-foreground">
+          Aucun ami ne correspond à « {query.trim()} ».
+        </p>
+      ) : (
+        <FriendList friends={matchingFriends} shares={shares} />
+      )}
+    </>
   )
 }
 
@@ -107,7 +155,7 @@ function ShareFriends({ target, onShared }: ShareFriendsProps): JSX.Element {
   return (
     <>
       {shares.error && <ErrorAlert message={shares.error} />}
-      <FriendList friends={friendships.friends} shares={shares} />
+      <SearchableFriendList friends={friendships.friends} shares={shares} />
     </>
   )
 }
