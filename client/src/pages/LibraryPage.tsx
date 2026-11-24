@@ -1,5 +1,5 @@
 import type { JSX } from 'react'
-import { LogoutButton } from '@/components/auth/LogoutButton.tsx'
+import { LibraryActions } from '@/components/library/LibraryActions.tsx'
 import { LibrarySection } from '@/components/library/LibrarySection.tsx'
 import { UploadForm } from '@/components/library/UploadForm.tsx'
 import {
@@ -24,7 +24,7 @@ export default function LibraryPage(): JSX.Element {
             Ajoutez une photo à votre bibliothèque : elle s'affiche sur votre cadre.
           </CardDescription>
           <CardAction>
-            <LogoutButton />
+            <LibraryActions />
           </CardAction>
         </CardHeader>
         <CardContent>
