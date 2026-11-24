@@ -18,10 +18,15 @@ const USER: UserRecord = {
 function makeDeps() {
   return {
     repository: {
+      findUserById: vi.fn<AccountRepository['findUserById']>(),
       updateDisplayName: vi
         .fn<AccountRepository['updateDisplayName']>()
         .mockImplementation(async (_id, displayName) => ({ ...USER, displayName })),
+      updatePasswordHash: vi.fn<AccountRepository['updatePasswordHash']>(),
+      deleteOtherSessions: vi.fn<AccountRepository['deleteOtherSessions']>(),
     },
+    hashPassword: vi.fn<AccountServiceDeps['hashPassword']>(),
+    verifyPassword: vi.fn<AccountServiceDeps['verifyPassword']>(),
     avatarUrl: vi.fn<AccountServiceDeps['avatarUrl']>(
       (cloudinaryId) => `https://cdn.test/${cloudinaryId}`,
     ),

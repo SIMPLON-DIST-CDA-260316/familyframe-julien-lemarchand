@@ -7,6 +7,7 @@ export type ApiErrorCode =
   | 'QUERY_INVALID'
   | 'DISPLAY_NAME_INVALID'
   | 'PASSWORD_INVALID'
+  | 'PASSWORD_INCORRECT'
   | 'SELF_FRIEND'
   | 'UNAUTHENTICATED'
   | 'INVALID_CREDENTIALS'
@@ -36,6 +37,7 @@ const ERROR_MESSAGES: Record<ApiErrorCode, string> = {
   QUERY_INVALID: 'Requête invalide. Rechargez la page et réessayez.',
   DISPLAY_NAME_INVALID: 'Choisissez un nom de 1 à 50 caractères.',
   PASSWORD_INVALID: 'Le mot de passe doit faire entre 12 et 128 caractères.',
+  PASSWORD_INCORRECT: 'Mot de passe actuel incorrect.',
   SELF_FRIEND: 'Vous ne pouvez pas vous ajouter vous-même.',
   UNAUTHENTICATED: 'Votre session a expiré. Reconnectez-vous.',
   INVALID_CREDENTIALS: 'E-mail ou mot de passe incorrect.',

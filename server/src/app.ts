@@ -80,6 +80,8 @@ function assembleFriendshipsRouter(service: FriendshipsService): Router {
 function assembleAccountRouter(): Router {
   const service = createAccountService({
     repository: createAccountRepository(prisma),
+    hashPassword,
+    verifyPassword,
     avatarUrl,
     logger,
   })

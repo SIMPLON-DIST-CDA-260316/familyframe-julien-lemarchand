@@ -152,6 +152,13 @@ describe('toErrorResponse', () => {
     })
   })
 
+  it('answers a wrong current password with 400, not 401', () => {
+    expect(toErrorResponse(new AppError('PASSWORD_INCORRECT'))).toEqual({
+      status: 400,
+      body: { error: 'PASSWORD_INCORRECT' },
+    })
+  })
+
   it('answers an invalid query string with 400', () => {
     expect(toErrorResponse(new AppError('QUERY_INVALID'))).toEqual({
       status: 400,
