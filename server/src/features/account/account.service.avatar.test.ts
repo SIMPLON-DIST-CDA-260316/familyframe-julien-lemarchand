@@ -106,6 +106,7 @@ describe('changeAvatar', () => {
       avatarUrl: `https://cdn.test/${NEW_ID}`,
     })
     expect(deps.logger.error).toHaveBeenCalledWith('account.avatar_orphaned', {
+      userId: USER_ID,
       cloudinaryId: PREVIOUS_ID,
       error: expect.any(Error),
     })
@@ -117,6 +118,7 @@ describe('changeAvatar', () => {
 
     await expect(changeAvatar(deps)).rejects.toThrow('database down')
     expect(deps.logger.error).toHaveBeenCalledWith('account.avatar_orphaned', {
+      userId: USER_ID,
       cloudinaryId: NEW_ID,
       error: expect.any(Error),
     })
@@ -148,6 +150,7 @@ describe('changeAvatar', () => {
     await expect(changeAvatar(deps)).rejects.toMatchObject({ code: 'IMAGE_UNREADABLE' })
     expect(deps.uploadAvatar).not.toHaveBeenCalled()
     expect(deps.logger.warn).toHaveBeenCalledWith('account.avatar_unreadable', {
+      userId: USER_ID,
       error: expect.any(Error),
     })
   })

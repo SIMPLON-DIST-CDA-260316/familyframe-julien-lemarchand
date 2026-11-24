@@ -92,12 +92,13 @@ async function changePassword(deps: AccountServiceDeps, change: PasswordChange):
 
 async function convertAvatar(
   { toAvatarJpeg, logger }: AccountServiceDeps,
+  userId: string,
   input: Buffer,
 ): Promise<Buffer> {
   try {
     return await toAvatarJpeg(input)
   } catch (error: unknown) {
-    logger.warn('account.avatar_unreadable', { error })
+    logger.warn('account.avatar_unreadable', { userId, error })
     throw new AppError('IMAGE_UNREADABLE')
   }
 }
@@ -111,7 +112,7 @@ async function saveAvatar(
   try {
     return await repository.updateAvatar(userId, cloudinaryId)
   } catch (error: unknown) {
-    logger.error('account.avatar_orphaned', { cloudinaryId, error })
+    logger.error('account.avatar_orphaned', { userId, cloudinaryId, error })
     throw error
   }
 }
@@ -120,19 +121,20 @@ async function saveAvatar(
 // image only costs storage.
 async function destroyAvatar(
   { deleteImage, logger }: AccountServiceDeps,
+  userId: string,
   cloudinaryId: string,
 ): Promise<boolean> {
   try {
     await deleteImage(cloudinaryId)
     return true
   } catch (error: unknown) {
-    logger.error('account.avatar_orphaned', { cloudinaryId, error })
+    logger.error('account.avatar_orphaned', { userId, cloudinaryId, error })
     return false
   }
 }
 
 async function changeAvatar(deps: AccountServiceDeps, change: AvatarChange): Promise<PublicUser> {
-  const jpeg = await convertAvatar(deps, parseFile(change.file).buffer)
+  const jpeg = await convertAvatar(deps, change.userId, parseFile(change.file).buffer)
   const { id: userId, avatarCloudinaryId: previousCloudinaryId } = await findUser(
     deps,
     change.userId,
@@ -140,7 +142,7 @@ async function changeAvatar(deps: AccountServiceDeps, change: AvatarChange): Pro
   const { cloudinaryId } = await deps.uploadAvatar(jpeg)
   const user = await saveAvatar(deps, userId, cloudinaryId)
   const isPreviousDestroyed =
-    previousCloudinaryId !== null && (await destroyAvatar(deps, previousCloudinaryId))
+    previousCloudinaryId !== null && (await destroyAvatar(deps, userId, previousCloudinaryId))
   deps.logger.info('account.avatar_changed', {
     userId,
     cloudinaryId,
@@ -158,7 +160,7 @@ async function removeAvatar(deps: AccountServiceDeps, userId: string): Promise<P
     return toPublicUser(current, deps.avatarUrl)
   }
   const user = await deps.repository.updateAvatar(userId, null)
-  const isImageDestroyed = await destroyAvatar(deps, cloudinaryId)
+  const isImageDestroyed = await destroyAvatar(deps, userId, cloudinaryId)
   deps.logger.info('account.avatar_removed', { userId, cloudinaryId, isImageDestroyed })
   return toPublicUser(user, deps.avatarUrl)
 }
