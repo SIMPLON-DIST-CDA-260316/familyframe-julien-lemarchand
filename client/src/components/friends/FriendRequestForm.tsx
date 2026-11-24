@@ -10,53 +10,43 @@ type FriendRequestFormState = {
   setEmail: (email: string) => void
   isSending: boolean
   error: string
-  notice: string
   handleSubmit: (event: SubmitEvent<HTMLFormElement>) => Promise<void>
 }
 
-type FriendRequestSuccess = Extract<FriendRequestResult, { isSuccess: true }>
-
-// Their request was waiting: mine accepted it, there is nothing left to wait for.
-function successNotice({ friendName, isAccepted }: FriendRequestSuccess): string {
-  return isAccepted
-    ? `Vous êtes maintenant amis avec ${friendName}.`
-    : `Demande envoyée à ${friendName}.`
-}
-
-function useFriendRequestForm(onDone: () => void): FriendRequestFormState {
+function useFriendRequestForm(
+  onDone: (result: FriendRequestResult) => void,
+): FriendRequestFormState {
   const { dropUser } = useAuth()
   const [email, setEmail] = useState('')
   const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState('')
-  const [notice, setNotice] = useState('')
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault()
     setError('')
-    setNotice('')
     setIsSending(true)
     const result = await postFriendRequest(email, dropUser)
     setIsSending(false)
-    if (result.isSuccess) {
-      setEmail('')
-      setNotice(successNotice(result))
-    } else setError(result.message)
+    if (result.isSuccess) setEmail('')
+    else setError(result.message)
     // Reload on failure too: the other side may have acted since the page loaded.
-    onDone()
+    onDone(result)
   }
 
-  // Editing the address makes the last message stale.
+  // Editing the address makes the last error stale.
   function changeEmail(nextEmail: string): void {
     setEmail(nextEmail)
     setError('')
-    setNotice('')
   }
 
-  return { email, setEmail: changeEmail, isSending, error, notice, handleSubmit }
+  return { email, setEmail: changeEmail, isSending, error, handleSubmit }
 }
 
-export function FriendRequestForm({ onDone }: { onDone: () => void }): JSX.Element {
-  const { email, setEmail, isSending, error, notice, handleSubmit } = useFriendRequestForm(onDone)
+// The page tells the success: the dialog holding this form closes on it.
+type FriendRequestFormProps = { onDone: (result: FriendRequestResult) => void }
+
+export function FriendRequestForm({ onDone }: FriendRequestFormProps): JSX.Element {
+  const { email, setEmail, isSending, error, handleSubmit } = useFriendRequestForm(onDone)
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
@@ -68,11 +58,6 @@ export function FriendRequestForm({ onDone }: { onDone: () => void }): JSX.Eleme
         value={email}
         onChange={setEmail}
       />
-      {notice && (
-        <Alert>
-          <AlertDescription>{notice}</AlertDescription>
-        </Alert>
-      )}
       {error && (
         <Alert variant="destructive">
           <AlertDescription>{error}</AlertDescription>

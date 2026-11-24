@@ -1,4 +1,5 @@
 import type { JSX, ReactNode } from 'react'
+import { UserAvatar } from '@/components/auth/UserAvatar.tsx'
 import type { Friendship } from '@/friendship.ts'
 
 type FriendshipRowProps = {
@@ -11,10 +12,13 @@ type FriendshipRowProps = {
 export function FriendshipRow({ friendship, children }: FriendshipRowProps): JSX.Element {
   const { displayName, email } = friendship.user
   return (
-    <li className="flex items-center justify-between gap-3 py-3">
-      <div className="flex min-w-0 flex-col">
-        <span className="truncate font-medium">{displayName}</span>
-        <span className="truncate text-sm text-muted-foreground">{email}</span>
+    <li className="flex items-center justify-between gap-3 px-4 py-3">
+      <div className="flex min-w-0 items-center gap-3">
+        <UserAvatar name={displayName} className="bg-muted text-foreground" />
+        <div className="flex min-w-0 flex-col">
+          <span className="truncate font-medium">{displayName}</span>
+          <span className="truncate text-sm text-muted-foreground">{email}</span>
+        </div>
       </div>
       <div className="flex shrink-0 gap-2">{children}</div>
     </li>
