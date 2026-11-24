@@ -29,6 +29,7 @@ function makeDeps() {
         .mockResolvedValue(null),
       create: vi.fn<PhotosRepository['create']>().mockResolvedValue(RECORD),
       deleteOwned: vi.fn<PhotosRepository['deleteOwned']>().mockResolvedValue(RECORD),
+      countByCloudinaryId: vi.fn<PhotosRepository['countByCloudinaryId']>().mockResolvedValue(0),
     },
     toFrameJpeg: vi.fn<PhotosServiceDeps['toFrameJpeg']>().mockResolvedValue(FRAME_JPEG),
     uploadImage: vi.fn<PhotosServiceDeps['uploadImage']>().mockResolvedValue(IMAGE),
@@ -183,7 +184,7 @@ describe('listLatest', () => {
 })
 
 describe('deletePhoto', () => {
-  it("deletes the owner's record, then its Cloudinary image, and returns the stored id", async () => {
+  it("deletes the owner's record, then its image once no photo uses it, and returns the id", async () => {
     const deps = makeDeps()
 
     const deletedId = await createPhotosService(deps).deletePhoto({
@@ -193,10 +194,28 @@ describe('deletePhoto', () => {
 
     expect(deletedId).toBe(RECORD.id)
     expect(deps.repository.deleteOwned).toHaveBeenCalledWith(RECORD.id, OWNER_ID)
-    expect(deps.deleteImage).toHaveBeenCalledWith(IMAGE.cloudinaryId)
+    expect(deps.repository.countByCloudinaryId).toHaveBeenCalledWith(IMAGE.cloudinaryId)
+    // Counted after the deletion: the deleted photo must not count itself.
     expect(deps.repository.deleteOwned.mock.invocationCallOrder[0]).toBeLessThan(
-      deps.deleteImage.mock.invocationCallOrder[0],
+      deps.repository.countByCloudinaryId.mock.invocationCallOrder[0],
     )
+    expect(deps.deleteImage).toHaveBeenCalledWith(IMAGE.cloudinaryId)
+  })
+
+  it('keeps the image while another photo still uses it', async () => {
+    const deps = makeDeps()
+    deps.repository.countByCloudinaryId.mockResolvedValue(1)
+
+    await expect(
+      createPhotosService(deps).deletePhoto({ ownerId: OWNER_ID, id: RECORD.id }),
+    ).resolves.toBe(RECORD.id)
+    expect(deps.deleteImage).not.toHaveBeenCalled()
+    expect(deps.logger.info).toHaveBeenCalledWith('photo.deleted', {
+      photoId: RECORD.id,
+      cloudinaryId: RECORD.cloudinaryId,
+      userId: OWNER_ID,
+      isImageDestroyed: false,
+    })
   })
 
   it('logs the deleted photo by its identifiers and its owner id', async () => {
@@ -208,6 +227,7 @@ describe('deletePhoto', () => {
       photoId: RECORD.id,
       cloudinaryId: RECORD.cloudinaryId,
       userId: OWNER_ID,
+      isImageDestroyed: true,
     })
   })
 
@@ -253,6 +273,10 @@ describe('deletePhoto', () => {
       cloudinaryId: IMAGE.cloudinaryId,
       error: cloudinaryError,
     })
+    expect(deps.logger.info).toHaveBeenCalledWith(
+      'photo.deleted',
+      expect.objectContaining({ isImageDestroyed: false }),
+    )
   })
 
   it('lets a database failure through without touching Cloudinary', async () => {

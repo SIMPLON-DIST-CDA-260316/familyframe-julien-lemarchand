@@ -78,16 +78,18 @@ async function convertToFrameJpeg(
   }
 }
 
-// The record is gone, or was never saved: a Cloudinary failure only leaves an orphan
-// image, so the caller still goes on.
+// true once Cloudinary destroyed the image. The record is gone, or was never saved:
+// a Cloudinary failure only leaves an orphan image, so the caller still goes on.
 async function deleteStoredImage(
   { deleteImage, logger }: PhotosServiceDeps,
   cloudinaryId: string,
-): Promise<void> {
+): Promise<boolean> {
   try {
     await deleteImage(cloudinaryId)
+    return true
   } catch (error: unknown) {
     logger.error('photo.orphaned', { cloudinaryId, error })
+    return false
   }
 }
 
@@ -113,6 +115,16 @@ async function saveRecord(deps: PhotosServiceDeps, photo: NewPhoto): Promise<Pho
   await deleteStoredImage(deps, photo.cloudinaryId)
   deps.logger.info('photo.duplicate', { userId: photo.ownerId, cloudinaryId: photo.cloudinaryId })
   throw new AppError('PHOTO_DUPLICATE')
+}
+
+// A share (step 5) points to the same image: it goes with the last photo using it.
+// Counted after the deletion, so the deleted photo does not count itself.
+async function destroyUnusedImage(deps: PhotosServiceDeps, cloudinaryId: string): Promise<boolean> {
+  const remainingCount = await deps.repository.countByCloudinaryId(cloudinaryId)
+  if (remainingCount > 0) {
+    return false
+  }
+  return deleteStoredImage(deps, cloudinaryId)
 }
 
 async function createPhoto(
@@ -145,11 +157,12 @@ async function deletePhoto(
   if (!record) {
     throw new AppError('PHOTO_NOT_FOUND')
   }
-  await deleteStoredImage(deps, record.cloudinaryId)
+  const isImageDestroyed = await destroyUnusedImage(deps, record.cloudinaryId)
   deps.logger.info('photo.deleted', {
     photoId: record.id,
     cloudinaryId: record.cloudinaryId,
     userId: ownerId,
+    isImageDestroyed,
   })
   return record.id
 }

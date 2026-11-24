@@ -7,6 +7,8 @@ docs {
   `DELETE /api/photos/:id` → 204 sans corps, et l'événement Socket.IO
   `photo:deleted` (l'id) pour les connexions du propriétaire. La photo d'un
   autre compte répond 404 `PHOTO_NOT_FOUND`, comme une photo inconnue.
+  L'image Cloudinary n'est détruite que si plus aucune photo n'y renvoie (à
+  l'étape 5, un partage pointera vers la même image).
 
   Ces requêtes suppriment les photos créées par `create/01` (variable
   `createdPhotoId`) et `create/02` (`createdPngId`) : lancer toute la

@@ -10,6 +10,7 @@ export type PhotosRepository = {
   // null when the owner already has this file: the service decides the error.
   create: (photo: NewPhoto) => Promise<PhotoRecord | null>
   deleteOwned: (id: string, ownerId: string) => Promise<PhotoRecord | null>
+  countByCloudinaryId: (cloudinaryId: string) => Promise<number>
 }
 
 // P2025: no record matches: unknown, already deleted by another request, or someone else's.
@@ -50,5 +51,6 @@ export function createPhotosRepository(prisma: PrismaClient): PhotosRepository {
         throw error
       }
     },
+    countByCloudinaryId: (cloudinaryId) => prisma.photo.count({ where: { cloudinaryId } }),
   }
 }
