@@ -25,6 +25,33 @@ function isUniqueViolation(error: unknown): boolean {
   return error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002'
 }
 
+async function createRecord(prisma: PrismaClient, photo: NewPhoto): Promise<PhotoRecord | null> {
+  try {
+    return await prisma.photo.create({ data: photo })
+  } catch (error: unknown) {
+    if (isUniqueViolation(error)) {
+      return null
+    }
+    throw error
+  }
+}
+
+// One atomic query: Prisma accepts the owner next to the unique id.
+async function deleteOwned(
+  prisma: PrismaClient,
+  id: string,
+  ownerId: string,
+): Promise<PhotoRecord | null> {
+  try {
+    return await prisma.photo.delete({ where: { id, ownerId } })
+  } catch (error: unknown) {
+    if (isRecordNotFound(error)) {
+      return null
+    }
+    throw error
+  }
+}
+
 export function createPhotosRepository(prisma: PrismaClient): PhotosRepository {
   return {
     // Keyset on the id: an ObjectId starts with its creation time, so by id is newest
@@ -37,27 +64,8 @@ export function createPhotosRepository(prisma: PrismaClient): PhotosRepository {
       }),
     findByOwnerAndSha256: (ownerId, sha256) =>
       prisma.photo.findUnique({ where: { ownerId_sha256: { ownerId, sha256 } } }),
-    create: async (photo) => {
-      try {
-        return await prisma.photo.create({ data: photo })
-      } catch (error: unknown) {
-        if (isUniqueViolation(error)) {
-          return null
-        }
-        throw error
-      }
-    },
-    // One atomic query: Prisma accepts the owner next to the unique id.
-    deleteOwned: async (id, ownerId) => {
-      try {
-        return await prisma.photo.delete({ where: { id, ownerId } })
-      } catch (error: unknown) {
-        if (isRecordNotFound(error)) {
-          return null
-        }
-        throw error
-      }
-    },
+    create: (photo) => createRecord(prisma, photo),
+    deleteOwned: (id, ownerId) => deleteOwned(prisma, id, ownerId),
     countByCloudinaryId: (cloudinaryId) => prisma.photo.count({ where: { cloudinaryId } }),
   }
 }
