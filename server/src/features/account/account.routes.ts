@@ -6,5 +6,6 @@ export function createAccountRouter(controller: AccountController): Router {
   const router = Router()
   // A JSON route brings its own parser (see the logging spec).
   router.patch('/', express.json(), controller.changeDisplayName)
+  router.put('/password', express.json(), controller.changePassword)
   return router
 }

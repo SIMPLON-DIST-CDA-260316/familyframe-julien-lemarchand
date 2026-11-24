@@ -1,0 +1,25 @@
+meta {
+  name: Nominal - l'autre session est fermée
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/auth/me
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  req.setHeader('Cookie', bru.getVar('inviteeOtherCookie'))
+}
+
+assert {
+  res.status: eq 401
+  res.body.error: eq UNAUTHENTICATED
+}
+
+docs {
+  NOMINAL → 401 UNAUTHENTICATED : la session ouverte par le script de `05`
+  n'existe plus. Le cadre, connecté de la même façon, doit se reconnecter.
+}

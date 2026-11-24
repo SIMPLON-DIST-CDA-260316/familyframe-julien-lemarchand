@@ -1,0 +1,31 @@
+meta {
+  name: Edge - connexion avec l'ancien mot de passe
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/api/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{inviteEmail}}",
+    "password": "invite-bruno-dev"
+  }
+}
+
+script:pre-request {
+  req.deleteHeader('Cookie')
+}
+
+assert {
+  res.status: eq 401
+  res.body.error: eq INVALID_CREDENTIALS
+}
+
+docs {
+  EDGE → 401 INVALID_CREDENTIALS : l'ancien mot de passe ne marche plus.
+}

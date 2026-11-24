@@ -1,0 +1,42 @@
+meta {
+  name: Nominal - nouveau mot de passe
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/api/account/password
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "currentPassword": "invite-bruno-dev",
+    "newPassword": "invite-bruno-nouveau"
+  }
+}
+
+script:pre-request {
+  const axios = require('axios')
+  const baseUrl = bru.getEnvVar('baseUrl')
+  // A second device of the same account: the change must close its session.
+  const login = await axios.post(`${baseUrl}/api/auth/login`, {
+    email: bru.getVar('inviteEmail'),
+    password: 'invite-bruno-dev',
+  })
+  const otherCookie = [].concat(login.headers['set-cookie'] ?? [])
+    .find((cookie) => cookie.startsWith('ff_session='))
+  bru.setVar('inviteeOtherCookie', otherCookie.split(';')[0])
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 204
+}
+
+docs {
+  NOMINAL → 204 sans corps. Le script de départ connecte le compte une
+  seconde fois (`POST /api/auth/login`) et range ce cookie dans
+  `inviteeOtherCookie` : c'est l'« autre appareil » que `06` vérifie.
+}
