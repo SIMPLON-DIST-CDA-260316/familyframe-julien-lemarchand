@@ -15,6 +15,7 @@ type SlideshowScreenProps = {
   selection: FrameSelection
   isActive: boolean
   settings: SlideshowSettings
+  onClose: () => void
 }
 
 export function SlideshowScreen({
@@ -23,8 +24,9 @@ export function SlideshowScreen({
   selection,
   isActive,
   settings,
+  onClose,
 }: SlideshowScreenProps): JSX.Element {
-  useEscapeToClose(selection.closeSlideshow)
+  useEscapeToClose(onClose)
 
   return (
     <>
@@ -33,7 +35,7 @@ export function SlideshowScreen({
         isVisible={isActive}
         photo={currentPhoto}
         settings={settings}
-        onClose={selection.closeSlideshow}
+        onClose={onClose}
       />
       <PhotoView
         photos={photos}

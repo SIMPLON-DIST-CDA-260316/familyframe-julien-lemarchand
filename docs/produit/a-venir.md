@@ -25,7 +25,6 @@ Les règles ci-dessous décrivent l'intention ; elles recevront leur identifiant
 **Prévu**
 
 - Un mode cadre lancé depuis la bibliothèque.
-- La page « Cadre » devient le diaporama seul.
 - Une nouvelle fenêtre d'envoi : une grille de ronds de profil à sélection multiple, un seul bouton « Envoyer à N personnes », une recherche dès 6 amis.
 
 ## Étape 8 · Mode cadre

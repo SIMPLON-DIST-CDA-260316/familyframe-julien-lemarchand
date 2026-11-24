@@ -10,8 +10,7 @@ export type SlideshowSettings = {
   onStripVisibleChange: (isStripVisible: boolean) => void
 }
 
-// Called by the page, not the slideshow screen: the screen unmounts in the library, and the
-// chosen speed must survive the trip.
+// Called by the page, not the slideshow screen: the page's photo selection reads isPlaying too.
 export function useSlideshowSettings(): SlideshowSettings {
   const [isPlaying, setIsPlaying] = useState(true)
   const [intervalMs, setIntervalMs] = useState(DEFAULT_SLIDESHOW_INTERVAL_MS)

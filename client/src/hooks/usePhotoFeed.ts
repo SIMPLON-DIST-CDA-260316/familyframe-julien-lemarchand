@@ -9,11 +9,22 @@ import { fetchAllPhotos } from '@/photosApi.ts'
 // Once a day: far below the 45 days left under which the server renews a session.
 const SESSION_REFRESH_MS = 24 * 60 * 60 * 1000
 
-type PhotoSetter = Dispatch<SetStateAction<Photo[]>>
+// failed only before any photo arrived: a later failed refresh keeps the photos on screen.
+export type FeedStatus = 'loading' | 'loaded' | 'failed'
+
+export type PhotoFeed = {
+  photos: Photo[]
+  status: FeedStatus
+}
+
+type FeedSetters = {
+  setPhotos: Dispatch<SetStateAction<Photo[]>>
+  setStatus: Dispatch<SetStateAction<FeedStatus>>
+}
 
 function createFeedLoader(
   liveLoads: LiveLoads,
-  setPhotos: PhotoSetter,
+  { setPhotos, setStatus }: FeedSetters,
   dropUser: () => void,
 ): () => Promise<void> {
   return async () => {
@@ -21,15 +32,21 @@ function createFeedLoader(
     const loadedPhotos = await fetchAllPhotos(() => {
       if (liveLoads.isCurrent(loadId)) dropUser()
     })
-    if (!loadedPhotos || !liveLoads.isCurrent(loadId)) return
+    if (!liveLoads.isCurrent(loadId)) return
+    if (!loadedPhotos) {
+      setStatus((status) => (status === 'loaded' ? status : 'failed'))
+      return
+    }
     setPhotos(liveLoads.withLiveChanges(loadedPhotos))
+    setStatus('loaded')
   }
 }
 
 // Returns the cleanup that stops the socket, the timer and any load still running.
-function connectPhotoFeed(setPhotos: PhotoSetter, dropUser: () => void): () => void {
+function connectPhotoFeed(setters: FeedSetters, dropUser: () => void): () => void {
+  const { setPhotos } = setters
   const liveLoads = createLiveLoads()
-  const load = createFeedLoader(liveLoads, setPhotos, dropUser)
+  const load = createFeedLoader(liveLoads, setters, dropUser)
 
   const socket = connectPhotoSocket({
     onConnect: load,
@@ -57,11 +74,12 @@ function connectPhotoFeed(setPhotos: PhotoSetter, dropUser: () => void): () => v
 }
 
 // The whole library of the logged-in user, newest first like GET /api/photos.
-export function usePhotoFeed(): Photo[] {
+export function usePhotoFeed(): PhotoFeed {
   const { dropUser } = useAuth()
   const [photos, setPhotos] = useState<Photo[]>([])
+  const [status, setStatus] = useState<FeedStatus>('loading')
 
-  useEffect(() => connectPhotoFeed(setPhotos, dropUser), [dropUser])
+  useEffect(() => connectPhotoFeed({ setPhotos, setStatus }, dropUser), [dropUser])
 
-  return photos
+  return { photos, status }
 }
