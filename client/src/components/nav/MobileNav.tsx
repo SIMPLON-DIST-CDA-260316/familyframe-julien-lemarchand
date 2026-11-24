@@ -4,6 +4,7 @@ import { NavLink } from 'react-router'
 import { LogoutButton } from '@/components/auth/LogoutButton.tsx'
 import { UserBadge } from '@/components/auth/UserBadge.tsx'
 import { useNavItems } from '@/components/nav/navItems.ts'
+import { ThemeToggle } from '@/components/theme/ThemeToggle.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import {
   Sheet,
@@ -55,6 +56,7 @@ export function MobileNav(): JSX.Element {
           ))}
         </nav>
         <div className="mt-auto border-t p-2">
+          <ThemeToggle />
           <LogoutButton />
         </div>
       </SheetContent>

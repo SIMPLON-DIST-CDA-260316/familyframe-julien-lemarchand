@@ -3,6 +3,7 @@ import type { JSX } from 'react'
 import { useAuth } from '@/auth/AuthContext.ts'
 import { UserAvatar } from '@/components/auth/UserAvatar.tsx'
 import { UserBadge } from '@/components/auth/UserBadge.tsx'
+import { ThemeToggle } from '@/components/theme/ThemeToggle.tsx'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +29,8 @@ export function UserMenu(): JSX.Element | null {
         <DropdownMenuLabel className="font-normal">
           <UserBadge />
         </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <ThemeToggle />
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={logout}>
           <LogOutIcon aria-hidden />
