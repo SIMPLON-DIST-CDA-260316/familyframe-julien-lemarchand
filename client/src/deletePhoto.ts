@@ -1,7 +1,7 @@
 import { errorMessage } from '@/api.ts'
 import type { Photo } from '@/photo.ts'
 
-// The list is not touched here: the server's photo:deleted reaches every frame, this one included.
+// The list is not touched here: the server's photo:deleted reaches every page and frame of the owner, this one included.
 // The confirmation lives in DeletePhotoDialog; no pending state, see the frame deletion spec.
 export async function deletePhoto({ id }: Photo): Promise<void> {
   try {

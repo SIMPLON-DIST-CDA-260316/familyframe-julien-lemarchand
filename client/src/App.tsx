@@ -3,8 +3,8 @@ import { BrowserRouter, Route, Routes } from 'react-router'
 import { AuthProvider } from './auth/AuthProvider.tsx'
 import { RequireAuth } from './auth/RequireAuth.tsx'
 import FramePage from './pages/FramePage.tsx'
+import LibraryPage from './pages/LibraryPage.tsx'
 import LoginPage from './pages/LoginPage.tsx'
-import UploadPage from './pages/UploadPage.tsx'
 
 function App(): JSX.Element {
   return (
@@ -16,7 +16,7 @@ function App(): JSX.Element {
             path="/"
             element={
               <RequireAuth>
-                <UploadPage />
+                <LibraryPage />
               </RequireAuth>
             }
           />

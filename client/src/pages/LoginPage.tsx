@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 
 const HOME_PATH = '/'
 
-// RequireAuth stores the page the user asked for; otherwise the upload page.
+// RequireAuth stores the page the user asked for; otherwise the library page.
 function requestedPath(state: unknown): string {
   if (
     typeof state === 'object' &&

@@ -1,10 +1,15 @@
-import { UNAUTHORIZED_STATUS } from '@/api.ts'
-import { isPhotoPage, type Photo, type PhotoPage } from '@/photo.ts'
+import { errorMessage, UNAUTHORIZED_STATUS } from '@/api.ts'
+import { isPhoto, isPhotoPage, type Photo, type PhotoPage } from '@/photo.ts'
 
 // The server's MAX_PAGE_SIZE: the fewest requests for a whole library.
 const FRAME_PAGE_SIZE = 100
 
 export type PageRequest = { cursor?: string; limit?: number }
+
+export type UploadResult =
+  | { status: 'uploaded'; photo: Photo }
+  | { status: 'failed'; message: string }
+  | { status: 'unauthenticated' }
 
 function photosUrl({ cursor, limit }: PageRequest): string {
   const params = new URLSearchParams()
@@ -52,4 +57,20 @@ export async function fetchAllPhotos(onUnauthenticated: () => void): Promise<Pho
     cursor = page.nextCursor ?? undefined
   } while (cursor !== undefined)
   return photos
+}
+
+export async function postPhoto(file: File): Promise<UploadResult> {
+  const body = new FormData()
+  body.append('photo', file)
+  try {
+    const res = await fetch('/api/photos', { method: 'POST', body })
+    if (res.status === UNAUTHORIZED_STATUS) return { status: 'unauthenticated' }
+    // Not JSON when the dev proxy answers for a stopped API.
+    const data: unknown = await res.json().catch(() => null)
+    if (res.ok && isPhoto(data)) return { status: 'uploaded', photo: data }
+    return { status: 'failed', message: errorMessage(data) }
+  } catch {
+    // fetch rejects only on network failure.
+    return { status: 'failed', message: errorMessage(null) }
+  }
 }
