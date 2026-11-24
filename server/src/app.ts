@@ -28,9 +28,9 @@ import { createPhotosController } from './features/photos/photos.controller.js'
 import { createPhotosRepository } from './features/photos/photos.repository.js'
 import { createPhotosRouter } from './features/photos/photos.routes.js'
 import { createPhotosService, type PhotosServiceDeps } from './features/photos/photos.service.js'
-import { avatarUrl, deleteImage, uploadImage } from './lib/cloudinary.js'
+import { avatarUrl, deleteImage, uploadAvatar, uploadImage } from './lib/cloudinary.js'
 import { prisma } from './lib/db.js'
-import { toFrameJpeg } from './lib/image.js'
+import { toAvatarJpeg, toFrameJpeg } from './lib/image.js'
 import { logger } from './lib/logger.js'
 import { hashPassword, verifyPassword } from './lib/password.js'
 import { requestLogger } from './lib/request-logger.js'
@@ -82,6 +82,9 @@ function assembleAccountRouter(): Router {
     repository: createAccountRepository(prisma),
     hashPassword,
     verifyPassword,
+    toAvatarJpeg,
+    uploadAvatar,
+    deleteImage,
     avatarUrl,
     logger,
   })

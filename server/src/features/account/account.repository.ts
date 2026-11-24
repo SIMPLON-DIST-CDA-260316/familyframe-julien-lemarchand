@@ -7,6 +7,7 @@ export type AccountRepository = {
   updateDisplayName: (id: string, displayName: string) => Promise<UserRecord>
   updatePasswordHash: (id: string, passwordHash: string) => Promise<void>
   deleteOtherSessions: (userId: string, keptSessionId: string) => Promise<number>
+  updateAvatar: (id: string, avatarCloudinaryId: string | null) => Promise<UserRecord>
 }
 
 export function createAccountRepository(prisma: PrismaClient): AccountRepository {
@@ -24,5 +25,7 @@ export function createAccountRepository(prisma: PrismaClient): AccountRepository
       })
       return count
     },
+    updateAvatar: (id, avatarCloudinaryId) =>
+      prisma.user.update({ where: { id }, data: { avatarCloudinaryId } }),
   }
 }

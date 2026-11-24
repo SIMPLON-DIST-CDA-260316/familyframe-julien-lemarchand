@@ -26,9 +26,13 @@ function makeDeps() {
       updateDisplayName: vi.fn<AccountRepository['updateDisplayName']>(),
       updatePasswordHash: vi.fn<AccountRepository['updatePasswordHash']>().mockResolvedValue(),
       deleteOtherSessions: vi.fn<AccountRepository['deleteOtherSessions']>().mockResolvedValue(2),
+      updateAvatar: vi.fn<AccountRepository['updateAvatar']>(),
     },
     hashPassword: vi.fn<AccountServiceDeps['hashPassword']>().mockResolvedValue('$argon2id$new'),
     verifyPassword: vi.fn<AccountServiceDeps['verifyPassword']>().mockResolvedValue(true),
+    toAvatarJpeg: vi.fn<AccountServiceDeps['toAvatarJpeg']>(),
+    uploadAvatar: vi.fn<AccountServiceDeps['uploadAvatar']>(),
+    deleteImage: vi.fn<AccountServiceDeps['deleteImage']>(),
     avatarUrl: vi.fn<AccountServiceDeps['avatarUrl']>(),
     logger: {
       info: vi.fn<Logger['info']>(),

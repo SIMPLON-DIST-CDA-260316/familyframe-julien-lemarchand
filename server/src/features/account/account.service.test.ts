@@ -24,9 +24,13 @@ function makeDeps() {
         .mockImplementation(async (_id, displayName) => ({ ...USER, displayName })),
       updatePasswordHash: vi.fn<AccountRepository['updatePasswordHash']>(),
       deleteOtherSessions: vi.fn<AccountRepository['deleteOtherSessions']>(),
+      updateAvatar: vi.fn<AccountRepository['updateAvatar']>(),
     },
     hashPassword: vi.fn<AccountServiceDeps['hashPassword']>(),
     verifyPassword: vi.fn<AccountServiceDeps['verifyPassword']>(),
+    toAvatarJpeg: vi.fn<AccountServiceDeps['toAvatarJpeg']>(),
+    uploadAvatar: vi.fn<AccountServiceDeps['uploadAvatar']>(),
+    deleteImage: vi.fn<AccountServiceDeps['deleteImage']>(),
     avatarUrl: vi.fn<AccountServiceDeps['avatarUrl']>(
       (cloudinaryId) => `https://cdn.test/${cloudinaryId}`,
     ),
