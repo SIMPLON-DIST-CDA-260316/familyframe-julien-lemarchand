@@ -169,10 +169,21 @@ function UploadAlert({ status, error }: Pick<PhotoUpload, 'status' | 'error'>): 
   return null
 }
 
+function FilePreview({ file }: { file: File | null }): JSX.Element | null {
+  const previewUrl = usePreviewUrl(file)
+  if (!previewUrl) return null
+  return (
+    <img
+      className="max-h-[40vh] w-full rounded-lg object-contain"
+      src={previewUrl}
+      alt="Aperçu avant envoi"
+    />
+  )
+}
+
 export function UploadForm({ onUploaded }: UploadFormProps): JSX.Element {
   const { upload, file, inputsKey, handleFileChange, handleSubmit, clearFile } =
     useUploadForm(onUploaded)
-  const previewUrl = usePreviewUrl(file)
   // The dialog keeps its own file: emptying the form after a send leaves it open.
   const [fileToShare, setFileToShare] = useState<File | null>(null)
 
@@ -180,13 +191,7 @@ export function UploadForm({ onUploaded }: UploadFormProps): JSX.Element {
     <>
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         <FileFields inputsKey={inputsKey} onChange={handleFileChange} />
-        {previewUrl && (
-          <img
-            className="max-h-[40vh] w-full rounded-lg object-contain"
-            src={previewUrl}
-            alt="Aperçu avant envoi"
-          />
-        )}
+        <FilePreview file={file} />
         <UploadButtons
           hasFile={file !== null}
           isSending={upload.status === 'sending'}
