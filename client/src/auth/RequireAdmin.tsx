@@ -1,6 +1,6 @@
 import type { JSX, ReactNode } from 'react'
 import { useAuth } from '@/auth/AuthContext.ts'
-import { BackToLibraryLink } from '@/components/admin/BackToLibraryLink.tsx'
+import { BackToLibraryLink } from '@/components/library/BackToLibraryLink.tsx'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.tsx'
 
 function AdminOnlyCard(): JSX.Element {

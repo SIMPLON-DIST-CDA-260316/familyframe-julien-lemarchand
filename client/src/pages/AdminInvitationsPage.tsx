@@ -1,8 +1,8 @@
 import { type JSX, useState } from 'react'
-import { BackToLibraryLink } from '@/components/admin/BackToLibraryLink.tsx'
 import { InvitationForm } from '@/components/admin/InvitationForm.tsx'
 import { InvitationLink } from '@/components/admin/InvitationLink.tsx'
 import { InvitationList } from '@/components/admin/InvitationList.tsx'
+import { BackToLibraryLink } from '@/components/library/BackToLibraryLink.tsx'
 import {
   Card,
   CardAction,
