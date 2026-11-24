@@ -1,4 +1,4 @@
-import type { JSX } from 'react'
+import { type JSX, useState } from 'react'
 import { FriendRequestForm } from '@/components/friends/FriendRequestForm.tsx'
 import { FriendshipSection } from '@/components/friends/FriendshipSection.tsx'
 import { RemoveFriendDialog } from '@/components/friends/RemoveFriendDialog.tsx'
@@ -112,7 +112,12 @@ function FriendshipLists({ friendships, actions }: FriendshipListsProps): JSX.El
 
 export default function FriendsPage(): JSX.Element {
   const { friendships, isLoading, error, reload } = useFriendships()
-  const actions = useFriendshipActions(reload)
+  const [requestFormKey, setRequestFormKey] = useState(0)
+  // A list action makes the form's last error stale: remounting the form clears it.
+  const actions = useFriendshipActions(async () => {
+    setRequestFormKey((key) => key + 1)
+    await reload()
+  })
   const { clearError } = actions
 
   function handleRequestDone(): void {
@@ -122,7 +127,7 @@ export default function FriendsPage(): JSX.Element {
 
   return (
     <main className="mx-auto flex max-w-md flex-col gap-8 px-4 py-10">
-      <RequestCard onDone={handleRequestDone} />
+      <RequestCard key={requestFormKey} onDone={handleRequestDone} />
       {(error || actions.error) && (
         <Alert variant="destructive">
           <AlertDescription>{error || actions.error}</AlertDescription>

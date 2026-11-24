@@ -31,7 +31,13 @@ function useFriendRequestForm(onDone: () => void): FriendRequestFormState {
     onDone()
   }
 
-  return { email, setEmail, isSending, error, handleSubmit }
+  // Editing the address makes the last error stale.
+  function changeEmail(nextEmail: string): void {
+    setEmail(nextEmail)
+    setError('')
+  }
+
+  return { email, setEmail: changeEmail, isSending, error, handleSubmit }
 }
 
 export function FriendRequestForm({ onDone }: { onDone: () => void }): JSX.Element {
