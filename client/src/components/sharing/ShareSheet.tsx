@@ -50,9 +50,7 @@ function ShareBody({ target, onShared, onClose }: ShareBodyProps): JSX.Element {
         <ShareThumbnail target={target} />
         <div className="flex min-w-0 flex-col gap-1">
           <DialogTitle>Envoyer à des proches</DialogTitle>
-          <DialogDescription className="truncate">
-            La photo s'affichera aussitôt sur leur cadre.
-          </DialogDescription>
+          <DialogDescription>La photo s'affichera aussitôt sur leur cadre.</DialogDescription>
         </div>
       </div>
       <ShareFriendsForm target={target} onSent={closeAfterSending} />
