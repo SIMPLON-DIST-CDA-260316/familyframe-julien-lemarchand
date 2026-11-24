@@ -1,4 +1,4 @@
-import type { Request, RequestHandler } from 'express'
+import type { RequestHandler } from 'express'
 import { AppError } from '../../errors/app-error.js'
 import { readSessionToken } from '../../lib/session-token.js'
 import type { PublicUser } from '../../types.js'
@@ -27,12 +27,4 @@ export function createRequireAuth(service: AuthService): RequestHandler {
     req.user = user
     next()
   }
-}
-
-// For handlers behind requireAuth: fails loudly if one is mounted without it.
-export function currentUser(req: Request): PublicUser {
-  if (!req.user) {
-    throw new AppError('UNAUTHENTICATED')
-  }
-  return req.user
 }

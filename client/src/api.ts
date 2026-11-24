@@ -6,6 +6,7 @@ export type ApiErrorCode =
   | 'QUERY_INVALID'
   | 'UNAUTHENTICATED'
   | 'INVALID_CREDENTIALS'
+  | 'FORBIDDEN'
   | 'ROUTE_NOT_FOUND'
   | 'PHOTO_NOT_FOUND'
   | 'PHOTO_DUPLICATE'
@@ -21,6 +22,7 @@ const ERROR_MESSAGES: Record<ApiErrorCode, string> = {
   QUERY_INVALID: 'Requête invalide. Rechargez la page et réessayez.',
   UNAUTHENTICATED: 'Votre session a expiré. Reconnectez-vous.',
   INVALID_CREDENTIALS: 'E-mail ou mot de passe incorrect.',
+  FORBIDDEN: "Cette action est réservée à l'administrateur.",
   ROUTE_NOT_FOUND: "Cette adresse n'existe pas sur le serveur.",
   PHOTO_NOT_FOUND: 'Cette photo a déjà été supprimée.',
   PHOTO_DUPLICATE: 'Cette photo est déjà dans votre bibliothèque.',

@@ -11,6 +11,13 @@ describe('toErrorResponse', () => {
     })
   })
 
+  it('answers a member on an admin route with 403', () => {
+    expect(toErrorResponse(new AppError('FORBIDDEN'))).toEqual({
+      status: 403,
+      body: { error: 'FORBIDDEN' },
+    })
+  })
+
   it('answers an unknown route with 404', () => {
     expect(toErrorResponse(new AppError('ROUTE_NOT_FOUND'))).toEqual({
       status: 404,

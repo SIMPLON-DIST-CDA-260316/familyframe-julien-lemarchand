@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express'
 import { readSessionToken } from '../../lib/session-token.js'
 import { clearSessionCookie, setSessionCookie } from './auth.cookie.js'
-import { currentUser } from './auth.middleware.js'
+import { currentUser } from './auth.guard.js'
 import type { AuthService } from './auth.service.js'
 
 export type AuthController = {
