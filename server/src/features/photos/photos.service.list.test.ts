@@ -1,12 +1,8 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { Logger } from '../../lib/logger.js'
+import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from './photos.input.js'
 import type { PhotoRecord, PhotosRepository } from './photos.repository.js'
-import {
-  createPhotosService,
-  DEFAULT_PAGE_SIZE,
-  MAX_PAGE_SIZE,
-  type PhotosServiceDeps,
-} from './photos.service.js'
+import { createPhotosService, type PhotosServiceDeps } from './photos.service.js'
 
 const OWNER_ID = '6b044f9d56a44767c7079b01'
 const CURSOR = '6b044f9d56a44767c7079a05'

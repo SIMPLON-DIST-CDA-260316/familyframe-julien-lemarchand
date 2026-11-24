@@ -1,8 +1,9 @@
 import { createHash } from 'node:crypto'
 import { describe, expect, it, vi } from 'vitest'
 import type { Logger } from '../../lib/logger.js'
+import type { UploadedFile } from './photos.input.js'
 import type { PhotoRecord, PhotosRepository } from './photos.repository.js'
-import { createPhotosService, type PhotosServiceDeps, type UploadedFile } from './photos.service.js'
+import { createPhotosService, type PhotosServiceDeps } from './photos.service.js'
 
 const OWNER_ID = '6b044f9d56a44767c7079b01'
 const JPEG_FILE: UploadedFile = { buffer: Buffer.from('raw upload'), mimetype: 'image/jpeg' }
