@@ -22,12 +22,10 @@ export function createInvitationsController(
       })
       res.status(201).json(created)
     },
-
     async list(_req, res) {
       const invitations = await service.listInvitations()
       res.json({ invitations })
     },
-
     // The new member lands logged in, with the same cookie as after /login.
     async accept(req, res) {
       const user = await service.acceptInvitation({
