@@ -3,6 +3,7 @@ import { BrowserRouter, Outlet, Route, Routes } from 'react-router'
 import { AuthProvider } from './auth/AuthProvider.tsx'
 import { RequireAdmin } from './auth/RequireAdmin.tsx'
 import { RequireAuth } from './auth/RequireAuth.tsx'
+import { AccountBar } from './components/auth/AccountBar.tsx'
 import AdminInvitationsPage from './pages/AdminInvitationsPage.tsx'
 import FramePage from './pages/FramePage.tsx'
 import FriendsPage from './pages/FriendsPage.tsx'
@@ -23,17 +24,27 @@ function AppRoutes(): JSX.Element {
           </RequireAuth>
         }
       >
-        <Route path="/" element={<LibraryPage />} />
         <Route path="/frame" element={<FramePage />} />
-        <Route path="/friends" element={<FriendsPage />} />
+        {/* The frame is full screen: only the other pages get the account bar. */}
         <Route
-          path="/admin/invitations"
           element={
-            <RequireAdmin>
-              <AdminInvitationsPage />
-            </RequireAdmin>
+            <>
+              <AccountBar />
+              <Outlet />
+            </>
           }
-        />
+        >
+          <Route path="/" element={<LibraryPage />} />
+          <Route path="/friends" element={<FriendsPage />} />
+          <Route
+            path="/admin/invitations"
+            element={
+              <RequireAdmin>
+                <AdminInvitationsPage />
+              </RequireAdmin>
+            }
+          />
+        </Route>
       </Route>
     </Routes>
   )
