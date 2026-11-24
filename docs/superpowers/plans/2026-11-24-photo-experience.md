@@ -1,13 +1,13 @@
 ---
 plan: photo-experience
-status: ready
+status: done
 spec: docs/superpowers/specs/2026-11-24-photo-experience-design.md
 branch: feat/photo-toasts (PR A), feat/photo-viewer (PR B), feat/library-frame-merge (PR C), feat/share-sheet (PR D)
 worktree: false
 tasks_total: 10
-tasks_done: 0
-current_task: 1
-last_commit: 9899a1b
+tasks_done: 10
+current_task: none
+last_commit: 7825c87
 last_updated: 2026-11-24
 ---
 
@@ -2739,6 +2739,17 @@ Format: `date · task/step · what the plan said · what was done · why`.
 | Date | Task / step | Plan said | Done | Why |
 | ---- | ----------- | --------- | ---- | --- |
 | 2026-11-24 | Plan | Spec: 8 tasks, PRs A-D | 10 tasks: Task 3 (accepted formats) and Task 5 (reconnect) added; Task 7 also covers the frame's states and its way out | Coordinator additions a-f, received after the spec was committed (Choices 1-2) |
+| 2026-11-24 | Task 1 | `pnpm --filter client add sonner` | Added with `--config.virtual-store-dir=<existing store>`, then a clean `pnpm install --frozen-lockfile` | `node_modules` pointed at a virtual store in a scratchpad directory (`ERR_PNPM_UNEXPECTED_VIRTUAL_STORE`); the lockfile came out consistent |
+| 2026-11-24 | Task 1 | Product docs: R-BIB rules only | R-PAR-23 reworded too (same id) | It quoted the old « Photo envoyée ! » message |
+| 2026-11-24 | Task 3 | R-BIB-03 and R-BIB-14 both updated | R-BIB-14 merged into R-BIB-03 | Both said which formats are accepted; one rule reads simpler |
+| 2026-11-24 | Task 4 | `useViewerPhoto` asks for the next page when the open photo is missing | `loadMoreOnce`: asks once per list length; `useMoreLoader` extracted | A failed fetch looped. Accepted: if that load fails, the viewer waits until the user goes back |
+| 2026-11-24 | Task 5 | `useLoadCountReader` in `usePhotoLibrary` | `useLibraryConnection` extracted as well | `usePhotoLibrary` stays within 30 lines |
+| 2026-11-24 | Task 8 | Library header: title, pill and toggle fit on one line at phone width | Header wraps (`flex-wrap`): actions go under the title | At 375px the row overflowed (scrollWidth 379) |
+| 2026-11-24 | Task 8 | ▶ « Mode cadre » added to `ViewerTopBar` | `CloseViewerButton` extracted; `useViewerParam` at 33 lines (accepted) | `ViewerTopBar` stays within 30 lines |
+| 2026-11-24 | Task 10 | `ShareSheet` switches `Sheet` / `Dialog` | `DesktopDialog` / `PhoneSheet` shells; no autofocus on the phone sheet; subtitle wraps instead of `truncate`; R-PAR-03/05/06 kept as « Remplacée » | 30-line rule; the keyboard covered the sheet on open; the subtitle was cut at 375px; rule ids are never dropped |
+| 2026-11-24 | Final review | Missing open photo after a reconnect: shown as deleted | Treated as deleted only when its place is loaded or the list has no more pages (`missingPhotoStep`) | A reconnect can push it onto a page not loaded yet (I1) |
+| 2026-11-24 | Final review | Product docs and comments | R-CAD-08 « Remplacée » by R-CAD-55; « vue bibliothèque du cadre » removed from R-BIB-24, R-APP-11 and menu lists; R-BIB-27 and R-BIB-35 precised; `useIdle` comments; ARCHITECTURE Notifications lists the share toast | They still described the removed frame library view (I2, M1-M3) |
+| 2026-11-24 | Final review | — | Left as is: an HTTP failure while the socket stays up waits for the daily reload before the frame retries (M6) | Rare (socket up, API down); a frame on a wall recovers on the next connection or the daily timer |
 
 ---
 
