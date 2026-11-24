@@ -7,6 +7,7 @@ export type ApiErrorCode =
   | 'INVALID_CREDENTIALS'
   | 'ROUTE_NOT_FOUND'
   | 'PHOTO_NOT_FOUND'
+  | 'PHOTO_DUPLICATE'
   | 'PHOTO_TOO_LARGE'
   | 'FORMAT_UNSUPPORTED'
   | 'IMAGE_UNREADABLE'
@@ -20,6 +21,7 @@ const ERROR_MESSAGES: Record<ApiErrorCode, string> = {
   INVALID_CREDENTIALS: 'E-mail ou mot de passe incorrect.',
   ROUTE_NOT_FOUND: "Cette adresse n'existe pas sur le serveur.",
   PHOTO_NOT_FOUND: 'Cette photo a déjà été supprimée.',
+  PHOTO_DUPLICATE: 'Cette photo est déjà dans votre bibliothèque.',
   PHOTO_TOO_LARGE: 'La photo est trop lourde (10 Mo maximum).',
   FORMAT_UNSUPPORTED: 'Format non pris en charge : JPEG, PNG ou WebP uniquement.',
   IMAGE_UNREADABLE: "Ce fichier n'est pas une image lisible.",

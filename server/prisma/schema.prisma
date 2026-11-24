@@ -40,8 +40,10 @@ model Photo {
   owner        User     @relation(fields: [ownerId], references: [id])
   url          String
   cloudinaryId String
+  sha256       String
   createdAt    DateTime @default(now())
 
+  @@unique([ownerId, sha256])
   @@index([ownerId, id])
   @@index([cloudinaryId])
 }

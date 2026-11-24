@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { AppError } from '../../errors/app-error.js'
 import type { UploadedImage } from '../../lib/cloudinary.js'
 import type { Logger } from '../../lib/logger.js'
@@ -47,6 +48,24 @@ function parsePhotoId(id: string): string {
   return id
 }
 
+// The original bytes, before sharp: its output is not guaranteed to be stable.
+function sha256Of(buffer: Buffer): string {
+  return createHash('sha256').update(buffer).digest('hex')
+}
+
+// Saves the sharp and Cloudinary work for a known file; the unique index is the real guarantee.
+async function rejectKnownFile(
+  { repository, logger }: PhotosServiceDeps,
+  ownerId: string,
+  sha256: string,
+): Promise<void> {
+  const existing = await repository.findByOwnerAndSha256(ownerId, sha256)
+  if (existing) {
+    logger.info('photo.duplicate', { userId: ownerId, photoId: existing.id })
+    throw new AppError('PHOTO_DUPLICATE')
+  }
+}
+
 async function convertToFrameJpeg(
   { toFrameJpeg, logger }: PhotosServiceDeps,
   input: Buffer,
@@ -59,21 +78,8 @@ async function convertToFrameJpeg(
   }
 }
 
-async function saveRecord(
-  { repository, logger }: PhotosServiceDeps,
-  photo: NewPhoto,
-): Promise<PhotoRecord> {
-  try {
-    return await repository.create(photo)
-  } catch (error: unknown) {
-    // The image is on Cloudinary with no record pointing to it: its id is needed to clean up.
-    logger.error('photo.orphaned', { cloudinaryId: photo.cloudinaryId, error })
-    throw error
-  }
-}
-
-// The record is already gone: a Cloudinary failure only leaves an orphan image,
-// so the deletion still succeeds.
+// The record is gone, or was never saved: a Cloudinary failure only leaves an orphan
+// image, so the caller still goes on.
 async function deleteStoredImage(
   { deleteImage, logger }: PhotosServiceDeps,
   cloudinaryId: string,
@@ -85,15 +91,41 @@ async function deleteStoredImage(
   }
 }
 
+async function insertRecord(
+  { repository, logger }: PhotosServiceDeps,
+  photo: NewPhoto,
+): Promise<PhotoRecord | null> {
+  try {
+    return await repository.create(photo)
+  } catch (error: unknown) {
+    // The image is on Cloudinary with no record pointing to it: its id is needed to clean up.
+    logger.error('photo.orphaned', { cloudinaryId: photo.cloudinaryId, error })
+    throw error
+  }
+}
+
+async function saveRecord(deps: PhotosServiceDeps, photo: NewPhoto): Promise<PhotoRecord> {
+  const record = await insertRecord(deps, photo)
+  if (record) {
+    return record
+  }
+  // A concurrent upload of the same file won: this new image is referenced by nothing.
+  await deleteStoredImage(deps, photo.cloudinaryId)
+  deps.logger.info('photo.duplicate', { userId: photo.ownerId, cloudinaryId: photo.cloudinaryId })
+  throw new AppError('PHOTO_DUPLICATE')
+}
+
 async function createPhoto(
   deps: PhotosServiceDeps,
   { ownerId, file }: NewPhotoInput,
 ): Promise<PhotoRecord> {
   const validFile = parseFile(file)
+  const sha256 = sha256Of(validFile.buffer)
+  await rejectKnownFile(deps, ownerId, sha256)
   const jpeg = await convertToFrameJpeg(deps, validFile.buffer)
   // Cloudinary and database failures are ours: they stay 500s.
   const image = await deps.uploadImage(jpeg)
-  const record = await saveRecord(deps, { ownerId, ...image })
+  const record = await saveRecord(deps, { ownerId, ...image, sha256 })
   deps.logger.info('photo.created', {
     photoId: record.id,
     cloudinaryId: record.cloudinaryId,

@@ -25,6 +25,13 @@ describe('toErrorResponse', () => {
     })
   })
 
+  it('answers a file already in the library with 409', () => {
+    expect(toErrorResponse(new AppError('PHOTO_DUPLICATE'))).toEqual({
+      status: 409,
+      body: { error: 'PHOTO_DUPLICATE' },
+    })
+  })
+
   it('maps a file over the size limit to PHOTO_TOO_LARGE', () => {
     expect(toErrorResponse(new multer.MulterError('LIMIT_FILE_SIZE'))).toEqual({
       status: 413,

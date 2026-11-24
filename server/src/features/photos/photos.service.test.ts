@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { describe, expect, it, vi } from 'vitest'
 import type { Logger } from '../../lib/logger.js'
 import type { PhotoRecord, PhotosRepository } from './photos.repository.js'
@@ -5,12 +6,15 @@ import { createPhotosService, type PhotosServiceDeps, type UploadedFile } from '
 
 const OWNER_ID = '6b044f9d56a44767c7079b01'
 const JPEG_FILE: UploadedFile = { buffer: Buffer.from('raw upload'), mimetype: 'image/jpeg' }
+// Computed like the service does: the hash of the original upload bytes.
+const JPEG_SHA256 = createHash('sha256').update(JPEG_FILE.buffer).digest('hex')
 const FRAME_JPEG = Buffer.from('frame jpeg')
 const IMAGE = { url: 'https://res.cloudinary.com/demo/photo.jpg', cloudinaryId: 'familyframe/abc' }
 const RECORD: PhotoRecord = {
   id: '6b044f9d56a44767c7079a01',
   ownerId: OWNER_ID,
   ...IMAGE,
+  sha256: JPEG_SHA256,
   createdAt: new Date('2026-11-23T10:00:00Z'),
 }
 const LATEST_PHOTOS_LIMIT = 20
@@ -20,6 +24,9 @@ function makeDeps() {
   return {
     repository: {
       findLatest: vi.fn<PhotosRepository['findLatest']>().mockResolvedValue([RECORD]),
+      findByOwnerAndSha256: vi
+        .fn<PhotosRepository['findByOwnerAndSha256']>()
+        .mockResolvedValue(null),
       create: vi.fn<PhotosRepository['create']>().mockResolvedValue(RECORD),
       deleteOwned: vi.fn<PhotosRepository['deleteOwned']>().mockResolvedValue(RECORD),
     },
@@ -35,7 +42,7 @@ function makeDeps() {
 }
 
 describe('createPhoto', () => {
-  it('saves the uploaded image for its owner and returns the record', async () => {
+  it('saves the uploaded image for its owner with the hash of the original bytes', async () => {
     const deps = makeDeps()
 
     const record = await createPhotosService(deps).createPhoto({
@@ -44,9 +51,15 @@ describe('createPhoto', () => {
     })
 
     expect(record).toBe(RECORD)
+    expect(deps.repository.findByOwnerAndSha256).toHaveBeenCalledWith(OWNER_ID, JPEG_SHA256)
     expect(deps.toFrameJpeg).toHaveBeenCalledWith(JPEG_FILE.buffer)
     expect(deps.uploadImage).toHaveBeenCalledWith(FRAME_JPEG)
-    expect(deps.repository.create).toHaveBeenCalledWith({ ownerId: OWNER_ID, ...IMAGE })
+    // Not the hash of FRAME_JPEG: sharp's output is not guaranteed to be stable.
+    expect(deps.repository.create).toHaveBeenCalledWith({
+      ownerId: OWNER_ID,
+      ...IMAGE,
+      sha256: JPEG_SHA256,
+    })
   })
 
   it('logs the created photo by its identifiers and its owner id', async () => {
@@ -59,6 +72,36 @@ describe('createPhoto', () => {
       cloudinaryId: RECORD.cloudinaryId,
       userId: OWNER_ID,
     })
+  })
+
+  it('rejects a file already in the library before any image work', async () => {
+    const deps = makeDeps()
+    deps.repository.findByOwnerAndSha256.mockResolvedValue(RECORD)
+
+    await expect(
+      createPhotosService(deps).createPhoto({ ownerId: OWNER_ID, file: JPEG_FILE }),
+    ).rejects.toMatchObject({ code: 'PHOTO_DUPLICATE' })
+    expect(deps.toFrameJpeg).not.toHaveBeenCalled()
+    expect(deps.uploadImage).not.toHaveBeenCalled()
+    expect(deps.logger.info).toHaveBeenCalledWith('photo.duplicate', {
+      userId: OWNER_ID,
+      photoId: RECORD.id,
+    })
+  })
+
+  it('rejects a duplicate a concurrent upload saved first, and destroys the new image', async () => {
+    const deps = makeDeps()
+    deps.repository.create.mockResolvedValue(null)
+
+    await expect(
+      createPhotosService(deps).createPhoto({ ownerId: OWNER_ID, file: JPEG_FILE }),
+    ).rejects.toMatchObject({ code: 'PHOTO_DUPLICATE' })
+    expect(deps.deleteImage).toHaveBeenCalledWith(IMAGE.cloudinaryId)
+    expect(deps.logger.info).toHaveBeenCalledWith('photo.duplicate', {
+      userId: OWNER_ID,
+      cloudinaryId: IMAGE.cloudinaryId,
+    })
+    expect(deps.logger.info).not.toHaveBeenCalledWith('photo.created', expect.anything())
   })
 
   it('rejects a missing file', async () => {
@@ -124,6 +167,7 @@ describe('createPhoto', () => {
       error: databaseError,
     })
     expect(deps.logger.info).not.toHaveBeenCalled()
+    expect(deps.deleteImage).not.toHaveBeenCalled()
   })
 })
 

@@ -26,7 +26,9 @@ docs {
   la bibliothèque du membre de test : elles apparaissent sur son cadre, et
   `photos/delete` les supprime en fin de lancement. Le second compte (l'admin,
   `auth/login/05`, cookie dans la variable `adminCookie`) vérifie qu'un compte
-  ne touche pas aux photos d'un autre.
+  ne touche pas aux photos d'un autre. Si un lancement s'arrête avant
+  `photos/delete`, ses photos restent : le suivant répond 409
+  `PHOTO_DUPLICATE` à `create/01` ; `pnpm db:seed` remet la base à zéro.
 
   Chemins `@file()` relatifs à la racine de la collection (`server/bruno/`).
 }

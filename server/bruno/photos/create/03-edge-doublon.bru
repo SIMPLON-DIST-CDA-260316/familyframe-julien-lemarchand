@@ -1,0 +1,27 @@
+meta {
+  name: Edge - photo déjà dans la bibliothèque
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/photos
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  photo: @file(fixtures/photo.jpg) @contentType(image/jpeg)
+}
+
+assert {
+  res.status: eq 409
+  res.body.error: eq PHOTO_DUPLICATE
+}
+
+docs {
+  EDGE → 409 PHOTO_DUPLICATE : le même `photo.jpg` que `01`, toujours dans
+  la bibliothèque du membre. Le serveur reconnaît le fichier à son SHA-256,
+  calculé sur les octets reçus, avant Sharp et Cloudinary : aucune image
+  n'est envoyée.
+}
