@@ -11,6 +11,14 @@ export type UploadResult =
   | { status: 'failed'; message: string }
   | { status: 'unauthenticated' }
 
+export type ShareResult =
+  | { status: 'shared' }
+  | { status: 'failed'; message: string }
+  | { status: 'unauthenticated' }
+
+// The shared PHOTO_DUPLICATE message says « votre bibliothèque »: a share hits the friend's.
+const SHARE_DUPLICATE_MESSAGE = 'Cette personne a déjà cette photo.'
+
 function photosUrl({ cursor, limit }: PageRequest): string {
   const params = new URLSearchParams()
   if (cursor !== undefined) params.set('cursor', cursor)
@@ -73,4 +81,40 @@ export async function postPhoto(file: File): Promise<UploadResult> {
     // fetch rejects only on network failure.
     return { status: 'failed', message: errorMessage(null) }
   }
+}
+
+function isDuplicateError(body: unknown): boolean {
+  return (
+    typeof body === 'object' && body !== null && 'error' in body && body.error === 'PHOTO_DUPLICATE'
+  )
+}
+
+// The sender's screen shows nothing of the new photo: the result carries no Photo.
+async function sendShare(url: string, init: RequestInit): Promise<ShareResult> {
+  try {
+    const res = await fetch(url, { method: 'POST', ...init })
+    if (res.status === UNAUTHORIZED_STATUS) return { status: 'unauthenticated' }
+    if (res.ok) return { status: 'shared' }
+    // Not JSON when the dev proxy answers for a stopped API.
+    const data: unknown = await res.json().catch(() => null)
+    const message = isDuplicateError(data) ? SHARE_DUPLICATE_MESSAGE : errorMessage(data)
+    return { status: 'failed', message }
+  } catch {
+    // fetch rejects only on network failure.
+    return { status: 'failed', message: errorMessage(null) }
+  }
+}
+
+export function postLibraryShare(photoId: string, friendId: string): Promise<ShareResult> {
+  return sendShare(`/api/photos/${photoId}/share`, {
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ friendId }),
+  })
+}
+
+export function postDeviceShare(file: File, friendId: string): Promise<ShareResult> {
+  const body = new FormData()
+  body.append('photo', file)
+  body.append('friendId', friendId)
+  return sendShare('/api/photos/share', { body })
 }

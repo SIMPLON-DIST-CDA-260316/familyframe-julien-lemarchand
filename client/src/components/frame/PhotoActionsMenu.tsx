@@ -1,6 +1,7 @@
-import { EllipsisIcon, Trash2Icon } from 'lucide-react'
+import { EllipsisIcon, SendIcon, Trash2Icon } from 'lucide-react'
 import { type JSX, type ReactNode, useRef, useState } from 'react'
 import { DeletePhotoDialog } from '@/components/frame/DeletePhotoDialog.tsx'
+import { SharePhotoDialog } from '@/components/sharing/SharePhotoDialog.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import {
   DropdownMenu,
@@ -25,6 +26,7 @@ export function PhotoActionsMenu({
   children,
 }: PhotoActionsMenuProps): JSX.Element {
   const [photoToDelete, setPhotoToDelete] = useState<Photo | null>(null)
+  const [photoToShare, setPhotoToShare] = useState<Photo | null>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
 
   function focusTrigger(event: Event): void {
@@ -50,13 +52,24 @@ export function PhotoActionsMenu({
         {/* `dark`: the menu portals to body, outside the frame's dark <main>. */}
         <DropdownMenuContent align="end" className="dark">
           {children}
+          <DropdownMenuItem onSelect={() => setPhotoToShare(photo)}>
+            <SendIcon />
+            Envoyer à un ami
+          </DropdownMenuItem>
           <DropdownMenuItem variant="destructive" onSelect={() => setPhotoToDelete(photo)}>
             <Trash2Icon />
             Supprimer
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      {/* Outside the menu content: closing the menu must not unmount the dialog. */}
+      {/* Outside the menu content: closing the menu must not unmount the dialogs. */}
+      {/* `dark`: the dialog portals to body, outside the frame's dark <main>. */}
+      <SharePhotoDialog
+        target={photoToShare ? { kind: 'library', photo: photoToShare } : null}
+        onClose={() => setPhotoToShare(null)}
+        onCloseAutoFocus={focusTrigger}
+        className="dark"
+      />
       <DeletePhotoDialog
         photo={photoToDelete}
         onClose={() => setPhotoToDelete(null)}
