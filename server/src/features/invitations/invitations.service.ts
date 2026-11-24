@@ -1,4 +1,5 @@
 import { AppError } from '../../errors/app-error.js'
+import { parseDisplayName, parsePassword } from '../../lib/account-input.js'
 import { parseEmail } from '../../lib/email.js'
 import type { Logger } from '../../lib/logger.js'
 import type { CreatedInvitation, Invitation, InvitationStatus, PublicUser } from '../../types.js'
@@ -9,11 +10,6 @@ const DAY_MS = 24 * 60 * 60 * 1000
 export const INVITATION_DURATION_MS = 7 * DAY_MS
 // What generateToken produces: 32 random bytes in hex.
 const TOKEN_PATTERN = /^[0-9a-f]{64}$/
-// Shown on frames and next to shared photos: a bound keeps the layout.
-export const DISPLAY_NAME_MAX_LENGTH = 50
-// OWASP ASVS: at least 12, allow up to 128; the maximum keeps argon2 away from huge inputs.
-export const PASSWORD_MIN_LENGTH = 12
-export const PASSWORD_MAX_LENGTH = 128
 
 // email comes straight from the JSON body: validated here, at the boundary.
 export type NewInvitationInput = { email: unknown; invitedById: string }
@@ -35,29 +31,6 @@ export type InvitationsService = {
   createInvitation: (input: NewInvitationInput) => Promise<CreatedInvitation>
   listInvitations: () => Promise<Invitation[]>
   acceptInvitation: (acceptance: InvitationAcceptance) => Promise<PublicUser>
-}
-
-function parseDisplayName(displayName: unknown): string {
-  if (typeof displayName !== 'string') {
-    throw new AppError('DISPLAY_NAME_INVALID')
-  }
-  const trimmedName = displayName.trim()
-  if (trimmedName.length === 0 || trimmedName.length > DISPLAY_NAME_MAX_LENGTH) {
-    throw new AppError('DISPLAY_NAME_INVALID')
-  }
-  return trimmedName
-}
-
-// Not trimmed: a space is a character the person chose.
-function parsePassword(password: unknown): string {
-  if (
-    typeof password !== 'string' ||
-    password.length < PASSWORD_MIN_LENGTH ||
-    password.length > PASSWORD_MAX_LENGTH
-  ) {
-    throw new AppError('PASSWORD_INVALID')
-  }
-  return password
 }
 
 // Used comes first: the admin learns the person signed up, even after the 7 days.

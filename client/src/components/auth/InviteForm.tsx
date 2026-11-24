@@ -4,8 +4,8 @@ import { TextField } from '@/components/form/TextField.tsx'
 import { Alert, AlertDescription } from '@/components/ui/alert.tsx'
 import { Button } from '@/components/ui/button.tsx'
 
-// Mirror the server's limits (invitations.service.ts): the browser catches most mistakes
-// before a request. Keep both in sync.
+// Mirror the server's limits (server/src/lib/account-input.ts): the browser catches most
+// mistakes before a request. Keep both in sync.
 const DISPLAY_NAME_MAX_LENGTH = 50
 const PASSWORD_MIN_LENGTH = 12
 const PASSWORD_MAX_LENGTH = 128
