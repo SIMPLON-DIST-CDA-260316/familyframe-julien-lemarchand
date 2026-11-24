@@ -1,4 +1,4 @@
-import type { JSX } from 'react'
+import { type JSX, useState } from 'react'
 import { cn } from '@/lib/utils.ts'
 
 // avatarUrl: null or absent shows the initial, as before any profile photo.
@@ -9,12 +9,16 @@ const AVATAR_CLASSES =
 
 // Decorative (aria-hidden, empty alt): the name is always written next to it.
 export function UserAvatar({ name, avatarUrl, className }: UserAvatarProps): JSX.Element {
-  if (avatarUrl) {
+  // The URL that failed, not a flag: a new URL (new photo) gets its own try.
+  const [failedUrl, setFailedUrl] = useState<string | null>(null)
+  // A signed URL can expire and Cloudinary can answer 404: the initial beats a broken image.
+  if (avatarUrl && avatarUrl !== failedUrl) {
     return (
       <img
         src={avatarUrl}
         alt=""
         aria-hidden
+        onError={() => setFailedUrl(avatarUrl)}
         className={cn(AVATAR_CLASSES, 'object-cover', className)}
       />
     )
