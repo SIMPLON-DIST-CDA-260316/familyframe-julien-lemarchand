@@ -36,14 +36,18 @@ export async function fetchPhotoPage(
   }
 }
 
-// Every page: old photos never silently leave a gift frame. The loop ends: each cursor
-// is strictly older than the previous one. null as soon as one page fails.
+// Every page: old photos never silently leave a gift frame. null as soon as one page fails,
+// or when the server repeats a cursor, which would loop forever.
 export async function fetchAllPhotos(onUnauthenticated: () => void): Promise<Photo[] | null> {
   const photos: Photo[] = []
   let cursor: string | undefined
   do {
     const page = await fetchPhotoPage({ cursor, limit: FRAME_PAGE_SIZE }, onUnauthenticated)
     if (page === null) return null
+    if (page.nextCursor === cursor) {
+      console.error('Photos cursor did not advance')
+      return null
+    }
     photos.push(...page.photos)
     cursor = page.nextCursor ?? undefined
   } while (cursor !== undefined)
