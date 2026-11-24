@@ -32,6 +32,27 @@ describe('toErrorResponse', () => {
     })
   })
 
+  it('answers an unknown, replaced or malformed invitation token with 404', () => {
+    expect(toErrorResponse(new AppError('INVITATION_NOT_FOUND'))).toEqual({
+      status: 404,
+      body: { error: 'INVITATION_NOT_FOUND' },
+    })
+  })
+
+  it('answers an invitation past its 7 days with 410', () => {
+    expect(toErrorResponse(new AppError('INVITATION_EXPIRED'))).toEqual({
+      status: 410,
+      body: { error: 'INVITATION_EXPIRED' },
+    })
+  })
+
+  it('answers an invitation already used with 410', () => {
+    expect(toErrorResponse(new AppError('INVITATION_USED'))).toEqual({
+      status: 410,
+      body: { error: 'INVITATION_USED' },
+    })
+  })
+
   it('answers a file already in the library with 409', () => {
     expect(toErrorResponse(new AppError('PHOTO_DUPLICATE'))).toEqual({
       status: 409,
@@ -72,6 +93,20 @@ describe('toErrorResponse', () => {
     expect(toErrorResponse(new AppError('EMAIL_INVALID'))).toEqual({
       status: 400,
       body: { error: 'EMAIL_INVALID' },
+    })
+  })
+
+  it('answers an invalid display name with 400', () => {
+    expect(toErrorResponse(new AppError('DISPLAY_NAME_INVALID'))).toEqual({
+      status: 400,
+      body: { error: 'DISPLAY_NAME_INVALID' },
+    })
+  })
+
+  it('answers a password of the wrong length with 400', () => {
+    expect(toErrorResponse(new AppError('PASSWORD_INVALID'))).toEqual({
+      status: 400,
+      body: { error: 'PASSWORD_INVALID' },
     })
   })
 

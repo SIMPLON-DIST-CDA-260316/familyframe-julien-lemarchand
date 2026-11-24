@@ -27,6 +27,7 @@ function invitationRecord(overrides: Partial<InvitationRecord> = {}): Invitation
   }
 }
 
+// Creating and listing read the first four repository functions: the others stay unused.
 // Every dependency succeeds by default: a new address, one older link replaced.
 // Each test breaks only the one it is about.
 function makeDeps() {
@@ -38,9 +39,13 @@ function makeDeps() {
         .mockResolvedValue(1),
       create: vi.fn<InvitationsRepository['create']>().mockResolvedValue(invitationRecord()),
       findAll: vi.fn<InvitationsRepository['findAll']>().mockResolvedValue([]),
+      findByTokenHash: vi.fn<InvitationsRepository['findByTokenHash']>(),
+      createUser: vi.fn<InvitationsRepository['createUser']>(),
+      markUsed: vi.fn<InvitationsRepository['markUsed']>(),
     },
     generateToken: vi.fn<InvitationsServiceDeps['generateToken']>().mockReturnValue(TOKEN),
     hashToken: vi.fn<InvitationsServiceDeps['hashToken']>().mockReturnValue(TOKEN_HASH),
+    hashPassword: vi.fn<InvitationsServiceDeps['hashPassword']>(),
     now: vi.fn<InvitationsServiceDeps['now']>().mockReturnValue(NOW),
     logger: {
       info: vi.fn<Logger['info']>(),

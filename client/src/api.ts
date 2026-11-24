@@ -5,13 +5,18 @@ export type ApiErrorCode =
   | 'UPLOAD_INVALID'
   | 'BODY_INVALID'
   | 'QUERY_INVALID'
+  | 'DISPLAY_NAME_INVALID'
+  | 'PASSWORD_INVALID'
   | 'UNAUTHENTICATED'
   | 'INVALID_CREDENTIALS'
   | 'FORBIDDEN'
   | 'ROUTE_NOT_FOUND'
   | 'PHOTO_NOT_FOUND'
+  | 'INVITATION_NOT_FOUND'
   | 'PHOTO_DUPLICATE'
   | 'ACCOUNT_EXISTS'
+  | 'INVITATION_EXPIRED'
+  | 'INVITATION_USED'
   | 'PHOTO_TOO_LARGE'
   | 'FORMAT_UNSUPPORTED'
   | 'IMAGE_UNREADABLE'
@@ -23,13 +28,18 @@ const ERROR_MESSAGES: Record<ApiErrorCode, string> = {
   UPLOAD_INVALID: 'Envoi invalide : une seule photo à la fois.',
   BODY_INVALID: 'Requête invalide. Rechargez la page et réessayez.',
   QUERY_INVALID: 'Requête invalide. Rechargez la page et réessayez.',
+  DISPLAY_NAME_INVALID: 'Choisissez un nom de 1 à 50 caractères.',
+  PASSWORD_INVALID: 'Le mot de passe doit faire entre 12 et 128 caractères.',
   UNAUTHENTICATED: 'Votre session a expiré. Reconnectez-vous.',
   INVALID_CREDENTIALS: 'E-mail ou mot de passe incorrect.',
   FORBIDDEN: "Cette action est réservée à l'administrateur.",
   ROUTE_NOT_FOUND: "Cette adresse n'existe pas sur le serveur.",
   PHOTO_NOT_FOUND: 'Cette photo a déjà été supprimée.',
+  INVITATION_NOT_FOUND: "Ce lien d'invitation n'est pas valide. Demandez-en un nouveau.",
   PHOTO_DUPLICATE: 'Cette photo est déjà dans votre bibliothèque.',
   ACCOUNT_EXISTS: 'Un compte existe déjà pour cette adresse e-mail.',
+  INVITATION_EXPIRED: "Ce lien d'invitation a expiré. Demandez-en un nouveau.",
+  INVITATION_USED: "Ce lien d'invitation a déjà servi. Connectez-vous.",
   PHOTO_TOO_LARGE: 'La photo est trop lourde (10 Mo maximum).',
   FORMAT_UNSUPPORTED: 'Format non pris en charge : JPEG, PNG ou WebP uniquement.',
   IMAGE_UNREADABLE: "Ce fichier n'est pas une image lisible.",

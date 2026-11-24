@@ -21,7 +21,7 @@ import { deleteImage, uploadImage } from './lib/cloudinary.js'
 import { prisma } from './lib/db.js'
 import { toFrameJpeg } from './lib/image.js'
 import { logger } from './lib/logger.js'
-import { verifyPassword } from './lib/password.js'
+import { hashPassword, verifyPassword } from './lib/password.js'
 import { requestLogger } from './lib/request-logger.js'
 import { generateToken, hashToken } from './lib/session-token.js'
 import type { SocketServer } from './lib/socket-types.js'
@@ -57,6 +57,7 @@ function assembleInvitationsRouter(
     repository: createInvitationsRepository(prisma),
     generateToken,
     hashToken,
+    hashPassword,
     now: () => new Date(),
     logger,
   })
