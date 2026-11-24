@@ -1,5 +1,6 @@
 import { SendIcon } from 'lucide-react'
 import { type ChangeEvent, type JSX, type SubmitEvent, useState } from 'react'
+import { toast } from 'sonner'
 import { useAuth } from '@/auth/AuthContext.ts'
 import { SharePhotoDialog } from '@/components/sharing/SharePhotoDialog.tsx'
 import { Alert, AlertDescription } from '@/components/ui/alert.tsx'
@@ -10,7 +11,7 @@ import { usePreviewUrl } from '@/hooks/usePreviewUrl.ts'
 import type { Photo } from '@/photo.ts'
 import { postPhoto } from '@/photosApi.ts'
 
-type UploadStatus = 'idle' | 'sending' | 'success' | 'error'
+type UploadStatus = 'idle' | 'sending' | 'error'
 
 type PhotoUpload = {
   status: UploadStatus
@@ -70,7 +71,9 @@ function usePhotoUpload(onUploaded: (photo: Photo) => void): PhotoUpload {
       return false
     }
     onUploaded(result.photo)
-    setStatus('success')
+    // A toast, not an alert: the form empties, and the message must not outstay the photo.
+    toast.success('Photo ajoutée à votre bibliothèque.')
+    setStatus('idle')
     return true
   }
 
@@ -152,21 +155,12 @@ function UploadButtons({ hasFile, isSending, onShare }: UploadButtonsProps): JSX
 }
 
 function UploadAlert({ status, error }: Pick<PhotoUpload, 'status' | 'error'>): JSX.Element | null {
-  if (status === 'success') {
-    return (
-      <Alert>
-        <AlertDescription>Photo envoyée !</AlertDescription>
-      </Alert>
-    )
-  }
-  if (status === 'error') {
-    return (
-      <Alert variant="destructive">
-        <AlertDescription>{error}</AlertDescription>
-      </Alert>
-    )
-  }
-  return null
+  if (status !== 'error') return null
+  return (
+    <Alert variant="destructive">
+      <AlertDescription>{error}</AlertDescription>
+    </Alert>
+  )
 }
 
 function FilePreview({ file }: { file: File | null }): JSX.Element | null {

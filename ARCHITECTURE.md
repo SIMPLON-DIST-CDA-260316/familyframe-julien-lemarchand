@@ -56,6 +56,8 @@ Le détail des fichiers n'est pas listé ici : il change trop vite pour rester j
 
 Thème : le menu du compte (avatar sur ordinateur, ☰ sur mobile) propose Clair, Sombre ou Système (par défaut). Le choix est gardé dans le `localStorage` du navigateur (`client/src/theme.ts`), qui pose ou retire la classe `.dark` sur `<html>` ; en navigation privée, ou si le stockage est bloqué, le choix vaut pour la visite seulement.
 
+Notifications : une notification éphémère (Sonner, `components/ui/sonner.tsx`, montée une seule fois dans `App.tsx` pour survivre à la page ou à la fenêtre qui l'a déclenchée) confirme ou signale une action qui ne laisse pas de fenêtre ouverte : « Photo ajoutée à votre bibliothèque. », l'échec d'une suppression (message de l'API). Elle suit la classe `.dark` de `<html>` (`useAppliedTheme`), donc le thème choisi.
+
 Le routage est fait côté navigateur (`react-router`). En production (J2), le serveur qui sert le client devra donc renvoyer `index.html` pour `/login`, `/frame`, `/friends`, `/invite/:token` et `/admin/invitations` (« SPA fallback »), sinon un rechargement de la page donne une 404. Un serveur statique qui journalise les chemins écrirait aussi le jeton des liens d'invitation : à régler en J2 en choisissant son format de logs.
 
 ## API

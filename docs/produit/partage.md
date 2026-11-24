@@ -74,7 +74,7 @@ Ceux de la fenêtre d'envoi (voir [Choisir à qui envoyer](#choisir-à-qui-envoy
 1. R-PAR-20 · La photo entre uniquement dans la bibliothèque de l'ami : elle n'est pas ajoutée à celle de l'expéditeur.
 2. R-PAR-21 · Les règles d'ajout s'appliquent comme pour sa propre bibliothèque : formats JPEG, PNG ou WebP, 10 Mo au plus, image lisible, photo préparée pour l'affichage et informations cachées retirées (voir [bibliotheque.md](bibliotheque.md#ajouter-une-photo), R-BIB-03 à R-BIB-09). Les messages d'erreur sont les mêmes.
 3. R-PAR-22 · Après le premier envoi réussi, le formulaire d'ajout se vide, mais la fenêtre reste ouverte avec la photo pour l'envoyer à d'autres amis.
-4. R-PAR-23 · Le message « Photo envoyée ! » du formulaire ne concerne que l'ajout à sa bibliothèque ; l'envoi à un ami se confirme dans la fenêtre, par le bouton « Envoyée ».
+4. R-PAR-23 · La notification « Photo ajoutée à votre bibliothèque. » du formulaire ne concerne que l'ajout à sa bibliothèque ; l'envoi à un ami se confirme dans la fenêtre, par le bouton « Envoyée ».
 
 **Messages affichés**
 

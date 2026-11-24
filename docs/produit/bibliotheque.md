@@ -28,18 +28,18 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 
 **Messages affichés**
 
-| Situation                       | Message                                                                                         |
-| ------------------------------- | ----------------------------------------------------------------------------------------------- |
-| En-tête de la carte             | « Ajouter une photo » — « Ajoutez-la à votre bibliothèque ou envoyez-la directement à un ami. » |
-| Aperçu                          | Image décrite comme « Aperçu avant envoi »                                                      |
-| Envoi en cours                  | « Envoi… »                                                                                      |
-| Photo ajoutée                   | « Photo envoyée ! »                                                                             |
-| Aucun fichier reçu              | « Prenez ou choisissez une photo. »                                                             |
-| Plusieurs fichiers d'un coup    | « Envoi invalide : une seule photo à la fois. »                                                 |
-| Format refusé                   | « Format non pris en charge : JPEG, PNG ou WebP uniquement. »                                   |
-| Fichier trop lourd              | « La photo est trop lourde (10 Mo maximum). »                                                   |
-| Fichier illisible               | « Ce fichier n'est pas une image lisible. »                                                     |
-| Photo déjà dans la bibliothèque | « Cette photo est déjà dans votre bibliothèque. »                                               |
+| Situation                       | Message                                                                                                           |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| En-tête de la carte             | « Ajouter une photo » — « Ajoutez-la à votre bibliothèque ou envoyez-la directement à un ami. »                   |
+| Aperçu                          | Image décrite comme « Aperçu avant envoi »                                                                        |
+| Envoi en cours                  | « Envoi… »                                                                                                        |
+| Photo ajoutée                   | « Photo ajoutée à votre bibliothèque. », dans une courte notification en bas de l'écran qui disparaît d'elle-même |
+| Aucun fichier reçu              | « Prenez ou choisissez une photo. »                                                                               |
+| Plusieurs fichiers d'un coup    | « Envoi invalide : une seule photo à la fois. »                                                                   |
+| Format refusé                   | « Format non pris en charge : JPEG, PNG ou WebP uniquement. »                                                     |
+| Fichier trop lourd              | « La photo est trop lourde (10 Mo maximum). »                                                                     |
+| Fichier illisible               | « Ce fichier n'est pas une image lisible. »                                                                       |
+| Photo déjà dans la bibliothèque | « Cette photo est déjà dans votre bibliothèque. »                                                                 |
 
 **Ce qui n'est pas possible**
 
@@ -100,7 +100,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 3. R-BIB-32 · La suppression est définitive : il n'y a ni corbeille ni annulation.
 4. R-BIB-33 · La photo disparaît aussitôt de la bibliothèque et du cadre, sur tous les appareils connectés au compte.
 5. R-BIB-34 · Supprimer une photo que l'on a envoyée à des amis ne la retire pas de leur bibliothèque ; supprimer une photo reçue ne la retire pas de celle de l'expéditeur (voir [partage.md](partage.md)).
-6. R-BIB-35 · Si la photo a déjà été supprimée ailleurs (sur un autre appareil), un message le signale dans une fenêtre d'alerte.
+6. R-BIB-35 · Si la photo a déjà été supprimée ailleurs (sur un autre appareil), le motif s'affiche dans une notification en bas de l'écran, et non plus dans une fenêtre à fermer.
 
 **Messages affichés**
 

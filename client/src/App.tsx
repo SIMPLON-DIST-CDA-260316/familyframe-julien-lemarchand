@@ -4,6 +4,7 @@ import { AuthProvider } from './auth/AuthProvider.tsx'
 import { RequireAdmin } from './auth/RequireAdmin.tsx'
 import { RequireAuth } from './auth/RequireAuth.tsx'
 import { AccountBar } from './components/auth/AccountBar.tsx'
+import { Toaster } from './components/ui/sonner.tsx'
 import AdminInvitationsPage from './pages/AdminInvitationsPage.tsx'
 import FramePage from './pages/FramePage.tsx'
 import FriendsPage from './pages/FriendsPage.tsx'
@@ -55,11 +56,15 @@ function AppRoutes(): JSX.Element {
 
 function App(): JSX.Element {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
-    </BrowserRouter>
+    <>
+      <BrowserRouter>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </BrowserRouter>
+      {/* One for the whole app: a toast outlives the page or dialog that raised it. */}
+      <Toaster />
+    </>
   )
 }
 
