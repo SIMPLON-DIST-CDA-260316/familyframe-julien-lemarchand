@@ -11,8 +11,8 @@ delete {
 }
 
 script:pre-request {
-  if (!bru.getVar('shareFriendshipId') || !bru.getVar('sharedPhotoId')) {
-    throw new Error('shareFriendshipId ou sharedPhotoId absent : lancer tout le dossier photos/share, 02 doit passer')
+  if (!bru.getVar('shareFriendshipId') || !bru.getVar('sharedPhotoId') || !bru.getVar('deviceSharedPhotoId')) {
+    throw new Error('shareFriendshipId, sharedPhotoId ou deviceSharedPhotoId absent : lancer tout le dossier photos/share, 02 et 08 doivent passer')
   }
 }
 
@@ -22,16 +22,18 @@ assert {
 
 script:post-response {
   const axios = require('axios')
-  test('la photo reçue reste dans la bibliothèque de l\'admin', async () => {
+  test('les deux photos reçues restent dans la bibliothèque de l\'admin', async () => {
     const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/photos`, {
       headers: { Cookie: bru.getVar('adminCookie') },
     })
-    expect(list.data.photos.map(({ id }) => id)).to.include(bru.getVar('sharedPhotoId'))
+    const ids = list.data.photos.map(({ id }) => id)
+    expect(ids).to.include(bru.getVar('sharedPhotoId'))
+    expect(ids).to.include(bru.getVar('deviceSharedPhotoId'))
   })
 }
 
 docs {
   NOMINAL → 204 : le membre retire l'admin de ses amis (l'amitié de `02`).
-  Le script vérifie que la photo reçue reste chez l'admin : c'est sa photo,
-  rien ne part en cascade.
+  Le script vérifie que les deux photos reçues (`02` et `08`) restent chez
+  l'admin : ce sont ses photos, rien ne part en cascade.
 }

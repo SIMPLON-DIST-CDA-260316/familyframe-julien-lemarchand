@@ -7,9 +7,12 @@ docs {
   `POST /api/photos/:id/share`, JSON `{ friendId }` : envoie une photo de sa
   bibliothèque à un ami accepté. L'ami reçoit une nouvelle photo qui pointe
   vers la même image Cloudinary (rien n'est renvoyé à Cloudinary), avec
-  `senderName`, le nom de l'expéditeur. Réponse : 201 avec la photo de l'ami,
-  telle qu'il la voit ; l'événement Socket.IO `photo:new` part vers les
-  connexions de l'ami seulement.
+  `senderName`, le nom de l'expéditeur. `POST /api/photos/share`, multipart
+  (`photo` et `friendId`) : envoie un fichier de l'appareil, converti et
+  envoyé à Cloudinary comme un envoi normal, mais qui n'entre que dans la
+  bibliothèque de l'ami. Réponse : 201 avec la photo de l'ami, telle qu'il
+  la voit ; l'événement Socket.IO `photo:new` part vers les connexions de
+  l'ami seulement.
 
   Un `friendId` absent, mal formé, inconnu, en attente ou le sien répond
   403 `NOT_FRIENDS` ; une photo d'un autre compte ou un id mal formé, 404
@@ -20,6 +23,6 @@ docs {
   par `GET /api/auth/me` et supprime une amitié laissée par un lancement
   interrompu ; `02` rend le membre et l'admin amis (`shareFriendshipId`) ;
   `13` supprime cette amitié. Les photos reçues par l'admin
-  (`sharedPhotoId`) restent après la fin de l'amitié : `delete/` les
-  supprime en fin de lancement.
+  (`sharedPhotoId`, `deviceSharedPhotoId`) restent après la fin de
+  l'amitié : `delete/` les supprime en fin de lancement.
 }

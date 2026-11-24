@@ -1,0 +1,27 @@
+meta {
+  name: Edge - friendId qui n'est pas un ObjectId
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/api/photos/share
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  photo: @file(fixtures/photo.png) @contentType(image/png)
+  friendId: pas-un-id
+}
+
+assert {
+  res.status: eq 403
+  res.body.error: eq NOT_FRIENDS
+}
+
+docs {
+  EDGE → 403 NOT_FRIENDS, pas une 400 ni une 500 : un `friendId` mal formé
+  reçoit la même réponse que n'importe quel compte qui n'est pas un ami,
+  sans requête en base.
+}

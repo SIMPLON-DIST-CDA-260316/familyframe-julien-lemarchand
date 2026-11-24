@@ -12,6 +12,7 @@ export type PhotosController = {
   create: (req: Request, res: Response) => Promise<void>
   remove: (req: Request<{ id: string }>, res: Response) => Promise<void>
   shareFromLibrary: (req: Request<{ id: string }>, res: Response) => Promise<void>
+  shareFromDevice: (req: Request, res: Response) => Promise<void>
 }
 
 type ControllerDeps = { service: PhotosService; io: SocketServer }
@@ -74,6 +75,16 @@ async function shareFromLibrary(
   announceNewPhoto(deps, res, record)
 }
 
+// multer fills req.body with the text fields: friendId is one of them.
+async function shareFromDevice(deps: ControllerDeps, req: Request, res: Response): Promise<void> {
+  const record = await deps.service.shareFromDevice({
+    senderId: currentUser(req).id,
+    file: req.file,
+    friendId: req.body?.friendId,
+  })
+  announceNewPhoto(deps, res, record)
+}
+
 export function createPhotosController(service: PhotosService, io: SocketServer): PhotosController {
   const deps: ControllerDeps = { service, io }
   return {
@@ -81,5 +92,6 @@ export function createPhotosController(service: PhotosService, io: SocketServer)
     create: (req, res) => create(deps, req, res),
     remove: (req, res) => remove(deps, req, res),
     shareFromLibrary: (req, res) => shareFromLibrary(deps, req, res),
+    shareFromDevice: (req, res) => shareFromDevice(deps, req, res),
   }
 }

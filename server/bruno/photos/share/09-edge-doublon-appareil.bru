@@ -1,0 +1,27 @@
+meta {
+  name: Edge - fichier que l'ami a déjà
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/api/photos/share
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  photo: @file(fixtures/photo.jpg) @contentType(image/jpeg)
+  friendId: {{adminId}}
+}
+
+assert {
+  res.status: eq 409
+  res.body.error: eq PHOTO_DUPLICATE
+}
+
+docs {
+  EDGE → 409 PHOTO_DUPLICATE : `photo.jpg`, que l'admin a reçu dans `02`.
+  Le SHA-256 est comparé à la bibliothèque de l'ami avant Sharp et
+  Cloudinary : aucune image n'est envoyée.
+}

@@ -1,0 +1,25 @@
+meta {
+  name: Edge - sans fichier
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{baseUrl}}/api/photos/share
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  friendId: {{adminId}}
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq PHOTO_MISSING
+}
+
+docs {
+  EDGE → 400 PHOTO_MISSING : un `friendId` mais aucun fichier dans le champ
+  `photo`. Le fichier est vérifié en premier.
+}
