@@ -13,6 +13,8 @@ export type PhotosController = {
   remove: (req: Request<{ id: string }>, res: Response) => Promise<void>
 }
 
+type ControllerDeps = { service: PhotosService; io: SocketServer }
+
 // cloudinaryId, ownerId and senderId stay on the server: the client gets ready-made URLs
 // and the sender's name.
 function toPhotoDto(record: PhotoRecord): Photo {
@@ -24,32 +26,44 @@ function toPhotoDto(record: PhotoRecord): Photo {
   }
 }
 
+// Only the owner's frames and pages: other accounts never see the photo.
+function announceNewPhoto({ io }: ControllerDeps, res: Response, record: PhotoRecord): void {
+  const photo = toPhotoDto(record)
+  io.to(userRoom(record.ownerId)).emit('photo:new', photo)
+  res.status(201).json(photo)
+}
+
+async function list({ service }: ControllerDeps, req: Request, res: Response): Promise<void> {
+  const { records, nextCursor } = await service.listPage({
+    ownerId: currentUser(req).id,
+    cursor: req.query.cursor,
+    limit: req.query.limit,
+  })
+  const page: PhotoPage = { photos: records.map(toPhotoDto), nextCursor }
+  res.json(page)
+}
+
+async function create(deps: ControllerDeps, req: Request, res: Response): Promise<void> {
+  const record = await deps.service.createPhoto({ ownerId: currentUser(req).id, file: req.file })
+  announceNewPhoto(deps, res, record)
+}
+
+async function remove(
+  { service, io }: ControllerDeps,
+  req: Request<{ id: string }>,
+  res: Response,
+): Promise<void> {
+  const ownerId = currentUser(req).id
+  const deletedId = await service.deletePhoto({ ownerId, id: req.params.id })
+  io.to(userRoom(ownerId)).emit('photo:deleted', deletedId)
+  res.status(204).end()
+}
+
 export function createPhotosController(service: PhotosService, io: SocketServer): PhotosController {
+  const deps: ControllerDeps = { service, io }
   return {
-    async list(req, res) {
-      const { records, nextCursor } = await service.listPage({
-        ownerId: currentUser(req).id,
-        cursor: req.query.cursor,
-        limit: req.query.limit,
-      })
-      const page: PhotoPage = { photos: records.map(toPhotoDto), nextCursor }
-      res.json(page)
-    },
-
-    async create(req, res) {
-      const ownerId = currentUser(req).id
-      const record = await service.createPhoto({ ownerId, file: req.file })
-      const photo = toPhotoDto(record)
-      // Only the owner's frames and pages: other accounts never see the photo.
-      io.to(userRoom(ownerId)).emit('photo:new', photo)
-      res.status(201).json(photo)
-    },
-
-    async remove(req, res) {
-      const ownerId = currentUser(req).id
-      const deletedId = await service.deletePhoto({ ownerId, id: req.params.id })
-      io.to(userRoom(ownerId)).emit('photo:deleted', deletedId)
-      res.status(204).end()
-    },
+    list: (req, res) => list(deps, req, res),
+    create: (req, res) => create(deps, req, res),
+    remove: (req, res) => remove(deps, req, res),
   }
 }
