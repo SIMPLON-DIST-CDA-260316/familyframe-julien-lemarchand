@@ -1,5 +1,7 @@
+import { createHash } from 'node:crypto'
 import { describe, expect, it, vi } from 'vitest'
 import type { Logger } from '../../lib/logger.js'
+import type { UploadedFile } from './photos.input.js'
 import type { PhotoRecord, PhotosRepository, StoredPhoto } from './photos.repository.js'
 import { createPhotosService, type PhotosServiceDeps } from './photos.service.js'
 
@@ -24,6 +26,15 @@ const COPY: PhotoRecord = {
   createdAt: new Date('2026-11-24T10:00:00Z'),
 }
 const MALFORMED_FRIEND_IDS: unknown[] = [undefined, 42, 'pas-un-id']
+const PNG_FILE: UploadedFile = { buffer: Buffer.from('raw png'), mimetype: 'image/png' }
+// Computed like the service does: the hash of the original upload bytes.
+const PNG_SHA256 = createHash('sha256').update(PNG_FILE.buffer).digest('hex')
+const FRAME_JPEG = Buffer.from('frame jpeg')
+// A device share uploads a new image: not the original's.
+const FRESH_IMAGE = {
+  url: 'https://res.cloudinary.com/demo/fresh.jpg',
+  cloudinaryId: 'familyframe/fresh',
+}
 
 // Every dependency succeeds by default; each test breaks only the one it is about.
 function makeDeps() {
@@ -38,8 +49,8 @@ function makeDeps() {
       deleteOwned: vi.fn<PhotosRepository['deleteOwned']>(),
       countByCloudinaryId: vi.fn<PhotosRepository['countByCloudinaryId']>(),
     },
-    toFrameJpeg: vi.fn<PhotosServiceDeps['toFrameJpeg']>(),
-    uploadImage: vi.fn<PhotosServiceDeps['uploadImage']>(),
+    toFrameJpeg: vi.fn<PhotosServiceDeps['toFrameJpeg']>().mockResolvedValue(FRAME_JPEG),
+    uploadImage: vi.fn<PhotosServiceDeps['uploadImage']>().mockResolvedValue(FRESH_IMAGE),
     deleteImage: vi.fn<PhotosServiceDeps['deleteImage']>().mockResolvedValue(undefined),
     areFriends: vi.fn<PhotosServiceDeps['areFriends']>().mockResolvedValue(true),
     logger: {
@@ -159,5 +170,80 @@ describe('shareFromLibrary', () => {
       userId: FRIEND_ID,
       cloudinaryId: IMAGE.cloudinaryId,
     })
+  })
+})
+
+function sharePng(deps: PhotosServiceDeps, friendId: unknown): Promise<PhotoRecord> {
+  return createPhotosService(deps).shareFromDevice({
+    senderId: SENDER_ID,
+    file: PNG_FILE,
+    friendId,
+  })
+}
+
+describe('shareFromDevice', () => {
+  it("converts and uploads the file into the friend's library only", async () => {
+    const deps = makeDeps()
+
+    const record = await sharePng(deps, FRIEND_ID)
+
+    expect(record).toBe(COPY)
+    expect(deps.repository.findByOwnerAndSha256).toHaveBeenCalledWith(FRIEND_ID, PNG_SHA256)
+    expect(deps.toFrameJpeg).toHaveBeenCalledWith(PNG_FILE.buffer)
+    expect(deps.uploadImage).toHaveBeenCalledWith(FRAME_JPEG)
+    expect(deps.repository.create).toHaveBeenCalledWith({
+      ownerId: FRIEND_ID,
+      senderId: SENDER_ID,
+      ...FRESH_IMAGE,
+      sha256: PNG_SHA256,
+    })
+    expect(deps.repository.findOwned).not.toHaveBeenCalled()
+    expect(deps.logger.info).toHaveBeenCalledWith('photo.shared', {
+      photoId: COPY.id,
+      cloudinaryId: COPY.cloudinaryId,
+      userId: SENDER_ID,
+      recipientId: FRIEND_ID,
+      source: 'device',
+    })
+  })
+
+  it('refuses an account that is no accepted friend before any image work', async () => {
+    const deps = makeDeps()
+    deps.areFriends.mockResolvedValue(false)
+
+    await expect(sharePng(deps, FRIEND_ID)).rejects.toMatchObject({ code: 'NOT_FRIENDS' })
+    expect(deps.repository.findByOwnerAndSha256).not.toHaveBeenCalled()
+    expect(deps.toFrameJpeg).not.toHaveBeenCalled()
+    expect(deps.uploadImage).not.toHaveBeenCalled()
+  })
+
+  it('rejects a file the friend already has before any image work', async () => {
+    const deps = makeDeps()
+    deps.repository.findByOwnerAndSha256.mockResolvedValue(COPY)
+
+    await expect(sharePng(deps, FRIEND_ID)).rejects.toMatchObject({ code: 'PHOTO_DUPLICATE' })
+    expect(deps.toFrameJpeg).not.toHaveBeenCalled()
+    expect(deps.uploadImage).not.toHaveBeenCalled()
+  })
+
+  it('destroys the fresh image when a concurrent copy was saved first', async () => {
+    const deps = makeDeps()
+    deps.repository.create.mockResolvedValue(null)
+
+    await expect(sharePng(deps, FRIEND_ID)).rejects.toMatchObject({ code: 'PHOTO_DUPLICATE' })
+    expect(deps.deleteImage).toHaveBeenCalledWith(FRESH_IMAGE.cloudinaryId)
+  })
+
+  it('rejects a missing file before asking who is friends', async () => {
+    const deps = makeDeps()
+
+    await expect(
+      createPhotosService(deps).shareFromDevice({
+        senderId: SENDER_ID,
+        file: undefined,
+        friendId: FRIEND_ID,
+      }),
+    ).rejects.toMatchObject({ code: 'PHOTO_MISSING' })
+    expect(deps.areFriends).not.toHaveBeenCalled()
   })
 })

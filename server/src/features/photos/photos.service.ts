@@ -23,6 +23,9 @@ export type PhotoDeletion = { ownerId: string; id: string }
 // photoId comes from the URL, friendId straight from the JSON body: validated here.
 export type LibraryShare = { senderId: string; photoId: string; friendId: unknown }
 
+// friendId is a multipart text field: validated here too.
+export type DeviceShare = { senderId: string; file: UploadedFile | undefined; friendId: unknown }
+
 // cursor and limit come straight from the query string: validated here, at the boundary.
 export type PageInput = { ownerId: string; cursor: unknown; limit: unknown }
 
@@ -44,6 +47,8 @@ export type PhotosService = {
   deletePhoto: (deletion: PhotoDeletion) => Promise<string>
   // Returns the friend's new photo: the controller sends it to the friend's room.
   shareFromLibrary: (share: LibraryShare) => Promise<PhotoRecord>
+  // The file lands in the friend's library only, not in the sender's.
+  shareFromDevice: (share: DeviceShare) => Promise<PhotoRecord>
 }
 
 // The original bytes, before sharp: its output is not guaranteed to be stable.
@@ -241,6 +246,24 @@ async function shareFromLibrary(
   return record
 }
 
+// An upload with the friend as owner: converted and uploaded like any new photo.
+async function shareFromDevice(
+  deps: PhotosServiceDeps,
+  { senderId, file, friendId }: DeviceShare,
+): Promise<PhotoRecord> {
+  const { buffer } = parseFile(file)
+  const recipientId = await requireFriend(deps, friendId, senderId)
+  const record = await storeNewPhoto(deps, { ownerId: recipientId, senderId, buffer })
+  deps.logger.info('photo.shared', {
+    photoId: record.id,
+    cloudinaryId: record.cloudinaryId,
+    userId: senderId,
+    recipientId,
+    source: 'device',
+  })
+  return record
+}
+
 // One record more than asked tells whether a next page exists, without a count query.
 async function listPage(
   { repository }: PhotosServiceDeps,
@@ -262,5 +285,6 @@ export function createPhotosService(deps: PhotosServiceDeps): PhotosService {
     createPhoto: (input) => createPhoto(deps, input),
     deletePhoto: (deletion) => deletePhoto(deps, deletion),
     shareFromLibrary: (share) => shareFromLibrary(deps, share),
+    shareFromDevice: (share) => shareFromDevice(deps, share),
   }
 }
