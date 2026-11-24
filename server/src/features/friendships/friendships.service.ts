@@ -19,6 +19,9 @@ const ERROR_BY_REFUSAL: Record<RequestRefusal, ApiErrorCode> = {
 // email comes straight from the JSON body: validated here, at the boundary.
 export type FriendRequest = { email: unknown; requesterId: string }
 
+// isAccepted: the other side had already asked, so the request answered theirs.
+export type FriendRequestOutcome = { friendship: Friendship; isAccepted: boolean }
+
 // id comes from the URL; userId is the logged-in account, on either side of the friendship.
 export type FriendshipAction = { id: string; userId: string }
 
@@ -30,7 +33,7 @@ export type FriendshipsServiceDeps = {
 }
 
 export type FriendshipsService = {
-  requestFriendship: (request: FriendRequest) => Promise<Friendship>
+  requestFriendship: (request: FriendRequest) => Promise<FriendRequestOutcome>
   listFriendships: (userId: string) => Promise<FriendshipList>
   deleteFriendship: (action: FriendshipAction) => Promise<void>
   acceptFriendship: (action: FriendshipAction) => Promise<Friendship>
@@ -75,35 +78,53 @@ async function findAddresseeId(
   return addresseeId
 }
 
-async function rejectExistingPair(
+// The reverse request is accepted by the same atomic write as « Accepter »: null means it was
+// cancelled or answered in between.
+async function acceptReverseRequest(
+  { repository, logger }: FriendshipsServiceDeps,
+  reverse: FriendshipRecord,
+  requesterId: string,
+): Promise<FriendRequestOutcome> {
+  const record = await repository.acceptReceived(reverse.id, requesterId)
+  if (!record) {
+    throw refusal(logger, 'request_exists', requesterId)
+  }
+  logger.info('friendship.accepted', { friendshipId: record.id, userId: requesterId })
+  return { friendship: toFriendship(record, requesterId), isAccepted: true }
+}
+
+async function createRequest(
   { repository, logger }: FriendshipsServiceDeps,
   requesterId: string,
   addresseeId: string,
-): Promise<void> {
-  const existing = await repository.findBetween(requesterId, addresseeId)
-  if (existing?.status === 'accepted') {
-    throw refusal(logger, 'already_friends', requesterId)
-  }
-  // Either direction: a reverse request already waits on the sender's page, with « Accepter ».
-  if (existing?.status === 'pending') {
+): Promise<FriendRequestOutcome> {
+  // The unique pairKey is the real guarantee: a concurrent request, in either order, ends here.
+  const record = await repository.create({ requesterId, addresseeId })
+  if (!record) {
     throw refusal(logger, 'request_exists', requesterId)
   }
+  logger.info('friendship.requested', { friendshipId: record.id, userId: requesterId })
+  return { friendship: toFriendship(record, requesterId), isAccepted: false }
 }
 
+// Asking someone who already asked me means yes: the request accepts theirs.
 async function requestFriendship(
   deps: FriendshipsServiceDeps,
   request: FriendRequest,
-): Promise<Friendship> {
+): Promise<FriendRequestOutcome> {
   const { requesterId } = request
   const addresseeId = await findAddresseeId(deps, request)
-  await rejectExistingPair(deps, requesterId, addresseeId)
-  // The unique pairKey is the real guarantee: a concurrent request, in either order, ends here.
-  const record = await deps.repository.create({ requesterId, addresseeId })
-  if (!record) {
+  const existing = await deps.repository.findBetween(requesterId, addresseeId)
+  if (existing?.status === 'accepted') {
+    throw refusal(deps.logger, 'already_friends', requesterId)
+  }
+  if (existing?.requesterId === requesterId) {
     throw refusal(deps.logger, 'request_exists', requesterId)
   }
-  deps.logger.info('friendship.requested', { friendshipId: record.id, userId: requesterId })
-  return toFriendship(record, requesterId)
+  if (existing) {
+    return acceptReverseRequest(deps, existing, requesterId)
+  }
+  return createRequest(deps, requesterId, addresseeId)
 }
 
 async function listFriendships(

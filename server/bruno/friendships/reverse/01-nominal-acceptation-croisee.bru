@@ -1,0 +1,56 @@
+meta {
+  name: Nominal - l'admin demande le membre qui l'a déjà demandé
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/friendships
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{memberEmail}}"
+  }
+}
+
+script:pre-request {
+  if (!bru.getVar('adminCookie')) {
+    throw new Error('adminCookie absent : lancer toute la collection, auth/login/05 doit passer')
+  }
+  const axios = require('axios')
+  // A script request does not get the collection headers: send the cookie itself.
+  const { data } = await axios.post(
+    `${bru.getEnvVar('baseUrl')}/api/friendships`,
+    { email: bru.getEnvVar('adminEmail') },
+    { headers: { Cookie: bru.getVar('sessionCookie') } },
+  )
+  bru.setVar('crossFriendshipId', data.friendship.id)
+  req.setHeader('Cookie', bru.getVar('adminCookie'))
+}
+
+assert {
+  res.status: eq 200
+  res.body.friendship.id: eq {{crossFriendshipId}}
+  res.body.friendship.user.email: eq {{memberEmail}}
+}
+
+script:post-response {
+  const axios = require('axios')
+  test('le membre voit l\'admin dans « Mes amis »', async () => {
+    const { data } = await axios.get(`${bru.getEnvVar('baseUrl')}/api/friendships`, {
+      headers: { Cookie: bru.getVar('sessionCookie') },
+    })
+    expect(data.friends.map(({ id }) => id)).to.include(bru.getVar('crossFriendshipId'))
+    expect(data.outgoing).to.have.length(0)
+  })
+}
+
+docs {
+  NOMINAL → 200 `{ friendship }` : le script envoie une demande du membre à
+  l'admin ; l'admin demande à son tour le membre. Sa demande accepte celle
+  du membre : même `id`, aucune seconde ligne, et le membre voit l'admin
+  dans `friends`.
+}

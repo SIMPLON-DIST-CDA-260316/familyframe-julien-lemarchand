@@ -44,6 +44,14 @@ function makeDeps() {
   }
 }
 
+// Mamie asked the member first: the member's request answers it.
+const REQUEST_FROM_MAMIE = friendshipRecord({
+  requesterId: MAMIE.id,
+  requester: MAMIE,
+  addresseeId: MEMBER.id,
+  addressee: MEMBER,
+})
+
 type Deps = ReturnType<typeof makeDeps>
 
 function request(deps: Deps, email: unknown = MAMIE.email): Promise<unknown> {
@@ -62,9 +70,8 @@ describe('requestFriendship', () => {
       addresseeId: MAMIE.id,
     })
     expect(friendship).toEqual({
-      id: FRIENDSHIP_ID,
-      user: MAMIE,
-      createdAt: CREATED_AT.toISOString(),
+      friendship: { id: FRIENDSHIP_ID, user: MAMIE, createdAt: CREATED_AT.toISOString() },
+      isAccepted: false,
     })
   })
 
@@ -117,27 +124,45 @@ describe('requestFriendship', () => {
     })
   })
 
-  it.each([
-    ['sent by the member', friendshipRecord()],
-    [
-      'sent by Mamie',
-      friendshipRecord({
-        requesterId: MAMIE.id,
-        requester: MAMIE,
-        addresseeId: MEMBER.id,
-        addressee: MEMBER,
-      }),
-    ],
-  ])('rejects a pending request %s with FRIEND_REQUEST_EXISTS', async (_label, pending) => {
+  it('rejects a second request from the same sender with FRIEND_REQUEST_EXISTS', async () => {
     const deps = makeDeps()
-    deps.repository.findBetween.mockResolvedValue(pending)
+    deps.repository.findBetween.mockResolvedValue(friendshipRecord())
 
     await expect(request(deps)).rejects.toMatchObject({ code: 'FRIEND_REQUEST_EXISTS' })
     expect(deps.repository.create).not.toHaveBeenCalled()
+    expect(deps.repository.acceptReceived).not.toHaveBeenCalled()
     expect(deps.logger.warn).toHaveBeenCalledWith('friendship.request_failed', {
       reason: 'request_exists',
       userId: MEMBER.id,
     })
+  })
+
+  it("accepts Mamie's pending request instead of creating a second one", async () => {
+    const deps = makeDeps()
+    deps.repository.findBetween.mockResolvedValue(REQUEST_FROM_MAMIE)
+    deps.repository.acceptReceived.mockResolvedValue({ ...REQUEST_FROM_MAMIE, status: 'accepted' })
+
+    const outcome = await request(deps)
+
+    expect(deps.repository.acceptReceived).toHaveBeenCalledWith(FRIENDSHIP_ID, MEMBER.id)
+    expect(deps.repository.create).not.toHaveBeenCalled()
+    expect(outcome).toEqual({
+      friendship: { id: FRIENDSHIP_ID, user: MAMIE, createdAt: CREATED_AT.toISOString() },
+      isAccepted: true,
+    })
+    expect(deps.logger.info).toHaveBeenCalledWith('friendship.accepted', {
+      friendshipId: FRIENDSHIP_ID,
+      userId: MEMBER.id,
+    })
+  })
+
+  it("answers FRIEND_REQUEST_EXISTS when Mamie's request changed before the acceptance", async () => {
+    const deps = makeDeps()
+    deps.repository.findBetween.mockResolvedValue(REQUEST_FROM_MAMIE)
+    deps.repository.acceptReceived.mockResolvedValue(null)
+
+    await expect(request(deps)).rejects.toMatchObject({ code: 'FRIEND_REQUEST_EXISTS' })
+    expect(deps.logger.info).not.toHaveBeenCalled()
   })
 
   it('answers FRIEND_REQUEST_EXISTS when a concurrent request took the pair first', async () => {

@@ -16,11 +16,12 @@ export function createFriendshipsController(service: FriendshipsService): Friend
       res.json(list)
     },
     async request(req, res) {
-      const friendship = await service.requestFriendship({
+      const { friendship, isAccepted } = await service.requestFriendship({
         email: req.body?.email,
         requesterId: currentUser(req).id,
       })
-      res.status(201).json({ friendship })
+      // 201: a new request exists. 200: the existing reverse request became the friendship.
+      res.status(isAccepted ? 200 : 201).json({ friendship })
     },
     async accept(req, res) {
       const friendship = await service.acceptFriendship({
