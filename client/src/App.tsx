@@ -10,6 +10,7 @@ import FriendsPage from './pages/FriendsPage.tsx'
 import InvitePage from './pages/InvitePage.tsx'
 import LibraryPage from './pages/LibraryPage.tsx'
 import LoginPage from './pages/LoginPage.tsx'
+import NotFoundPage from './pages/NotFoundPage.tsx'
 
 // One layout route guards every logged-in page, instead of wrapping each one.
 function AppRoutes(): JSX.Element {
@@ -44,6 +45,8 @@ function AppRoutes(): JSX.Element {
               </RequireAdmin>
             }
           />
+          {/* Behind RequireAuth: a logged-out visitor goes to /login, as for any other page. */}
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Route>
     </Routes>
