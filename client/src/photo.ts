@@ -8,6 +8,12 @@ export type Photo = {
   createdAt: string
 }
 
+// nextCursor is the id to send as cursor for the next page; null on the last page.
+export type PhotoPage = {
+  photos: Photo[]
+  nextCursor: string | null
+}
+
 export type ServerToClientEvents = {
   'photo:new': (photo: Photo) => void
   'photo:deleted': (id: string) => void
@@ -25,5 +31,17 @@ export function isPhoto(value: unknown): value is Photo {
     typeof value.thumbnailUrl === 'string' &&
     'createdAt' in value &&
     typeof value.createdAt === 'string'
+  )
+}
+
+export function isPhotoPage(value: unknown): value is PhotoPage {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'photos' in value &&
+    Array.isArray(value.photos) &&
+    value.photos.every(isPhoto) &&
+    'nextCursor' in value &&
+    (value.nextCursor === null || typeof value.nextCursor === 'string')
   )
 }

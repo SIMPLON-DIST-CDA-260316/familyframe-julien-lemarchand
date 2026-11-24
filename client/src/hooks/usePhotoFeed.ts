@@ -1,8 +1,8 @@
 import { type Dispatch, type SetStateAction, useEffect, useState } from 'react'
 import { io, type Socket } from 'socket.io-client'
-import { UNAUTHORIZED_STATUS } from '@/api.ts'
 import { useAuth } from '@/auth/AuthContext.ts'
 import { isPhoto, type Photo, type ServerToClientEvents } from '@/photo.ts'
+import { fetchAllPhotos } from '@/photosApi.ts'
 
 // The message the server's Socket.IO middleware rejects a handshake with, like the HTTP code.
 const UNAUTHENTICATED_SOCKET_ERROR = 'UNAUTHENTICATED'
@@ -10,28 +10,14 @@ const UNAUTHENTICATED_SOCKET_ERROR = 'UNAUTHENTICATED'
 // Once a day: far below the 45 days left under which the server renews a session.
 const SESSION_REFRESH_MS = 24 * 60 * 60 * 1000
 
-// null keeps the photos already shown when a reload fails.
-async function fetchPhotos(onUnauthenticated: () => void): Promise<Photo[] | null> {
-  try {
-    const res = await fetch('/api/photos')
-    if (res.status === UNAUTHORIZED_STATUS) {
-      onUnauthenticated()
-      return null
-    }
-    const data: unknown = await res.json()
-    if (Array.isArray(data) && data.every(isPhoto)) return data
-    // Client and API images out of sync: say so instead of waiting forever.
-    console.error('Unexpected photos payload from the API')
-    return null
-  } catch (error) {
-    console.error('Could not load photos', error)
-    return null
-  }
-}
-
 // The fetch and the event can bring the same photo.
 function withNewPhoto(photos: Photo[], photo: Photo): Photo[] {
   return photos.some(({ id }) => id === photo.id) ? photos : [photo, ...photos]
+}
+
+// The whole library is loaded: no gap to fill, the photo just leaves the list.
+function withoutPhoto(photos: Photo[], deletedId: string): Photo[] {
+  return photos.filter(({ id }) => id !== deletedId)
 }
 
 // Socket.IO types are a promise, not a check.
@@ -57,7 +43,7 @@ function connectPhotoFeed(
   const socket: Socket<ServerToClientEvents> = io()
 
   async function loadPhotos(): Promise<void> {
-    const loadedPhotos = await fetchPhotos(dropUser)
+    const loadedPhotos = await fetchAllPhotos(dropUser)
     if (loadedPhotos) setPhotos(loadedPhotos)
   }
 
@@ -65,9 +51,7 @@ function connectPhotoFeed(
   socket.on('connect', loadPhotos)
   socket.on('connect_error', (error) => dropUserIfRefused(error, dropUser))
   socket.on('photo:new', (photo) => addPhotoIfValid(photo, setPhotos))
-
-  // Reload rather than drop one photo: the next photo beyond the 20 latest fills the gap.
-  socket.on('photo:deleted', loadPhotos)
+  socket.on('photo:deleted', (id) => setPhotos((current) => withoutPhoto(current, id)))
 
   // An HTTP call slides the session, the socket handshake does not: without it a frame
   // that never reconnects would see its session expire. It also refreshes the feed.
@@ -79,7 +63,7 @@ function connectPhotoFeed(
   }
 }
 
-// Newest first, like GET /api/photos.
+// The whole library of the logged-in user, newest first like GET /api/photos.
 export function usePhotoFeed(): Photo[] {
   const { dropUser } = useAuth()
   const [photos, setPhotos] = useState<Photo[]>([])
