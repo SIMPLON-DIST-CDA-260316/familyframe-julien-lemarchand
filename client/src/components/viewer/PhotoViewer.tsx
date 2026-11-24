@@ -34,7 +34,12 @@ function ViewerPhoto({ library, viewer, photo, index }: ViewerPhotoProps): JSX.E
     <>
       <ViewerCarousel photos={library.photos} currentId={photo.id} onCurrentChange={viewer.show} />
       <ViewerCaption photo={photo} />
-      <ViewerTopBar photo={photo} counter={viewerCounter(index, library)} onClose={viewer.close} />
+      <ViewerTopBar
+        photo={photo}
+        counter={viewerCounter(index, library)}
+        onClose={viewer.close}
+        onStartFrame={() => viewer.startFrame(photo.id)}
+      />
     </>
   )
 }

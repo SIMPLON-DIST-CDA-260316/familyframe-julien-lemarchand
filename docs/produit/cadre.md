@@ -24,6 +24,7 @@ Le cadre est la page à laisser affichée en plein écran sur l'appareil posé c
 10. R-CAD-54 · Le diaporama ne démarre plus de lui-même après une minute : il est déjà la seule vue du cadre.
 11. R-CAD-55 · Sans photo à montrer, le cadre dit pourquoi : chargement en cours, aucune photo encore, ou chargement impossible ; il réessaie tout seul quand la connexion revient.
 12. R-CAD-56 · Un bouton « Retour à la bibliothèque » permet toujours de sortir du cadre.
+13. R-CAD-57 · Lancé depuis une photo, le diaporama commence par cette photo.
 
 **Messages affichés**
 

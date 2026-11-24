@@ -58,6 +58,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 - Charger les photos plus anciennes avec « Charger plus ».
 - Ouvrir une photo en grand dans l'application, puis passer à la suivante ou à la précédente d'un geste du doigt, avec les flèches à l'écran ou celles du clavier.
 - Ouvrir le menu « … » d'une photo pour l'envoyer à un ami ou la supprimer.
+- Lancer le mode cadre depuis la bibliothèque, ou depuis une photo ouverte pour que le diaporama commence par elle.
 
 **Règles**
 

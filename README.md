@@ -261,7 +261,7 @@ Quand le schéma change sur une base qui contient déjà des photos, un nouvel i
 
 Sans session, la bibliothèque et le cadre redirigent vers `/login` ; le cadre se connecte une fois avec un compte et reste connecté tant qu'il est allumé : il recharge ses photos chaque jour, ce qui prolonge la session glissante de 90 jours.
 
-Le cadre (`/frame`) n'affiche que le diaporama ; ✕ ou Échap ramène à la bibliothèque sur la photo qui était à l'écran.
+Le cadre (`/frame`) n'affiche que le diaporama : « Mode cadre » le lance depuis la bibliothèque ou depuis une photo ouverte ; ✕ ou Échap ramène à la bibliothèque sur la photo qui était à l'écran.
 
 Regarder ses photos : dans la bibliothèque, toucher une photo l'ouvre en grand ; balayer ou utiliser les flèches pour passer à la suivante, ✕ ou Échap pour revenir.
 

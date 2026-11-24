@@ -1,4 +1,6 @@
+import { PlayIcon } from 'lucide-react'
 import type { JSX } from 'react'
+import { Link } from 'react-router'
 import { LayoutToggle } from '@/components/frame/LayoutToggle.tsx'
 import { PhotoGrid } from '@/components/frame/PhotoGrid.tsx'
 import { PhotoList } from '@/components/frame/PhotoList.tsx'
@@ -7,6 +9,7 @@ import type { LibraryLayout } from '@/hooks/useLibraryLayout.ts'
 import { useLibraryLayout } from '@/hooks/useLibraryLayout.ts'
 import type { PhotoLibrary } from '@/hooks/usePhotoLibrary.ts'
 import type { Photo } from '@/photo.ts'
+import { LIBRARY_BELOW_STATE } from '@/viewerHistory.ts'
 
 type LibrarySectionProps = {
   library: PhotoLibrary
@@ -40,11 +43,23 @@ function LibraryPhotos({ photos, layout, onSelect }: LibraryPhotosProps): JSX.El
 
 function LibrarySectionHeader({ layout, onLayoutChange }: LibraryHeaderProps): JSX.Element {
   return (
-    <header className="flex items-center gap-4 px-8 pt-6">
+    // Wraps on a phone: the title, the pill and the toggle do not fit on one line there.
+    <header className="flex flex-wrap items-center gap-x-4 gap-y-3 px-8 pt-6">
       <h2 id="library-title" className="text-xl font-medium tracking-tight">
         Ma bibliothèque
       </h2>
-      <div className="ml-auto">
+      <div className="ml-auto flex items-center gap-2">
+        <Button
+          asChild
+          size="lg"
+          className="rounded-full bg-frame-accent px-4 text-black hover:bg-frame-accent/85"
+        >
+          {/* The state: leaving the frame comes back to this library entry. */}
+          <Link to="/frame" state={LIBRARY_BELOW_STATE}>
+            <PlayIcon data-icon="inline-start" />
+            Mode cadre
+          </Link>
+        </Button>
         <LayoutToggle layout={layout} onLayoutChange={onLayoutChange} />
       </div>
     </header>

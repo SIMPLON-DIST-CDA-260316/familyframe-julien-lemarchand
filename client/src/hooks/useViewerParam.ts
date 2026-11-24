@@ -1,5 +1,5 @@
 import { useLocation, useNavigate, useSearchParams } from 'react-router'
-import { isLibraryBelow, LIBRARY_BELOW_STATE, PHOTO_PARAM } from '@/viewerHistory.ts'
+import { isLibraryBelow, LIBRARY_BELOW_STATE, PHOTO_PARAM, photoPath } from '@/viewerHistory.ts'
 
 export type ViewerParam = {
   openId: string | null
@@ -7,6 +7,7 @@ export type ViewerParam = {
   show: (photoId: string) => void
   close: () => void
   dismiss: () => void
+  startFrame: (photoId: string) => void
 }
 
 export function useViewerParam(): ViewerParam {
@@ -35,5 +36,11 @@ export function useViewerParam(): ViewerParam {
     else dismiss()
   }
 
-  return { openId, open, show, close, dismiss }
+  // Replace, keeping the viewer's state: the frame takes the viewer's place above the library,
+  // so leaving the frame brings back one viewer, not two.
+  function startFrame(photoId: string): void {
+    navigate(photoPath('/frame', photoId), { replace: true, state: location.state })
+  }
+
+  return { openId, open, show, close, dismiss, startFrame }
 }
