@@ -10,3 +10,6 @@ export const GLASS_BUTTON_CLASSES = `${GLASS_CLASSES} size-11 text-white/80 hove
 // A button inside the glass pill: the pill is the glass, the button only lights up.
 export const PILL_BUTTON_CLASSES =
   'size-11 rounded-full text-white/80 hover:bg-white/10 hover:text-white dark:hover:bg-white/10 aria-pressed:bg-white/15 aria-pressed:text-white data-[state=on]:bg-white/15 data-[state=on]:text-white'
+
+// 44 px under a finger, the size touch guidelines ask for; a mouse keeps the compact button.
+export const COARSE_POINTER_TARGET_CLASSES = 'pointer-coarse:size-11'

@@ -1,5 +1,6 @@
 import { EllipsisIcon, SendIcon, Trash2Icon } from 'lucide-react'
 import { type JSX, type ReactNode, useRef, useState } from 'react'
+import { COARSE_POINTER_TARGET_CLASSES } from '@/components/frame/controlClasses.ts'
 import { DeletePhotoDialog } from '@/components/frame/DeletePhotoDialog.tsx'
 import { SharePhotoDialog } from '@/components/sharing/SharePhotoDialog.tsx'
 import { Button } from '@/components/ui/button.tsx'
@@ -9,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu.tsx'
+import { cn } from '@/lib/utils.ts'
 import type { Photo } from '@/photo.ts'
 
 type PhotoActionsMenuProps = {
@@ -44,7 +46,7 @@ export function PhotoActionsMenu({
             variant="ghost"
             size="icon-sm"
             aria-label={label}
-            className={className}
+            className={cn(COARSE_POINTER_TARGET_CLASSES, className)}
           >
             <EllipsisIcon />
           </Button>
