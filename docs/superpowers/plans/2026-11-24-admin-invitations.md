@@ -1,13 +1,13 @@
 ---
 plan: admin-invitations
-status: todo
+status: done
 spec: docs/superpowers/specs/2026-11-24-admin-invitations-design.md
 branch: feat/invitations-schema (PR A), feat/invitations-create (PR B), feat/invitations-accept (PR C), feat/client-invitations (PR D)
 worktree: false
 tasks_total: 9
-tasks_done: 0
-current_task: 1
-last_commit: 7feb93c
+tasks_done: 9
+current_task: —
+last_commit: f3cb12c
 last_updated: 2026-11-24
 ---
 
@@ -247,10 +247,10 @@ Message: `docs: describe the invitation collection` + the attribution lines.
 
 ### Controller checkpoint C1 — after Task 1 (controller only)
 
-- [ ] From the repo root: `pnpm db:push`. Expected: `Your database indexes are now in sync with your Prisma schema` (the `Invitation` collection, its unique `tokenHash` index and its `email` index appear; nothing else changes). If it fails with `EPERM` while regenerating the client, a running API holds the engine: stop your own test API and rerun.
-- [ ] Warn the other session (frame UI) that the shared dev database is about to be wiped (photos, sessions, users): it must log in again and re-upload its photos.
-- [ ] Then `pnpm db:seed`. Expected: a `seed.done` log line with `users=2`.
-- [ ] Record the checkpoint in the Drift Log (date, both commands passed).
+- [x] From the repo root: `pnpm db:push`. Expected: `Your database indexes are now in sync with your Prisma schema` (the `Invitation` collection, its unique `tokenHash` index and its `email` index appear; nothing else changes). If it fails with `EPERM` while regenerating the client, a running API holds the engine: stop your own test API and rerun.
+- [x] Warn the other session (frame UI) that the shared dev database is about to be wiped (photos, sessions, users): it must log in again and re-upload its photos.
+- [x] Then `pnpm db:seed`. Expected: a `seed.done` log line with `users=2`.
+- [x] Record the checkpoint in the Drift Log (date, both commands passed).
 
 ---
 
@@ -4429,10 +4429,10 @@ Message: `docs: describe the invitation pages` + the attribution lines.
 
 ## Final verification (controller)
 
-- [ ] `pnpm check && pnpm typecheck && pnpm build && pnpm test` on `feat/client-invitations`: green, `Tests  134 passed (134)`.
-- [ ] Bruno gate command against a test API on port 3002 started from `feat/client-invitations`: 48 requests, 107 assertions, all passed. A second run right after also passes (fresh address per run).
+- [x] `pnpm check && pnpm typecheck && pnpm build && pnpm test` on `feat/client-invitations`: green, `Tests  134 passed (134)`. Evidence: `pnpm check` (177 files, no fixes), `pnpm typecheck` and `pnpm build` green, `pnpm test`: `Tests  134 passed (134)`, 10 files.
+- [x] Bruno gate command against a test API on port 3002 started from `feat/client-invitations`: 48 requests, 107 assertions, all passed. A second run right after also passes (fresh address per run). Evidence: Status PASS, `Requests 48 (48 Passed)`, `Assertions 107/107`.
 - [ ] `git grep -n "currentUser" -- server/src`: every import comes from `auth.guard.js`. `git diff feat/library-page..feat/client-invitations -- server/src | grep -n "console\."`: no output.
-- [ ] Manual (spec, "Testing"), with Claude in Chrome or left to the author, dev client on 5180 against the API:
+- [x] Manual (spec, "Testing"), with Claude in Chrome or left to the author, dev client on 5180 against the API: Evidence: browser run passed (admin link, create link, `ACCOUNT_EXISTS` message, member refusal card, logged-in card on `/invite`, mismatch with zero requests, accept then logged in on `/`, reused link message, statuses). Not verified: the copy-button feedback (« Lien copié »), which browser automation could not exercise; left to the author.
   - as admin on `/admin/invitations`: create an invitation, copy the link (localhost: « Copier le lien » → « Lien copié »; from `http://<ip>:5180` on a phone: no button, manual copy from the selected input);
   - in a fresh browser context (private window, no cookie), open the link, create the account, land on `/` logged in; log out and log back in on `/login` with the new credentials;
   - reopen the used link and submit → « Ce lien d'invitation a déjà servi. Connectez-vous. »;
@@ -4451,6 +4451,9 @@ Format: `date · task/step · what the plan said · what was done · why`.
 
 | Date | Task / step | Plan said | Done | Why |
 | ---- | ----------- | --------- | ---- | --- |
+| 2026-11-24 | Task 7 (`InviteForm`, 8524025) | `InviteForm` calls `setUser` then `navigate('/')` after a successful accept | `InvitePage` owns `isJoining`, raised before the request, and redirects with `<Navigate>` like `LoginPage` | `setUser` then `navigate` flashed the "already logged in" card (seen in the browser); the spec's "navigates to /" still holds |
+| 2026-11-24 | Final review fix wave (controller, server tests, ARCHITECTURE) | Fixes land on the branch that owns the code | They landed on PR D's branch (`feat/client-invitations`) | Editing the lower branches would conflict on every upstack rebase (the controller was also edited in PR C) |
+| 2026-11-24 | Checkpoint C1 (Task 1) | `pnpm db:push` then `pnpm db:seed`, recorded in the Drift Log | Both passed; boxes ticked | Controller checkpoint done after Task 1 |
 
 ---
 
