@@ -3,10 +3,10 @@ import { useEffect, useState } from 'react'
 // wheel: scrolling the library with a mouse wheel moves no pointer, yet someone is using it.
 const ACTIVITY_EVENTS: (keyof WindowEventMap)[] = ['pointermove', 'pointerdown', 'keydown', 'wheel']
 
-// Someone reading the actions menu or the delete dialog is still using the frame, even
+// Someone reading the actions menu, the share or the delete dialog is still using the frame, even
 // without moving: the slideshow must not change the photo behind it.
 export function isOverlayOpen(): boolean {
-  return document.querySelector('[role="menu"], [role="alertdialog"]') !== null
+  return document.querySelector('[role="menu"], [role="dialog"], [role="alertdialog"]') !== null
 }
 
 // Starts active: someone just opened the page, and the library must wait its full delay
