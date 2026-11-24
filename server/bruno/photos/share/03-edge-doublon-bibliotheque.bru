@@ -1,0 +1,27 @@
+meta {
+  name: Edge - l'ami a déjà cette photo
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/photos/{{createdPhotoId}}/share
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "friendId": "{{adminId}}"
+  }
+}
+
+assert {
+  res.status: eq 409
+  res.body.error: eq PHOTO_DUPLICATE
+}
+
+docs {
+  EDGE → 409 PHOTO_DUPLICATE : la même photo, une seconde fois. L'admin a
+  déjà ce fichier (même SHA-256) depuis `02` : rien n'est écrit.
+}

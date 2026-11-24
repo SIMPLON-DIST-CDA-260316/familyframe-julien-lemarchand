@@ -31,8 +31,16 @@ script:post-response {
     const ids = list.data.photos.map(({ id }) => id)
     expect(ids).to.not.include(bru.getVar('createdPhotoId'))
   })
+  test('la copie reçue par l\'admin reste', async () => {
+    const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/photos`, {
+      headers: { Cookie: bru.getVar('adminCookie') },
+    })
+    expect(list.data.photos.map(({ id }) => id)).to.include(bru.getVar('sharedPhotoId'))
+  })
 }
 
 docs {
-  NOMINAL → 204, puis `GET /api/photos` ne renvoie plus la photo.
+  NOMINAL → 204, puis `GET /api/photos` ne renvoie plus la photo. La copie
+  que l'admin a reçue dans `share/02` (`sharedPhotoId`) reste dans sa
+  bibliothèque, et l'image Cloudinary aussi : la copie y renvoie encore.
 }

@@ -11,6 +11,7 @@ export type PhotosController = {
   list: (req: Request, res: Response) => Promise<void>
   create: (req: Request, res: Response) => Promise<void>
   remove: (req: Request<{ id: string }>, res: Response) => Promise<void>
+  shareFromLibrary: (req: Request<{ id: string }>, res: Response) => Promise<void>
 }
 
 type ControllerDeps = { service: PhotosService; io: SocketServer }
@@ -59,11 +60,26 @@ async function remove(
   res.status(204).end()
 }
 
+// The new photo is the friend's: it goes to their room, the sender's library does not change.
+async function shareFromLibrary(
+  deps: ControllerDeps,
+  req: Request<{ id: string }>,
+  res: Response,
+): Promise<void> {
+  const record = await deps.service.shareFromLibrary({
+    senderId: currentUser(req).id,
+    photoId: req.params.id,
+    friendId: req.body?.friendId,
+  })
+  announceNewPhoto(deps, res, record)
+}
+
 export function createPhotosController(service: PhotosService, io: SocketServer): PhotosController {
   const deps: ControllerDeps = { service, io }
   return {
     list: (req, res) => list(deps, req, res),
     create: (req, res) => create(deps, req, res),
     remove: (req, res) => remove(deps, req, res),
+    shareFromLibrary: (req, res) => shareFromLibrary(deps, req, res),
   }
 }

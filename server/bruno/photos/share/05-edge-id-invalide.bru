@@ -1,0 +1,27 @@
+meta {
+  name: Edge - id qui n'est pas un ObjectId
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/photos/pas-un-id/share
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "friendId": "{{adminId}}"
+  }
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq PHOTO_NOT_FOUND
+}
+
+docs {
+  EDGE → 404 PHOTO_NOT_FOUND, pas une 500 : le service vérifie le format de
+  l'id avant toute requête.
+}

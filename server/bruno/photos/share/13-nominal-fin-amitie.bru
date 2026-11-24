@@ -1,0 +1,37 @@
+meta {
+  name: Nominal - fin de l'amitié, les photos reçues restent
+  type: http
+  seq: 13
+}
+
+delete {
+  url: {{baseUrl}}/api/friendships/{{shareFriendshipId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('shareFriendshipId') || !bru.getVar('sharedPhotoId')) {
+    throw new Error('shareFriendshipId ou sharedPhotoId absent : lancer tout le dossier photos/share, 02 doit passer')
+  }
+}
+
+assert {
+  res.status: eq 204
+}
+
+script:post-response {
+  const axios = require('axios')
+  test('la photo reçue reste dans la bibliothèque de l\'admin', async () => {
+    const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/photos`, {
+      headers: { Cookie: bru.getVar('adminCookie') },
+    })
+    expect(list.data.photos.map(({ id }) => id)).to.include(bru.getVar('sharedPhotoId'))
+  })
+}
+
+docs {
+  NOMINAL → 204 : le membre retire l'admin de ses amis (l'amitié de `02`).
+  Le script vérifie que la photo reçue reste chez l'admin : c'est sa photo,
+  rien ne part en cascade.
+}

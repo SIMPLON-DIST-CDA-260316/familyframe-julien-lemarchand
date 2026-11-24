@@ -39,6 +39,11 @@ docs {
   membre et l'admin : il n'en laisse aucune, et commence par effacer celles
   d'un lancement interrompu.
 
+  Le dossier `photos/share/` lit les ids du membre et de l'admin
+  (`memberId`, `adminId`, par `GET /api/auth/me`), rend les deux comptes amis
+  le temps de ses requêtes, puis supprime cette amitié. Les photos que l'admin
+  y reçoit restent après la fin de l'amitié : `photos/delete` les supprime.
+
   Environnement `Prod` : la stack de prod ne publie pas le port 3000, l'API
   se joint par le proxy du client (`http://localhost:5180/api`). La prod n'a
   pas de comptes de test (pas de seed) : `pnpm test:bruno:prod` ne lance que
