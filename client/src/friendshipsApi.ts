@@ -1,5 +1,5 @@
 import { errorMessage, UNAUTHORIZED_STATUS } from '@/api.ts'
-import { type FriendshipList, isFriendshipList } from '@/friendship.ts'
+import { type FriendshipList, isFriendshipBody, isFriendshipList } from '@/friendship.ts'
 
 export type FriendshipListResult =
   | { isSuccess: true; friendships: FriendshipList }
@@ -7,6 +7,13 @@ export type FriendshipListResult =
 
 // The page reloads the whole list after every action: a success carries nothing more.
 export type FriendshipActionResult = { isSuccess: true } | { isSuccess: false; message: string }
+
+// isAccepted: their request was waiting, mine accepted it (200 instead of 201).
+export type FriendRequestResult =
+  | { isSuccess: true; isAccepted: boolean; friendName: string }
+  | { isSuccess: false; message: string }
+
+const OK_STATUS = 200
 
 // A 401 calls onUnauthenticated: the session ended on the server, the provider drops the user.
 export async function fetchFriendships(
@@ -41,16 +48,26 @@ async function sendAction(
   }
 }
 
-export function postFriendRequest(
+export async function postFriendRequest(
   email: string,
   onUnauthenticated: () => void,
-): Promise<FriendshipActionResult> {
-  const init: RequestInit = {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email }),
+): Promise<FriendRequestResult> {
+  try {
+    const res = await fetch('/api/friendships', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    })
+    if (res.status === UNAUTHORIZED_STATUS) onUnauthenticated()
+    const data: unknown = await res.json().catch(() => null)
+    if (res.ok && isFriendshipBody(data)) {
+      const { displayName } = data.friendship.user
+      return { isSuccess: true, isAccepted: res.status === OK_STATUS, friendName: displayName }
+    }
+    return { isSuccess: false, message: errorMessage(data) }
+  } catch {
+    return { isSuccess: false, message: errorMessage(null) }
   }
-  return sendAction('/api/friendships', init, onUnauthenticated)
 }
 
 export function postAcceptFriendship(

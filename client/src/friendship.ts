@@ -60,3 +60,13 @@ export function isFriendshipList(value: unknown): value is FriendshipList {
     isFriendshipArray(value.outgoing)
   )
 }
+
+// The body of a request, an acceptance: one friendship.
+export function isFriendshipBody(value: unknown): value is { friendship: Friendship } {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'friendship' in value &&
+    isFriendship(value.friendship)
+  )
+}

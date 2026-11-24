@@ -49,7 +49,7 @@ const ERROR_MESSAGES: Record<ApiErrorCode, string> = {
   ACCOUNT_EXISTS: 'Un compte existe déjà pour cette adresse e-mail.',
   ALREADY_FRIENDS: 'Vous êtes déjà amis.',
   FRIEND_REQUEST_EXISTS:
-    "Une demande est déjà en attente avec cette personne. Si elle vous l'a envoyée, acceptez-la ci-dessous.",
+    'Vous avez déjà envoyé une demande à cette personne : elle attend sa réponse.',
   INVITATION_EXPIRED: "Ce lien d'invitation a expiré. Demandez-en un nouveau.",
   INVITATION_USED: "Ce lien d'invitation a déjà servi. Connectez-vous.",
   PHOTO_TOO_LARGE: 'La photo est trop lourde (10 Mo maximum).',
