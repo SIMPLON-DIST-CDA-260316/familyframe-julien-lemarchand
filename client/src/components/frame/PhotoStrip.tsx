@@ -2,6 +2,7 @@ import { type JSX, useRef } from 'react'
 import { useDragScroll } from '@/hooks/useDragScroll.ts'
 import { cn } from '@/lib/utils.ts'
 import type { Photo } from '@/photo.ts'
+import { photoLabel } from '@/photoLabel.ts'
 
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
 
@@ -65,7 +66,7 @@ export function PhotoStrip({
                 <img
                   className="size-20 rounded-lg object-cover shadow-lg"
                   src={photo.thumbnailUrl}
-                  alt={`Envoyée par ${photo.uploaderName}`}
+                  alt={photoLabel(photo)}
                   loading="lazy"
                   decoding="async"
                   // The browser's own image drag would steal the mouse from the strip's scroll.

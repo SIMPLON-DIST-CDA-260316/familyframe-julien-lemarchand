@@ -5,7 +5,6 @@ export type Photo = {
   id: string
   url: string
   thumbnailUrl: string
-  uploaderName: string
   createdAt: string
 }
 
@@ -24,8 +23,6 @@ export function isPhoto(value: unknown): value is Photo {
     typeof value.url === 'string' &&
     'thumbnailUrl' in value &&
     typeof value.thumbnailUrl === 'string' &&
-    'uploaderName' in value &&
-    typeof value.uploaderName === 'string' &&
     'createdAt' in value &&
     typeof value.createdAt === 'string'
   )

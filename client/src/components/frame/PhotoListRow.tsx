@@ -1,6 +1,7 @@
 import type { JSX } from 'react'
 import { PhotoActionsMenu } from '@/components/frame/PhotoActionsMenu.tsx'
 import type { Photo } from '@/photo.ts'
+import { photoLabel } from '@/photoLabel.ts'
 
 // In a list, photos of the same day are told apart by their time.
 const ROW_DATE_FORMAT = new Intl.DateTimeFormat('fr-FR', {
@@ -27,19 +28,17 @@ export function PhotoListRow({ photo, isCurrent, onSelect }: PhotoListRowProps):
         <img
           className="size-14 shrink-0 rounded-lg object-cover"
           src={photo.thumbnailUrl}
-          // The name is written right beside it: an alt would read it twice.
-          alt=""
+          alt={photoLabel(photo)}
           loading="lazy"
           decoding="async"
         />
-        <span className="min-w-0 flex-1 truncate text-lg font-medium">{photo.uploaderName}</span>
-        <time dateTime={photo.createdAt} className="text-muted-foreground tabular-nums">
+        <time dateTime={photo.createdAt} className="min-w-0 flex-1 text-lg tabular-nums">
           {ROW_DATE_FORMAT.format(new Date(photo.createdAt))}
         </time>
       </button>
       <PhotoActionsMenu
         photo={photo}
-        label={`Actions sur la photo envoyée par ${photo.uploaderName}`}
+        label={`Actions : ${photoLabel(photo)}`}
         className="absolute top-1/2 right-3 -translate-y-1/2 rounded-full text-white/80"
       />
     </li>
