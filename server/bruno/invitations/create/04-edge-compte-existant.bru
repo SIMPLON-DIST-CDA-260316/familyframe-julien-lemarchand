@@ -1,0 +1,35 @@
+meta {
+  name: Edge - adresse qui a déjà un compte
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/invitations
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{memberEmail}}"
+  }
+}
+
+script:pre-request {
+  if (!bru.getVar('adminCookie')) {
+    throw new Error('adminCookie absent : lancer toute la collection, auth/login/05 doit passer')
+  }
+  req.setHeader('Cookie', bru.getVar('adminCookie'))
+}
+
+assert {
+  res.status: eq 409
+  res.body.error: eq ACCOUNT_EXISTS
+}
+
+docs {
+  EDGE → 409 ACCOUNT_EXISTS : le membre de test a déjà un compte, il se
+  connecte sur `/login`. Route admin : dire qu'une adresse a un compte ne
+  renseigne aucun inconnu.
+}

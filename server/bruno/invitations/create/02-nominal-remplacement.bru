@@ -1,0 +1,46 @@
+meta {
+  name: Nominal - nouvelle invitation pour la même adresse
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/invitations
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{inviteEmail}}"
+  }
+}
+
+script:pre-request {
+  if (!bru.getVar('adminCookie') || !bru.getVar('inviteToken')) {
+    throw new Error('adminCookie ou inviteToken absent : lancer toute la collection, create/01 doit passer')
+  }
+  req.setHeader('Cookie', bru.getVar('adminCookie'))
+}
+
+assert {
+  res.status: eq 201
+  res.body.invitation.status: eq pending
+}
+
+script:post-response {
+  const previousToken = bru.getVar('inviteToken')
+  test('un nouveau jeton, différent du premier', () => {
+    expect(res.body.token).to.match(/^[0-9a-f]{64}$/)
+    expect(res.body.token).to.not.equal(previousToken)
+  })
+  // accept/01 checks that the replaced link no longer works.
+  bru.setVar('replacedInviteToken', previousToken)
+  bru.setVar('inviteToken', res.body.token)
+}
+
+docs {
+  NOMINAL → 201 : la même adresse reçoit un nouveau lien, qui remplace le
+  premier (« j'ai perdu le lien »). L'ancien jeton passe dans
+  `replacedInviteToken`, le nouveau dans `inviteToken`.
+}

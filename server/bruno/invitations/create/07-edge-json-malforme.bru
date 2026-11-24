@@ -1,0 +1,36 @@
+meta {
+  name: Edge - JSON malformé
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/invitations
+  body: text
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:text {
+  {"email": "refuse@familyframe.test"
+}
+
+script:pre-request {
+  if (!bru.getVar('adminCookie')) {
+    throw new Error('adminCookie absent : lancer toute la collection, auth/login/05 doit passer')
+  }
+  req.setHeader('Cookie', bru.getVar('adminCookie'))
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq BODY_INVALID
+}
+
+docs {
+  EDGE → 400 BODY_INVALID : le routeur des invitations monte son propre
+  `express.json()`, qui refuse un corps JSON illisible.
+}

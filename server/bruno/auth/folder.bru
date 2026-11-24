@@ -12,7 +12,8 @@ docs {
 
   Identifiants : ceux des deux comptes créés par `pnpm db:seed`, dans
   `environments/Local.bru`. Le membre est le compte de toutes les requêtes ;
-  l'admin sert à vérifier qu'un compte ne touche pas aux photos d'un autre.
+  l'admin crée les invitations (`invitations/`) et sert à vérifier qu'un
+  compte ne touche pas aux photos d'un autre.
   Un utilisateur renvoyé par l'API vaut `{ id, email, displayName, role }`,
   jamais le hash du mot de passe.
 }

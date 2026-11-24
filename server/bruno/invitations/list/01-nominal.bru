@@ -1,0 +1,43 @@
+meta {
+  name: Nominal - liste des invitations
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/invitations
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('adminCookie') || !bru.getVar('inviteEmail')) {
+    throw new Error('adminCookie ou inviteEmail absent : lancer toute la collection, create/01 doit passer')
+  }
+  req.setHeader('Cookie', bru.getVar('adminCookie'))
+}
+
+assert {
+  res.status: eq 200
+  res.body.invitations: isArray
+}
+
+script:post-response {
+  const { invitations } = res.body
+  const invited = invitations.filter(({ email }) => email === bru.getVar('inviteEmail'))
+  test('une seule invitation pour l\'adresse : la seconde a remplacé la première', () => {
+    expect(invited).to.have.length(1)
+    expect(invited[0].status).to.equal('pending')
+  })
+  test('aucune invitation ne porte le hash du jeton', () => {
+    for (const invitation of invitations) {
+      expect(invitation).to.not.have.property('tokenHash')
+    }
+  })
+}
+
+docs {
+  NOMINAL → 200 `{ invitations }`. L'adresse de `create/01` n'apparaît
+  qu'une fois, en attente : `create/02` a supprimé la première invitation en
+  la remplaçant.
+}

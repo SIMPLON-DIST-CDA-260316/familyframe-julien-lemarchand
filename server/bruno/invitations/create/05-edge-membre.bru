@@ -1,0 +1,28 @@
+meta {
+  name: Edge - un membre crée une invitation
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/invitations
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "refuse@familyframe.test"
+  }
+}
+
+assert {
+  res.status: eq 403
+  res.body.error: eq FORBIDDEN
+}
+
+docs {
+  EDGE → 403 FORBIDDEN : le cookie de la collection est celui du membre,
+  connecté mais pas admin (`requireRole('admin')`, monté après
+  `requireAuth`).
+}

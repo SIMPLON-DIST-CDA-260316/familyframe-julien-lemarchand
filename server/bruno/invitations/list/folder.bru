@@ -1,0 +1,11 @@
+meta {
+  name: list
+  seq: 2
+}
+
+docs {
+  `GET /api/invitations`, admin seulement → 200 `{ invitations }` : toutes
+  les invitations, la plus récente en premier, chacune avec son `status`
+  calculé. Pas de pagination : le remplacement garde environ une ligne par
+  adresse invitée.
+}

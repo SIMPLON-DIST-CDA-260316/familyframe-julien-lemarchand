@@ -1,0 +1,19 @@
+meta {
+  name: invitations
+  seq: 2
+}
+
+docs {
+  Lancé juste après `auth/` (`seq: 2`), qui range le cookie de l'admin dans
+  `adminCookie`. Une requête admin l'envoie à la place de celui du membre,
+  dans son script (`req.setHeader('Cookie', bru.getVar('adminCookie'))`) ;
+  le membre reste le compte par défaut et reçoit 403 `FORBIDDEN`.
+
+  Une invitation renvoyée par l'API : `{ id, email, status, createdAt,
+  expiresAt }` (`status` : `pending`, `used` ou `expired` ; dates en
+  ISO 8601), jamais le hash du jeton. Chaque lancement invite une adresse
+  neuve (`invite-<horodatage>@familyframe.test`, variable `inviteEmail`) :
+  pas de remise à zéro entre deux lancements. L'expiration (7 jours) n'est
+  pas testable ici, faute de contrôle de l'horloge : les tests unitaires la
+  couvrent.
+}

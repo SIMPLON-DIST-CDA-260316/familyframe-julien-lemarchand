@@ -1,0 +1,12 @@
+meta {
+  name: create
+  seq: 1
+}
+
+docs {
+  `POST /api/invitations`, JSON `{ email }`, admin seulement → 201
+  `{ invitation, token }`. Le jeton brut n'est renvoyé qu'ici, une fois : le
+  client en fait le lien `/invite/<jeton>`. Une nouvelle invitation pour la
+  même adresse remplace celle qui n'a pas servi (l'ancien lien répond
+  ensuite 404).
+}

@@ -1,13 +1,18 @@
 import cors from 'cors'
-import express, { type Express, type Router } from 'express'
+import express, { type Express, type RequestHandler, type Router } from 'express'
 import { config } from './config.js'
 import { errorHandler } from './errors/error-handler.js'
 import { notFound } from './errors/not-found.js'
 import { createAuthController } from './features/auth/auth.controller.js'
+import { requireRole } from './features/auth/auth.guard.js'
 import { createRequireAuth } from './features/auth/auth.middleware.js'
 import { createAuthRepository } from './features/auth/auth.repository.js'
 import { createAuthRouter } from './features/auth/auth.routes.js'
 import { type AuthService, createAuthService } from './features/auth/auth.service.js'
+import { createInvitationsController } from './features/invitations/invitations.controller.js'
+import { createInvitationsRepository } from './features/invitations/invitations.repository.js'
+import { createInvitationsRouter } from './features/invitations/invitations.routes.js'
+import { createInvitationsService } from './features/invitations/invitations.service.js'
 import { createPhotosController } from './features/photos/photos.controller.js'
 import { createPhotosRepository } from './features/photos/photos.repository.js'
 import { createPhotosRouter } from './features/photos/photos.routes.js'
@@ -44,8 +49,23 @@ function assemblePhotosRouter(io: SocketServer): Router {
   return createPhotosRouter(createPhotosController(service, io))
 }
 
+function assembleInvitationsRouter(
+  requireAuth: RequestHandler,
+  requireAdmin: RequestHandler,
+): Router {
+  const service = createInvitationsService({
+    repository: createInvitationsRepository(prisma),
+    generateToken,
+    hashToken,
+    now: () => new Date(),
+    logger,
+  })
+  return createInvitationsRouter(createInvitationsController(service), requireAuth, requireAdmin)
+}
+
 export function createApp(io: SocketServer, authService: AuthService): Express {
   const requireAuth = createRequireAuth(authService)
+  const requireAdmin = requireRole('admin')
   const app = express()
 
   // First, so every request is timed and logged, 404s included.
@@ -58,6 +78,7 @@ export function createApp(io: SocketServer, authService: AuthService): Express {
 
   app.use('/api/auth', createAuthRouter(createAuthController(authService), requireAuth))
   app.use('/api/photos', requireAuth, assemblePhotosRouter(io))
+  app.use('/api/invitations', assembleInvitationsRouter(requireAuth, requireAdmin))
 
   app.use(notFound)
   app.use(errorHandler)
