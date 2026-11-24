@@ -15,6 +15,8 @@ function recordWithId(id: string): PhotoRecord {
   return {
     id,
     ownerId: OWNER_ID,
+    senderId: null,
+    sender: null,
     url: 'https://res.cloudinary.com/demo/photo.jpg',
     cloudinaryId: `familyframe/${id}`,
     sha256: `sha-${id}`,
@@ -35,6 +37,7 @@ function makeDeps() {
     repository: {
       findPage: vi.fn<PhotosRepository['findPage']>().mockResolvedValue([]),
       findByOwnerAndSha256: vi.fn<PhotosRepository['findByOwnerAndSha256']>(),
+      findOwned: vi.fn<PhotosRepository['findOwned']>(),
       create: vi.fn<PhotosRepository['create']>(),
       deleteOwned: vi.fn<PhotosRepository['deleteOwned']>(),
       countByCloudinaryId: vi.fn<PhotosRepository['countByCloudinaryId']>(),

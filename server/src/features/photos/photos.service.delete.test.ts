@@ -8,6 +8,8 @@ const IMAGE = { url: 'https://res.cloudinary.com/demo/photo.jpg', cloudinaryId: 
 const RECORD: PhotoRecord = {
   id: '6b044f9d56a44767c7079a01',
   ownerId: OWNER_ID,
+  senderId: null,
+  sender: null,
   ...IMAGE,
   sha256: 'sha-of-the-original-bytes',
   createdAt: new Date('2026-11-23T10:00:00Z'),
@@ -20,6 +22,7 @@ function makeDeps() {
     repository: {
       findPage: vi.fn<PhotosRepository['findPage']>(),
       findByOwnerAndSha256: vi.fn<PhotosRepository['findByOwnerAndSha256']>(),
+      findOwned: vi.fn<PhotosRepository['findOwned']>(),
       create: vi.fn<PhotosRepository['create']>(),
       deleteOwned: vi.fn<PhotosRepository['deleteOwned']>().mockResolvedValue(RECORD),
       countByCloudinaryId: vi.fn<PhotosRepository['countByCloudinaryId']>().mockResolvedValue(0),
