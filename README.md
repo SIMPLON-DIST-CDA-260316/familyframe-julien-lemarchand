@@ -16,6 +16,8 @@ Projet de formation **Concepteur Développeur d'Applications** (Simplon), axé s
 
 Architecture, parcours d'une photo et choix techniques : [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
+Ce que l'application permet de faire et ses règles de gestion, sans détail technique : [`docs/produit/README.md`](docs/produit/README.md).
+
 ## Feuille de route
 
 - [x] **J1** — MVP fonctionnel en local, sans Docker
