@@ -1,13 +1,13 @@
 ---
 plan: personal-library
-status: draft
+status: done
 spec: docs/superpowers/specs/2026-11-24-personal-library-design.md
 branch: feat/library-schema (PR A), feat/library-duplicates (PR B), feat/library-pagination (PR C), feat/library-page (PR D)
 worktree: false
 tasks_total: 8
-tasks_done: 0
+tasks_done: 8
 current_task: —
-last_commit: —
+last_commit: e50e1f3
 last_updated: 2026-11-24
 ---
 
@@ -101,6 +101,7 @@ last_updated: 2026-11-24
 | `client/src/photosApi.ts` | 6, 8 | page, all pages, upload |
 | `client/src/hooks/usePhotoFeed.ts` | 6, 7 | whole library, local deletion, shared socket |
 | `client/src/photoList.ts`, `client/src/photoSocket.ts` | 7 | list helpers, shared socket |
+| `client/src/liveLoads.ts` | 6, 7, 8 | generation counter and replay of live events during a load, shared by both hooks |
 | `client/src/components/frame/{PhotoGrid,PhotoList,LibraryScreen}.tsx` | 7 | `currentId` nullable, header offset |
 | `client/src/hooks/usePhotoLibrary.ts` | 8 | library page state |
 | `client/src/components/library/{UploadForm,LibrarySection}.tsx` | 8 | upload card form, "Ma bibliothèque" |
@@ -157,7 +158,7 @@ last_updated: 2026-11-24
   ```
   Bruno runtime variables: `adminCookie` (admin session), `createdPngId` (PNG of `create/02`).
 
-- [ ] **Step 1: Update the Bruno requests (the failing tests)**
+- [x] **Step 1: Update the Bruno requests (the failing tests)**
 
 Replace `server/bruno/environments/Local.bru` with:
 
@@ -433,7 +434,7 @@ docs {
 }
 ```
 
-- [ ] **Step 2: Run Bruno against the current code to verify it fails**
+- [x] **Step 2: Run Bruno against the current code to verify it fails**
 
 From `server/`, in its own background command: `PORT=3002 npx tsx --env-file-if-exists=.env src/server.ts`. Wait for `server.started`.
 
@@ -442,7 +443,7 @@ Expected: 27 requests, 3 failed: `photos/create/01-nominal-jpeg` (`uploaderName`
 
 Stop the test API (Global Constraints, "Stopping the test API").
 
-- [ ] **Step 3: Write the failing unit tests**
+- [x] **Step 3: Write the failing unit tests**
 
 Replace `server/src/features/photos/photos.service.test.ts` with:
 
@@ -673,12 +674,12 @@ describe('deletePhoto', () => {
 })
 ```
 
-- [ ] **Step 4: Run the unit tests to verify they fail**
+- [x] **Step 4: Run the unit tests to verify they fail**
 
 Run: `pnpm test`
 Expected: FAIL in `photos.service.test.ts` (the service still calls `deleteById` and logs without `userId`); the other files pass.
 
-- [ ] **Step 5: Change the schema and regenerate the client**
+- [x] **Step 5: Change the schema and regenerate the client**
 
 In `server/prisma/schema.prisma`, add `photos       Photo[]` as the last field of `model User` (after `sessions     Session[]`), and replace `model Photo` with:
 
@@ -706,7 +707,7 @@ In `server/prisma/seed.ts`, replace the two comment lines above `await prisma.se
   // to delete a user that still has sessions or photos.
 ```
 
-- [ ] **Step 6: Scope the repository to the owner**
+- [x] **Step 6: Scope the repository to the owner**
 
 Replace `server/src/features/photos/photos.repository.ts` with:
 
@@ -749,7 +750,7 @@ export function createPhotosRepository(prisma: PrismaClient): PhotosRepository {
 }
 ```
 
-- [ ] **Step 7: Scope the service to the owner**
+- [x] **Step 7: Scope the service to the owner**
 
 Replace `server/src/features/photos/photos.service.ts` with:
 
@@ -887,7 +888,7 @@ export function createPhotosService(deps: PhotosServiceDeps): PhotosService {
 }
 ```
 
-- [ ] **Step 8: Room helper, controller and DTO**
+- [x] **Step 8: Room helper, controller and DTO**
 
 In `server/src/features/auth/auth.socket.ts`, add after `toHandshakeError`:
 
@@ -966,7 +967,7 @@ export function createPhotosController(service: PhotosService, io: SocketServer)
 }
 ```
 
-- [ ] **Step 9: Run the unit tests and the typecheck**
+- [x] **Step 9: Run the unit tests and the typecheck**
 
 Run: `pnpm test`
 Expected: PASS, `Tests  70 passed (70)`.
@@ -974,7 +975,7 @@ Expected: PASS, `Tests  70 passed (70)`.
 Run: `pnpm --filter server typecheck`
 Expected: no error. (`pnpm typecheck` for the whole repo still passes: the client's `Photo` copy is its own type; Task 2 updates it.)
 
-- [ ] **Step 10: Run Bruno against the new code**
+- [x] **Step 10: Run Bruno against the new code**
 
 Start the test API again (own background command, from `server/`): `PORT=3002 npx tsx --env-file-if-exists=.env src/server.ts`. Wait for `server.started`.
 
@@ -983,7 +984,7 @@ Expected: status PASS, 27 requests, all passed. If `delete/01-edge-photo-d-un-au
 
 Stop the test API.
 
-- [ ] **Step 11: Gates**
+- [x] **Step 11: Gates**
 
 Run: `pnpm check && pnpm typecheck && pnpm test && pnpm build`
 Expected: all green, `Tests  70 passed (70)`.
@@ -991,7 +992,7 @@ Expected: all green, `Tests  70 passed (70)`.
 Run: `git grep -n uploaderName -- server/src server/bruno server/prisma`
 Expected: one hit only, `server/bruno/photos/create/01-nominal-jpeg.bru` (`res.body.uploaderName: isUndefined` and its docs line).
 
-- [ ] **Step 12: Commit**
+- [x] **Step 12: Commit**
 
 ```bash
 git add -A server/prisma server/src/features server/src/types.ts server/bruno
@@ -1004,10 +1005,10 @@ Message: `feat(server): scope photos to their owner`, body: `A photo now belongs
 
 ### Controller checkpoint C1 — after Task 1 (controller only)
 
-- [ ] Warn the other session (frame UI) that the shared dev database is about to be wiped (photos, sessions, users): it must log in again and re-upload its photos.
-- [ ] From the repo root: `pnpm db:seed`. Expected: a `seed.done` log line with `users=2`.
-- [ ] Then `pnpm db:push`. Expected: `Your database indexes are now in sync with your Prisma schema` (the `cloudinaryId` unique index goes, `(ownerId, id)` and `cloudinaryId` indexes appear). If it fails with `EPERM` while regenerating the client, a running API holds the engine: stop your own test API and rerun.
-- [ ] Record the checkpoint in the Drift Log (date, both commands passed).
+- [x] Warn the other session (frame UI) that the shared dev database is about to be wiped (photos, sessions, users): it must log in again and re-upload its photos.
+- [x] From the repo root: `pnpm db:seed`. Expected: a `seed.done` log line with `users=2`.
+- [x] Then `pnpm db:push`. Expected: `Your database indexes are now in sync with your Prisma schema` (the `cloudinaryId` unique index goes, `(ownerId, id)` and `cloudinaryId` indexes appear). If it fails with `EPERM` while regenerating the client, a running API holds the engine: stop your own test API and rerun.
+- [x] Record the checkpoint in the Drift Log (date, both commands passed).
 
 ---
 
@@ -1031,7 +1032,7 @@ Message: `feat(server): scope photos to their owner`, body: `A photo now belongs
   export function photoLabel(photo: Photo): string    // "Photo du 24 novembre 2026"
   ```
 
-- [ ] **Step 1: Drop the name from the client type**
+- [x] **Step 1: Drop the name from the client type**
 
 In `client/src/photo.ts`, remove the line `  uploaderName: string` from `Photo`, and remove these two lines from `isPhoto`:
 
@@ -1043,7 +1044,7 @@ In `client/src/photo.ts`, remove the line `  uploaderName: string` from `Photo`,
 Run: `pnpm --filter client typecheck`
 Expected: FAIL, the six frame components still read `photo.uploaderName` (`Property 'uploaderName' does not exist on type 'Photo'`). This is the failing check for this task.
 
-- [ ] **Step 2: Labels by day**
+- [x] **Step 2: Labels by day**
 
 Create `client/src/photoLabel.ts`:
 
@@ -1067,7 +1068,7 @@ export function photoLabel({ createdAt }: Photo): string {
 }
 ```
 
-- [ ] **Step 3: Update the frame components**
+- [x] **Step 3: Update the frame components**
 
 Replace `client/src/components/frame/PhotoCaption.tsx` with:
 
@@ -1195,7 +1196,7 @@ In `client/src/components/frame/DeletePhotoDialog.tsx`, replace the content of `
             irréversible.
 ```
 
-- [ ] **Step 4: Gates**
+- [x] **Step 4: Gates**
 
 Run: `pnpm check && pnpm typecheck && pnpm test && pnpm build`
 Expected: all green, `Tests  70 passed (70)`.
@@ -1205,7 +1206,7 @@ Expected: no output.
 
 Manual check (optional for the implementer, done by the controller in the final verification): `/frame` shows the date as the slideshow caption, tiles without a name overlay, rows with the date in full width; the delete dialog text above.
 
-- [ ] **Step 5: Commit the client**
+- [x] **Step 5: Commit the client**
 
 ```bash
 git add client/src/photo.ts client/src/photoLabel.ts client/src/components/frame
@@ -1214,7 +1215,7 @@ git commit -F <message-file>
 
 Message: `feat(client): label photos by their day instead of the uploader name` + the attribution lines.
 
-- [ ] **Step 6: ARCHITECTURE**
+- [x] **Step 6: ARCHITECTURE**
 
 In `ARCHITECTURE.md`:
 
@@ -1250,7 +1251,7 @@ In `ARCHITECTURE.md`:
     ```
 11. In `## Outillage`, append to the Bruno bullet: ` Un second compte (l'admin, \`auth/login/05\`) range son cookie dans \`adminCookie\` : les requêtes qui vérifient qu'un compte ne touche pas aux photos d'un autre l'envoient à la place de celui du membre.`
 
-- [ ] **Step 7: README**
+- [x] **Step 7: README**
 
 In `README.md`, add after the paragraph starting with `Le seed efface toutes les photos`:
 
@@ -1258,7 +1259,7 @@ In `README.md`, add after the paragraph starting with `Le seed efface toutes les
 Quand le schéma change sur une base qui contient déjà des photos, lancer `pnpm db:seed` **avant** `pnpm db:push` : un nouvel index unique ne peut pas se créer tant que d'anciennes photos n'ont pas les nouveaux champs.
 ```
 
-- [ ] **Step 8: Check and commit the docs**
+- [x] **Step 8: Check and commit the docs**
 
 Run: `pnpm check`
 Expected: green (if the hook rejects a `.md` file, run `pnpm exec biome format --write README.md ARCHITECTURE.md`).
@@ -1281,7 +1282,7 @@ Message: `docs: describe photo ownership` + the attribution lines.
 
 ### Controller checkpoint C2 — before Task 3 (controller only)
 
-- [ ] If any Bruno run since C1 stopped before `photos/delete` finished, or someone uploaded photos by hand, warn the other session and run `pnpm db:seed` (expected: `seed.done`, `users=2`): those photos have no `sha256`, which Task 3 makes required. Otherwise nothing to do: every complete run deletes the photos it created. Record the decision in the Drift Log.
+- [x] If any Bruno run since C1 stopped before `photos/delete` finished, or someone uploaded photos by hand, warn the other session and run `pnpm db:seed` (expected: `seed.done`, `users=2`): those photos have no `sha256`, which Task 3 makes required. Otherwise nothing to do: every complete run deletes the photos it created. Record the decision in the Drift Log.
 
 ### Task 3: Refuse a photo already in the library (PR B, `feat/library-duplicates`)
 
@@ -1306,7 +1307,7 @@ Message: `docs: describe photo ownership` + the attribution lines.
 
 **No red Bruno run in this task** (see "Choices made while planning"): an old-code run would save a second `photo.jpg` without `sha256`, which the new code cannot read.
 
-- [ ] **Step 1: Write the failing unit tests**
+- [x] **Step 1: Write the failing unit tests**
 
 In `server/src/errors/error-handler.test.ts`, add after the test `answers an unknown photo with 404`:
 
@@ -1402,12 +1403,12 @@ In `server/src/features/photos/photos.service.test.ts`:
        expect(deps.deleteImage).not.toHaveBeenCalled()
    ```
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `pnpm test`
 Expected: FAIL, 4 failed (`answers a file already in the library with 409`, `saves the uploaded image for its owner with the hash of the original bytes`, the two duplicate tests), `Tests  4 failed | 69 passed (73)`.
 
-- [ ] **Step 3: Schema**
+- [x] **Step 3: Schema**
 
 In `server/prisma/schema.prisma`, `model Photo`, add the field `sha256       String` after `cloudinaryId`, and the line `@@unique([ownerId, sha256])` before `@@index([ownerId, id])`. The model reads:
 
@@ -1430,7 +1431,7 @@ model Photo {
 Run: `pnpm --filter server exec prisma format` then `pnpm --filter server db:generate`
 Expected: `✔ Generated Prisma Client`.
 
-- [ ] **Step 4: Error code, server and client**
+- [x] **Step 4: Error code, server and client**
 
 In `server/src/types.ts`, add `  | 'PHOTO_DUPLICATE'` after `  | 'PHOTO_NOT_FOUND'` in `ApiErrorCode`.
 
@@ -1442,7 +1443,7 @@ In `client/src/api.ts`, add `  | 'PHOTO_DUPLICATE'` after `  | 'PHOTO_NOT_FOUND'
   PHOTO_DUPLICATE: 'Cette photo est déjà dans votre bibliothèque.',
 ```
 
-- [ ] **Step 5: Repository**
+- [x] **Step 5: Repository**
 
 Replace `server/src/features/photos/photos.repository.ts` with:
 
@@ -1503,7 +1504,7 @@ export function createPhotosRepository(prisma: PrismaClient): PhotosRepository {
 }
 ```
 
-- [ ] **Step 6: Service**
+- [x] **Step 6: Service**
 
 In `server/src/features/photos/photos.service.ts`:
 
@@ -1589,7 +1590,7 @@ In `server/src/features/photos/photos.service.ts`:
    }
    ```
 
-- [ ] **Step 7: Run the unit tests**
+- [x] **Step 7: Run the unit tests**
 
 Run: `pnpm test`
 Expected: PASS, `Tests  73 passed (73)`.
@@ -1597,7 +1598,7 @@ Expected: PASS, `Tests  73 passed (73)`.
 Run: `pnpm typecheck`
 Expected: no error.
 
-- [ ] **Step 8: Bruno requests**
+- [x] **Step 8: Bruno requests**
 
 Create `server/bruno/photos/create/03-edge-doublon.bru`:
 
@@ -1664,7 +1665,7 @@ In `server/bruno/collection.bru`, append to the paragraph that starts with `Les 
   base à zéro.
 ```
 
-- [ ] **Step 9: Run Bruno**
+- [x] **Step 9: Run Bruno**
 
 Start the test API (own background command, from `server/`): `PORT=3002 npx tsx --env-file-if-exists=.env src/server.ts`. Wait for `server.started`.
 
@@ -1675,7 +1676,7 @@ The API log shows one `photo.duplicate` line with `userId` and `photoId` only.
 
 Stop the test API.
 
-- [ ] **Step 10: Gates and commit**
+- [x] **Step 10: Gates and commit**
 
 Run: `pnpm check && pnpm typecheck && pnpm test && pnpm build`
 Expected: all green, `Tests  73 passed (73)`.
@@ -1691,8 +1692,8 @@ Message: `feat(server): refuse a photo already in the library`, body: `The SHA-2
 
 ### Controller checkpoint C3 — after Task 3 (controller only)
 
-- [ ] Warn the other session, then from the repo root: `pnpm db:seed` (expected: `seed.done`, `users=2`), then `pnpm db:push` (expected: `Your database indexes are now in sync with your Prisma schema`; the unique `(ownerId, sha256)` index is created). Seed first: photos without `sha256` (from any API still running older code on the shared database) would count as duplicate `null`s and block the index.
-- [ ] Record the checkpoint in the Drift Log.
+- [x] Warn the other session, then from the repo root: `pnpm db:seed` (expected: `seed.done`, `users=2`), then `pnpm db:push` (expected: `Your database indexes are now in sync with your Prisma schema`; the unique `(ownerId, sha256)` index is created). Seed first: photos without `sha256` (from any API still running older code on the shared database) would count as duplicate `null`s and block the index.
+- [x] Record the checkpoint in the Drift Log.
 
 ### Task 4: Keep a Cloudinary image while a photo uses it, and the PR B docs (PR B, `feat/library-duplicates`)
 
@@ -1706,7 +1707,7 @@ Message: `feat(server): refuse a photo already in the library`, body: `The SHA-2
 - Consumes: Task 3's repository and service.
 - Produces: `PhotosRepository.countByCloudinaryId: (cloudinaryId: string) => Promise<number>` (used by Task 5's fakes). `photo.deleted` gains `isImageDestroyed: boolean`.
 
-- [ ] **Step 1: Write the failing unit tests**
+- [x] **Step 1: Write the failing unit tests**
 
 In `server/src/features/photos/photos.service.test.ts`:
 
@@ -1767,12 +1768,12 @@ In `server/src/features/photos/photos.service.test.ts`:
        )
    ```
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `pnpm test`
 Expected: FAIL in `photos.service.test.ts` (no `countByCloudinaryId` call, no `isImageDestroyed`), `Tests  4 failed | 70 passed (74)`.
 
-- [ ] **Step 3: Repository**
+- [x] **Step 3: Repository**
 
 In `server/src/features/photos/photos.repository.ts`, add to `PhotosRepository` after `deleteOwned`:
 
@@ -1786,7 +1787,7 @@ and to the returned object, after `deleteOwned`:
     countByCloudinaryId: (cloudinaryId) => prisma.photo.count({ where: { cloudinaryId } }),
 ```
 
-- [ ] **Step 4: Service**
+- [x] **Step 4: Service**
 
 In `server/src/features/photos/photos.service.ts`:
 
@@ -1830,12 +1831,12 @@ In `server/src/features/photos/photos.service.ts`:
      })
    ```
 
-- [ ] **Step 5: Run the unit tests**
+- [x] **Step 5: Run the unit tests**
 
 Run: `pnpm test`
 Expected: PASS, `Tests  74 passed (74)`.
 
-- [ ] **Step 6: Bruno docs and run**
+- [x] **Step 6: Bruno docs and run**
 
 Replace the `docs` block of `server/bruno/photos/delete/folder.bru` with:
 
@@ -1857,7 +1858,7 @@ docs {
 Start the test API (own background command, from `server/`): `PORT=3002 npx tsx --env-file-if-exists=.env src/server.ts`; from `server/bruno/`: `pnpm dlx @usebruno/cli@4.2.0 run . -r --env Local --disable-cookies --env-var baseUrl=http://localhost:3002`
 Expected: status PASS, 28 requests, all passed; the API log shows two `photo.deleted` lines with `isImageDestroyed=true`. Stop the test API.
 
-- [ ] **Step 7: Gates and commit**
+- [x] **Step 7: Gates and commit**
 
 Run: `pnpm check && pnpm typecheck && pnpm test && pnpm build`
 Expected: all green, `Tests  74 passed (74)`.
@@ -1869,7 +1870,7 @@ git commit -F <message-file>
 
 Message: `feat(server): keep a Cloudinary image while a photo still uses it` + the attribution lines.
 
-- [ ] **Step 8: ARCHITECTURE**
+- [x] **Step 8: ARCHITECTURE**
 
 In `ARCHITECTURE.md`:
 
@@ -1934,7 +1935,7 @@ Message: `docs: describe duplicate detection and image cleanup` + the attributio
   ```
   `GET /api/photos?cursor=<id>&limit=<n>` → `200 PhotoPage`; `400 QUERY_INVALID` for a bad `limit` or `cursor`.
 
-- [ ] **Step 1: Update the Bruno requests (the failing tests)**
+- [x] **Step 1: Update the Bruno requests (the failing tests)**
 
 Set `seq: 2` in `server/bruno/photos/list/folder.bru` and `seq: 3` in `server/bruno/photos/delete/folder.bru`. Give `list/folder.bru` this `docs` block (after `meta`):
 
@@ -2142,12 +2143,12 @@ In `server/bruno/photos/delete/01-edge-photo-d-un-autre.bru`, replace `return li
 
 In `server/bruno/photos/delete/02-nominal.bru`, replace `const ids = list.data.map(({ id }) => id)` with `const ids = list.data.photos.map(({ id }) => id)`.
 
-- [ ] **Step 2: Run Bruno against the current code to verify it fails**
+- [x] **Step 2: Run Bruno against the current code to verify it fails**
 
 Start the test API (own background command, from `server/`): `PORT=3002 npx tsx --env-file-if-exists=.env src/server.ts`; from `server/bruno/`: `pnpm dlx @usebruno/cli@4.2.0 run . -r --env Local --disable-cookies --env-var baseUrl=http://localhost:3002`
 Expected: 32 requests, 7 failed: `list/01` to `list/05` (the API still answers an array and ignores the query) and the scripts of `delete/01`, `delete/02` (`list.data.photos` is undefined). The photos created by the run are still deleted by `delete/02` and `delete/05`. Stop the test API.
 
-- [ ] **Step 3: Write the failing unit tests**
+- [x] **Step 3: Write the failing unit tests**
 
 In `server/src/errors/error-handler.test.ts`, add after the test `maps a malformed JSON body to BODY_INVALID`:
 
@@ -2317,12 +2318,12 @@ describe('listPage', () => {
 })
 ```
 
-- [ ] **Step 4: Run them to verify they fail**
+- [x] **Step 4: Run them to verify they fail**
 
 Run: `pnpm test`
 Expected: FAIL, `Tests  13 failed | 73 passed (86)` (the 12 listing tests: `listPage` is not a function; the `QUERY_INVALID` status).
 
-- [ ] **Step 5: Types, error code, client message**
+- [x] **Step 5: Types, error code, client message**
 
 In `server/src/types.ts`, add `  | 'QUERY_INVALID'` after `  | 'BODY_INVALID'` in `ApiErrorCode`, and add after `Photo`:
 
@@ -2342,7 +2343,7 @@ In `client/src/api.ts`, add `  | 'QUERY_INVALID'` after `  | 'BODY_INVALID'`, an
   QUERY_INVALID: 'Requête invalide. Rechargez la page et réessayez.',
 ```
 
-- [ ] **Step 6: Repository**
+- [x] **Step 6: Repository**
 
 In `server/src/features/photos/photos.repository.ts`:
 
@@ -2366,7 +2367,7 @@ In `server/src/features/photos/photos.repository.ts`:
          }),
    ```
 
-- [ ] **Step 7: Service**
+- [x] **Step 7: Service**
 
 In `server/src/features/photos/photos.service.ts`:
 
@@ -2436,7 +2437,7 @@ In `server/src/features/photos/photos.service.ts`:
        listPage: (input) => listPage(deps, input),
    ```
 
-- [ ] **Step 8: Controller**
+- [x] **Step 8: Controller**
 
 In `server/src/features/photos/photos.controller.ts`, replace `import type { Photo } from '../../types.js'` with `import type { Photo, PhotoPage } from '../../types.js'`, and replace the `list` method with:
 
@@ -2452,7 +2453,7 @@ In `server/src/features/photos/photos.controller.ts`, replace `import type { Pho
     },
 ```
 
-- [ ] **Step 9: Run the unit tests and Bruno**
+- [x] **Step 9: Run the unit tests and Bruno**
 
 Run: `pnpm test`
 Expected: PASS, `Test Files  7 passed (7)`, `Tests  86 passed (86)`.
@@ -2463,7 +2464,7 @@ Expected: no error. (The client still reads an array: Task 6 follows; `pnpm type
 Start the test API (own background command, from `server/`): `PORT=3002 npx tsx --env-file-if-exists=.env src/server.ts`; from `server/bruno/`: `pnpm dlx @usebruno/cli@4.2.0 run . -r --env Local --disable-cookies --env-var baseUrl=http://localhost:3002`
 Expected: status PASS, 32 requests, all passed. Stop the test API.
 
-- [ ] **Step 10: Gates and commit**
+- [x] **Step 10: Gates and commit**
 
 Run: `pnpm check && pnpm typecheck && pnpm test && pnpm build`
 Expected: all green, `Tests  86 passed (86)`.
@@ -2498,7 +2499,7 @@ Message: `feat(server): paginate the photo list with a cursor`, body: `GET /api/
   export function fetchAllPhotos(onUnauthenticated: () => void): Promise<Photo[] | null>
   ```
 
-- [ ] **Step 1: Page type**
+- [x] **Step 1: Page type**
 
 In `client/src/photo.ts`, add after `Photo`:
 
@@ -2526,7 +2527,7 @@ export function isPhotoPage(value: unknown): value is PhotoPage {
 }
 ```
 
-- [ ] **Step 2: Photos API**
+- [x] **Step 2: Photos API**
 
 Create `client/src/photosApi.ts`:
 
@@ -2584,7 +2585,7 @@ export async function fetchAllPhotos(onUnauthenticated: () => void): Promise<Pho
 }
 ```
 
-- [ ] **Step 3: The frame's feed**
+- [x] **Step 3: The frame's feed**
 
 Replace `client/src/hooks/usePhotoFeed.ts` with:
 
@@ -2665,14 +2666,14 @@ export function usePhotoFeed(): Photo[] {
 }
 ```
 
-- [ ] **Step 4: Gates**
+- [x] **Step 4: Gates**
 
 Run: `pnpm check && pnpm typecheck && pnpm test && pnpm build`
 Expected: all green, `Tests  86 passed (86)`.
 
 Manual check (optional for the implementer, done by the controller in the final verification): with the test API on 3002 and the client dev server pointed at it, `/frame` lists every photo of the member; "Photos · N" equals the library size; a deletion from the frame's menu removes the tile without a reload.
 
-- [ ] **Step 5: Commit the client**
+- [x] **Step 5: Commit the client**
 
 ```bash
 git add client/src/photo.ts client/src/photosApi.ts client/src/hooks/usePhotoFeed.ts
@@ -2681,7 +2682,7 @@ git commit -F <message-file>
 
 Message: `feat(client): load the whole library on the frame`, body: `The frame fetches every page (100 photos per request) on each connection and once a day, and drops a deleted photo locally: without the 20-photo cap there is no gap to refill.` + the attribution lines.
 
-- [ ] **Step 6: ARCHITECTURE**
+- [x] **Step 6: ARCHITECTURE**
 
 In `ARCHITECTURE.md`:
 
@@ -2746,7 +2747,7 @@ Message: `docs: describe the paginated photo list` + the attribution lines.
 
 This task changes no behaviour: its check is the build plus the frame still working.
 
-- [ ] **Step 1: List helpers and shared socket**
+- [x] **Step 1: List helpers and shared socket**
 
 Create `client/src/photoList.ts`:
 
@@ -2810,7 +2811,7 @@ export function connectPhotoSocket({
 }
 ```
 
-- [ ] **Step 2: The frame's feed on the shared socket**
+- [x] **Step 2: The frame's feed on the shared socket**
 
 Replace `client/src/hooks/usePhotoFeed.ts` with:
 
@@ -2874,7 +2875,7 @@ git commit -F <message-file>
 
 Message: `refactor(client): share the photo socket between hooks` + the attribution lines.
 
-- [ ] **Step 3: Grid and list without a current photo, header offset in LibraryScreen**
+- [x] **Step 3: Grid and list without a current photo, header offset in LibraryScreen**
 
 Replace `client/src/components/frame/PhotoGrid.tsx` with:
 
@@ -2959,7 +2960,7 @@ with:
       </div>
 ```
 
-- [ ] **Step 4: Gates and commit**
+- [x] **Step 4: Gates and commit**
 
 Run: `pnpm check && pnpm typecheck && pnpm test && pnpm build`
 Expected: all green, `Tests  86 passed (86)`.
@@ -3006,7 +3007,7 @@ Message: `refactor(client): let the photo grid and list show no current photo` +
   export function usePhotoLibrary(): PhotoLibrary
   ```
 
-- [ ] **Step 1: Upload call**
+- [x] **Step 1: Upload call**
 
 Replace `client/src/photosApi.ts` with:
 
@@ -3085,7 +3086,7 @@ export async function postPhoto(file: File): Promise<UploadResult> {
 }
 ```
 
-- [ ] **Step 2: Library state hook**
+- [x] **Step 2: Library state hook**
 
 Create `client/src/hooks/usePhotoLibrary.ts`:
 
@@ -3163,7 +3164,7 @@ export function usePhotoLibrary(): PhotoLibrary {
 }
 ```
 
-- [ ] **Step 3: Upload form**
+- [x] **Step 3: Upload form**
 
 Create `client/src/components/library/UploadForm.tsx`:
 
@@ -3319,7 +3320,7 @@ export function UploadForm({ onUploaded }: UploadFormProps): JSX.Element {
 }
 ```
 
-- [ ] **Step 4: "Ma bibliothèque" section**
+- [x] **Step 4: "Ma bibliothèque" section**
 
 Create `client/src/components/library/LibrarySection.tsx`:
 
@@ -3395,7 +3396,7 @@ export function LibrarySection({ library }: LibrarySectionProps): JSX.Element {
 
 (If Biome's import sorting merges the two `@/hooks/useLibraryLayout.ts` imports into `import { type LibraryLayout, useLibraryLayout } from …`, accept its fix: `pnpm check:fix`.)
 
-- [ ] **Step 5: The page and the route**
+- [x] **Step 5: The page and the route**
 
 ```bash
 git mv client/src/pages/UploadPage.tsx client/src/pages/LibraryPage.tsx
@@ -3449,7 +3450,7 @@ In `client/src/pages/LoginPage.tsx`, replace the comment `// RequireAuth stores 
 
 In `client/src/deletePhoto.ts`, replace the comment line `// The list is not touched here: the server's photo:deleted reaches every frame, this one included.` with `// The list is not touched here: the server's photo:deleted reaches every page and frame of the owner, this one included.`
 
-- [ ] **Step 6: Gates**
+- [x] **Step 6: Gates**
 
 Run: `pnpm check && pnpm typecheck && pnpm test && pnpm build`
 Expected: all green, `Tests  86 passed (86)`.
@@ -3459,7 +3460,7 @@ Expected: no output.
 
 Manual check (optional for the implementer, done by the controller in the final verification): on `/`, the upload card then « Ma bibliothèque »; an upload appears at the top of the library at once (and only once); sending the same file again shows « Cette photo est déjà dans votre bibliothèque. »; « Supprimer » from a tile's menu removes it; a click on a tile opens the full photo in a new tab; the grid/list choice is the one `/frame` uses.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add -A client/src
@@ -3468,7 +3469,7 @@ git commit -F <message-file>
 
 Message: `feat(client): turn the upload page into the library page`, body: `/ shows the upload card and, below it, the user's library from the frame's grid and list, 30 photos per page with "Charger plus", kept live by the same socket events as the frame.` + the attribution lines.
 
-- [ ] **Step 8: Docs**
+- [x] **Step 8: Docs**
 
 In `ARCHITECTURE.md`:
 
@@ -3492,9 +3493,9 @@ Message: `docs: describe the library page` + the attribution lines.
 
 ## Final verification (controller)
 
-- [ ] `pnpm check && pnpm typecheck && pnpm build && pnpm test` on `feat/library-page`: green, `Tests  86 passed (86)`.
-- [ ] Bruno gate command against a test API on port 3002 started from `feat/library-page`: 32/32.
-- [ ] `git grep -n uploaderName -- client/src server/src server/prisma ARCHITECTURE.md README.md`: no output; `server/bruno` has only the `isUndefined` assertion of `create/01`.
+- [x] `pnpm check && pnpm typecheck && pnpm build && pnpm test` on `feat/library-page`: green, `Tests  87 passed (87)`.
+- [x] Bruno gate command against a test API on port 3002 started from `feat/library-page`: 32/32.
+- [x] `git grep -n uploaderName -- client/src server/src server/prisma ARCHITECTURE.md README.md`: no output; `server/bruno` has only the `isUndefined` assertion of `create/01`.
 - [ ] Manual (spec, "Testing"), with Claude in Chrome or left to the author: the member on `/frame` in one browser, the admin on `/frame` in another; an upload by the member reaches the member's frame only; a deletion removes it from the member's frame only. On `/`: the duplicate message; « Charger plus » with more than 30 photos; the frame with more than 100 photos (several pages). Distinct test images can come from a throwaway script outside the repo (never committed).
 - [ ] `git log --oneline feat/client-login..feat/library-page`: one concern per commit, each ending with the attribution lines; `git diff --stat feat/client-login..feat/library-page` shows no `.env` file.
 - [ ] Fresh-context review of the whole stack diff (`superpowers:requesting-code-review`), then `gh stack submit --auto` (draft PRs) and `gh stack view --json`.
@@ -3507,6 +3508,12 @@ Format: `date · task/step · what the plan said · what was done · why`.
 
 | Date | Task / step | Plan said | Done | Why |
 | ---- | ----------- | --------- | ---- | --- |
+| 2026-11-24 | Task 6, step 3 (`usePhotoFeed`) | The frame's load replaces the list when the pages arrive | Generation counter and replay of live events (`photo:new`, `photo:deleted`) received during a load, in `client/src/liveLoads.ts`; only the latest load applies | Replace-on-load lost a `photo:new` received mid-load, resurrected a photo deleted mid-load and let overlapping loads apply out of order. Controller decision while the author was away: pending author validation |
+| 2026-11-24 | Task 6, step 2 (`fetchAllPhotos`) | No guard on the cursor | Stops when a page returns the same cursor as the previous one | Defensive against an endless loop on a misbehaving server |
+| 2026-11-24 | Task 7 (`usePhotoFeed`) | Paste the brief's `usePhotoFeed` replacement | Not pasted: the extraction of the shared load logic was done on top of the Task 6 fix | The brief's version predates the generation counter and would have dropped it |
+| 2026-11-24 | Task 8 (`usePhotoLibrary`) | Own load and buffers in the hook | Rebuilt on `liveLoads.ts`; the next-page cursor is bound to the load that produced it (`{ cursor, loadId }`) | A click after a reconnect's `begin()` but before its result paired the new generation with the old cursor. Controller decision while the author was away: pending author validation |
+| 2026-11-24 | Task 8 (`addPhoto`) | `addPhoto` only adds the photo to the list | It also calls `rememberAdded` | A first page landing after the 201 would have hidden the upload |
+| 2026-11-24 | Final review, Task 4 (`destroyUnusedImage`) | A failing `countByCloudinaryId` after the delete propagates | Caught: `photo.orphaned` logged, image kept, the delete completes (unit tests 86 to 87) | Otherwise a completed delete answered 500, sent no `photo:deleted` event and leaked the image silently |
 
 ---
 
