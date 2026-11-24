@@ -52,3 +52,18 @@ export function postFriendRequest(
   }
   return sendAction('/api/friendships', init, onUnauthenticated)
 }
+
+export function postAcceptFriendship(
+  id: string,
+  onUnauthenticated: () => void,
+): Promise<FriendshipActionResult> {
+  return sendAction(`/api/friendships/${id}/accept`, { method: 'POST' }, onUnauthenticated)
+}
+
+// One call for the three ways out: refuse, cancel and remove.
+export function deleteFriendship(
+  id: string,
+  onUnauthenticated: () => void,
+): Promise<FriendshipActionResult> {
+  return sendAction(`/api/friendships/${id}`, { method: 'DELETE' }, onUnauthenticated)
+}
