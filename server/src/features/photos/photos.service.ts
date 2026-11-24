@@ -15,6 +15,9 @@ import type { NewPhoto, PhotoRecord, PhotosRepository, StoredPhoto } from './pho
 // ownerId is the logged-in account: a photo belongs to whoever uploaded it.
 export type NewPhotoInput = { ownerId: string; file: UploadedFile | undefined }
 
+// senderId only when the file goes to a friend's library.
+type NewUpload = { ownerId: string; senderId?: string; buffer: Buffer }
+
 export type PhotoDeletion = { ownerId: string; id: string }
 
 // photoId comes from the URL, friendId straight from the JSON body: validated here.
@@ -130,17 +133,26 @@ async function destroyUnusedImage(deps: PhotosServiceDeps, cloudinaryId: string)
   return deleteStoredImage(deps, cloudinaryId)
 }
 
+// From the received bytes to a saved photo of ownerId: the same steps for an upload to
+// one's own library and for a file sent to a friend.
+async function storeNewPhoto(
+  deps: PhotosServiceDeps,
+  { ownerId, senderId, buffer }: NewUpload,
+): Promise<PhotoRecord> {
+  const sha256 = sha256Of(buffer)
+  await rejectKnownFile(deps, ownerId, sha256)
+  const jpeg = await convertToFrameJpeg(deps, buffer)
+  // Cloudinary and database failures are ours: they stay 500s.
+  const image = await deps.uploadImage(jpeg)
+  return saveRecord(deps, { ownerId, senderId, ...image, sha256 })
+}
+
 async function createPhoto(
   deps: PhotosServiceDeps,
   { ownerId, file }: NewPhotoInput,
 ): Promise<PhotoRecord> {
-  const validFile = parseFile(file)
-  const sha256 = sha256Of(validFile.buffer)
-  await rejectKnownFile(deps, ownerId, sha256)
-  const jpeg = await convertToFrameJpeg(deps, validFile.buffer)
-  // Cloudinary and database failures are ours: they stay 500s.
-  const image = await deps.uploadImage(jpeg)
-  const record = await saveRecord(deps, { ownerId, ...image, sha256 })
+  const { buffer } = parseFile(file)
+  const record = await storeNewPhoto(deps, { ownerId, buffer })
   deps.logger.info('photo.created', {
     photoId: record.id,
     cloudinaryId: record.cloudinaryId,
