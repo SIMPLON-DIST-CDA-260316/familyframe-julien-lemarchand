@@ -1,14 +1,14 @@
 ---
 plan: account-settings
-status: ready
+status: done
 spec: docs/superpowers/specs/2026-11-24-account-settings-design.md
-branch: feat/account-profile (PR A), feat/account-password (PR B), feat/account-avatar (PR C), feat/client-settings (PR D)
+branch: feat/account-rename (PR A), feat/account-password (PR B), feat/account-avatar (PR C), feat/client-settings (PR D)
 worktree: false
 tasks_total: 9
-tasks_done: 0
-current_task: 1
+tasks_done: 9
+current_task: null
 last_commit: f5c8339
-last_updated: 2026-11-24
+last_updated: 2026-11-25
 ---
 
 # Account Settings (Step 6) Implementation Plan
@@ -5527,6 +5527,15 @@ Format: `date · task/step · what the plan said · what was done · why`.
 
 | Date | Task / step | Plan said | Done | Why |
 | ---- | ----------- | --------- | ---- | --- |
+| 2026-11-25 | Stack | PR A on `feat/account-profile`, stacked on `develop` | PR A on `feat/account-rename`; the four PRs stack above step 7 (`feat/share-sheet`) | `feat/account-profile` already holds this spec and plan (PR #70); step 7 shipped first, so step 6 code sits on top of it |
+| 2026-11-25 | Task 8 | share dialog `SharePhotoDialog.tsx` shows the avatar | `FriendPicker.tsx` gets `avatarUrl`; the real ARCHITECTURE share paragraph edited | step 7 replaced the dialog by `ShareSheet` → `ShareFriendsForm` → `FriendPicker` |
+| 2026-11-25 | Tasks 8, 9 | no product docs | `docs/produit/preferences.md` created (R-PRF), `a-venir.md` « Étape 6 » removed, R-APP-10, R-AMI-01, R-PAR-44 replaced, `comptes-et-connexion.md` updated | project rule: a user-visible change updates `docs/produit/` in the same commit |
+| 2026-11-25 | Task 6 | `account.avatar_unreadable` / `account.avatar_orphaned` logged without the user | both logs carry `userId` (and `cloudinaryId` for orphaned), fix commit 209080c; ARCHITECTURE rows follow (429c9c3) | the global constraints ask every log to say whose account it concerns; the task block omitted it |
+| 2026-11-25 | Task 6 | `account.service.ts` 173 lines | 175 lines | the `userId` log fields above; still under the size limit |
+| 2026-11-25 | Task 9 | `UserAvatar` image without a fallback | the image remembers a failed URL and shows the initial instead (dec703c), rule R-PRF-37 | per-task review minor of Task 8: a deleted Cloudinary image left an empty circle |
+| 2026-11-25 | Task 9 | one rule R-PRF-35 for « new photo replaces the old one » and the load failure | R-PRF-35 marked « Remplacée », split into R-PRF-36 and R-PRF-37 (f963c8e) | review: one rule per behaviour; ids are never reused |
+| 2026-11-25 | Tasks 1, 3, 4 | run the failing test first (red step) | some red runs skipped, tests written with the code; all green at the gate | the plan's code came from a throwaway clone already proven green |
+| 2026-11-25 | Gates | Bruno counts `test()` calls (44 at the end) | Bruno CLI 4.2.0 prints `Tests 0/0`; requests (112) and assertions (242) checked instead, twice | the CLI does not count post-response `test()` calls |
 
 ---
 
