@@ -1,0 +1,21 @@
+meta {
+  name: Edge - curseur invalide
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/photos?cursor=pas-un-id
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq QUERY_INVALID
+}
+
+docs {
+  EDGE → 400 QUERY_INVALID : le curseur doit être un ObjectId (l'id d'une
+  photo). Le service le vérifie avant d'interroger MongoDB.
+}

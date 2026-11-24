@@ -4,7 +4,9 @@ import type { UploadedImage } from '../../lib/cloudinary.js'
 import type { Logger } from '../../lib/logger.js'
 import type { NewPhoto, PhotoRecord, PhotosRepository } from './photos.repository.js'
 
-const LATEST_PHOTOS_LIMIT = 20
+export const DEFAULT_PAGE_SIZE = 30
+export const MAX_PAGE_SIZE = 100
+const DIGITS_PATTERN = /^\d+$/
 const ALLOWED_TYPES: string[] = ['image/jpeg', 'image/png', 'image/webp']
 const OBJECT_ID_PATTERN = /^[0-9a-f]{24}$/i
 
@@ -15,6 +17,11 @@ export type NewPhotoInput = { ownerId: string; file: UploadedFile | undefined }
 
 export type PhotoDeletion = { ownerId: string; id: string }
 
+// cursor and limit come straight from the query string: validated here, at the boundary.
+export type PageInput = { ownerId: string; cursor: unknown; limit: unknown }
+
+export type RecordPage = { records: PhotoRecord[]; nextCursor: string | null }
+
 export type PhotosServiceDeps = {
   repository: PhotosRepository
   toFrameJpeg: (input: Buffer) => Promise<Buffer>
@@ -24,7 +31,7 @@ export type PhotosServiceDeps = {
 }
 
 export type PhotosService = {
-  listLatest: (ownerId: string) => Promise<PhotoRecord[]>
+  listPage: (input: PageInput) => Promise<RecordPage>
   createPhoto: (input: NewPhotoInput) => Promise<PhotoRecord>
   deletePhoto: (deletion: PhotoDeletion) => Promise<string>
 }
@@ -46,6 +53,31 @@ function parsePhotoId(id: string): string {
     throw new AppError('PHOTO_NOT_FOUND')
   }
   return id
+}
+
+// Express 5 gives a string, or an array for a repeated key: only one string of digits passes.
+function parseLimit(limit: unknown): number {
+  if (limit === undefined) {
+    return DEFAULT_PAGE_SIZE
+  }
+  if (typeof limit !== 'string' || !DIGITS_PATTERN.test(limit)) {
+    throw new AppError('QUERY_INVALID')
+  }
+  const pageSize = Number(limit)
+  if (pageSize < 1 || pageSize > MAX_PAGE_SIZE) {
+    throw new AppError('QUERY_INVALID')
+  }
+  return pageSize
+}
+
+function parseCursor(cursor: unknown): string | undefined {
+  if (cursor === undefined) {
+    return undefined
+  }
+  if (typeof cursor !== 'string' || !OBJECT_ID_PATTERN.test(cursor)) {
+    throw new AppError('QUERY_INVALID')
+  }
+  return cursor
 }
 
 // The original bytes, before sharp: its output is not guaranteed to be stable.
@@ -175,9 +207,24 @@ async function deletePhoto(
   return record.id
 }
 
+// One record more than asked tells whether a next page exists, without a count query.
+async function listPage(
+  { repository }: PhotosServiceDeps,
+  { ownerId, cursor, limit }: PageInput,
+): Promise<RecordPage> {
+  const pageSize = parseLimit(limit)
+  const beforeId = parseCursor(cursor)
+  const records = await repository.findPage({ ownerId, beforeId, take: pageSize + 1 })
+  if (records.length <= pageSize) {
+    return { records, nextCursor: null }
+  }
+  const pageRecords = records.slice(0, pageSize)
+  return { records: pageRecords, nextCursor: pageRecords[pageRecords.length - 1].id }
+}
+
 export function createPhotosService(deps: PhotosServiceDeps): PhotosService {
   return {
-    listLatest: (ownerId) => deps.repository.findLatest(ownerId, LATEST_PHOTOS_LIMIT),
+    listPage: (input) => listPage(deps, input),
     createPhoto: (input) => createPhoto(deps, input),
     deletePhoto: (deletion) => deletePhoto(deps, deletion),
   }

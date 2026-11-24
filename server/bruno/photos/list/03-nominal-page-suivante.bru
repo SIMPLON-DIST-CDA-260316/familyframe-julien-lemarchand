@@ -1,0 +1,38 @@
+meta {
+  name: Nominal - page suivante
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/photos?cursor={{nextCursor}}&limit=1
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  // Without it the request would test the first page again.
+  if (!bru.getVar('nextCursor')) {
+    throw new Error('nextCursor absent : lancer le dossier photos en entier, list/02 doit passer')
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.photos.length: eq 1
+}
+
+script:post-response {
+  const firstId = bru.getVar('firstPagePhotoId')
+  test('une autre photo, plus ancienne que celle de la première page', () => {
+    const [photo] = res.body.photos
+    expect(photo.id).to.not.equal(firstId)
+    expect(photo.id < firstId).to.equal(true)
+  })
+}
+
+docs {
+  NOMINAL → 200 : la page qui suit `02`, une photo plus ancienne. Le curseur
+  est l'id de la dernière photo reçue : une photo ajoutée ou supprimée entre
+  deux pages ne décale rien.
+}

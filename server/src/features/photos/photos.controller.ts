@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express'
 import { deliveryUrls } from '../../lib/cloudinary.js'
 import type { SocketServer } from '../../lib/socket-types.js'
-import type { Photo } from '../../types.js'
+import type { Photo, PhotoPage } from '../../types.js'
 import { currentUser } from '../auth/auth.middleware.js'
 import { userRoom } from '../auth/auth.socket.js'
 import type { PhotoRecord } from './photos.repository.js'
@@ -25,8 +25,13 @@ function toPhotoDto(record: PhotoRecord): Photo {
 export function createPhotosController(service: PhotosService, io: SocketServer): PhotosController {
   return {
     async list(req, res) {
-      const records = await service.listLatest(currentUser(req).id)
-      res.json(records.map(toPhotoDto))
+      const { records, nextCursor } = await service.listPage({
+        ownerId: currentUser(req).id,
+        cursor: req.query.cursor,
+        limit: req.query.limit,
+      })
+      const page: PhotoPage = { photos: records.map(toPhotoDto), nextCursor }
+      res.json(page)
     },
 
     async create(req, res) {

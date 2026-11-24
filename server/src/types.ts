@@ -5,6 +5,7 @@ export type ApiErrorCode =
   | 'PHOTO_MISSING'
   | 'UPLOAD_INVALID'
   | 'BODY_INVALID'
+  | 'QUERY_INVALID'
   | 'UNAUTHENTICATED'
   | 'INVALID_CREDENTIALS'
   | 'ROUTE_NOT_FOUND'
@@ -33,6 +34,12 @@ export type Photo = {
   url: string
   thumbnailUrl: string
   createdAt: string
+}
+
+// nextCursor is the id to send as cursor for the next page; null on the last page.
+export type PhotoPage = {
+  photos: Photo[]
+  nextCursor: string | null
 }
 
 export type ServerToClientEvents = {

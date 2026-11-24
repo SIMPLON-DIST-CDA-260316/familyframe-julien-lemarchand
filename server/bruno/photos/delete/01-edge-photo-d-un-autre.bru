@@ -31,7 +31,7 @@ script:post-response {
     const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/photos`, {
       headers: { Cookie: cookie },
     })
-    return list.data.map(({ id }) => id)
+    return list.data.photos.map(({ id }) => id)
   }
   test('la photo est toujours dans la bibliothèque du membre', async () => {
     expect(await listIds(bru.getVar('sessionCookie'))).to.include(bru.getVar('createdPhotoId'))
@@ -45,5 +45,5 @@ docs {
   EDGE → 404 PHOTO_NOT_FOUND : l'admin demande la suppression de la photo du
   membre. La réponse est celle d'une photo inconnue (pas de 403, qui dirait
   qu'elle existe). Le script vérifie ensuite que la photo est toujours dans
-  la liste du membre et absente de celle de l'admin.
+  la liste du membre et absente de celle de l'admin (première page de chaque compte).
 }

@@ -54,6 +54,13 @@ describe('toErrorResponse', () => {
     expect(toErrorResponse(parseError)).toEqual({ status: 400, body: { error: 'BODY_INVALID' } })
   })
 
+  it('answers an invalid query string with 400', () => {
+    expect(toErrorResponse(new AppError('QUERY_INVALID'))).toEqual({
+      status: 400,
+      body: { error: 'QUERY_INVALID' },
+    })
+  })
+
   it('answers a request without a valid session with 401', () => {
     expect(toErrorResponse(new AppError('UNAUTHENTICATED'))).toEqual({
       status: 401,

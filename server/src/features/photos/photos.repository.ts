@@ -4,8 +4,10 @@ export type PhotoRecord = Photo
 
 export type NewPhoto = { ownerId: string; url: string; cloudinaryId: string; sha256: string }
 
+export type PageQuery = { ownerId: string; beforeId: string | undefined; take: number }
+
 export type PhotosRepository = {
-  findLatest: (ownerId: string, limit: number) => Promise<PhotoRecord[]>
+  findPage: (query: PageQuery) => Promise<PhotoRecord[]>
   findByOwnerAndSha256: (ownerId: string, sha256: string) => Promise<PhotoRecord | null>
   // null when the owner already has this file: the service decides the error.
   create: (photo: NewPhoto) => Promise<PhotoRecord | null>
@@ -25,9 +27,14 @@ function isUniqueViolation(error: unknown): boolean {
 
 export function createPhotosRepository(prisma: PrismaClient): PhotosRepository {
   return {
-    // An ObjectId starts with its creation time: by id is newest first.
-    findLatest: (ownerId, limit) =>
-      prisma.photo.findMany({ where: { ownerId }, orderBy: { id: 'desc' }, take: limit }),
+    // Keyset on the id: an ObjectId starts with its creation time, so by id is newest
+    // first, and "older than the cursor" is a single indexed range.
+    findPage: ({ ownerId, beforeId, take }) =>
+      prisma.photo.findMany({
+        where: { ownerId, id: beforeId ? { lt: beforeId } : undefined },
+        orderBy: { id: 'desc' },
+        take,
+      }),
     findByOwnerAndSha256: (ownerId, sha256) =>
       prisma.photo.findUnique({ where: { ownerId_sha256: { ownerId, sha256 } } }),
     create: async (photo) => {

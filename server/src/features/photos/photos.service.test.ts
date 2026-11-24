@@ -17,13 +17,12 @@ const RECORD: PhotoRecord = {
   sha256: JPEG_SHA256,
   createdAt: new Date('2026-11-23T10:00:00Z'),
 }
-const LATEST_PHOTOS_LIMIT = 20
 
 // Every dependency succeeds by default; each test breaks only the one it is about.
 function makeDeps() {
   return {
     repository: {
-      findLatest: vi.fn<PhotosRepository['findLatest']>().mockResolvedValue([RECORD]),
+      findPage: vi.fn<PhotosRepository['findPage']>().mockResolvedValue([RECORD]),
       findByOwnerAndSha256: vi
         .fn<PhotosRepository['findByOwnerAndSha256']>()
         .mockResolvedValue(null),
@@ -169,17 +168,6 @@ describe('createPhoto', () => {
     })
     expect(deps.logger.info).not.toHaveBeenCalled()
     expect(deps.deleteImage).not.toHaveBeenCalled()
-  })
-})
-
-describe('listLatest', () => {
-  it("returns the owner's latest photos from the repository", async () => {
-    const deps = makeDeps()
-
-    const records = await createPhotosService(deps).listLatest(OWNER_ID)
-
-    expect(records).toEqual([RECORD])
-    expect(deps.repository.findLatest).toHaveBeenCalledWith(OWNER_ID, LATEST_PHOTOS_LIMIT)
   })
 })
 
