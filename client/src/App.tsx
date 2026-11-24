@@ -5,6 +5,7 @@ import { RequireAdmin } from './auth/RequireAdmin.tsx'
 import { RequireAuth } from './auth/RequireAuth.tsx'
 import AdminInvitationsPage from './pages/AdminInvitationsPage.tsx'
 import FramePage from './pages/FramePage.tsx'
+import FriendsPage from './pages/FriendsPage.tsx'
 import InvitePage from './pages/InvitePage.tsx'
 import LibraryPage from './pages/LibraryPage.tsx'
 import LoginPage from './pages/LoginPage.tsx'
@@ -24,6 +25,7 @@ function AppRoutes(): JSX.Element {
       >
         <Route path="/" element={<LibraryPage />} />
         <Route path="/frame" element={<FramePage />} />
+        <Route path="/friends" element={<FriendsPage />} />
         <Route
           path="/admin/invitations"
           element={

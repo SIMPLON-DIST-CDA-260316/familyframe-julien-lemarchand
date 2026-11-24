@@ -1,4 +1,4 @@
-import { UserPlusIcon } from 'lucide-react'
+import { UserPlusIcon, UsersIcon } from 'lucide-react'
 import type { JSX } from 'react'
 import { Link } from 'react-router'
 import { useAuth } from '@/auth/AuthContext.ts'
@@ -10,6 +10,12 @@ export function LibraryActions(): JSX.Element {
 
   return (
     <div className="flex gap-1">
+      <Button asChild variant="ghost" size="sm">
+        <Link to="/friends">
+          <UsersIcon aria-hidden data-icon="inline-start" />
+          Amis
+        </Link>
+      </Button>
       {user?.role === 'admin' && (
         <Button asChild variant="ghost" size="sm">
           <Link to="/admin/invitations">
