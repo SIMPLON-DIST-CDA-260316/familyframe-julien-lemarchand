@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, type Mock, vi } from 'vitest'
 import { logger } from '../../lib/logger.js'
 import type { PublicUser } from '../../types.js'
-import { requireRole } from './auth.guard.js'
+import { currentSessionId, requireRole } from './auth.guard.js'
 
 const ADMIN: PublicUser = {
   id: '6b044f9d56a44767c7079b01',
@@ -57,5 +57,17 @@ describe('requireRole', () => {
     expect(() => runAdminGuard(undefined)).toThrow(
       expect.objectContaining({ code: 'UNAUTHENTICATED' }),
     )
+  })
+})
+
+describe('currentSessionId', () => {
+  it('returns the session id that requireAuth set', () => {
+    expect(currentSessionId({ sessionId: '6b044f9d56a44767c7079c01' })).toBe(
+      '6b044f9d56a44767c7079c01',
+    )
+  })
+
+  it('refuses a request without a session id with UNAUTHENTICATED', () => {
+    expect(() => currentSessionId({})).toThrow(expect.objectContaining({ code: 'UNAUTHENTICATED' }))
   })
 })

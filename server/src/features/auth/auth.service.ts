@@ -17,7 +17,13 @@ export type LoginResult = { user: PublicUser; token: string; expiresAt: Date }
 
 export type OpenedSession = { token: string; expiresAt: Date }
 
-export type AuthenticatedSession = { user: PublicUser; expiresAt: Date; isRenewed: boolean }
+// sessionId lets a password change close every other session and keep this one.
+export type AuthenticatedSession = {
+  user: PublicUser
+  sessionId: string
+  expiresAt: Date
+  isRenewed: boolean
+}
 
 export type AuthServiceDeps = {
   repository: AuthRepository
@@ -122,7 +128,7 @@ async function authenticate(
 ): Promise<AuthenticatedSession> {
   const session = await findValidSession(deps, token)
   const user = toPublicUser(session.user, deps.avatarUrl)
-  return { user, expiresAt: session.expiresAt, isRenewed: false }
+  return { user, sessionId: session.id, expiresAt: session.expiresAt, isRenewed: false }
 }
 
 async function authenticateAndSlide(
@@ -133,11 +139,11 @@ async function authenticateAndSlide(
   const user = toPublicUser(session.user, deps.avatarUrl)
   const remainingMs = session.expiresAt.getTime() - deps.now().getTime()
   if (remainingMs >= RENEWAL_THRESHOLD_MS) {
-    return { user, expiresAt: session.expiresAt, isRenewed: false }
+    return { user, sessionId: session.id, expiresAt: session.expiresAt, isRenewed: false }
   }
   const expiresAt = sessionEnd(deps)
   await deps.repository.extendSession(session.id, expiresAt)
-  return { user, expiresAt, isRenewed: true }
+  return { user, sessionId: session.id, expiresAt, isRenewed: true }
 }
 
 export function createAuthService(deps: AuthServiceDeps): AuthService {
