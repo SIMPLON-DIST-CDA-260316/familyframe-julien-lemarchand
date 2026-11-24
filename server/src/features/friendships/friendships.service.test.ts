@@ -84,6 +84,8 @@ describe('requestFriendship', () => {
     await expect(request(deps, email)).rejects.toMatchObject({ code: 'EMAIL_INVALID' })
     expect(deps.repository.findUserIdByEmail).not.toHaveBeenCalled()
     expect(deps.repository.create).not.toHaveBeenCalled()
+    expect(deps.logger.warn).not.toHaveBeenCalled()
+    expect(deps.logger.info).not.toHaveBeenCalled()
   })
 
   it('rejects an email without an account with USER_NOT_FOUND', async () => {

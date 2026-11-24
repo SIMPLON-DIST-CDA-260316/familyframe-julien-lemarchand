@@ -41,7 +41,7 @@ export type FriendshipsService = {
   areFriends: (userId: string, otherUserId: string) => Promise<boolean>
 }
 
-// user is the other side: whoever reads the friendship already knows who he is.
+// user is the other side: whoever reads the friendship already knows who they are.
 function toFriendship(record: FriendshipRecord, userId: string): Friendship {
   return {
     id: record.id,
@@ -167,7 +167,7 @@ async function deleteFriendship(
 }
 
 // Filtered on the addressee and the pending status: one atomic write, no read-then-write race,
-// and the requester cannot accept his own request.
+// and the requester cannot accept their own request.
 async function acceptFriendship(
   { repository, logger }: FriendshipsServiceDeps,
   { id, userId }: FriendshipAction,
