@@ -37,11 +37,11 @@ Le détail des fichiers n'est pas listé ici : il change trop vite pour rester j
 
 ## Pages
 
-| Chemin   | Page                                                                                                                                                                                                 |
-| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/login` | connexion : e-mail et mot de passe ; renvoie ensuite vers la page demandée                                                                                                                           |
-| `/`      | envoi : « Prendre une photo » ou « Choisir une image », dans la bibliothèque du compte connecté ; « Se déconnecter »                                                                                 |
-| `/frame` | cadre : bibliothèque du compte connecté, en vignettes ou en liste (choix mémorisé par appareil), chacune avec « Supprimer » ; « Lancer le diaporama » ou une minute sans activité lance le diaporama |
+| Chemin   | Page                                                                                                                                                                                                                                                     |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/login` | connexion : e-mail et mot de passe ; renvoie ensuite vers la page demandée                                                                                                                                                                               |
+| `/`      | envoi : « Prendre une photo » ou « Choisir une image », dans la bibliothèque du compte connecté ; « Se déconnecter »                                                                                                                                     |
+| `/frame` | cadre : toute la bibliothèque du compte connecté (toutes les pages, 100 photos par requête), en vignettes ou en liste (choix mémorisé par appareil), chacune avec « Supprimer » ; « Lancer le diaporama » ou une minute sans activité lance le diaporama |
 
 `/` et `/frame` sont enveloppées dans `RequireAuth` (`client/src/auth/`) : sans utilisateur, redirection vers `/login` en gardant la page demandée. `AuthProvider` appelle `GET /api/auth/me` au chargement (le cookie est `httpOnly`, seul le serveur sait qui est connecté) et oublie l'utilisateur quand l'API répond 401 ou que Socket.IO refuse la connexion (`UNAUTHENTICATED`). Seul un 401 renvoie vers `/login` : si l'API est injoignable au démarrage (erreur réseau ou 5xx, par exemple un cadre rallumé avant le Wi-Fi), `AuthProvider` reste en chargement et réessaie toutes les 5 secondes. Le cadre recharge ses photos une fois par jour : cet appel HTTP prolonge la session (voir [Authentification](#authentification)).
 
@@ -49,19 +49,21 @@ Le routage est fait côté navigateur (`react-router`). En production (J2), le s
 
 ## API
 
-| Route                    | Réponse                                                                                                                                                       |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `GET /api/health`        | `200 { "status": "ok" }` (servira de healthcheck Docker en J2)                                                                                                |
-| `POST /api/auth/login`   | JSON `{ email, password }` → `200 { user }` + cookie `ff_session`                                                                                             |
-| `POST /api/auth/logout`  | `204` ; supprime la session et efface le cookie (répond `204` aussi sans session)                                                                             |
-| `GET /api/auth/me`       | `200 { user }`, l'utilisateur de la session                                                                                                                   |
-| `GET /api/photos`        | `200 Photo[]`, les 20 plus récentes du compte connecté en premier                                                                                             |
-| `POST /api/photos`       | `multipart/form-data` avec `photo` (fichier) → `201 Photo`                                                                                                    |
-| `DELETE /api/photos/:id` | `204` sans corps, pour une photo du compte connecté ; supprime l'enregistrement, puis l'image Cloudinary (cache CDN compris) si plus aucune photo n'y renvoie |
+| Route                                   | Réponse                                                                                                                                                                                                            |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `GET /api/health`                       | `200 { "status": "ok" }` (servira de healthcheck Docker en J2)                                                                                                                                                     |
+| `POST /api/auth/login`                  | JSON `{ email, password }` → `200 { user }` + cookie `ff_session`                                                                                                                                                  |
+| `POST /api/auth/logout`                 | `204` ; supprime la session et efface le cookie (répond `204` aussi sans session)                                                                                                                                  |
+| `GET /api/auth/me`                      | `200 { user }`, l'utilisateur de la session                                                                                                                                                                        |
+| `GET /api/photos?cursor=<id>&limit=<n>` | `200 { photos, nextCursor }` : photos du compte connecté, la plus récente en premier ; `limit` de 1 à 100 (30 par défaut) ; `nextCursor` est l'id à passer en `cursor` pour la page suivante, `null` à la dernière |
+| `POST /api/photos`                      | `multipart/form-data` avec `photo` (fichier) → `201 Photo`                                                                                                                                                         |
+| `DELETE /api/photos/:id`                | `204` sans corps, pour une photo du compte connecté ; supprime l'enregistrement, puis l'image Cloudinary (cache CDN compris) si plus aucune photo n'y renvoie                                                      |
 
 Toutes les routes `/api/photos` et `GET /api/auth/me` demandent une session ; sans elle : `401 UNAUTHENTICATED`. Un `user` vaut `{ id, email, displayName, role }` (`role` : `member` ou `admin`), jamais le hash du mot de passe.
 
 Une `Photo` vaut `{ id, url, thumbnailUrl, createdAt }` (`createdAt` en ISO 8601). Chaque photo appartient au compte qui l'a envoyée (`ownerId`, côté serveur seulement) : la liste, la suppression et les événements ne concernent que les photos du compte connecté. L'identifiant Cloudinary reste côté serveur : le client reçoit des URL prêtes à l'emploi.
+
+La liste est paginée par curseur (_keyset_) sur l'id : un ObjectId commence par sa date de création, trier par id revient donc à trier par date, et `id < cursor` est une seule requête sur l'index `(ownerId, id)`. Une photo ajoutée ou supprimée entre deux pages ne décale rien, contrairement à une pagination par numéro de page.
 
 En cas d'erreur, l'API renvoie `{ "error": code }` ; le client traduit le code en message français :
 
@@ -70,6 +72,7 @@ En cas d'erreur, l'API renvoie `{ "error": code }` ; le client traduit le code e
 | aucun fichier                                                            | 400    | `PHOTO_MISSING`       |
 | autre erreur Multer (mauvais champ, plusieurs fichiers)                  | 400    | `UPLOAD_INVALID`      |
 | corps JSON illisible (routes `/api/auth`)                                | 400    | `BODY_INVALID`        |
+| `limit` ou `cursor` invalide (`GET /api/photos`)                         | 400    | `QUERY_INVALID`       |
 | pas de session, session inconnue ou expirée                              | 401    | `UNAUTHENTICATED`     |
 | e-mail inconnu ou mauvais mot de passe                                   | 401    | `INVALID_CREDENTIALS` |
 | route inconnue                                                           | 404    | `ROUTE_NOT_FOUND`     |
@@ -95,7 +98,7 @@ En cas d'erreur, l'API renvoie `{ "error": code }` ; le client traduit le code e
 
 - **Connexion protégée** : un middleware `io.use` (`features/auth/auth.socket.ts`) lit le même cookie dans la requête de handshake et valide la session, sans glissement (pas de réponse HTTP pour porter un nouveau cookie). Sans session valide, la connexion est refusée avec l'erreur `UNAUTHENTICATED`, que le client traite comme une déconnexion ; une panne de la base donne `SERVER_ERROR` (journalisée en `server.error`). Chaque socket rejoint la room `user:<id>` (`userRoom`, même fichier).
 - Deux événements, du serveur vers les connexions du propriétaire de la photo (`io.to(userRoom(ownerId))`) : `photo:new` avec la `Photo` créée, `photo:deleted` avec l'id de la photo supprimée. Les autres comptes ne les reçoivent pas.
-- Le cadre recharge la liste à chaque connexion Socket.IO, reconnexions comprises : une photo envoyée pendant une coupure n'est pas perdue.
+- Le cadre recharge toute la bibliothèque (toutes les pages) à chaque connexion Socket.IO, reconnexions comprises : une photo envoyée pendant une coupure n'est pas perdue. Ensuite il ajoute `photo:new` en tête et retire `photo:deleted` de la liste, sans recharger. Limite connue : chaque connexion relit toutes les pages et le diaporama crée une diapositive par photo, ce qui convient à quelques centaines de photos.
 - Les types partagés (`Photo`, codes d'erreur, événements) sont dupliqués entre `server/src/types.ts` et `client/src` : un package commun compliquerait les builds Docker.
 
 ## Serveur : app et processus
