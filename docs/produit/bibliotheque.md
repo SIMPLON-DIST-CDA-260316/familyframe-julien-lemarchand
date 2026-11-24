@@ -56,7 +56,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 - Voir ses photos dans la section « Ma bibliothèque », en miniatures (grille de vignettes carrées) ou en liste.
 - Passer de l'un à l'autre avec les boutons « Miniatures » et « Liste ».
 - Charger les photos plus anciennes avec « Charger plus ».
-- Ouvrir une photo en grand en cliquant dessus.
+- Ouvrir une photo en grand dans l'application, puis passer à la suivante ou à la précédente d'un geste du doigt, avec les flèches à l'écran ou celles du clavier.
 - Ouvrir le menu « … » d'une photo pour l'envoyer à un ami ou la supprimer.
 
 **Règles**
@@ -66,17 +66,24 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 3. R-BIB-22 · Les vignettes sont carrées : la photo est recadrée autour de son sujet principal. La photo entière reste visible en l'ouvrant.
 4. R-BIB-23 · En miniatures, chaque vignette est seule. En liste, chaque ligne montre la vignette, la date et l'heure d'ajout (par exemple « 24 nov. 2026, 14:05 ») et, pour une photo reçue, « Envoyée par » suivi du nom de l'expéditeur.
 5. R-BIB-24 · L'affichage choisi (miniatures ou liste) est retenu sur l'appareil et vaut aussi pour la vue bibliothèque du cadre. Par défaut : miniatures.
-6. R-BIB-25 · Cliquer sur une photo l'ouvre en grand dans un nouvel onglet.
+6. R-BIB-25 · Cliquer sur une photo l'ouvre en grand dans l'application.
 7. R-BIB-26 · La bibliothèque se met à jour seule : une photo ajoutée depuis un autre appareil ou reçue d'un ami apparaît en tête, une photo supprimée disparaît, sans recharger la page.
 8. R-BIB-27 · Après une coupure de réseau, la bibliothèque se recharge seule depuis le début dès que la connexion revient, pour rattraper ce qui a changé entre-temps.
 9. R-BIB-28 · La section « Ma bibliothèque » est toujours sombre, quel que soit le thème choisi, pour présenter les photos comme sur le cadre.
 10. R-BIB-29 · Pour l'administrateur, la carte « Vos proches » propose en plus « Inviter un proche sur FamilyFrame ».
+11. R-BIB-36 · La photo affiche sa date, et « Envoyée par » suivi du nom quand elle a été reçue.
+12. R-BIB-37 · Un compteur indique la position de la photo (« 3 / 42 ») ; « 30+ » signifie que d'autres photos plus anciennes ne sont pas encore chargées.
+13. R-BIB-38 · Fermer la photo ramène à l'endroit de la bibliothèque où se trouve la dernière photo regardée.
+14. R-BIB-39 · Supprimer la photo affichée montre la suivante ; s'il n'en reste aucune, la photo se ferme.
+15. R-BIB-40 · Le bouton retour du téléphone ferme la photo.
+16. R-BIB-41 · Un lien vers une photo qui n'existe plus ramène simplement à la bibliothèque.
 
 **Messages affichés**
 
 | Situation                                 | Message                                                                                                         |
 | ----------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
 | Bibliothèque vide                         | « Aucune photo pour l'instant. »                                                                                |
+| Photo en cours d'arrivée                  | « Chargement… »                                                                                                 |
 | Chargement des photos suivantes           | « Chargement… » (sur le bouton « Charger plus »)                                                                |
 | Carte d'accès aux amis                    | « Vos proches » — « Ajoutez vos proches en amis pour leur envoyer des photos. » et le bouton « Gérer mes amis » |
 | Description d'une photo (lecture d'écran) | « Photo du 24 novembre 2026 » ou « Photo envoyée par [nom], du 24 novembre 2026 »                               |
@@ -85,7 +92,6 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 
 - Trier ou filtrer les photos (par date, par expéditeur…), ou les rechercher.
 - Ranger les photos dans des albums ou des collections : prévu, voir [a-venir.md](a-venir.md).
-- Faire défiler les photos en grand sans quitter la page : prévu, voir [a-venir.md](a-venir.md).
 - Voir la bibliothèque d'un autre membre.
 
 ## Supprimer une photo

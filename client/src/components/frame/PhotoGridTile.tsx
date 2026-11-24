@@ -17,6 +17,8 @@ export function PhotoGridTile({ photo, isCurrent, onSelect }: PhotoGridTileProps
         type="button"
         onClick={() => onSelect(photo.id)}
         aria-current={isCurrent}
+        // The viewer focuses this tile when it closes on this photo.
+        data-photo-id={photo.id}
         className="group relative block w-full overflow-hidden rounded-xl outline-none ring-offset-4 ring-offset-frame-background focus-visible:ring-3 focus-visible:ring-ring aria-[current=true]:ring-2 aria-[current=true]:ring-frame-accent"
       >
         <img

@@ -3,10 +3,13 @@ import { FriendsCallToAction } from '@/components/library/FriendsCallToAction.ts
 import { LibrarySection } from '@/components/library/LibrarySection.tsx'
 import { UploadForm } from '@/components/library/UploadForm.tsx'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.tsx'
+import { PhotoViewer } from '@/components/viewer/PhotoViewer.tsx'
 import { usePhotoLibrary } from '@/hooks/usePhotoLibrary.ts'
+import { useViewerParam } from '@/hooks/useViewerParam.ts'
 
 export default function LibraryPage(): JSX.Element {
   const library = usePhotoLibrary()
+  const viewer = useViewerParam()
 
   return (
     <main className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-10">
@@ -24,7 +27,10 @@ export default function LibraryPage(): JSX.Element {
         </Card>
         <FriendsCallToAction />
       </div>
-      <LibrarySection library={library} />
+      <LibrarySection library={library} onOpenPhoto={viewer.open} />
+      {viewer.openId !== null && (
+        <PhotoViewer library={library} openId={viewer.openId} viewer={viewer} />
+      )}
     </main>
   )
 }

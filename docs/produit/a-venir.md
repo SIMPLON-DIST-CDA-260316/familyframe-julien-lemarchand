@@ -24,9 +24,6 @@ Les règles ci-dessous décrivent l'intention ; elles recevront leur identifiant
 
 **Prévu**
 
-- Une visionneuse dans l'application, en carrousel, à la place de l'ouverture de la photo dans un nouvel onglet : on fait défiler les photos en grand sans quitter la bibliothèque.
-- Le bouton « Retour » du téléphone ou du navigateur ferme la visionneuse au lieu de quitter la page.
-- La visionneuse propose le même menu d'actions que les autres vues (envoyer à un ami, supprimer).
 - Un mode cadre lancé depuis la bibliothèque.
 - La page « Cadre » devient le diaporama seul.
 - Une nouvelle fenêtre d'envoi : une grille de ronds de profil à sélection multiple, un seul bouton « Envoyer à N personnes », une recherche dès 6 amis.

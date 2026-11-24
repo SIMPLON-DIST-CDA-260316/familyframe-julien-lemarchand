@@ -10,6 +10,7 @@ import type { Photo } from '@/photo.ts'
 
 type LibrarySectionProps = {
   library: PhotoLibrary
+  onOpenPhoto: (id: string) => void
 }
 
 type LibraryPhotosProps = {
@@ -60,15 +61,9 @@ function LoadMoreButton({ isLoadingMore, loadMore }: LoadMoreButtonProps): JSX.E
   )
 }
 
-export function LibrarySection({ library }: LibrarySectionProps): JSX.Element {
+export function LibrarySection({ library, onOpenPhoto }: LibrarySectionProps): JSX.Element {
   const [layout, setLayout] = useLibraryLayout()
   const { photos, hasMore, isLoadingMore, loadMore } = library
-
-  // No viewer to build: on a phone, the full photo in a new tab is enough.
-  function openPhoto(id: string): void {
-    const photo = photos.find((candidate) => candidate.id === id)
-    if (photo) window.open(photo.url, '_blank', 'noopener')
-  }
 
   return (
     // `dark` and the frame background: the frame's components look as designed.
@@ -77,7 +72,7 @@ export function LibrarySection({ library }: LibrarySectionProps): JSX.Element {
       className="dark rounded-2xl bg-frame-background text-foreground"
     >
       <LibrarySectionHeader layout={layout} onLayoutChange={setLayout} />
-      <LibraryPhotos photos={photos} layout={layout} onSelect={openPhoto} />
+      <LibraryPhotos photos={photos} layout={layout} onSelect={onOpenPhoto} />
       {hasMore && <LoadMoreButton isLoadingMore={isLoadingMore} loadMore={loadMore} />}
     </section>
   )

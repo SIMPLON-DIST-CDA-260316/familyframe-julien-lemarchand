@@ -23,6 +23,8 @@ export function PhotoListRow({ photo, isCurrent, onSelect }: PhotoListRowProps):
         type="button"
         onClick={() => onSelect(photo.id)}
         aria-current={isCurrent}
+        // The viewer focuses this row when it closes on this photo.
+        data-photo-id={photo.id}
         className="flex w-full items-center gap-4 rounded-xl p-2 pr-14 text-left outline-none hover:bg-white/5 focus-visible:ring-3 focus-visible:ring-ring aria-[current=true]:ring-2 aria-[current=true]:ring-frame-accent"
       >
         <img
