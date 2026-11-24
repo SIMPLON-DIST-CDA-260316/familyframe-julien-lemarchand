@@ -1,5 +1,7 @@
+import { SendIcon } from 'lucide-react'
 import { type ChangeEvent, type JSX, type SubmitEvent, useState } from 'react'
 import { useAuth } from '@/auth/AuthContext.ts'
+import { SharePhotoDialog } from '@/components/sharing/SharePhotoDialog.tsx'
 import { Alert, AlertDescription } from '@/components/ui/alert.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import { Input } from '@/components/ui/input.tsx'
@@ -40,6 +42,13 @@ type UploadFormState = {
   inputsKey: number
   handleFileChange: (event: ChangeEvent<HTMLInputElement>) => void
   handleSubmit: (event: SubmitEvent<HTMLFormElement>) => Promise<void>
+  clearFile: () => void
+}
+
+type UploadButtonsProps = {
+  hasFile: boolean
+  isSending: boolean
+  onShare: () => void
 }
 
 function usePhotoUpload(onUploaded: (photo: Photo) => void): PhotoUpload {
@@ -79,16 +88,18 @@ function useUploadForm(onUploaded: (photo: Photo) => void): UploadFormState {
     upload.clearStatus()
   }
 
+  function clearFile(): void {
+    setFile(null)
+    setInputsKey((key) => key + 1)
+  }
+
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault()
     if (!file) return
-    if (await upload.send(file)) {
-      setFile(null)
-      setInputsKey((key) => key + 1)
-    }
+    if (await upload.send(file)) clearFile()
   }
 
-  return { upload, file, inputsKey, handleFileChange, handleSubmit }
+  return { upload, file, inputsKey, handleFileChange, handleSubmit, clearFile }
 }
 
 function FileField({ id, label, capture, onChange }: FileFieldProps): JSX.Element {
@@ -120,6 +131,26 @@ function FileFields({ inputsKey, onChange }: FileFieldsProps): JSX.Element {
   )
 }
 
+function UploadButtons({ hasFile, isSending, onShare }: UploadButtonsProps): JSX.Element {
+  return (
+    <div className="flex flex-col gap-2">
+      <Button type="submit" size="lg" disabled={!hasFile || isSending}>
+        {isSending ? 'Envoi…' : 'Ajouter à ma bibliothèque'}
+      </Button>
+      <Button
+        type="button"
+        variant="outline"
+        size="lg"
+        disabled={!hasFile || isSending}
+        onClick={onShare}
+      >
+        <SendIcon aria-hidden data-icon="inline-start" />
+        Envoyer à un ami
+      </Button>
+    </div>
+  )
+}
+
 function UploadAlert({ status, error }: Pick<PhotoUpload, 'status' | 'error'>): JSX.Element | null {
   if (status === 'success') {
     return (
@@ -139,23 +170,36 @@ function UploadAlert({ status, error }: Pick<PhotoUpload, 'status' | 'error'>): 
 }
 
 export function UploadForm({ onUploaded }: UploadFormProps): JSX.Element {
-  const { upload, file, inputsKey, handleFileChange, handleSubmit } = useUploadForm(onUploaded)
+  const { upload, file, inputsKey, handleFileChange, handleSubmit, clearFile } =
+    useUploadForm(onUploaded)
   const previewUrl = usePreviewUrl(file)
+  // The dialog keeps its own file: emptying the form after a send leaves it open.
+  const [fileToShare, setFileToShare] = useState<File | null>(null)
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-      <FileFields inputsKey={inputsKey} onChange={handleFileChange} />
-      {previewUrl && (
-        <img
-          className="max-h-[40vh] w-full rounded-lg object-contain"
-          src={previewUrl}
-          alt="Aperçu avant envoi"
+    <>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        <FileFields inputsKey={inputsKey} onChange={handleFileChange} />
+        {previewUrl && (
+          <img
+            className="max-h-[40vh] w-full rounded-lg object-contain"
+            src={previewUrl}
+            alt="Aperçu avant envoi"
+          />
+        )}
+        <UploadButtons
+          hasFile={file !== null}
+          isSending={upload.status === 'sending'}
+          onShare={() => setFileToShare(file)}
         />
-      )}
-      <Button type="submit" size="lg" disabled={!file || upload.status === 'sending'}>
-        {upload.status === 'sending' ? 'Envoi…' : 'Envoyer'}
-      </Button>
-      <UploadAlert status={upload.status} error={upload.error} />
-    </form>
+        <UploadAlert status={upload.status} error={upload.error} />
+      </form>
+      {/* The file goes to the friend only: the own library does not change. */}
+      <SharePhotoDialog
+        target={fileToShare ? { kind: 'device', file: fileToShare } : null}
+        onClose={() => setFileToShare(null)}
+        onShared={clearFile}
+      />
+    </>
   )
 }

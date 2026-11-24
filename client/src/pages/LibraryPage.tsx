@@ -15,7 +15,7 @@ export default function LibraryPage(): JSX.Element {
           <CardHeader>
             <CardTitle className="text-xl">Ajouter une photo</CardTitle>
             <CardDescription>
-              Elle rejoint votre bibliothèque et s'affiche sur votre cadre.
+              Ajoutez-la à votre bibliothèque ou envoyez-la directement à un ami.
             </CardDescription>
           </CardHeader>
           <CardContent>
