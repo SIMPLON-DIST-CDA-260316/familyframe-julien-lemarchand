@@ -3,7 +3,6 @@ import { withLiveChanges, withoutPhoto } from '@/photoList.ts'
 
 export type LiveLoads = {
   begin: () => number
-  currentLoadId: () => number
   isCurrent: (loadId: number) => boolean
   rememberAdded: (photo: Photo) => void
   rememberDeleted: (id: string) => void
@@ -26,7 +25,6 @@ export function createLiveLoads(): LiveLoads {
       deletedIds = []
       return latestLoadId
     },
-    currentLoadId: () => latestLoadId,
     isCurrent: (loadId) => loadId === latestLoadId,
     rememberAdded: (photo) => addedPhotos.push(photo),
     rememberDeleted: (id) => deletedIds.push(id),

@@ -21,19 +21,26 @@ export type PhotoLibrary = {
   addPhoto: (photo: Photo) => void
 }
 
+// The load that gave the cursor: a page fetched with it is only valid while that load is current.
+type NextPage = { cursor: string; loadId: number }
+
 type LibrarySetters = {
   setPhotos: Dispatch<SetStateAction<Photo[]>>
-  setNextCursor: Dispatch<SetStateAction<string | null>>
+  setNextPage: Dispatch<SetStateAction<NextPage | null>>
 }
 
 type MoreSetters = LibrarySetters & {
   setIsLoadingMore: Dispatch<SetStateAction<boolean>>
 }
 
+function toNextPage(cursor: string | null, loadId: number): NextPage | null {
+  return cursor === null ? null : { cursor, loadId }
+}
+
 // Each (re)connection starts over from the first page: simple, and catches what changed offline.
 function createFirstPageLoader(
   liveLoads: LiveLoads,
-  { setPhotos, setNextCursor }: LibrarySetters,
+  { setPhotos, setNextPage }: LibrarySetters,
   dropUser: () => void,
 ): () => Promise<void> {
   return async () => {
@@ -43,28 +50,28 @@ function createFirstPageLoader(
     })
     if (page === null || !liveLoads.isCurrent(loadId)) return
     setPhotos(liveLoads.withLiveChanges(page.photos))
-    setNextCursor(page.nextCursor)
+    setNextPage(toNextPage(page.nextCursor, loadId))
   }
 }
 
 // Does not begin a load: a reconnect reload or the cleanup makes this page stale, and it is dropped.
 function createMoreLoader(
   liveLoads: LiveLoads,
-  nextCursor: string | null,
-  { setPhotos, setNextCursor, setIsLoadingMore }: MoreSetters,
+  nextPage: NextPage | null,
+  { setPhotos, setNextPage, setIsLoadingMore }: MoreSetters,
   dropUser: () => void,
 ): () => Promise<void> {
   return async () => {
-    if (nextCursor === null) return
-    const loadId = liveLoads.currentLoadId()
+    if (nextPage === null) return
+    const { cursor, loadId } = nextPage
     setIsLoadingMore(true)
-    const page = await fetchPhotoPage({ cursor: nextCursor }, () => {
+    const page = await fetchPhotoPage({ cursor }, () => {
       if (liveLoads.isCurrent(loadId)) dropUser()
     })
     setIsLoadingMore(false)
     if (page === null || !liveLoads.isCurrent(loadId)) return
     setPhotos((current) => withOlderPhotos(current, liveLoads.withoutDeleted(page.photos)))
-    setNextCursor(page.nextCursor)
+    setNextPage(toNextPage(page.nextCursor, loadId))
   }
 }
 
@@ -96,25 +103,31 @@ function connectLibrary(
 
 export function usePhotoLibrary(): PhotoLibrary {
   const { dropUser } = useAuth()
+  // useState keeps one instance across renders: its load bookkeeping must survive them.
   const [liveLoads] = useState(createLiveLoads)
   const [photos, setPhotos] = useState<Photo[]>([])
-  const [nextCursor, setNextCursor] = useState<string | null>(null)
+  const [nextPage, setNextPage] = useState<NextPage | null>(null)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
 
   useEffect(
-    () => connectLibrary(liveLoads, { setPhotos, setNextCursor }, dropUser),
+    () => connectLibrary(liveLoads, { setPhotos, setNextPage }, dropUser),
     [liveLoads, dropUser],
   )
 
+  // Rebuilt when the next page changes, so loadMore always fetches the page after the current one.
   const loadMore = useMemo(() => {
-    const setters = { setPhotos, setNextCursor, setIsLoadingMore }
-    return createMoreLoader(liveLoads, nextCursor, setters, dropUser)
-  }, [liveLoads, nextCursor, dropUser])
+    const setters = { setPhotos, setNextPage, setIsLoadingMore }
+    return createMoreLoader(liveLoads, nextPage, setters, dropUser)
+  }, [liveLoads, nextPage, dropUser])
 
   // The upload response and the photo:new event bring the same photo: withNewPhoto keeps one.
-  const addPhoto = useCallback((photo: Photo): void => {
-    setPhotos((current) => withNewPhoto(current, photo))
-  }, [])
+  const addPhoto = useCallback(
+    (photo: Photo): void => {
+      liveLoads.rememberAdded(photo)
+      setPhotos((current) => withNewPhoto(current, photo))
+    },
+    [liveLoads],
+  )
 
-  return { photos, hasMore: nextCursor !== null, isLoadingMore, loadMore, addPhoto }
+  return { photos, hasMore: nextPage !== null, isLoadingMore, loadMore, addPhoto }
 }
