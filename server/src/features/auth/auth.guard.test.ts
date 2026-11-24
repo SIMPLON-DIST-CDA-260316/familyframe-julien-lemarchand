@@ -17,8 +17,10 @@ const MEMBER: PublicUser = {
 }
 
 // The guard only reads req.user: a plain object stands in for the Express request.
-function runAdminGuard(user: PublicUser | undefined): Mock<() => void> {
-  const next = vi.fn<() => void>()
+function runAdminGuard(
+  user: PublicUser | undefined,
+  next: Mock<() => void> = vi.fn<() => void>(),
+): Mock<() => void> {
   requireRole('admin')({ user }, undefined, next)
   return next
 }
@@ -29,15 +31,23 @@ afterEach(() => {
 
 describe('requireRole', () => {
   it('lets an admin through to the next handler', () => {
+    const warn = vi.spyOn(logger, 'warn').mockImplementation(() => {})
+
     const next = runAdminGuard(ADMIN)
 
     expect(next).toHaveBeenCalledWith()
+    expect(warn).not.toHaveBeenCalled()
   })
 
   it('refuses a member with FORBIDDEN and logs the user id only', () => {
     const warn = vi.spyOn(logger, 'warn').mockImplementation(() => {})
 
-    expect(() => runAdminGuard(MEMBER)).toThrow(expect.objectContaining({ code: 'FORBIDDEN' }))
+    const next = vi.fn<() => void>()
+
+    expect(() => runAdminGuard(MEMBER, next)).toThrow(
+      expect.objectContaining({ code: 'FORBIDDEN' }),
+    )
+    expect(next).not.toHaveBeenCalled()
     expect(warn).toHaveBeenCalledWith('auth.forbidden', { userId: MEMBER.id })
   })
 

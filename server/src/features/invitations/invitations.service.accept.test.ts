@@ -205,8 +205,12 @@ describe('acceptInvitation: the account', () => {
 describe('acceptInvitation: the logs', () => {
   // Every value the person typed or received: none may reach the logs.
   function expectNoPersonalData(deps: Deps): void {
-    const logged = JSON.stringify([deps.logger.info.mock.calls, deps.logger.warn.mock.calls])
-    for (const secret of [TOKEN, EMAIL, 'Mamie', PASSWORD]) {
+    const logged = JSON.stringify([
+      deps.logger.info.mock.calls,
+      deps.logger.warn.mock.calls,
+      deps.logger.error.mock.calls,
+    ])
+    for (const secret of [TOKEN, TOKEN_HASH, EMAIL, 'Mamie', PASSWORD]) {
       expect(logged).not.toContain(secret)
     }
   }
