@@ -8,6 +8,12 @@ export type AccountSaveResult =
   | { status: 'failed'; message: string }
   | { status: 'unauthenticated' }
 
+// 204 without a body: the account the client knows does not change.
+export type PasswordChangeResult =
+  | { status: 'saved' }
+  | { status: 'failed'; message: string }
+  | { status: 'unauthenticated' }
+
 // Every route that edits the account answers { user }.
 async function sendForUser(url: string, init: RequestInit): Promise<AccountSaveResult> {
   try {
@@ -29,4 +35,34 @@ export function patchDisplayName(displayName: string): Promise<AccountSaveResult
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ displayName }),
   })
+}
+
+// No Content-Type: the browser sets multipart/form-data with its boundary.
+export function putAvatar(file: File): Promise<AccountSaveResult> {
+  const body = new FormData()
+  body.append('avatar', file)
+  return sendForUser('/api/account/avatar', { method: 'PUT', body })
+}
+
+export function deleteAvatar(): Promise<AccountSaveResult> {
+  return sendForUser('/api/account/avatar', { method: 'DELETE' })
+}
+
+export async function putPassword(
+  currentPassword: string,
+  newPassword: string,
+): Promise<PasswordChangeResult> {
+  try {
+    const res = await fetch('/api/account/password', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ currentPassword, newPassword }),
+    })
+    if (res.status === UNAUTHORIZED_STATUS) return { status: 'unauthenticated' }
+    if (res.ok) return { status: 'saved' }
+    const data: unknown = await res.json().catch(() => null)
+    return { status: 'failed', message: errorMessage(data) }
+  } catch {
+    return { status: 'failed', message: errorMessage(null) }
+  }
 }

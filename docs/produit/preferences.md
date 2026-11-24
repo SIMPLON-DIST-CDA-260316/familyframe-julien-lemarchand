@@ -1,6 +1,6 @@
 # Préférences
 
-La page où chacun règle son compte : son nom affiché et, plus tard, son adresse e-mail. Chaque réglage a son propre encart, enregistré séparément.
+La page où chacun règle son compte : sa photo de profil, son nom affiché et son mot de passe, et d'y voir son adresse e-mail. Chaque réglage a son propre encart, enregistré séparément.
 
 ## Ouvrir ses préférences
 
@@ -26,7 +26,8 @@ La page où chacun règle son compte : son nom affiché et, plus tard, son adres
 
 **Ce qui n'est pas possible**
 
-- Réinitialiser un mot de passe oublié ou supprimer son compte.
+- Supprimer son compte.
+- Réinitialiser un mot de passe oublié : il faut connaître son mot de passe actuel pour en choisir un nouveau.
 
 ## Nom affiché
 
@@ -84,4 +85,65 @@ La page où chacun règle son compte : son nom affiché et, plus tard, son adres
 
 **Ce qui n'est pas possible**
 
-- Rien de particulier : ajouter ou retirer sa photo de profil n'est pas encore possible.
+- Rien de particulier.
+
+## Photo de profil
+
+**Ce que l'on peut faire**
+
+- Choisir une image dans l'encart « Photo de profil » (« Changer la photo »), la voir en aperçu dans le grand rond, puis « Enregistrer ».
+- Renoncer à l'image choisie avec « Annuler » avant d'enregistrer : le rond montre de nouveau la photo actuelle.
+- Retirer la photo actuelle avec « Retirer » : l'initiale revient partout.
+
+**Règles**
+
+1. R-PRF-31 · Les formats acceptés et le poids maximal sont ceux des photos de la bibliothèque : JPEG, PNG ou WebP, 10 Mo au plus.
+2. R-PRF-32 · La photo est recadrée en carré, au centre, sans outil de recadrage. L'aperçu montre l'image choisie ; le recadrage se fait à l'enregistrement.
+3. R-PRF-33 · « Enregistrer » reste grisé tant qu'aucune image n'est choisie. « Annuler » n'apparaît que lorsqu'une image est choisie ; « Retirer » n'apparaît que lorsqu'une photo est enregistrée et qu'aucune image n'est choisie.
+4. R-PRF-34 · Après l'enregistrement ou le retrait, la barre du haut, les menus et, chez ses amis, la page Amis et le panneau « Envoyer à des proches » montrent le changement (R-PRF-30).
+5. R-PRF-35 · Une nouvelle photo remplace l'ancienne. Si l'image d'une photo de profil ne peut pas se charger, le rond montre l'initiale à la place.
+
+**Messages affichés**
+
+| Situation          | Message                                                                                                     |
+| ------------------ | ----------------------------------------------------------------------------------------------------------- |
+| Titre de l'encart  | « Photo de profil » — « Elle remplace votre initiale dans le menu et dans la liste d'amis de vos proches. » |
+| Champ              | « Changer la photo »                                                                                        |
+| Aide sous le champ | « JPEG, PNG ou WebP, 10 Mo au plus. Recadrée en carré, au centre. »                                         |
+| Image trop lourde  | « La photo est trop lourde (10 Mo maximum). »                                                               |
+| Format refusé      | « Format non pris en charge : JPEG, PNG ou WebP uniquement. »                                               |
+| Fichier illisible  | « Ce fichier n'est pas une image lisible. »                                                                 |
+
+**Ce qui n'est pas possible**
+
+- Choisir soi-même la zone recadrée.
+- Enregistrer un format autre que JPEG, PNG ou WebP, ou une image de plus de 10 Mo.
+
+## Mot de passe
+
+**Ce que l'on peut faire**
+
+- Changer son mot de passe dans l'encart « Mot de passe » : saisir le mot de passe actuel, le nouveau, puis le nouveau une seconde fois, et « Enregistrer ».
+
+**Règles**
+
+1. R-PRF-40 · Le mot de passe actuel est exigé : s'il est faux, rien ne change.
+2. R-PRF-41 · Le nouveau mot de passe compte de 12 à 128 caractères (R-INV-33).
+3. R-PRF-42 · Le nouveau mot de passe est saisi deux fois ; si les deux saisies diffèrent, rien n'est envoyé.
+4. R-PRF-43 · Une fois enregistré, les trois champs sont vidés.
+5. R-PRF-44 · Tous les autres appareils du compte, le cadre compris, sont déconnectés : ils reviennent à la page de connexion à leur prochaine action, à leur prochaine reconnexion ou au rechargement quotidien du cadre, et s'y reconnectent avec le nouveau mot de passe. L'appareil utilisé reste connecté. L'encart prévient de cette conséquence.
+
+**Messages affichés**
+
+| Situation                       | Message                                                                                                                                      |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Titre de l'encart               | « Mot de passe » — « Les autres appareils connectés à votre compte, le cadre compris, devront se reconnecter avec le nouveau mot de passe. » |
+| Champs                          | « Mot de passe actuel », « Nouveau mot de passe », « Confirmer le nouveau mot de passe »                                                     |
+| Saisies différentes             | « Les deux mots de passe ne correspondent pas. »                                                                                             |
+| Mot de passe actuel faux        | « Mot de passe actuel incorrect. »                                                                                                           |
+| Nouveau mot de passe hors règle | « Le mot de passe doit faire entre 12 et 128 caractères. »                                                                                   |
+
+**Ce qui n'est pas possible**
+
+- Changer son mot de passe sans connaître l'actuel.
+- Déconnecter à distance un seul appareil : le changement les déconnecte tous, sauf celui utilisé.

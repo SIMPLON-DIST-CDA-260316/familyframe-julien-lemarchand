@@ -1,7 +1,9 @@
 import type { JSX } from 'react'
 import { useAuth } from '@/auth/AuthContext.ts'
+import { AvatarCard } from '@/components/settings/AvatarCard.tsx'
 import { DisplayNameCard } from '@/components/settings/DisplayNameCard.tsx'
 import { EmailCard } from '@/components/settings/EmailCard.tsx'
+import { PasswordCard } from '@/components/settings/PasswordCard.tsx'
 
 export default function SettingsPage(): JSX.Element | null {
   const { user } = useAuth()
@@ -16,8 +18,10 @@ export default function SettingsPage(): JSX.Element | null {
           Votre profil et la sécurité de votre compte.
         </p>
       </header>
+      <AvatarCard name={user.displayName} avatarUrl={user.avatarUrl} />
       <DisplayNameCard displayName={user.displayName} />
       <EmailCard email={user.email} />
+      <PasswordCard />
     </main>
   )
 }

@@ -35,7 +35,7 @@ Comment on entre dans FamilyFrame, combien de temps on y reste connecté et comm
 
 - S'inscrire seul : un compte se crée uniquement par une invitation de l'administrateur.
 - Réinitialiser un mot de passe oublié : aucune procédure « mot de passe oublié » n'existe.
-- Changer son mot de passe, son nom ou son adresse e-mail : prévu en partie, voir [a-venir.md](a-venir.md).
+- Changer son adresse e-mail : le mot de passe et le nom se changent dans « Préférences », voir [preferences.md](preferences.md).
 - Être bloqué après plusieurs essais ratés : le nombre d'essais n'est pas limité.
 
 ## Rester connecté
@@ -75,7 +75,7 @@ Comment on entre dans FamilyFrame, combien de temps on y reste connecté et comm
 
 **Règles**
 
-1. R-CNX-20 · La déconnexion ne concerne que l'appareil utilisé : les autres appareils du compte, le cadre compris, restent connectés.
+1. R-CNX-20 · La déconnexion ne concerne que l'appareil utilisé : les autres appareils du compte, le cadre compris, restent connectés. Changer son mot de passe a l'effet inverse, voir R-PRF-44 dans [preferences.md](preferences.md).
 2. R-CNX-21 · Après la déconnexion, la personne arrive sur la page de connexion.
 3. R-CNX-22 · La déconnexion fonctionne même si l'application est momentanément injoignable : l'appareil oublie la personne tout de suite.
 4. R-CNX-23 · Se déconnecter deux fois, ou alors que la connexion avait déjà expiré, ne provoque aucune erreur.
