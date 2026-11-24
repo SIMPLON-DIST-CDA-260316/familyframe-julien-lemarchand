@@ -12,16 +12,23 @@ enum Role {
   admin
 }
 
+enum FriendshipStatus {
+  pending
+  accepted
+}
+
 model User {
-  id           String       @id @default(auto()) @map("_id") @db.ObjectId
-  email        String       @unique
-  displayName  String
-  passwordHash String
-  role         Role         @default(member)
-  createdAt    DateTime     @default(now())
-  sessions     Session[]
-  photos       Photo[]
-  invitations  Invitation[]
+  id                     String       @id @default(auto()) @map("_id") @db.ObjectId
+  email                  String       @unique
+  displayName            String
+  passwordHash           String
+  role                   Role         @default(member)
+  createdAt              DateTime     @default(now())
+  sessions               Session[]
+  photos                 Photo[]
+  invitations            Invitation[]
+  sentFriendRequests     Friendship[] @relation("FriendshipRequester")
+  receivedFriendRequests Friendship[] @relation("FriendshipAddressee")
 }
 
 model Session {
@@ -60,4 +67,19 @@ model Invitation {
   createdAt   DateTime  @default(now())
 
   @@index([email])
+}
+
+model Friendship {
+  id          String           @id @default(auto()) @map("_id") @db.ObjectId
+  requesterId String           @db.ObjectId
+  requester   User             @relation("FriendshipRequester", fields: [requesterId], references: [id])
+  addresseeId String           @db.ObjectId
+  addressee   User             @relation("FriendshipAddressee", fields: [addresseeId], references: [id])
+  // Both ids sorted: the unique index then refuses a pair in either order.
+  pairKey     String           @unique
+  status      FriendshipStatus @default(pending)
+  createdAt   DateTime         @default(now())
+
+  @@index([requesterId])
+  @@index([addresseeId])
 }
