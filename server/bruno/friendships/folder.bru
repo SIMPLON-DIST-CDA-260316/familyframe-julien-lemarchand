@@ -12,7 +12,7 @@ docs {
 
   Une amitié renvoyée par l'API : `{ id, user, createdAt }`. `id` est celui
   de l'amitié (c'est lui qu'on accepte ou supprime), `user` l'autre compte,
-  `{ id, displayName, email }`, jamais son rôle ni le hash de son mot de
-  passe. La liste : `{ friends, incoming, outgoing }`. Le dossier finit sans
+  `{ id, displayName, email, avatarUrl }`, jamais son rôle, le hash de son
+  mot de passe ni l'id Cloudinary de sa photo. La liste : `{ friends, incoming, outgoing }`. Le dossier finit sans
   aucune amitié entre le membre et l'admin : on peut le relancer.
 }

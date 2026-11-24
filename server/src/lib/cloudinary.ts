@@ -61,3 +61,8 @@ export function deliveryUrls(cloudinaryId: string): DeliveryUrls {
     thumbnailUrl: deliveryUrl(cloudinaryId, [thumbnail, OPTIMIZED_DELIVERY]),
   }
 }
+
+// toAvatarJpeg already made it a 256 px square: only the format and the compression change.
+export function avatarUrl(cloudinaryId: string): string {
+  return deliveryUrl(cloudinaryId, [OPTIMIZED_DELIVERY])
+}

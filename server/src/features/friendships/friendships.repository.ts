@@ -1,13 +1,20 @@
 import { Prisma, type PrismaClient } from '@prisma/client'
 
 // The other side's public fields only: the password hash never leaves the repository.
-const PARTY_FIELDS = { id: true, email: true, displayName: true } satisfies Prisma.UserSelect
+const PARTY_FIELDS = {
+  id: true,
+  email: true,
+  displayName: true,
+  avatarCloudinaryId: true,
+} satisfies Prisma.UserSelect
 const WITH_PARTIES = {
   requester: { select: PARTY_FIELDS },
   addressee: { select: PARTY_FIELDS },
 } satisfies Prisma.FriendshipInclude
 
 export type FriendshipRecord = Prisma.FriendshipGetPayload<{ include: typeof WITH_PARTIES }>
+
+export type FriendshipParty = FriendshipRecord['requester']
 
 export type NewFriendship = { requesterId: string; addresseeId: string }
 

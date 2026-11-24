@@ -34,12 +34,14 @@ export type ApiError = { error: ApiErrorCode }
 
 export type UserRole = 'member' | 'admin'
 
-// What the API says about a user: never the password hash.
+// What the API says about a user: never the password hash. avatarUrl is null until the account
+// picks a profile photo.
 export type PublicUser = {
   id: string
   email: string
   displayName: string
   role: UserRole
+  avatarUrl: string | null
 }
 
 export type InvitationStatus = 'pending' | 'used' | 'expired'
@@ -64,6 +66,7 @@ export type FriendUser = {
   id: string
   displayName: string
   email: string
+  avatarUrl: string | null
 }
 
 // id is the friendship's, user the other side; createdAt is an ISO 8601 string.

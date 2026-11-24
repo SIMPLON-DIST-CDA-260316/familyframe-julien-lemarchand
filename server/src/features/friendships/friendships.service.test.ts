@@ -1,12 +1,32 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { Logger } from '../../lib/logger.js'
-import type { FriendshipRecord, FriendshipsRepository } from './friendships.repository.js'
-import { createFriendshipsService } from './friendships.service.js'
+import type { FriendUser } from '../../types.js'
+import type {
+  FriendshipParty,
+  FriendshipRecord,
+  FriendshipsRepository,
+} from './friendships.repository.js'
+import { createFriendshipsService, type FriendshipsServiceDeps } from './friendships.service.js'
 
 const CREATED_AT = new Date('2026-11-24T10:00:00Z')
-const MEMBER = { id: '6b044f9d56a44767c7079b02', email: 'membre@example.fr', displayName: 'Membre' }
-const MAMIE = { id: '6b044f9d56a44767c7079b05', email: 'mamie@example.fr', displayName: 'Mamie' }
+const MEMBER: FriendshipParty = {
+  id: '6b044f9d56a44767c7079b02',
+  email: 'membre@example.fr',
+  displayName: 'Membre',
+  avatarCloudinaryId: null,
+}
+const MAMIE: FriendshipParty = {
+  id: '6b044f9d56a44767c7079b05',
+  email: 'mamie@example.fr',
+  displayName: 'Mamie',
+  avatarCloudinaryId: null,
+}
 const FRIENDSHIP_ID = '6b044f9d56a44767c7079f01'
+
+// What the client gets of a party without a profile photo.
+function friendUser({ id, email, displayName }: FriendshipParty): FriendUser {
+  return { id, displayName, email, avatarUrl: null }
+}
 
 // The member asked Mamie by default; each test changes only what it is about.
 function friendshipRecord(overrides: Partial<FriendshipRecord> = {}): FriendshipRecord {
@@ -36,6 +56,9 @@ function makeDeps() {
       acceptReceived: vi.fn<FriendshipsRepository['acceptReceived']>(),
       deleteOf: vi.fn<FriendshipsRepository['deleteOf']>(),
     },
+    avatarUrl: vi.fn<FriendshipsServiceDeps['avatarUrl']>(
+      (cloudinaryId) => `https://cdn.test/${cloudinaryId}`,
+    ),
     logger: {
       info: vi.fn<Logger['info']>(),
       warn: vi.fn<Logger['warn']>(),
@@ -70,7 +93,11 @@ describe('requestFriendship', () => {
       addresseeId: MAMIE.id,
     })
     expect(friendship).toEqual({
-      friendship: { id: FRIENDSHIP_ID, user: MAMIE, createdAt: CREATED_AT.toISOString() },
+      friendship: {
+        id: FRIENDSHIP_ID,
+        user: friendUser(MAMIE),
+        createdAt: CREATED_AT.toISOString(),
+      },
       isAccepted: false,
     })
   })
@@ -149,7 +176,11 @@ describe('requestFriendship', () => {
     expect(deps.repository.acceptReceived).toHaveBeenCalledWith(FRIENDSHIP_ID, MEMBER.id)
     expect(deps.repository.create).not.toHaveBeenCalled()
     expect(outcome).toEqual({
-      friendship: { id: FRIENDSHIP_ID, user: MAMIE, createdAt: CREATED_AT.toISOString() },
+      friendship: {
+        id: FRIENDSHIP_ID,
+        user: friendUser(MAMIE),
+        createdAt: CREATED_AT.toISOString(),
+      },
       isAccepted: true,
     })
     expect(deps.logger.info).toHaveBeenCalledWith('friendship.accepted', {
@@ -193,8 +224,8 @@ describe('requestFriendship', () => {
 describe('listFriendships', () => {
   it('puts each record in its list, with the other side as user', async () => {
     const deps = makeDeps()
-    const PAPI = { id: '6b044f9d56a44767c7079b07', email: 'papi@example.fr', displayName: 'Papi' }
-    const TATA = { id: '6b044f9d56a44767c7079b08', email: 'tata@example.fr', displayName: 'Tata' }
+    const PAPI = { ...MAMIE, id: '6b044f9d56a44767c7079b07', displayName: 'Papi' }
+    const TATA = { ...MAMIE, id: '6b044f9d56a44767c7079b08', displayName: 'Tata' }
     const outgoing = friendshipRecord()
     const incoming = friendshipRecord({
       id: '6b044f9d56a44767c7079f02',
@@ -216,9 +247,22 @@ describe('listFriendships', () => {
     expect(deps.repository.findAllOf).toHaveBeenCalledWith(MEMBER.id)
     const createdAt = CREATED_AT.toISOString()
     expect(list).toEqual({
-      friends: [{ id: '6b044f9d56a44767c7079f03', user: TATA, createdAt }],
-      incoming: [{ id: '6b044f9d56a44767c7079f02', user: PAPI, createdAt }],
-      outgoing: [{ id: FRIENDSHIP_ID, user: MAMIE, createdAt }],
+      friends: [{ id: '6b044f9d56a44767c7079f03', user: friendUser(TATA), createdAt }],
+      incoming: [{ id: '6b044f9d56a44767c7079f02', user: friendUser(PAPI), createdAt }],
+      outgoing: [{ id: FRIENDSHIP_ID, user: friendUser(MAMIE), createdAt }],
+    })
+  })
+
+  it("gives the other side's avatar URL, never its Cloudinary id", async () => {
+    const deps = makeDeps()
+    const addressee = { ...MAMIE, avatarCloudinaryId: 'familyframe/avatars/abc' }
+    deps.repository.findAllOf.mockResolvedValue([friendshipRecord({ addressee })])
+
+    const { outgoing } = await createFriendshipsService(deps).listFriendships(MEMBER.id)
+
+    expect(outgoing[0]?.user).toEqual({
+      ...friendUser(MAMIE),
+      avatarUrl: 'https://cdn.test/familyframe/avatars/abc',
     })
   })
 })

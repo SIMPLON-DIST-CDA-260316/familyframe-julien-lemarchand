@@ -29,9 +29,16 @@ script:post-response {
     expect(idsOf(res.body.incoming)).to.not.include(friendshipId)
     expect(idsOf(res.body.friends)).to.not.include(friendshipId)
   })
+  test('chaque compte listé a un avatarUrl, jamais son id Cloudinary', () => {
+    for (const { user } of res.body.outgoing) {
+      expect(user).to.have.property('avatarUrl')
+      expect(user).to.not.have.property('avatarCloudinaryId')
+    }
+  })
 }
 
 docs {
   NOMINAL → 200 : la demande de `create/01` est dans `outgoing` du membre,
-  ni dans `incoming` ni dans `friends`.
+  ni dans `incoming` ni dans `friends`. Chaque compte listé porte
+  `avatarUrl` (`null` sans photo de profil), jamais l'id Cloudinary.
 }

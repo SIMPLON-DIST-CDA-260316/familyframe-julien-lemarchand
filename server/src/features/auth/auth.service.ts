@@ -3,6 +3,7 @@ import type { Logger } from '../../lib/logger.js'
 import { DUMMY_PASSWORD_HASH } from '../../lib/password.js'
 import type { PublicUser } from '../../types.js'
 import type { AuthRepository, SessionWithUser, UserRecord } from './auth.repository.js'
+import { type AvatarUrlBuilder, toPublicUser } from './public-user.js'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 const SESSION_DURATION_MS = 90 * DAY_MS
@@ -23,6 +24,7 @@ export type AuthServiceDeps = {
   hashToken: (token: string) => string
   generateToken: () => string
   verifyPassword: (passwordHash: string, plain: string) => Promise<boolean>
+  avatarUrl: AvatarUrlBuilder
   now: () => Date
   logger: Logger
 }
@@ -33,11 +35,6 @@ export type AuthService = {
   logout: (token: string | null) => Promise<void>
   authenticate: (token: string | null) => Promise<AuthenticatedSession>
   authenticateAndSlide: (token: string | null) => Promise<AuthenticatedSession>
-}
-
-// The password hash never leaves the service.
-function toPublicUser({ id, email, displayName, role }: UserRecord): PublicUser {
-  return { id, email, displayName, role }
 }
 
 function isFilledString(value: unknown): value is string {
@@ -100,7 +97,7 @@ async function login(deps: AuthServiceDeps, credentials: Credentials): Promise<L
   const user = await findUserByCredentials(deps, credentials)
   const { token, expiresAt } = await openSession(deps, user.id)
   deps.logger.info('auth.login_succeeded', { userId: user.id })
-  return { user: toPublicUser(user), token, expiresAt }
+  return { user: toPublicUser(user, deps.avatarUrl), token, expiresAt }
 }
 
 // Idempotent: logging out without a session, or twice, is not an error.
@@ -124,7 +121,8 @@ async function authenticate(
   token: string | null,
 ): Promise<AuthenticatedSession> {
   const session = await findValidSession(deps, token)
-  return { user: toPublicUser(session.user), expiresAt: session.expiresAt, isRenewed: false }
+  const user = toPublicUser(session.user, deps.avatarUrl)
+  return { user, expiresAt: session.expiresAt, isRenewed: false }
 }
 
 async function authenticateAndSlide(
@@ -132,13 +130,14 @@ async function authenticateAndSlide(
   token: string | null,
 ): Promise<AuthenticatedSession> {
   const session = await findValidSession(deps, token)
+  const user = toPublicUser(session.user, deps.avatarUrl)
   const remainingMs = session.expiresAt.getTime() - deps.now().getTime()
   if (remainingMs >= RENEWAL_THRESHOLD_MS) {
-    return { user: toPublicUser(session.user), expiresAt: session.expiresAt, isRenewed: false }
+    return { user, expiresAt: session.expiresAt, isRenewed: false }
   }
   const expiresAt = sessionEnd(deps)
   await deps.repository.extendSession(session.id, expiresAt)
-  return { user: toPublicUser(session.user), expiresAt, isRenewed: true }
+  return { user, expiresAt, isRenewed: true }
 }
 
 export function createAuthService(deps: AuthServiceDeps): AuthService {

@@ -1,8 +1,13 @@
 import { AppError } from '../../errors/app-error.js'
 import { parseEmail } from '../../lib/email.js'
 import type { Logger } from '../../lib/logger.js'
-import type { ApiErrorCode, Friendship, FriendshipList } from '../../types.js'
-import type { FriendshipRecord, FriendshipsRepository } from './friendships.repository.js'
+import type { ApiErrorCode, Friendship, FriendshipList, FriendUser } from '../../types.js'
+import { type AvatarUrlBuilder, toAvatarUrl } from '../auth/public-user.js'
+import type {
+  FriendshipParty,
+  FriendshipRecord,
+  FriendshipsRepository,
+} from './friendships.repository.js'
 
 // Prisma fails on an id that is not an ObjectId: that would be a 500, not a 404.
 const OBJECT_ID_PATTERN = /^[0-9a-f]{24}$/i
@@ -29,6 +34,7 @@ type DeletionReason = 'removed' | 'cancelled' | 'refused'
 
 export type FriendshipsServiceDeps = {
   repository: FriendshipsRepository
+  avatarUrl: AvatarUrlBuilder
   logger: Logger
 }
 
@@ -41,11 +47,24 @@ export type FriendshipsService = {
   areFriends: (userId: string, otherUserId: string) => Promise<boolean>
 }
 
+// The Cloudinary id stays on the server: the client gets a ready URL.
+function toFriendUser(
+  { id, displayName, email, avatarCloudinaryId }: FriendshipParty,
+  avatarUrl: AvatarUrlBuilder,
+): FriendUser {
+  return { id, displayName, email, avatarUrl: toAvatarUrl(avatarCloudinaryId, avatarUrl) }
+}
+
 // user is the other side: whoever reads the friendship already knows who they are.
-function toFriendship(record: FriendshipRecord, userId: string): Friendship {
+function toFriendship(
+  record: FriendshipRecord,
+  userId: string,
+  avatarUrl: AvatarUrlBuilder,
+): Friendship {
+  const otherSide = record.requester.id === userId ? record.addressee : record.requester
   return {
     id: record.id,
-    user: record.requester.id === userId ? record.addressee : record.requester,
+    user: toFriendUser(otherSide, avatarUrl),
     createdAt: record.createdAt.toISOString(),
   }
 }
@@ -81,7 +100,7 @@ async function findAddresseeId(
 // The reverse request is accepted by the same atomic write as « Accepter »: null means it was
 // cancelled or answered in between.
 async function acceptReverseRequest(
-  { repository, logger }: FriendshipsServiceDeps,
+  { repository, avatarUrl, logger }: FriendshipsServiceDeps,
   reverse: FriendshipRecord,
   requesterId: string,
 ): Promise<FriendRequestOutcome> {
@@ -90,11 +109,11 @@ async function acceptReverseRequest(
     throw refusal(logger, 'request_exists', requesterId)
   }
   logger.info('friendship.accepted', { friendshipId: record.id, userId: requesterId })
-  return { friendship: toFriendship(record, requesterId), isAccepted: true }
+  return { friendship: toFriendship(record, requesterId, avatarUrl), isAccepted: true }
 }
 
 async function createRequest(
-  { repository, logger }: FriendshipsServiceDeps,
+  { repository, avatarUrl, logger }: FriendshipsServiceDeps,
   requesterId: string,
   addresseeId: string,
 ): Promise<FriendRequestOutcome> {
@@ -104,7 +123,7 @@ async function createRequest(
     throw refusal(logger, 'request_exists', requesterId)
   }
   logger.info('friendship.requested', { friendshipId: record.id, userId: requesterId })
-  return { friendship: toFriendship(record, requesterId), isAccepted: false }
+  return { friendship: toFriendship(record, requesterId, avatarUrl), isAccepted: false }
 }
 
 // Asking someone who already asked me means yes: the request accepts theirs.
@@ -128,12 +147,12 @@ async function requestFriendship(
 }
 
 async function listFriendships(
-  { repository }: FriendshipsServiceDeps,
+  { repository, avatarUrl }: FriendshipsServiceDeps,
   userId: string,
 ): Promise<FriendshipList> {
   const records = await repository.findAllOf(userId)
   const toFriendships = (selected: FriendshipRecord[]): Friendship[] =>
-    selected.map((record) => toFriendship(record, userId))
+    selected.map((record) => toFriendship(record, userId, avatarUrl))
   const pendingRecords = records.filter(({ status }) => status === 'pending')
   return {
     friends: toFriendships(records.filter(({ status }) => status === 'accepted')),
@@ -169,7 +188,7 @@ async function deleteFriendship(
 // Filtered on the addressee and the pending status: one atomic write, no read-then-write race,
 // and the requester cannot accept their own request.
 async function acceptFriendship(
-  { repository, logger }: FriendshipsServiceDeps,
+  { repository, avatarUrl, logger }: FriendshipsServiceDeps,
   { id, userId }: FriendshipAction,
 ): Promise<Friendship> {
   const record = await repository.acceptReceived(parseFriendshipId(id), userId)
@@ -177,7 +196,7 @@ async function acceptFriendship(
     throw new AppError('FRIENDSHIP_NOT_FOUND')
   }
   logger.info('friendship.accepted', { friendshipId: record.id, userId })
-  return toFriendship(record, userId)
+  return toFriendship(record, userId, avatarUrl)
 }
 
 async function areFriends(

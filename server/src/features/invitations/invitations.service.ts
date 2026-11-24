@@ -2,11 +2,8 @@ import { AppError } from '../../errors/app-error.js'
 import { parseEmail } from '../../lib/email.js'
 import type { Logger } from '../../lib/logger.js'
 import type { CreatedInvitation, Invitation, InvitationStatus, PublicUser } from '../../types.js'
-import type {
-  InvitationRecord,
-  InvitationsRepository,
-  UserRecord,
-} from './invitations.repository.js'
+import { type AvatarUrlBuilder, toPublicUser } from '../auth/public-user.js'
+import type { InvitationRecord, InvitationsRepository } from './invitations.repository.js'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 export const INVITATION_DURATION_MS = 7 * DAY_MS
@@ -29,6 +26,7 @@ export type InvitationsServiceDeps = {
   generateToken: () => string
   hashToken: (token: string) => string
   hashPassword: (plain: string) => Promise<string>
+  avatarUrl: AvatarUrlBuilder
   now: () => Date
   logger: Logger
 }
@@ -79,11 +77,6 @@ function toInvitation(record: InvitationRecord, now: Date): Invitation {
     createdAt: record.createdAt.toISOString(),
     expiresAt: record.expiresAt.toISOString(),
   }
-}
-
-// The password hash never leaves the service.
-function toPublicUser({ id, email, displayName, role }: UserRecord): PublicUser {
-  return { id, email, displayName, role }
 }
 
 async function createInvitation(
@@ -161,7 +154,7 @@ async function acceptInvitation(
   }
   await repository.markUsed(invitation.id, now())
   logger.info('invitation.accepted', { invitationId: invitation.id, userId: user.id })
-  return toPublicUser(user)
+  return toPublicUser(user, deps.avatarUrl)
 }
 
 export function createInvitationsService(deps: InvitationsServiceDeps): InvitationsService {

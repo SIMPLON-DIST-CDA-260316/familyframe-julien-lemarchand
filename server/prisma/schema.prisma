@@ -23,6 +23,8 @@ model User {
   displayName            String
   passwordHash           String
   role                   Role         @default(member)
+  // null until the account picks a profile photo; the image lives on Cloudinary.
+  avatarCloudinaryId     String?
   createdAt              DateTime     @default(now())
   sessions               Session[]
   photos                 Photo[]      @relation("PhotoOwner")

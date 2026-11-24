@@ -14,6 +14,7 @@ const USER: UserRecord = {
   displayName: 'Membre',
   passwordHash: '$argon2id$stored-hash',
   role: 'member',
+  avatarCloudinaryId: null,
   createdAt: new Date('2026-11-01T10:00:00Z'),
 }
 const PUBLIC_USER = {
@@ -21,6 +22,7 @@ const PUBLIC_USER = {
   email: 'membre@familyframe.test',
   displayName: 'Membre',
   role: 'member',
+  avatarUrl: null,
 }
 const CREDENTIALS = { email: 'membre@familyframe.test', password: 'secret' }
 
@@ -54,6 +56,9 @@ function makeDeps() {
     hashToken: vi.fn<AuthServiceDeps['hashToken']>().mockReturnValue(TOKEN_HASH),
     generateToken: vi.fn<AuthServiceDeps['generateToken']>().mockReturnValue(TOKEN),
     verifyPassword: vi.fn<AuthServiceDeps['verifyPassword']>().mockResolvedValue(true),
+    avatarUrl: vi.fn<AuthServiceDeps['avatarUrl']>(
+      (cloudinaryId) => `https://cdn.test/${cloudinaryId}`,
+    ),
     now: vi.fn<AuthServiceDeps['now']>().mockReturnValue(NOW),
     logger: {
       info: vi.fn<Logger['info']>(),

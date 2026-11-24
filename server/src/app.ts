@@ -24,7 +24,7 @@ import { createPhotosController } from './features/photos/photos.controller.js'
 import { createPhotosRepository } from './features/photos/photos.repository.js'
 import { createPhotosRouter } from './features/photos/photos.routes.js'
 import { createPhotosService, type PhotosServiceDeps } from './features/photos/photos.service.js'
-import { deleteImage, uploadImage } from './lib/cloudinary.js'
+import { avatarUrl, deleteImage, uploadImage } from './lib/cloudinary.js'
 import { prisma } from './lib/db.js'
 import { toFrameJpeg } from './lib/image.js'
 import { logger } from './lib/logger.js'
@@ -40,6 +40,7 @@ export function assembleAuthService(): AuthService {
     hashToken,
     generateToken,
     verifyPassword,
+    avatarUrl,
     now: () => new Date(),
     logger,
   })
@@ -63,6 +64,7 @@ function assemblePhotosRouter(
 function assembleFriendshipsService(): FriendshipsService {
   return createFriendshipsService({
     repository: createFriendshipsRepository(prisma),
+    avatarUrl,
     logger,
   })
 }
@@ -81,6 +83,7 @@ function assembleInvitationsRouter(
     generateToken,
     hashToken,
     hashPassword,
+    avatarUrl,
     now: () => new Date(),
     logger,
   })

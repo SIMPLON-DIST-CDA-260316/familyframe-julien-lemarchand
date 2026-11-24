@@ -8,12 +8,14 @@ const ADMIN: PublicUser = {
   email: 'admin@familyframe.test',
   displayName: 'Admin',
   role: 'admin',
+  avatarUrl: null,
 }
 const MEMBER: PublicUser = {
   id: '6b044f9d56a44767c7079b02',
   email: 'membre@familyframe.test',
   displayName: 'Membre',
   role: 'member',
+  avatarUrl: null,
 }
 
 // The guard only reads req.user: a plain object stands in for the Express request.
