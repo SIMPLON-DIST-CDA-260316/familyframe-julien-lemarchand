@@ -17,7 +17,7 @@ import type { Friendship, FriendshipList } from '@/friendship.ts'
 import { type FriendshipActions, useFriendshipActions } from '@/hooks/useFriendshipActions.ts'
 import { useFriendships } from '@/hooks/useFriendships.ts'
 
-function RequestCard({ onSent }: { onSent: () => void }): JSX.Element {
+function RequestCard({ onDone }: { onDone: () => void }): JSX.Element {
   return (
     <Card>
       <CardHeader>
@@ -30,7 +30,7 @@ function RequestCard({ onSent }: { onSent: () => void }): JSX.Element {
         </CardAction>
       </CardHeader>
       <CardContent>
-        <FriendRequestForm onSent={onSent} />
+        <FriendRequestForm onDone={onDone} />
       </CardContent>
     </Card>
   )
@@ -113,20 +113,23 @@ function FriendshipLists({ friendships, actions }: FriendshipListsProps): JSX.El
 export default function FriendsPage(): JSX.Element {
   const { friendships, isLoading, error, reload } = useFriendships()
   const actions = useFriendshipActions(reload)
+  const { clearError } = actions
+
+  function handleRequestDone(): void {
+    clearError()
+    reload()
+  }
 
   return (
     <main className="mx-auto flex max-w-md flex-col gap-8 px-4 py-10">
-      <RequestCard onSent={reload} />
+      <RequestCard onDone={handleRequestDone} />
       {(error || actions.error) && (
         <Alert variant="destructive">
           <AlertDescription>{error || actions.error}</AlertDescription>
         </Alert>
       )}
-      {isLoading ? (
-        <p className="text-sm text-muted-foreground">Chargement…</p>
-      ) : (
-        <FriendshipLists friendships={friendships} actions={actions} />
-      )}
+      {isLoading && <p className="text-sm text-muted-foreground">Chargement…</p>}
+      {!isLoading && !error && <FriendshipLists friendships={friendships} actions={actions} />}
     </main>
   )
 }

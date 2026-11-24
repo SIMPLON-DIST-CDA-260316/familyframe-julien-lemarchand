@@ -10,6 +10,7 @@ export type FriendshipActions = {
   // Ids with a call in flight: their buttons wait, the other rows stay usable.
   busyIds: string[]
   error: string
+  clearError: () => void
   accept: (id: string) => Promise<void>
   remove: (id: string) => Promise<void>
 }
@@ -34,6 +35,7 @@ export function useFriendshipActions(reload: () => Promise<void>): FriendshipAct
   return {
     busyIds,
     error,
+    clearError: () => setError(''),
     accept: (id) => run(id, postAcceptFriendship),
     remove: (id) => run(id, deleteFriendship),
   }

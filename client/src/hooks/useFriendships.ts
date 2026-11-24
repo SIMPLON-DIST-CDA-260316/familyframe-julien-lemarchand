@@ -17,7 +17,7 @@ export function useFriendships(): FriendshipsState {
   const [friendships, setFriendships] = useState<FriendshipList>(NO_FRIENDSHIPS)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
-  // Two quick actions start two loads: only the latest one may set the lists (step 2 lesson).
+  // Two quick actions start two loads: only the latest one may set the lists.
   const latestLoadId = useRef(0)
 
   const reload = useCallback(async (): Promise<void> => {

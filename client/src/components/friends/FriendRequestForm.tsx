@@ -13,7 +13,7 @@ type FriendRequestFormState = {
   handleSubmit: (event: SubmitEvent<HTMLFormElement>) => Promise<void>
 }
 
-function useFriendRequestForm(onSent: () => void): FriendRequestFormState {
+function useFriendRequestForm(onDone: () => void): FriendRequestFormState {
   const { dropUser } = useAuth()
   const [email, setEmail] = useState('')
   const [isSending, setIsSending] = useState(false)
@@ -25,19 +25,17 @@ function useFriendRequestForm(onSent: () => void): FriendRequestFormState {
     setIsSending(true)
     const result = await postFriendRequest(email, dropUser)
     setIsSending(false)
-    if (!result.isSuccess) {
-      setError(result.message)
-      return
-    }
-    setEmail('')
-    onSent()
+    if (result.isSuccess) setEmail('')
+    else setError(result.message)
+    // Reload on failure too: the other side may have acted since the page loaded.
+    onDone()
   }
 
   return { email, setEmail, isSending, error, handleSubmit }
 }
 
-export function FriendRequestForm({ onSent }: { onSent: () => void }): JSX.Element {
-  const { email, setEmail, isSending, error, handleSubmit } = useFriendRequestForm(onSent)
+export function FriendRequestForm({ onDone }: { onDone: () => void }): JSX.Element {
+  const { email, setEmail, isSending, error, handleSubmit } = useFriendRequestForm(onDone)
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
