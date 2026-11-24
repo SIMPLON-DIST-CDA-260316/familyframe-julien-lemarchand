@@ -46,6 +46,13 @@ describe('toErrorResponse', () => {
     })
   })
 
+  it('answers an unknown, malformed or foreign friendship id with 404', () => {
+    expect(toErrorResponse(new AppError('FRIENDSHIP_NOT_FOUND'))).toEqual({
+      status: 404,
+      body: { error: 'FRIENDSHIP_NOT_FOUND' },
+    })
+  })
+
   it('answers an invitation past its 7 days with 410', () => {
     expect(toErrorResponse(new AppError('INVITATION_EXPIRED'))).toEqual({
       status: 410,

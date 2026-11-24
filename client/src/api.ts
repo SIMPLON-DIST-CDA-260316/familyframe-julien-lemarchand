@@ -15,6 +15,7 @@ export type ApiErrorCode =
   | 'PHOTO_NOT_FOUND'
   | 'INVITATION_NOT_FOUND'
   | 'USER_NOT_FOUND'
+  | 'FRIENDSHIP_NOT_FOUND'
   | 'PHOTO_DUPLICATE'
   | 'ACCOUNT_EXISTS'
   | 'ALREADY_FRIENDS'
@@ -43,6 +44,7 @@ const ERROR_MESSAGES: Record<ApiErrorCode, string> = {
   INVITATION_NOT_FOUND: "Ce lien d'invitation n'est pas valide. Demandez-en un nouveau.",
   USER_NOT_FOUND:
     "Aucun compte n'utilise cette adresse e-mail. Demandez à l'administrateur d'inviter cette personne.",
+  FRIENDSHIP_NOT_FOUND: "Cette demande ou cette amitié n'existe plus.",
   PHOTO_DUPLICATE: 'Cette photo est déjà dans votre bibliothèque.',
   ACCOUNT_EXISTS: 'Un compte existe déjà pour cette adresse e-mail.',
   ALREADY_FRIENDS: 'Vous êtes déjà amis.',

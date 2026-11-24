@@ -1,8 +1,11 @@
 import { AppError } from '../../errors/app-error.js'
 import { parseEmail } from '../../lib/email.js'
 import type { Logger } from '../../lib/logger.js'
-import type { ApiErrorCode, Friendship } from '../../types.js'
+import type { ApiErrorCode, Friendship, FriendshipList } from '../../types.js'
 import type { FriendshipRecord, FriendshipsRepository } from './friendships.repository.js'
+
+// Prisma fails on an id that is not an ObjectId: that would be a 500, not a 404.
+const OBJECT_ID_PATTERN = /^[0-9a-f]{24}$/i
 
 type RequestRefusal = 'user_not_found' | 'self' | 'already_friends' | 'request_exists'
 
@@ -16,6 +19,11 @@ const ERROR_BY_REFUSAL: Record<RequestRefusal, ApiErrorCode> = {
 // email comes straight from the JSON body: validated here, at the boundary.
 export type FriendRequest = { email: unknown; requesterId: string }
 
+// id comes from the URL; userId is the logged-in account, on either side of the friendship.
+export type FriendshipAction = { id: string; userId: string }
+
+type DeletionReason = 'removed' | 'cancelled' | 'refused'
+
 export type FriendshipsServiceDeps = {
   repository: FriendshipsRepository
   logger: Logger
@@ -23,6 +31,8 @@ export type FriendshipsServiceDeps = {
 
 export type FriendshipsService = {
   requestFriendship: (request: FriendRequest) => Promise<Friendship>
+  listFriendships: (userId: string) => Promise<FriendshipList>
+  deleteFriendship: (action: FriendshipAction) => Promise<void>
 }
 
 // user is the other side: whoever reads the friendship already knows who he is.
@@ -32,6 +42,13 @@ function toFriendship(record: FriendshipRecord, userId: string): Friendship {
     user: record.requester.id === userId ? record.addressee : record.requester,
     createdAt: record.createdAt.toISOString(),
   }
+}
+
+function parseFriendshipId(id: string): string {
+  if (!OBJECT_ID_PATTERN.test(id)) {
+    throw new AppError('FRIENDSHIP_NOT_FOUND')
+  }
+  return id
 }
 
 // Ids and a reason only: never the email the sender typed.
@@ -86,8 +103,49 @@ async function requestFriendship(
   return toFriendship(record, requesterId)
 }
 
+async function listFriendships(
+  { repository }: FriendshipsServiceDeps,
+  userId: string,
+): Promise<FriendshipList> {
+  const records = await repository.findAllOf(userId)
+  const toFriendships = (selected: FriendshipRecord[]): Friendship[] =>
+    selected.map((record) => toFriendship(record, userId))
+  const pendingRecords = records.filter(({ status }) => status === 'pending')
+  return {
+    friends: toFriendships(records.filter(({ status }) => status === 'accepted')),
+    incoming: toFriendships(pendingRecords.filter(({ addresseeId }) => addresseeId === userId)),
+    outgoing: toFriendships(pendingRecords.filter(({ requesterId }) => requesterId === userId)),
+  }
+}
+
+function deletionReasonOf(
+  { status, requesterId }: FriendshipRecord,
+  userId: string,
+): DeletionReason {
+  if (status === 'accepted') {
+    return 'removed'
+  }
+  return requesterId === userId ? 'cancelled' : 'refused'
+}
+
+// Refuse, cancel and remove are the same write: only the log tells them apart.
+async function deleteFriendship(
+  { repository, logger }: FriendshipsServiceDeps,
+  { id, userId }: FriendshipAction,
+): Promise<void> {
+  // Someone else's friendship answers like a missing one: its existence does not leak.
+  const record = await repository.deleteOf(parseFriendshipId(id), userId)
+  if (!record) {
+    throw new AppError('FRIENDSHIP_NOT_FOUND')
+  }
+  const reason = deletionReasonOf(record, userId)
+  logger.info('friendship.deleted', { friendshipId: record.id, userId, reason })
+}
+
 export function createFriendshipsService(deps: FriendshipsServiceDeps): FriendshipsService {
   return {
     requestFriendship: (request) => requestFriendship(deps, request),
+    listFriendships: (userId) => listFriendships(deps, userId),
+    deleteFriendship: (action) => deleteFriendship(deps, action),
   }
 }

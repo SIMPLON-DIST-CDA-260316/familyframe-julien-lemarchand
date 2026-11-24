@@ -162,3 +162,36 @@ describe('requestFriendship', () => {
     expect(logged).not.toContain(MAMIE.email)
   })
 })
+
+describe('listFriendships', () => {
+  it('puts each record in its list, with the other side as user', async () => {
+    const deps = makeDeps()
+    const PAPI = { id: '6b044f9d56a44767c7079b07', email: 'papi@example.fr', displayName: 'Papi' }
+    const TATA = { id: '6b044f9d56a44767c7079b08', email: 'tata@example.fr', displayName: 'Tata' }
+    const outgoing = friendshipRecord()
+    const incoming = friendshipRecord({
+      id: '6b044f9d56a44767c7079f02',
+      requesterId: PAPI.id,
+      requester: PAPI,
+      addresseeId: MEMBER.id,
+      addressee: MEMBER,
+    })
+    const accepted = friendshipRecord({
+      id: '6b044f9d56a44767c7079f03',
+      addresseeId: TATA.id,
+      addressee: TATA,
+      status: 'accepted',
+    })
+    deps.repository.findAllOf.mockResolvedValue([accepted, incoming, outgoing])
+
+    const list = await createFriendshipsService(deps).listFriendships(MEMBER.id)
+
+    expect(deps.repository.findAllOf).toHaveBeenCalledWith(MEMBER.id)
+    const createdAt = CREATED_AT.toISOString()
+    expect(list).toEqual({
+      friends: [{ id: '6b044f9d56a44767c7079f03', user: TATA, createdAt }],
+      incoming: [{ id: '6b044f9d56a44767c7079f02', user: PAPI, createdAt }],
+      outgoing: [{ id: FRIENDSHIP_ID, user: MAMIE, createdAt }],
+    })
+  })
+})
