@@ -6,6 +6,7 @@ import { AppError } from './app-error.js'
 
 const HTTP_STATUS_BY_CODE: Record<ApiErrorCode, number> = {
   PHOTO_MISSING: 400,
+  EMAIL_INVALID: 400,
   UPLOAD_INVALID: 400,
   BODY_INVALID: 400,
   QUERY_INVALID: 400,
@@ -15,6 +16,7 @@ const HTTP_STATUS_BY_CODE: Record<ApiErrorCode, number> = {
   ROUTE_NOT_FOUND: 404,
   PHOTO_NOT_FOUND: 404,
   PHOTO_DUPLICATE: 409,
+  ACCOUNT_EXISTS: 409,
   PHOTO_TOO_LARGE: 413,
   FORMAT_UNSUPPORTED: 415,
   IMAGE_UNREADABLE: 422,

@@ -3,6 +3,7 @@
 
 export type ApiErrorCode =
   | 'PHOTO_MISSING'
+  | 'EMAIL_INVALID'
   | 'UPLOAD_INVALID'
   | 'BODY_INVALID'
   | 'QUERY_INVALID'
@@ -12,6 +13,7 @@ export type ApiErrorCode =
   | 'ROUTE_NOT_FOUND'
   | 'PHOTO_NOT_FOUND'
   | 'PHOTO_DUPLICATE'
+  | 'ACCOUNT_EXISTS'
   | 'PHOTO_TOO_LARGE'
   | 'FORMAT_UNSUPPORTED'
   | 'IMAGE_UNREADABLE'
@@ -27,6 +29,23 @@ export type PublicUser = {
   email: string
   displayName: string
   role: UserRole
+}
+
+export type InvitationStatus = 'pending' | 'used' | 'expired'
+
+// createdAt and expiresAt are ISO 8601 strings; the token's hash never leaves the server.
+export type Invitation = {
+  id: string
+  email: string
+  status: InvitationStatus
+  createdAt: string
+  expiresAt: string
+}
+
+// The raw token, sent once at creation: the admin's page builds the link from it.
+export type CreatedInvitation = {
+  invitation: Invitation
+  token: string
 }
 
 // createdAt is an ISO 8601 string: JSON has no dates.

@@ -39,6 +39,13 @@ describe('toErrorResponse', () => {
     })
   })
 
+  it('answers an invitation for an address that has an account with 409', () => {
+    expect(toErrorResponse(new AppError('ACCOUNT_EXISTS'))).toEqual({
+      status: 409,
+      body: { error: 'ACCOUNT_EXISTS' },
+    })
+  })
+
   it('maps a file over the size limit to PHOTO_TOO_LARGE', () => {
     expect(toErrorResponse(new multer.MulterError('LIMIT_FILE_SIZE'))).toEqual({
       status: 413,
@@ -59,6 +66,13 @@ describe('toErrorResponse', () => {
     })
 
     expect(toErrorResponse(parseError)).toEqual({ status: 400, body: { error: 'BODY_INVALID' } })
+  })
+
+  it('answers an invalid invitation email with 400', () => {
+    expect(toErrorResponse(new AppError('EMAIL_INVALID'))).toEqual({
+      status: 400,
+      body: { error: 'EMAIL_INVALID' },
+    })
   })
 
   it('answers an invalid query string with 400', () => {
