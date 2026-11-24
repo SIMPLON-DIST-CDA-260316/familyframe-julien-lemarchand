@@ -257,6 +257,7 @@ Quand le schéma change sur une base qui contient déjà des photos, un nouvel i
 | Bibliothèque  | http://localhost:5180                   |
 | Cadre         | http://localhost:5180/frame             |
 | Amis          | http://localhost:5180/friends           |
+| Préférences   | http://localhost:5180/settings          |
 | Invitations   | http://localhost:5180/admin/invitations |
 
 Sans session, la bibliothèque et le cadre redirigent vers `/login` ; le cadre se connecte une fois avec un compte et reste connecté tant qu'il est allumé : il recharge ses photos chaque jour, ce qui prolonge la session glissante de 90 jours.
