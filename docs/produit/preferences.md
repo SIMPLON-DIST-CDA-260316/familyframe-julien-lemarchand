@@ -1,6 +1,6 @@
 # Préférences
 
-La page où chacun règle son compte : sa photo de profil, son nom affiché et son mot de passe, et d'y voir son adresse e-mail. Chaque réglage a son propre encart, enregistré séparément.
+La page où chacun règle son compte : sa photo de profil, son nom affiché et son mot de passe, et où il voit son adresse e-mail. Chaque réglage a son propre encart, enregistré séparément.
 
 ## Ouvrir ses préférences
 
@@ -82,10 +82,12 @@ La page où chacun règle son compte : sa photo de profil, son nom affiché et s
 **Règles**
 
 1. R-PRF-30 · Le rond de profil montre la photo de la personne quand elle en a une, et sa première lettre en majuscule sinon. Cela vaut pour la barre du haut, les menus, la page Amis et le panneau « Envoyer à des proches ».
+2. R-PRF-37 · Si l'image d'une photo de profil ne peut pas se charger, le rond montre la première lettre à la place.
 
 **Ce qui n'est pas possible**
 
-- Rien de particulier.
+- Voir la photo de profil en plus grand : le rond n'est pas cliquable.
+- Voir la photo de profil d'une personne qui n'est pas dans ses amis.
 
 ## Photo de profil
 
@@ -101,7 +103,8 @@ La page où chacun règle son compte : sa photo de profil, son nom affiché et s
 2. R-PRF-32 · La photo est recadrée en carré, au centre, sans outil de recadrage. L'aperçu montre l'image choisie ; le recadrage se fait à l'enregistrement.
 3. R-PRF-33 · « Enregistrer » reste grisé tant qu'aucune image n'est choisie. « Annuler » n'apparaît que lorsqu'une image est choisie ; « Retirer » n'apparaît que lorsqu'une photo est enregistrée et qu'aucune image n'est choisie.
 4. R-PRF-34 · Après l'enregistrement ou le retrait, la barre du haut, les menus et, chez ses amis, la page Amis et le panneau « Envoyer à des proches » montrent le changement (R-PRF-30).
-5. R-PRF-35 · Une nouvelle photo remplace l'ancienne. Si l'image d'une photo de profil ne peut pas se charger, le rond montre l'initiale à la place.
+5. R-PRF-35 · Remplacée : une nouvelle photo remplace l'ancienne (R-PRF-36) ; si l'image ne peut pas se charger, le rond montre l'initiale (R-PRF-37).
+6. R-PRF-36 · Une nouvelle photo remplace l'ancienne.
 
 **Messages affichés**
 
@@ -117,7 +120,6 @@ La page où chacun règle son compte : sa photo de profil, son nom affiché et s
 **Ce qui n'est pas possible**
 
 - Choisir soi-même la zone recadrée.
-- Enregistrer un format autre que JPEG, PNG ou WebP, ou une image de plus de 10 Mo.
 
 ## Mot de passe
 
@@ -145,5 +147,4 @@ La page où chacun règle son compte : sa photo de profil, son nom affiché et s
 
 **Ce qui n'est pas possible**
 
-- Changer son mot de passe sans connaître l'actuel.
 - Déconnecter à distance un seul appareil : le changement les déconnecte tous, sauf celui utilisé.
