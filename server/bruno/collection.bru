@@ -39,6 +39,10 @@ docs {
   membre et l'admin : il n'en laisse aucune, et commence par effacer celles
   d'un lancement interrompu.
 
+  Le dossier `account/` modifie aussi ce compte jetable, jamais le membre, et
+  le remet dans son état de départ en fin de dossier (voir
+  `account/folder.bru`).
+
   Le dossier `photos/share/` lit les ids du membre et de l'admin
   (`memberId`, `adminId`, par `GET /api/auth/me`), rend les deux comptes amis
   le temps de ses requêtes, puis supprime cette amitié. Les photos que l'admin

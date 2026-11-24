@@ -3,6 +3,10 @@ import express, { type Express, type RequestHandler, type Router } from 'express
 import { config } from './config.js'
 import { errorHandler } from './errors/error-handler.js'
 import { notFound } from './errors/not-found.js'
+import { createAccountController } from './features/account/account.controller.js'
+import { createAccountRepository } from './features/account/account.repository.js'
+import { createAccountRouter } from './features/account/account.routes.js'
+import { createAccountService } from './features/account/account.service.js'
 import { createAuthController } from './features/auth/auth.controller.js'
 import { requireRole } from './features/auth/auth.guard.js'
 import { createRequireAuth } from './features/auth/auth.middleware.js'
@@ -73,6 +77,15 @@ function assembleFriendshipsRouter(service: FriendshipsService): Router {
   return createFriendshipsRouter(createFriendshipsController(service))
 }
 
+function assembleAccountRouter(): Router {
+  const service = createAccountService({
+    repository: createAccountRepository(prisma),
+    avatarUrl,
+    logger,
+  })
+  return createAccountRouter(createAccountController(service))
+}
+
 function assembleInvitationsRouter(
   authService: AuthService,
   requireAuth: RequestHandler,
@@ -111,6 +124,7 @@ export function createApp(io: SocketServer, authService: AuthService): Express {
   // Unlike photos, the router gets requireAuth itself: its accept route is public.
   app.use('/api/invitations', assembleInvitationsRouter(authService, requireAuth, requireAdmin))
   app.use('/api/friendships', requireAuth, assembleFriendshipsRouter(friendships))
+  app.use('/api/account', requireAuth, assembleAccountRouter())
 
   app.use(notFound)
   app.use(errorHandler)
