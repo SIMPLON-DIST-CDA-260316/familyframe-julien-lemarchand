@@ -60,13 +60,18 @@ Le routage est fait côté navigateur (`react-router`). En production (J2), le s
 | `POST /api/invitations`                 | JSON `{ email }` → `201 { invitation, token }` : réservé à l'admin ; le jeton brut n'est envoyé qu'une fois, le client en fait le lien                                                                             |
 | `GET /api/invitations`                  | `200 { invitations }` : réservé à l'admin ; toutes les invitations, la plus récente en premier                                                                                                                     |
 | `POST /api/invitations/accept`          | JSON `{ token, displayName, password }` → `201 { user }` + cookie `ff_session` : public ; crée un compte `member` à l'e-mail de l'invitation et le connecte                                                        |
+| `GET /api/friendships`                  | `200 { friends, incoming, outgoing }` : amis, demandes reçues et demandes envoyées du compte connecté, la plus récente en premier                                                                                  |
+| `POST /api/friendships`                 | JSON `{ email }` → `201 { friendship }` : demande d'ami à l'e-mail exact d'un compte existant                                                                                                                      |
+| `DELETE /api/friendships/:id`           | `204` sans corps, pour l'un ou l'autre côté : refuse une demande reçue, annule une demande envoyée ou retire un ami                                                                                                |
 | `GET /api/photos?cursor=<id>&limit=<n>` | `200 { photos, nextCursor }` : photos du compte connecté, la plus récente en premier ; `limit` de 1 à 100 (30 par défaut) ; `nextCursor` est l'id à passer en `cursor` pour la page suivante, `null` à la dernière |
 | `POST /api/photos`                      | `multipart/form-data` avec `photo` (fichier) → `201 Photo`                                                                                                                                                         |
 | `DELETE /api/photos/:id`                | `204` sans corps, pour une photo du compte connecté ; supprime l'enregistrement, puis l'image Cloudinary (cache CDN compris) si plus aucune photo n'y renvoie                                                      |
 
-Toutes les routes `/api/photos`, `GET /api/auth/me` et les routes admin de `/api/invitations` demandent une session ; sans elle : `401 UNAUTHENTICATED`. Les routes admin répondent `403 FORBIDDEN` à un membre. Un `user` vaut `{ id, email, displayName, role }` (`role` : `member` ou `admin`), jamais le hash du mot de passe.
+Toutes les routes `/api/photos`, `/api/friendships`, `GET /api/auth/me` et les routes admin de `/api/invitations` demandent une session ; sans elle : `401 UNAUTHENTICATED`. Les routes admin répondent `403 FORBIDDEN` à un membre. Un `user` vaut `{ id, email, displayName, role }` (`role` : `member` ou `admin`), jamais le hash du mot de passe.
 
 Une `Invitation` vaut `{ id, email, status, createdAt, expiresAt }` (dates en ISO 8601) ; `status` vaut `pending` (en attente), `used` (utilisée) ou `expired` (expirée), calculé à chaque lecture. Le hash du jeton et l'admin qui l'a créée restent côté serveur.
+
+Une `Friendship` vaut `{ id, user, createdAt }` (`createdAt` en ISO 8601) : `id` est celui de l'amitié (c'est lui qu'on accepte ou supprime), `user` l'autre compte, `{ id, displayName, email }`, jamais son rôle ni le hash de son mot de passe. Une demande vise l'e-mail exact d'un compte (même normalisation qu'au login) ; une demande dans un sens ou dans l'autre bloque une nouvelle demande. Refuser, annuler et retirer sont la même suppression, permise aux deux côtés : seul le log les distingue. L'admin est ici un membre comme un autre.
 
 Une `Photo` vaut `{ id, url, thumbnailUrl, createdAt }` (`createdAt` en ISO 8601). Chaque photo appartient au compte qui l'a envoyée (`ownerId`, côté serveur seulement) : la liste, la suppression et les événements ne concernent que les photos du compte connecté. L'identifiant Cloudinary reste côté serveur : le client reçoit des URL prêtes à l'emploi.
 
@@ -74,29 +79,34 @@ La liste est paginée par curseur (_keyset_) sur l'id : un ObjectId commence par
 
 En cas d'erreur, l'API renvoie `{ "error": code }` ; le client traduit le code en message français :
 
-| Cas                                                                                | Statut | `error`                |
-| ---------------------------------------------------------------------------------- | ------ | ---------------------- |
-| aucun fichier                                                                      | 400    | `PHOTO_MISSING`        |
-| autre erreur Multer (mauvais champ, plusieurs fichiers)                            | 400    | `UPLOAD_INVALID`       |
-| corps JSON illisible (routes `/api/auth` et `/api/invitations`)                    | 400    | `BODY_INVALID`         |
-| e-mail absent ou mal formé (création d'invitation)                                 | 400    | `EMAIL_INVALID`        |
-| nom d'affichage vide après trim, de plus de 50 caractères, ou absent               | 400    | `DISPLAY_NAME_INVALID` |
-| mot de passe de moins de 12 ou plus de 128 caractères, ou absent                   | 400    | `PASSWORD_INVALID`     |
-| `limit` ou `cursor` invalide (`GET /api/photos`)                                   | 400    | `QUERY_INVALID`        |
-| pas de session, session inconnue ou expirée                                        | 401    | `UNAUTHENTICATED`      |
-| e-mail inconnu ou mauvais mot de passe                                             | 401    | `INVALID_CREDENTIALS`  |
-| compte connecté sans le rôle demandé (membre sur une route admin)                  | 403    | `FORBIDDEN`            |
-| route inconnue                                                                     | 404    | `ROUTE_NOT_FOUND`      |
-| photo inconnue, photo d'un autre compte, ou id qui n'est pas un ObjectId           | 404    | `PHOTO_NOT_FOUND`      |
-| jeton d'invitation inconnu, remplacé ou mal formé                                  | 404    | `INVITATION_NOT_FOUND` |
-| fichier déjà dans la bibliothèque du compte (même SHA-256)                         | 409    | `PHOTO_DUPLICATE`      |
-| l'e-mail a déjà un compte (création d'invitation, ou acceptation après une course) | 409    | `ACCOUNT_EXISTS`       |
-| invitation de plus de 7 jours                                                      | 410    | `INVITATION_EXPIRED`   |
-| invitation déjà utilisée                                                           | 410    | `INVITATION_USED`      |
-| fichier de plus de 10 Mo                                                           | 413    | `PHOTO_TOO_LARGE`      |
-| type autre que JPEG, PNG ou WebP                                                   | 415    | `FORMAT_UNSUPPORTED`   |
-| image illisible par Sharp                                                          | 422    | `IMAGE_UNREADABLE`     |
-| toute autre erreur (Cloudinary, base)                                              | 500    | `SERVER_ERROR`         |
+| Cas                                                                                           | Statut | `error`                 |
+| --------------------------------------------------------------------------------------------- | ------ | ----------------------- |
+| aucun fichier                                                                                 | 400    | `PHOTO_MISSING`         |
+| autre erreur Multer (mauvais champ, plusieurs fichiers)                                       | 400    | `UPLOAD_INVALID`        |
+| corps JSON illisible (routes `/api/auth`, `/api/invitations` et `/api/friendships`)           | 400    | `BODY_INVALID`          |
+| e-mail absent ou mal formé (création d'invitation, demande d'ami)                             | 400    | `EMAIL_INVALID`         |
+| nom d'affichage vide après trim, de plus de 50 caractères, ou absent                          | 400    | `DISPLAY_NAME_INVALID`  |
+| mot de passe de moins de 12 ou plus de 128 caractères, ou absent                              | 400    | `PASSWORD_INVALID`      |
+| demande d'ami à sa propre adresse                                                             | 400    | `SELF_FRIEND`           |
+| `limit` ou `cursor` invalide (`GET /api/photos`)                                              | 400    | `QUERY_INVALID`         |
+| pas de session, session inconnue ou expirée                                                   | 401    | `UNAUTHENTICATED`       |
+| e-mail inconnu ou mauvais mot de passe                                                        | 401    | `INVALID_CREDENTIALS`   |
+| compte connecté sans le rôle demandé (membre sur une route admin)                             | 403    | `FORBIDDEN`             |
+| route inconnue                                                                                | 404    | `ROUTE_NOT_FOUND`       |
+| photo inconnue, photo d'un autre compte, ou id qui n'est pas un ObjectId                      | 404    | `PHOTO_NOT_FOUND`       |
+| jeton d'invitation inconnu, remplacé ou mal formé                                             | 404    | `INVITATION_NOT_FOUND`  |
+| demande d'ami à un e-mail sans compte                                                         | 404    | `USER_NOT_FOUND`        |
+| amitié ou demande inconnue, d'autres comptes, déjà supprimée, ou id qui n'est pas un ObjectId | 404    | `FRIENDSHIP_NOT_FOUND`  |
+| fichier déjà dans la bibliothèque du compte (même SHA-256)                                    | 409    | `PHOTO_DUPLICATE`       |
+| l'e-mail a déjà un compte (création d'invitation, ou acceptation après une course)            | 409    | `ACCOUNT_EXISTS`        |
+| demande d'ami entre deux comptes déjà amis                                                    | 409    | `ALREADY_FRIENDS`       |
+| demande d'ami alors qu'une demande attend entre les deux, dans un sens ou dans l'autre        | 409    | `FRIEND_REQUEST_EXISTS` |
+| invitation de plus de 7 jours                                                                 | 410    | `INVITATION_EXPIRED`    |
+| invitation déjà utilisée                                                                      | 410    | `INVITATION_USED`       |
+| fichier de plus de 10 Mo                                                                      | 413    | `PHOTO_TOO_LARGE`       |
+| type autre que JPEG, PNG ou WebP                                                              | 415    | `FORMAT_UNSUPPORTED`    |
+| image illisible par Sharp                                                                     | 422    | `IMAGE_UNREADABLE`      |
+| toute autre erreur (Cloudinary, base)                                                         | 500    | `SERVER_ERROR`          |
 
 ## Authentification
 
@@ -106,15 +116,16 @@ En cas d'erreur, l'API renvoie `{ "error": code }` ; le client traduit le code e
 - **Glissement** : une session dure 90 jours ; une requête HTTP authentifiée qui arrive à moins de 45 jours de la fin la prolonge à 90 jours et renvoie le cookie. Le cadre recharge ses photos une fois par jour (`usePhotoFeed`) : cet appel HTTP prolonge la session, ce que la connexion Socket.IO ne ferait pas. Un cadre allumé ne se déconnecte donc jamais, pour au plus une écriture en base tous les 45 jours. Une socket déjà ouverte n'est pas revérifiée par le serveur quand sa session expire ou est supprimée par une déconnexion : elle est refusée à la reconnexion suivante.
 - **Expiration** : Prisma 6 ne sait pas déclarer d'index TTL MongoDB. Une session expirée est supprimée quand on la lit, et toutes les sessions expirées à chaque session ouverte (connexion, invitation).
 - **Connexion refusée** : e-mail inconnu et mauvais mot de passe répondent tous deux `401 INVALID_CREDENTIALS`, et un e-mail inconnu coûte quand même une vérification argon2 (contre un hash factice) : ni le message ni le temps de réponse ne disent qui a un compte.
-- **Garde HTTP** : `requireAuth` (`features/auth/auth.middleware.ts`) lit le cookie avec `lib/session-token.ts` (sans `cookie-parser`), valide la session et pose `req.user`, typé par _declaration merging_ sur `Request` ; `currentUser(req)` (`features/auth/auth.guard.ts`) le relit sans cast. `requireRole(role)` (même fichier), monté après `requireAuth`, compare le rôle de la session déjà chargée (aucune requête en plus) et répond `403 FORBIDDEN` à un autre rôle. Il vit à part du middleware : `auth.middleware.ts` atteint `config.ts`, qu'un test unitaire ne peut pas charger sans variables d'environnement. `/api/photos`, `/api/auth/me` et les routes admin de `/api/invitations` (puis `requireRole('admin')`) sont derrière `requireAuth` ; `/api/health`, `/api/auth/login`, `/api/auth/logout` et `/api/invitations/accept` restent publics.
+- **Garde HTTP** : `requireAuth` (`features/auth/auth.middleware.ts`) lit le cookie avec `lib/session-token.ts` (sans `cookie-parser`), valide la session et pose `req.user`, typé par _declaration merging_ sur `Request` ; `currentUser(req)` (`features/auth/auth.guard.ts`) le relit sans cast. `requireRole(role)` (même fichier), monté après `requireAuth`, compare le rôle de la session déjà chargée (aucune requête en plus) et répond `403 FORBIDDEN` à un autre rôle. Il vit à part du middleware : `auth.middleware.ts` atteint `config.ts`, qu'un test unitaire ne peut pas charger sans variables d'environnement. `/api/photos`, `/api/auth/me`, `/api/friendships` et les routes admin de `/api/invitations` (puis `requireRole('admin')`) sont derrière `requireAuth` ; `/api/health`, `/api/auth/login`, `/api/auth/logout` et `/api/invitations/accept` restent publics.
 - **Invitations** : l'admin crée un lien depuis `/admin/invitations`. Le jeton suit la règle des sessions (32 octets aléatoires, `lib/session-token.ts`, seul son SHA-256 en base dans `Invitation.tokenHash`), vaut 7 jours (`INVITATION_DURATION_MS`) et sert une fois (`usedAt`). Le serveur renvoie le jeton brut une seule fois ; le client construit le lien `` `${window.location.origin}/invite/${token}` `` : l'origine que l'admin utilise est celle que la famille atteint, sans variable de configuration en plus. Une nouvelle invitation pour le même e-mail **remplace** les précédentes non utilisées (supprimées) : « j'ai perdu le lien » se règle sans bouton de révocation, et l'ancien lien répond `404 INVITATION_NOT_FOUND`. Le jeton ne passe jamais dans un chemin d'API (`http.request` journalise les chemins) : il voyage dans le corps JSON. L'acceptation (`POST /api/invitations/accept`, publique) vérifie d'abord le jeton (forme, existence, déjà utilisé, expiré), puis le nom, puis le mot de passe : inutile de choisir un mot de passe pour un lien mort. Elle crée le compte, puis marque l'invitation utilisée, sans transaction : l'index unique sur `User.email` garantit qu'un double envoi ne crée qu'un compte (l'autre reçoit `409 ACCOUNT_EXISTS`). Limite connue : si l'admin réinvite la même adresse pendant une acceptation, le compte peut être créé alors que la réponse est une `500` ; le compte fonctionne, la personne se connecte sur `/login`. La session est ouverte par `openSession` du service d'auth (aussi utilisé par la connexion), et le contrôleur pose le cookie comme au login.
-- **JSON** : `express.json()` n'est monté que sur `/api/auth` et `/api/invitations`, les seules routes qui lisent du JSON ; un corps illisible répond `400 BODY_INVALID`.
+- **JSON** : `express.json()` n'est monté que sur `/api/auth`, `/api/invitations` et `/api/friendships`, les seules routes qui lisent du JSON ; un corps illisible répond `400 BODY_INVALID`.
 
 ## Temps réel
 
 - **Connexion protégée** : un middleware `io.use` (`features/auth/auth.socket.ts`) lit le même cookie dans la requête de handshake et valide la session, sans glissement (pas de réponse HTTP pour porter un nouveau cookie). Sans session valide, la connexion est refusée avec l'erreur `UNAUTHENTICATED`, que le client traite comme une déconnexion ; une panne de la base donne `SERVER_ERROR` (journalisée en `server.error`). Chaque socket rejoint la room `user:<id>` (`userRoom`, même fichier).
 - Deux événements, du serveur vers les connexions du propriétaire de la photo (`io.to(userRoom(ownerId))`) : `photo:new` avec la `Photo` créée, `photo:deleted` avec l'id de la photo supprimée. Les autres comptes ne les reçoivent pas.
 - Le cadre recharge toute la bibliothèque (toutes les pages) à chaque connexion Socket.IO, reconnexions comprises : une photo envoyée pendant une coupure n'est pas perdue. Ensuite il ajoute `photo:new` en tête et retire `photo:deleted` de la liste, sans recharger. Les événements reçus pendant un chargement sont rejoués sur la liste chargée, et seul le dernier chargement lancé s'applique. Limite connue : chaque connexion relit toutes les pages et le diaporama crée une diapositive par photo, ce qui convient à quelques centaines de photos. La page bibliothèque (`/`) recharge sa première page à chaque connexion et suit les mêmes événements (`usePhotoLibrary`, socket partagée dans `client/src/photoSocket.ts`).
+- Les amitiés ne sont pas poussées : la page `/friends` recharge ses listes à l'ouverture et après chaque action. Les demandes sont rares et la page est ouverte exprès ; un événement Socket.IO demanderait un type d'événement, un écouteur côté client et `io` dans un quatrième contrôleur.
 - Les types partagés (`Photo`, codes d'erreur, événements) sont dupliqués entre `server/src/types.ts` et `client/src` : un package commun compliquerait les builds Docker.
 
 ## Serveur : app et processus
@@ -126,7 +137,7 @@ En cas d'erreur, l'API renvoie `{ "error": code }` ; le client traduit le code e
 
 ## Couches du backend
 
-Une feature par dossier (`server/src/features/photos/`, `server/src/features/auth/`, `server/src/features/invitations/`), un fichier par couche. Pour les photos :
+Une feature par dossier (`server/src/features/photos/`, `server/src/features/auth/`, `server/src/features/invitations/`, `server/src/features/friendships/`), un fichier par couche. Pour les photos :
 
 | Fichier                | Rôle                                                                                                                       |
 | ---------------------- | -------------------------------------------------------------------------------------------------------------------------- |
@@ -138,8 +149,9 @@ Une feature par dossier (`server/src/features/photos/`, `server/src/features/aut
 
 - `features/auth/` suit le même découpage (`auth.repository.ts`, `auth.service.ts`, `auth.controller.ts`, `auth.routes.ts`), plus `auth.middleware.ts` (garde HTTP), `auth.guard.ts` (`currentUser`, `requireRole`), `auth.socket.ts` (garde Socket.IO) et `auth.cookie.ts` (pose et efface le cookie). Le service d'auth reçoit ses dépendances (`repository`, `hashToken`, `generateToken`, `verifyPassword`, `now`, `logger`) ; `app.ts` l'assemble une fois (`assembleAuthService`) et `server.ts` le partage avec Socket.IO.
 - `features/invitations/` suit le même découpage (`invitations.repository.ts`, `invitations.service.ts`, `invitations.controller.ts`, `invitations.routes.ts`). Le service reçoit `repository` (seul endroit qui crée un compte), `generateToken`, `hashToken`, `hashPassword`, `now` et `logger` ; le contrôleur reçoit aussi le service d'auth pour `openSession` ; `app.ts` construit `requireAdmin = requireRole('admin')` une fois et le passe au routeur, derrière `requireAuth`.
+- `features/friendships/` suit le même découpage (`friendships.repository.ts`, `friendships.service.ts`, `friendships.controller.ts`, `friendships.routes.ts`). Le service reçoit `repository` et `logger` ; le repository calcule `pairKey` et ne lit des comptes que `id`, `email` et `displayName`. `app.ts` monte le routeur derrière `requireAuth`, comme les photos.
 - Les dépendances sont passées par des fonctions-fabriques (`createPhotosService({ repository, toFrameJpeg, uploadImage, deleteImage, logger })`), assemblées dans `app.ts` : un test peut fournir de fausses implémentations.
-- `server/src/lib/` regroupe les clients techniques : Prisma (`db.ts`), Cloudinary, sharp (`image.ts`).
+- `server/src/lib/` regroupe les clients techniques : Prisma (`db.ts`), Cloudinary, sharp (`image.ts`), et `email.ts` (`parseEmail`, la même règle pour une invitation et une demande d'ami).
 - **Erreurs** : le service lève une `AppError` portant un code ; le contrôleur n'a pas de try/catch (Express 5 transmet les rejets). Une route inconnue tombe sur `errors/not-found.ts` (monté après les routes), qui lève `ROUTE_NOT_FOUND`. `errors/error-handler.ts` est le seul endroit qui écrit une réponse d'erreur, avec un statut tiré d'un `Record` exhaustif sur les codes. Une erreur de sharp devient `IMAGE_UNREADABLE` (faute de l'utilisateur) ; une erreur de Cloudinary ou de Prisma reste une 500.
 
 ## Logs
@@ -148,7 +160,7 @@ Une feature par dossier (`server/src/features/photos/`, `server/src/features/aut
 - **Format** : JSON par défaut, filtrable (`{"time":"…","level":"info","event":"photo.created","photoId":"…"}`) ; `LOG_FORMAT=pretty` en dev donne `14:37:17 INFO  photo.created photoId=…`. Une `Error` est écrite avec son nom, son message et sa pile.
 - **Niveaux** : `info` < `warn` < `error` ; `LOG_LEVEL` fixe le niveau minimum écrit.
 - **Noms d'événements stables** `domaine.action` : on filtre sur le nom (`docker logs <conteneur> | grep photo.`), pas sur un texte qui change à chaque reformulation.
-- **Pas de données personnelles** : jamais un nom, l'e-mail, le mot de passe ni le jeton de session ; seulement des identifiants (`photoId`, `cloudinaryId`, `socketId`, `userId`) ; les chemins sans leur query string.
+- **Pas de données personnelles** : jamais un nom, l'e-mail, le mot de passe ni le jeton de session ; seulement des identifiants (`photoId`, `cloudinaryId`, `socketId`, `userId`, `friendshipId`) ; les chemins sans leur query string.
 - Le service photos reçoit le logger par injection ; le reste du serveur importe `logger`.
 
 | Événement                                                   | Niveau                        | Écrit par                                                                                                                                                                         |
@@ -168,6 +180,8 @@ Une feature par dossier (`server/src/features/photos/`, `server/src/features/aut
 | `invitation.created`                                        | info                          | service invitations, avec `invitationId`, `userId` (l'admin) et `replacedCount` (invitations remplacées) ; jamais l'e-mail ni le jeton                                            |
 | `invitation.accepted`                                       | info                          | service invitations, avec `invitationId` et `userId` (le nouveau membre)                                                                                                          |
 | `invitation.accept_failed`                                  | warn                          | service invitations, avec `reason` (`not_found`, `used`, `expired`, `account_exists`) et `invitationId` quand il est connu ; jamais le jeton, l'e-mail, le nom ni le mot de passe |
+| `friendship.requested` / `friendship.deleted`               | info                          | service amis, avec `friendshipId` et `userId` (qui agit) ; `friendship.deleted` dit aussi ce qui s'est passé (`reason` : `removed`, `cancelled`, `refused`)                       |
+| `friendship.request_failed`                                 | warn                          | service amis, avec `reason` (`user_not_found`, `self`, `already_friends`, `request_exists`) et `userId` ; jamais l'e-mail                                                         |
 | `server.error`                                              | error                         | `errors/error-handler.ts` (chaque 500), `auth.socket.ts` (handshake)                                                                                                              |
 | `server.stopping` / `server.stopped` / `server.stop_failed` | info / info / error           | `server.ts`, à l'arrêt                                                                                                                                                            |
 | `process.crashed`                                           | error                         | `server.ts`, exception ou rejet non géré, puis arrêt                                                                                                                              |
@@ -207,7 +221,7 @@ Une feature par dossier (`server/src/features/photos/`, `server/src/features/aut
 - **Biome** : lint, formatage et tri des imports (remplace ESLint + Prettier). Dans `server/src`, `noConsole` interdit `console` : on passe par le logger.
 - **lefthook** : `biome check` au pre-commit, **commitlint** au commit-msg.
 - **Vitest** : tests unitaires du serveur, colocalisés (`*.test.ts`), lancés par `pnpm test` sans API ; exclus du build par `server/tsconfig.build.json`.
-- **Bruno** (`server/bruno/`) : requêtes de l'API avec assertions, un dossier par endpoint, des fichiers `NN-nominal-…` / `NN-edge-…`. Lancées par `pnpm test:bruno` contre l'API démarrée et la base remplie par le seed (CLI via `pnpm dlx`, version figée, pas de dépendance). Le dossier `auth/` passe en premier (`seq: 1`) et range le cookie de session dans une variable, envoyée à toutes les requêtes par un en-tête de collection ; le CLI tourne avec `--disable-cookies` pour que sa boîte à cookies ne renvoie pas la session aux requêtes « sans cookie ». Un second compte (l'admin, `auth/login/05`) range son cookie dans `adminCookie` : les requêtes qui vérifient qu'un compte ne touche pas aux photos d'un autre l'envoient à la place de celui du membre. Le dossier `invitations/` passe juste après (`seq: 2`) : l'admin y crée une invitation pour une adresse neuve à chaque lancement (`invite-<horodatage>@familyframe.test`), donc rien à remettre à zéro entre deux lancements.
+- **Bruno** (`server/bruno/`) : requêtes de l'API avec assertions, un dossier par endpoint, des fichiers `NN-nominal-…` / `NN-edge-…`. Lancées par `pnpm test:bruno` contre l'API démarrée et la base remplie par le seed (CLI via `pnpm dlx`, version figée, pas de dépendance). Le dossier `auth/` passe en premier (`seq: 1`) et range le cookie de session dans une variable, envoyée à toutes les requêtes par un en-tête de collection ; le CLI tourne avec `--disable-cookies` pour que sa boîte à cookies ne renvoie pas la session aux requêtes « sans cookie ». Un second compte (l'admin, `auth/login/05`) range son cookie dans `adminCookie` : les requêtes qui vérifient qu'un compte ne touche pas aux photos d'un autre l'envoient à la place de celui du membre. Le dossier `invitations/` passe juste après (`seq: 2`) : l'admin y crée une invitation pour une adresse neuve à chaque lancement (`invite-<horodatage>@familyframe.test`), donc rien à remettre à zéro entre deux lancements. Le dossier `friendships/` suit (`seq: 3`) : le membre y envoie une demande à l'admin, et `invitations/accept/05` range le cookie du compte créé dans `inviteeCookie`, un tiers qui ne doit toucher à aucune amitié. Le dossier finit sans amitié entre le membre et l'admin ; `create/01` efface d'abord celle d'un lancement interrompu.
 - **Hooks Claude Code** (`.claude/hooks/`) : garde-fous pour l'agent IA, testés avec `node:test`.
 
 ## Conteneurisation
