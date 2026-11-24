@@ -29,9 +29,9 @@ Le détail des fichiers n'est pas listé ici : il change trop vite pour rester j
 
 1. Le proche, connecté à son compte, prend ou choisit une photo (`<input type="file" accept="image/*" capture>`).
 2. Le client envoie l'image en `multipart/form-data` à une route Express ; **Multer** la reçoit en mémoire.
-3. Le serveur vérifie la session (cookie `ff_session`, voir [Authentification](#authentification)) et le fichier (10 Mo max, JPEG/PNG/WebP), puis le **décode et le réencode avec Sharp** : JPEG de 1920 px max, orientation EXIF appliquée, métadonnées (GPS compris) supprimées. Le type déclaré par le navigateur n'est pas fiable : c'est le décodage par Sharp qui valide vraiment l'image.
+3. Le serveur vérifie la session (cookie `ff_session`, voir [Authentification](#authentification)) et le fichier (10 Mo max, JPEG/PNG/WebP), calcule le **SHA-256** des octets reçus et refuse un fichier déjà présent dans la bibliothèque du compte (`409 PHOTO_DUPLICATE`, sans appeler Sharp ni Cloudinary), puis le **décode et le réencode avec Sharp** : JPEG de 1920 px max, orientation EXIF appliquée, métadonnées (GPS compris) supprimées. Le type déclaré par le navigateur n'est pas fiable : c'est le décodage par Sharp qui valide vraiment l'image.
 4. L'image réencodée est envoyée à **Cloudinary**, dans le dossier `familyframe`.
-5. **Prisma** enregistre dans MongoDB l'URL, l'identifiant Cloudinary, le propriétaire (`ownerId`, le compte connecté) et la date.
+5. **Prisma** enregistre dans MongoDB l'URL, l'identifiant Cloudinary, le propriétaire (`ownerId`, le compte connecté), le SHA-256 du fichier reçu et la date. L'index unique `(ownerId, sha256)` est la vraie garantie : deux envois simultanés du même fichier passent la vérification, le second est refusé à l'enregistrement (`409` aussi) et son image Cloudinary est détruite.
 6. Le serveur émet un événement **Socket.IO** vers les connexions de ce compte ; son cadre affiche la nouvelle photo sans rechargement.
 7. À l'affichage, le serveur construit deux URL Cloudinary depuis l'identifiant : la photo entière et une miniature carrée de 640 px recadrée sur le sujet (`c_fill,g_auto`). Les deux portent `f_auto,q_auto` : Cloudinary livre du WebP si le navigateur l'accepte et que c'est plus léger, sinon du JPEG. Une seule image est stockée. Les URL sont **signées** et le compte Cloudinary a « Strict transformations » activé : une URL dont on modifie la transformation est refusée, personne ne peut consommer le quota à notre place.
 
@@ -49,15 +49,15 @@ Le routage est fait côté navigateur (`react-router`). En production (J2), le s
 
 ## API
 
-| Route                    | Réponse                                                                                                                     |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| `GET /api/health`        | `200 { "status": "ok" }` (servira de healthcheck Docker en J2)                                                              |
-| `POST /api/auth/login`   | JSON `{ email, password }` → `200 { user }` + cookie `ff_session`                                                           |
-| `POST /api/auth/logout`  | `204` ; supprime la session et efface le cookie (répond `204` aussi sans session)                                           |
-| `GET /api/auth/me`       | `200 { user }`, l'utilisateur de la session                                                                                 |
-| `GET /api/photos`        | `200 Photo[]`, les 20 plus récentes du compte connecté en premier                                                           |
-| `POST /api/photos`       | `multipart/form-data` avec `photo` (fichier) → `201 Photo`                                                                  |
-| `DELETE /api/photos/:id` | `204` sans corps, pour une photo du compte connecté ; supprime l'enregistrement puis l'image Cloudinary (cache CDN compris) |
+| Route                    | Réponse                                                                                                                                                       |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /api/health`        | `200 { "status": "ok" }` (servira de healthcheck Docker en J2)                                                                                                |
+| `POST /api/auth/login`   | JSON `{ email, password }` → `200 { user }` + cookie `ff_session`                                                                                             |
+| `POST /api/auth/logout`  | `204` ; supprime la session et efface le cookie (répond `204` aussi sans session)                                                                             |
+| `GET /api/auth/me`       | `200 { user }`, l'utilisateur de la session                                                                                                                   |
+| `GET /api/photos`        | `200 Photo[]`, les 20 plus récentes du compte connecté en premier                                                                                             |
+| `POST /api/photos`       | `multipart/form-data` avec `photo` (fichier) → `201 Photo`                                                                                                    |
+| `DELETE /api/photos/:id` | `204` sans corps, pour une photo du compte connecté ; supprime l'enregistrement, puis l'image Cloudinary (cache CDN compris) si plus aucune photo n'y renvoie |
 
 Toutes les routes `/api/photos` et `GET /api/auth/me` demandent une session ; sans elle : `401 UNAUTHENTICATED`. Un `user` vaut `{ id, email, displayName, role }` (`role` : `member` ou `admin`), jamais le hash du mot de passe.
 
@@ -74,6 +74,7 @@ En cas d'erreur, l'API renvoie `{ "error": code }` ; le client traduit le code e
 | e-mail inconnu ou mauvais mot de passe                                   | 401    | `INVALID_CREDENTIALS` |
 | route inconnue                                                           | 404    | `ROUTE_NOT_FOUND`     |
 | photo inconnue, photo d'un autre compte, ou id qui n'est pas un ObjectId | 404    | `PHOTO_NOT_FOUND`     |
+| fichier déjà dans la bibliothèque du compte (même SHA-256)               | 409    | `PHOTO_DUPLICATE`     |
 | fichier de plus de 10 Mo                                                 | 413    | `PHOTO_TOO_LARGE`     |
 | type autre que JPEG, PNG ou WebP                                         | 415    | `FORMAT_UNSUPPORTED`  |
 | image illisible par Sharp                                                | 422    | `IMAGE_UNREADABLE`    |
@@ -108,13 +109,13 @@ En cas d'erreur, l'API renvoie `{ "error": code }` ; le client traduit le code e
 
 Une feature par dossier (`server/src/features/photos/`, `server/src/features/auth/`), un fichier par couche. Pour les photos :
 
-| Fichier                | Rôle                                                                                                                  |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `photos.routes.ts`     | chemins et middleware d'upload, rien d'autre                                                                          |
-| `photos.upload.ts`     | configuration Multer : en mémoire, 10 Mo, un fichier                                                                  |
-| `photos.controller.ts` | lit la requête et le compte connecté, appelle le service, convertit en DTO, diffuse à la room du propriétaire, répond |
-| `photos.service.ts`    | règles métier (fichier, format, image lisible) ; ignore Express et Socket.IO                                          |
-| `photos.repository.ts` | seul accès à Prisma                                                                                                   |
+| Fichier                | Rôle                                                                                                                       |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `photos.routes.ts`     | chemins et middleware d'upload, rien d'autre                                                                               |
+| `photos.upload.ts`     | configuration Multer : en mémoire, 10 Mo, un fichier                                                                       |
+| `photos.controller.ts` | lit la requête et le compte connecté, appelle le service, convertit en DTO, diffuse à la room du propriétaire, répond      |
+| `photos.service.ts`    | règles métier (fichier, format, doublon, image lisible, propriétaire, image encore utilisée) ; ignore Express et Socket.IO |
+| `photos.repository.ts` | seul accès à Prisma                                                                                                        |
 
 - `features/auth/` suit le même découpage (`auth.repository.ts`, `auth.service.ts`, `auth.controller.ts`, `auth.routes.ts`), plus `auth.middleware.ts` (garde HTTP), `auth.socket.ts` (garde Socket.IO) et `auth.cookie.ts` (pose et efface le cookie). Le service d'auth reçoit ses dépendances (`repository`, `hashToken`, `generateToken`, `verifyPassword`, `now`, `logger`) ; `app.ts` l'assemble une fois (`assembleAuthService`) et `server.ts` le partage avec Socket.IO.
 - Les dépendances sont passées par des fonctions-fabriques (`createPhotosService({ repository, toFrameJpeg, uploadImage, deleteImage, logger })`), assemblées dans `app.ts` : un test peut fournir de fausses implémentations.
@@ -130,21 +131,22 @@ Une feature par dossier (`server/src/features/photos/`, `server/src/features/aut
 - **Pas de données personnelles** : jamais un nom, l'e-mail, le mot de passe ni le jeton de session ; seulement des identifiants (`photoId`, `cloudinaryId`, `socketId`, `userId`) ; les chemins sans leur query string.
 - Le service photos reçoit le logger par injection ; le reste du serveur importe `logger`.
 
-| Événement                                                   | Niveau                        | Écrit par                                                                                                    |
-| ----------------------------------------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `db.connected` / `db.unreachable`                           | info / error                  | `server.ts`, ping au démarrage                                                                               |
-| `server.started`                                            | info                          | `server.ts`                                                                                                  |
-| `socket.connected` / `socket.disconnected`                  | info                          | `server.ts`, avec `userId`                                                                                   |
-| `auth.login_succeeded` / `auth.logged_out`                  | info                          | service auth, avec `userId`                                                                                  |
-| `auth.login_failed`                                         | warn                          | service auth, sans aucune donnée (jamais l'e-mail)                                                           |
-| `seed.done` / `seed.refused`                                | info / error                  | `prisma/seed.ts` : nombre de comptes créés / refus avec `NODE_ENV=production`                                |
-| `http.request`                                              | info, warn (4xx), error (5xx) | `lib/request-logger.ts`, sauf `/api/health`                                                                  |
-| `photo.created` / `photo.deleted`                           | info                          | service photos, avec `userId` (le propriétaire)                                                              |
-| `photo.unreadable`                                          | warn                          | service photos, erreur de sharp                                                                              |
-| `photo.orphaned`                                            | error                         | service photos : image sur Cloudinary sans enregistrement en base (échec d'enregistrement ou de suppression) |
-| `server.error`                                              | error                         | `errors/error-handler.ts` (chaque 500), `auth.socket.ts` (handshake)                                         |
-| `server.stopping` / `server.stopped` / `server.stop_failed` | info / info / error           | `server.ts`, à l'arrêt                                                                                       |
-| `process.crashed`                                           | error                         | `server.ts`, exception ou rejet non géré, puis arrêt                                                         |
+| Événement                                                   | Niveau                        | Écrit par                                                                                                                                                                   |
+| ----------------------------------------------------------- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `db.connected` / `db.unreachable`                           | info / error                  | `server.ts`, ping au démarrage                                                                                                                                              |
+| `server.started`                                            | info                          | `server.ts`                                                                                                                                                                 |
+| `socket.connected` / `socket.disconnected`                  | info                          | `server.ts`, avec `userId`                                                                                                                                                  |
+| `auth.login_succeeded` / `auth.logged_out`                  | info                          | service auth, avec `userId`                                                                                                                                                 |
+| `auth.login_failed`                                         | warn                          | service auth, sans aucune donnée (jamais l'e-mail)                                                                                                                          |
+| `seed.done` / `seed.refused`                                | info / error                  | `prisma/seed.ts` : nombre de comptes créés / refus avec `NODE_ENV=production`                                                                                               |
+| `http.request`                                              | info, warn (4xx), error (5xx) | `lib/request-logger.ts`, sauf `/api/health`                                                                                                                                 |
+| `photo.created` / `photo.deleted`                           | info                          | service photos, avec `userId` (le propriétaire) ; `photo.deleted` dit aussi si l'image Cloudinary a été détruite (`isImageDestroyed`)                                       |
+| `photo.duplicate`                                           | info                          | service photos : fichier déjà dans la bibliothèque, avec `userId` et le `photoId` de la photo existante (ou le `cloudinaryId` de l'image détruite après un envoi simultané) |
+| `photo.unreadable`                                          | warn                          | service photos, erreur de sharp                                                                                                                                             |
+| `photo.orphaned`                                            | error                         | service photos : image sur Cloudinary sans enregistrement en base (échec d'enregistrement ou de suppression)                                                                |
+| `server.error`                                              | error                         | `errors/error-handler.ts` (chaque 500), `auth.socket.ts` (handshake)                                                                                                        |
+| `server.stopping` / `server.stopped` / `server.stop_failed` | info / info / error           | `server.ts`, à l'arrêt                                                                                                                                                      |
+| `process.crashed`                                           | error                         | `server.ts`, exception ou rejet non géré, puis arrêt                                                                                                                        |
 
 ## Réseau en développement
 
@@ -170,7 +172,7 @@ Une feature par dossier (`server/src/features/photos/`, `server/src/features/aut
 
 - **MongoDB Atlas** via **Prisma 6**. Prisma 7+ ne supporte pas encore MongoDB : la version est volontairement figée.
 - Le client Prisma est généré à l'installation (`postinstall`) ; le schéma est poussé avec `pnpm --filter server db:push` (pas de migrations avec MongoDB).
-- Collections `User`, `Session` et `Photo`. Index uniques sur `User.email` et `Session.tokenHash` ; le rôle est un `enum Role` Prisma, que Prisma génère en union de chaînes. `Photo.ownerId` relie chaque photo à son compte ; index `(ownerId, id)` pour la liste d'un compte, et index simple sur `cloudinaryId` (plus unique : à l'étape 5, un partage pointera vers la même image). `pnpm db:seed` (`server/prisma/seed.ts`) vide la base et crée les deux comptes de test du README.
+- Collections `User`, `Session` et `Photo`. Index uniques sur `User.email` et `Session.tokenHash` ; le rôle est un `enum Role` Prisma, que Prisma génère en union de chaînes. `Photo.ownerId` relie chaque photo à son compte ; index unique `(ownerId, sha256)` (un même fichier n'entre qu'une fois dans une bibliothèque), index `(ownerId, id)` pour la liste d'un compte, et index simple sur `cloudinaryId` (plus unique : à l'étape 5, un partage pointera vers la même image). `pnpm db:seed` (`server/prisma/seed.ts`) vide la base et crée les deux comptes de test du README.
 - Quand `Photo` gagne un champ obligatoire ou un index unique, `pnpm db:seed` passe **avant** `pnpm db:push` : MongoDB compte un champ absent comme `null`, et d'anciennes photos sans ce champ empêcheraient l'index unique de se créer.
 
 ## Outillage
