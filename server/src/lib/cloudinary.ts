@@ -21,10 +21,19 @@ export type UploadedImage = { url: string; cloudinaryId: string }
 export type DeliveryUrls = { url: string; thumbnailUrl: string }
 
 // Data URI rather than a stream: simpler, and fine up to 10 MB.
-export async function uploadImage(jpeg: Buffer): Promise<UploadedImage> {
+async function uploadToFolder(jpeg: Buffer, folder: string): Promise<UploadedImage> {
   const dataUri = `data:image/jpeg;base64,${jpeg.toString('base64')}`
-  const result = await cloudinary.uploader.upload(dataUri, { folder: 'familyframe' })
+  const result = await cloudinary.uploader.upload(dataUri, { folder })
   return { url: result.secure_url, cloudinaryId: result.public_id }
+}
+
+export function uploadImage(jpeg: Buffer): Promise<UploadedImage> {
+  return uploadToFolder(jpeg, 'familyframe')
+}
+
+// A folder of their own: the Cloudinary console tells profile photos from library photos.
+export function uploadAvatar(jpeg: Buffer): Promise<UploadedImage> {
+  return uploadToFolder(jpeg, 'familyframe/avatars')
 }
 
 // invalidate: the CDN would otherwise keep serving the cached derived images.
