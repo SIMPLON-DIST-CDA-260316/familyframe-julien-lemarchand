@@ -1,0 +1,29 @@
+meta {
+  name: Edge - image GIF
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseUrl}}/api/account/avatar
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  avatar: @file(fixtures/animation.gif) @contentType(image/gif)
+}
+
+script:pre-request {
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 415
+  res.body.error: eq FORMAT_UNSUPPORTED
+}
+
+docs {
+  EDGE → 415 FORMAT_UNSUPPORTED : seuls JPEG, PNG et WebP sont acceptés,
+  comme pour une photo.
+}

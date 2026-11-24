@@ -5,8 +5,8 @@ meta {
 
 docs {
   Le compte de la personne connectée : `PATCH /api/account` (nom affiché),
-  `PUT /api/account/password`. Pas d'id dans l'URL : chaque route agit sur
-  le compte de la session.
+  `PUT /api/account/password`, `PUT` et `DELETE /api/account/avatar`. Pas
+  d'id dans l'URL : chaque route agit sur le compte de la session.
 
   Toutes les requêtes passent par le compte créé par
   `invitations/accept/05` (cookie `inviteeCookie`, mot de passe
@@ -14,6 +14,7 @@ docs {
   les autres sessions du compte, et celles du membre sont le navigateur et le
   cadre de la base de dev partagée. Un lancement interrompu laisserait aussi
   le membre renommé, ce que `auth/login/01` refuse au lancement suivant. Au
-  pire, il reste un compte jetable modifié ; chaque dossier remet quand même
-  le compte dans son état de départ.
+  pire, il reste un compte jetable modifié (et sa photo de profil sur
+  Cloudinary) ; chaque dossier remet quand même le compte dans son état de
+  départ.
 }

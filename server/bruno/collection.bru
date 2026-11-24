@@ -41,7 +41,8 @@ docs {
 
   Le dossier `account/` modifie aussi ce compte jetable, jamais le membre, et
   le remet dans son état de départ en fin de dossier (voir
-  `account/folder.bru`).
+  `account/folder.bru`). `account/avatar/` publie deux photos de profil sur
+  Cloudinary et les détruit avant la fin.
 
   Le dossier `photos/share/` lit les ids du membre et de l'admin
   (`memberId`, `adminId`, par `GET /api/auth/me`), rend les deux comptes amis

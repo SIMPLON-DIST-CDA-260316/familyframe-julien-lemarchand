@@ -1,0 +1,29 @@
+meta {
+  name: Edge - texte déguisé en JPEG
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/api/account/avatar
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  avatar: @file(fixtures/pas-une-image.jpg) @contentType(image/jpeg)
+}
+
+script:pre-request {
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 422
+  res.body.error: eq IMAGE_UNREADABLE
+}
+
+docs {
+  EDGE → 422 IMAGE_UNREADABLE : le type annoncé est `image/jpeg`, mais Sharp
+  ne décode pas le fichier. Rien n'est envoyé sur Cloudinary.
+}
