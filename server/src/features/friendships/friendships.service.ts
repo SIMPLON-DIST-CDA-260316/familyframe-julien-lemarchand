@@ -33,6 +33,9 @@ export type FriendshipsService = {
   requestFriendship: (request: FriendRequest) => Promise<Friendship>
   listFriendships: (userId: string) => Promise<FriendshipList>
   deleteFriendship: (action: FriendshipAction) => Promise<void>
+  acceptFriendship: (action: FriendshipAction) => Promise<Friendship>
+  // Step 5 sends photos only between friends: it receives this, the rule stays here.
+  areFriends: (userId: string, otherUserId: string) => Promise<boolean>
 }
 
 // user is the other side: whoever reads the friendship already knows who he is.
@@ -142,10 +145,35 @@ async function deleteFriendship(
   logger.info('friendship.deleted', { friendshipId: record.id, userId, reason })
 }
 
+// Filtered on the addressee and the pending status: one atomic write, no read-then-write race,
+// and the requester cannot accept his own request.
+async function acceptFriendship(
+  { repository, logger }: FriendshipsServiceDeps,
+  { id, userId }: FriendshipAction,
+): Promise<Friendship> {
+  const record = await repository.acceptReceived(parseFriendshipId(id), userId)
+  if (!record) {
+    throw new AppError('FRIENDSHIP_NOT_FOUND')
+  }
+  logger.info('friendship.accepted', { friendshipId: record.id, userId })
+  return toFriendship(record, userId)
+}
+
+async function areFriends(
+  { repository }: FriendshipsServiceDeps,
+  userId: string,
+  otherUserId: string,
+): Promise<boolean> {
+  const friendship = await repository.findBetween(userId, otherUserId)
+  return friendship?.status === 'accepted'
+}
+
 export function createFriendshipsService(deps: FriendshipsServiceDeps): FriendshipsService {
   return {
     requestFriendship: (request) => requestFriendship(deps, request),
     listFriendships: (userId) => listFriendships(deps, userId),
     deleteFriendship: (action) => deleteFriendship(deps, action),
+    acceptFriendship: (action) => acceptFriendship(deps, action),
+    areFriends: (userId, otherUserId) => areFriends(deps, userId, otherUserId),
   }
 }

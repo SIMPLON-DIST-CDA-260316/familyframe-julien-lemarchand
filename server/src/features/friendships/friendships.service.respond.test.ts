@@ -30,7 +30,9 @@ function makeDeps() {
       findBetween: vi.fn<FriendshipsRepository['findBetween']>().mockResolvedValue(null),
       create: vi.fn<FriendshipsRepository['create']>(),
       findAllOf: vi.fn<FriendshipsRepository['findAllOf']>(),
-      acceptReceived: vi.fn<FriendshipsRepository['acceptReceived']>(),
+      acceptReceived: vi
+        .fn<FriendshipsRepository['acceptReceived']>()
+        .mockResolvedValue(friendshipRecord({ status: 'accepted' })),
       deleteOf: vi.fn<FriendshipsRepository['deleteOf']>().mockResolvedValue(friendshipRecord()),
     },
     logger: {
@@ -40,6 +42,54 @@ function makeDeps() {
     },
   }
 }
+
+describe('acceptFriendship', () => {
+  it('answers an id that is not an ObjectId with FRIENDSHIP_NOT_FOUND, without a query', async () => {
+    const deps = makeDeps()
+
+    await expect(
+      createFriendshipsService(deps).acceptFriendship({ id: 'pas-un-id', userId: MAMIE.id }),
+    ).rejects.toMatchObject({ code: 'FRIENDSHIP_NOT_FOUND' })
+    expect(deps.repository.acceptReceived).not.toHaveBeenCalled()
+  })
+
+  it('accepts only as the addressee of the request', async () => {
+    const deps = makeDeps()
+
+    await createFriendshipsService(deps).acceptFriendship({ id: FRIENDSHIP_ID, userId: MAMIE.id })
+
+    expect(deps.repository.acceptReceived).toHaveBeenCalledWith(FRIENDSHIP_ID, MAMIE.id)
+  })
+
+  it('answers FRIENDSHIP_NOT_FOUND when no pending request is addressed to the caller', async () => {
+    const deps = makeDeps()
+    deps.repository.acceptReceived.mockResolvedValue(null)
+
+    await expect(
+      createFriendshipsService(deps).acceptFriendship({ id: FRIENDSHIP_ID, userId: MEMBER.id }),
+    ).rejects.toMatchObject({ code: 'FRIENDSHIP_NOT_FOUND' })
+    expect(deps.logger.info).not.toHaveBeenCalled()
+  })
+
+  it('returns the friendship with the requester as user, and logs ids only', async () => {
+    const deps = makeDeps()
+
+    const friendship = await createFriendshipsService(deps).acceptFriendship({
+      id: FRIENDSHIP_ID,
+      userId: MAMIE.id,
+    })
+
+    expect(friendship).toEqual({
+      id: FRIENDSHIP_ID,
+      user: MEMBER,
+      createdAt: '2026-11-24T10:00:00.000Z',
+    })
+    expect(deps.logger.info).toHaveBeenCalledWith('friendship.accepted', {
+      friendshipId: FRIENDSHIP_ID,
+      userId: MAMIE.id,
+    })
+  })
+})
 
 describe('deleteFriendship', () => {
   it('answers an id that is not an ObjectId with FRIENDSHIP_NOT_FOUND, without a query', async () => {
@@ -78,5 +128,21 @@ describe('deleteFriendship', () => {
       userId,
       reason,
     })
+  })
+})
+
+describe('areFriends', () => {
+  it.each<[string, FriendshipRecord | null, boolean]>([
+    ['an accepted friendship', friendshipRecord({ status: 'accepted' }), true],
+    ['a pending request', friendshipRecord(), false],
+    ['no link', null, false],
+  ])('answers %s with %s', async (_label, found, expected) => {
+    const deps = makeDeps()
+    deps.repository.findBetween.mockResolvedValue(found)
+
+    const isFriend = await createFriendshipsService(deps).areFriends(MEMBER.id, MAMIE.id)
+
+    expect(isFriend).toBe(expected)
+    expect(deps.repository.findBetween).toHaveBeenCalledWith(MEMBER.id, MAMIE.id)
   })
 })
