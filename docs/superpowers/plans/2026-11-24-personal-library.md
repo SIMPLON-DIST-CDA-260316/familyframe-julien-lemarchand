@@ -3496,9 +3496,20 @@ Message: `docs: describe the library page` + the attribution lines.
 - [x] `pnpm check && pnpm typecheck && pnpm build && pnpm test` on `feat/library-page`: green, `Tests  87 passed (87)`.
 - [x] Bruno gate command against a test API on port 3002 started from `feat/library-page`: 32/32.
 - [x] `git grep -n uploaderName -- client/src server/src server/prisma ARCHITECTURE.md README.md`: no output; `server/bruno` has only the `isUndefined` assertion of `create/01`.
-- [ ] Manual (spec, "Testing"), with Claude in Chrome or left to the author: the member on `/frame` in one browser, the admin on `/frame` in another; an upload by the member reaches the member's frame only; a deletion removes it from the member's frame only. On `/`: the duplicate message; « Charger plus » with more than 30 photos; the frame with more than 100 photos (several pages). Distinct test images can come from a throwaway script outside the repo (never committed).
-- [ ] `git log --oneline feat/client-login..feat/library-page`: one concern per commit, each ending with the attribution lines; `git diff --stat feat/client-login..feat/library-page` shows no `.env` file.
-- [ ] Fresh-context review of the whole stack diff (`superpowers:requesting-code-review`), then `gh stack submit --auto` (draft PRs) and `gh stack view --json`.
+- [x] Manual (spec, "Testing"), with Claude in Chrome or left to the author: the member on `/frame` in one browser, the admin on `/frame` in another; an upload by the member reaches the member's frame only; a deletion removes it from the member's frame only. On `/`: the duplicate message; « Charger plus » with more than 30 photos; the frame with more than 100 photos (several pages). Distinct test images can come from a throwaway script outside the repo (never committed).
+- [x] `git log --oneline feat/client-login..feat/library-page`: one concern per commit, each ending with the attribution lines; `git diff --stat feat/client-login..feat/library-page` shows no `.env` file.
+- [x] Fresh-context review of the whole stack diff (`superpowers:requesting-code-review`), then `gh stack submit --auto` (draft PRs) and `gh stack view --json`.
+
+Manual checks done 2026-11-24 with Claude in Chrome (member) and curl (admin), seeded test accounts, API on 3000:
+- `/` redirects to `/login`; login lands on the library page.
+- Upload from the form shows the photo; the same file again shows « Cette photo est déjà dans votre bibliothèque. ».
+- 33 photos: `/` shows 30 and « Charger plus »; one click shows 33, no duplicate, the button disappears.
+- Live uploads (form and API) appear once each; the API count matches the page.
+- `?limit=0` answers 400, `?cursor=xyz` answers `QUERY_INVALID`.
+- The admin lists 0 photos; an admin upload does not reach the member's frame; an admin DELETE of a member photo answers 404 `PHOTO_NOT_FOUND`.
+- The member deletes from `/frame`: 35 → 34 live; a member upload: 34 → 35 live. The same bytes uploaded by both accounts are accepted (duplicates are per owner).
+- 105 photos: `/frame` shows « Photos · 105 » after two requests (`limit=100`, then with the cursor).
+- Not reproduced: one early count read 34 images on `/` for 33 photos, before a reload; later live checks (form and API uploads) always matched the API.
 
 ---
 
