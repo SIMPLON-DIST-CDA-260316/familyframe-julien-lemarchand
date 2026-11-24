@@ -4,6 +4,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react'
 import { useAuth } from '@/auth/AuthContext.ts'
@@ -11,7 +12,10 @@ import { createLiveLoads, type LiveLoads } from '@/liveLoads.ts'
 import type { Photo } from '@/photo.ts'
 import { withNewPhoto, withOlderPhotos, withoutPhoto } from '@/photoList.ts'
 import { connectPhotoSocket } from '@/photoSocket.ts'
-import { fetchPhotoPage } from '@/photosApi.ts'
+import { fetchNewestPhotos, fetchPhotoPage } from '@/photosApi.ts'
+
+// The server's DEFAULT_PAGE_SIZE: the first load asks for one page.
+const FIRST_LOAD_COUNT = 30
 
 export type PhotoLibrary = {
   photos: Photo[]
@@ -43,15 +47,17 @@ function toNextPage(cursor: string | null, loadId: number): NextPage | null {
   return cursor === null ? null : { cursor, loadId }
 }
 
-// Each (re)connection starts over from the first page: simple, and catches what changed offline.
+// Each (re)connection reloads from the newest photo, which catches what changed offline. It asks
+// for as many photos as were loaded: the viewer's photo, pages deep, stays in the list.
 function createFirstPageLoader(
   liveLoads: LiveLoads,
   { setPhotos, setNextPage, setIsFirstPageLoaded }: FirstPageSetters,
+  readLoadCount: () => number,
   dropUser: () => void,
 ): () => Promise<void> {
   return async () => {
     const loadId = liveLoads.begin()
-    const page = await fetchPhotoPage({}, () => {
+    const page = await fetchNewestPhotos(readLoadCount(), () => {
       if (liveLoads.isCurrent(loadId)) dropUser()
     })
     if (page === null || !liveLoads.isCurrent(loadId)) return
@@ -86,11 +92,12 @@ function createMoreLoader(
 function connectLibrary(
   liveLoads: LiveLoads,
   setters: FirstPageSetters,
+  readLoadCount: () => number,
   dropUser: () => void,
 ): () => void {
   const { setPhotos } = setters
   const socket = connectPhotoSocket({
-    onConnect: createFirstPageLoader(liveLoads, setters, dropUser),
+    onConnect: createFirstPageLoader(liveLoads, setters, readLoadCount, dropUser),
     onNewPhoto: (photo) => {
       liveLoads.rememberAdded(photo)
       setPhotos((current) => withNewPhoto(current, photo))
@@ -136,6 +143,29 @@ function useMoreLoader(
   }, [liveLoads, nextPage, setPhotos, setNextPage, setIsLoadingMore, dropUser])
 }
 
+// A ref, not state: the socket's reconnect reads it without reconnecting when it changes.
+function useLoadCountReader(photos: Photo[]): () => number {
+  const loadedCount = useRef(0)
+  useEffect(() => {
+    loadedCount.current = photos.length
+  }, [photos])
+  return useCallback(() => Math.max(loadedCount.current, FIRST_LOAD_COUNT), [])
+}
+
+function useLibraryConnection(
+  liveLoads: LiveLoads,
+  photos: Photo[],
+  setters: FirstPageSetters,
+  dropUser: () => void,
+): void {
+  const readLoadCount = useLoadCountReader(photos)
+  const { setPhotos, setNextPage, setIsFirstPageLoaded } = setters
+  useEffect(() => {
+    const stableSetters = { setPhotos, setNextPage, setIsFirstPageLoaded }
+    return connectLibrary(liveLoads, stableSetters, readLoadCount, dropUser)
+  }, [liveLoads, readLoadCount, setPhotos, setNextPage, setIsFirstPageLoaded, dropUser])
+}
+
 export function usePhotoLibrary(): PhotoLibrary {
   const { dropUser } = useAuth()
   // useState keeps one instance across renders: its load bookkeeping must survive them.
@@ -144,10 +174,11 @@ export function usePhotoLibrary(): PhotoLibrary {
   const [nextPage, setNextPage] = useState<NextPage | null>(null)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [isFirstPageLoaded, setIsFirstPageLoaded] = useState(false)
-
-  useEffect(
-    () => connectLibrary(liveLoads, { setPhotos, setNextPage, setIsFirstPageLoaded }, dropUser),
-    [liveLoads, dropUser],
+  useLibraryConnection(
+    liveLoads,
+    photos,
+    { setPhotos, setNextPage, setIsFirstPageLoaded },
+    dropUser,
   )
   const loadMore = useMoreLoader(
     liveLoads,
@@ -156,7 +187,6 @@ export function usePhotoLibrary(): PhotoLibrary {
     dropUser,
   )
   const addPhoto = usePhotoAdder(liveLoads, setPhotos)
-
   return {
     photos,
     hasMore: nextPage !== null,

@@ -1,8 +1,8 @@
 import { errorMessage, UNAUTHORIZED_STATUS } from '@/api.ts'
 import { isPhoto, isPhotoPage, type Photo, type PhotoPage } from '@/photo.ts'
 
-// The server's MAX_PAGE_SIZE: the fewest requests for a whole library.
-const FRAME_PAGE_SIZE = 100
+// The server's MAX_PAGE_SIZE: the fewest requests for many photos.
+const MAX_PAGE_SIZE = 100
 
 export type PageRequest = { cursor?: string; limit?: number }
 
@@ -55,7 +55,7 @@ export async function fetchAllPhotos(onUnauthenticated: () => void): Promise<Pho
   const photos: Photo[] = []
   let cursor: string | undefined
   do {
-    const page = await fetchPhotoPage({ cursor, limit: FRAME_PAGE_SIZE }, onUnauthenticated)
+    const page = await fetchPhotoPage({ cursor, limit: MAX_PAGE_SIZE }, onUnauthenticated)
     if (page === null) return null
     if (page.nextCursor === cursor) {
       console.error('Photos cursor did not advance')
@@ -65,6 +65,26 @@ export async function fetchAllPhotos(onUnauthenticated: () => void): Promise<Pho
     cursor = page.nextCursor ?? undefined
   } while (cursor !== undefined)
   return photos
+}
+
+// The newest `count` photos as one page, so a reload gives back as many as were shown. null as
+// soon as one page fails.
+export async function fetchNewestPhotos(
+  count: number,
+  onUnauthenticated: () => void,
+): Promise<PhotoPage | null> {
+  const photos: Photo[] = []
+  let cursor: string | undefined
+  while (photos.length < count) {
+    const limit = Math.min(count - photos.length, MAX_PAGE_SIZE)
+    const page = await fetchPhotoPage({ cursor, limit }, onUnauthenticated)
+    if (page === null) return null
+    photos.push(...page.photos)
+    // An empty page with a cursor would ask for the same page forever.
+    if (page.nextCursor === null || page.photos.length === 0) return { ...page, photos }
+    cursor = page.nextCursor
+  }
+  return { photos, nextCursor: cursor ?? null }
 }
 
 export async function postPhoto(file: File): Promise<UploadResult> {
