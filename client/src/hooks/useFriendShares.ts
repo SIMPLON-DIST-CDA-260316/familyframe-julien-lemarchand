@@ -3,6 +3,9 @@ import { useAuth } from '@/auth/AuthContext.ts'
 import type { Photo } from '@/photo.ts'
 import { postDeviceShare, postLibraryShare, type ShareResult } from '@/photosApi.ts'
 
+// Until the share sheet replaces this dialog: the message the API's duplicate used to give.
+const SHARE_DUPLICATE_MESSAGE = 'Cette personne a déjà cette photo.'
+
 export type ShareTarget = { kind: 'library'; photo: Photo } | { kind: 'device'; file: File }
 
 // Keyed by the friend's user id: one dialog may send to several friends.
@@ -37,6 +40,10 @@ export function useFriendShares(target: ShareTarget, onShared?: () => void): Fri
     }
     if (result.status === 'failed') {
       setError(result.message)
+      return
+    }
+    if (result.status === 'duplicate') {
+      setError(SHARE_DUPLICATE_MESSAGE)
       return
     }
     setSentIds((ids) => [...ids, friendId])

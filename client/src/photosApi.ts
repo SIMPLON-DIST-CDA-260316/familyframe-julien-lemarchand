@@ -11,13 +11,12 @@ export type UploadResult =
   | { status: 'failed'; message: string }
   | { status: 'unauthenticated' }
 
+// duplicate apart from failed: the share sheet names the friend who already has the photo.
 export type ShareResult =
   | { status: 'shared' }
+  | { status: 'duplicate' }
   | { status: 'failed'; message: string }
   | { status: 'unauthenticated' }
-
-// The shared PHOTO_DUPLICATE message says « votre bibliothèque »: a share hits the friend's.
-const SHARE_DUPLICATE_MESSAGE = 'Cette personne a déjà cette photo.'
 
 function photosUrl({ cursor, limit }: PageRequest): string {
   const params = new URLSearchParams()
@@ -117,8 +116,8 @@ async function sendShare(url: string, init: RequestInit): Promise<ShareResult> {
     if (res.ok) return { status: 'shared' }
     // Not JSON when the dev proxy answers for a stopped API.
     const data: unknown = await res.json().catch(() => null)
-    const message = isDuplicateError(data) ? SHARE_DUPLICATE_MESSAGE : errorMessage(data)
-    return { status: 'failed', message }
+    if (isDuplicateError(data)) return { status: 'duplicate' }
+    return { status: 'failed', message: errorMessage(data) }
   } catch {
     // fetch rejects only on network failure.
     return { status: 'failed', message: errorMessage(null) }
