@@ -14,7 +14,7 @@ type TextFieldProps = {
   maxLength?: number
 }
 
-// Every field of the invitation forms is required: an empty one never reaches the API.
+// Every field of the invitation and settings forms is required: an empty one never reaches the API.
 export function TextField({
   id,
   label,

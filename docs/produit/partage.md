@@ -7,7 +7,7 @@ Envoyer une photo à un ou plusieurs amis la fait entrer dans sa bibliothèque e
 **Ce que l'on peut faire**
 
 - Ouvrir « Envoyer à des proches » depuis une photo de sa bibliothèque ou depuis le formulaire d'ajout (voir les deux sections suivantes).
-- Voir un aperçu de la photo, puis ses amis sous forme de ronds avec leurs initiales.
+- Voir un aperçu de la photo, puis ses amis sous forme de ronds portant leur photo de profil ou, sans photo, leur initiale.
 - Envoyer une photo à plusieurs proches en une fois, en touchant leur visage puis un seul bouton.
 - Rechercher un ami par son nom ou son adresse e-mail quand on en a beaucoup.
 - Fermer avec la croix, la touche Échap ou en touchant à côté.
@@ -23,9 +23,10 @@ Envoyer une photo à un ou plusieurs amis la fait entrer dans sa bibliothèque e
 7. R-PAR-07 · Une photo que le destinataire possède déjà (identique octet pour octet, ajoutée par lui ou reçue de quelqu'un d'autre) est refusée.
 8. R-PAR-08 · Une personne retirée des amis entre l'ouverture et l'envoi ne peut pas recevoir la photo.
 9. R-PAR-09 · Le panneau garde la photo choisie à son ouverture : si le diaporama passe à une autre photo pendant ce temps, c'est bien la photo d'origine qui est envoyée.
-10. R-PAR-44 · Les proches apparaissent avec leurs initiales et leur prénom ; le nom complet s'affiche au survol. Leur adresse e-mail n'est pas montrée.
+10. R-PAR-44 · Remplacée : le rond porte désormais la photo de profil quand il y en a une (R-PAR-47). Les proches apparaissent avec leur prénom ; le nom complet s'affiche au survol. Leur adresse e-mail n'est pas montrée.
 11. R-PAR-45 · Le bouton indique combien de personnes recevront la photo et reste grisé tant que personne n'est choisi.
 12. R-PAR-46 · Dès qu'au moins une personne a reçu la photo, le panneau se ferme et une notification dit à qui elle est partie, ainsi que pour qui l'envoi a échoué. Si personne ne l'a reçue, le panneau reste ouvert avec les raisons, et le choix est gardé.
+13. R-PAR-47 · Le rond de chaque proche porte sa photo de profil quand il en a une, et sa première lettre en majuscule sinon.
 
 **Messages affichés**
 

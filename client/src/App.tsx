@@ -12,6 +12,7 @@ import InvitePage from './pages/InvitePage.tsx'
 import LibraryPage from './pages/LibraryPage.tsx'
 import LoginPage from './pages/LoginPage.tsx'
 import NotFoundPage from './pages/NotFoundPage.tsx'
+import SettingsPage from './pages/SettingsPage.tsx'
 
 // One layout route guards every logged-in page, instead of wrapping each one.
 function AppRoutes(): JSX.Element {
@@ -38,6 +39,7 @@ function AppRoutes(): JSX.Element {
         >
           <Route path="/" element={<LibraryPage />} />
           <Route path="/friends" element={<FriendsPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
           <Route
             path="/admin/invitations"
             element={

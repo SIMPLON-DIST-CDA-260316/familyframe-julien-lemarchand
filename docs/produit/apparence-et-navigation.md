@@ -31,33 +31,33 @@ Comment on se déplace dans l'application, comment on choisit son thème, et les
 
 **Ce que l'on peut faire**
 
-- Ouvrir le menu en touchant le rond portant son initiale, à droite de la barre.
+- Ouvrir le menu en touchant le rond de son profil (sa photo, ou son initiale), à droite de la barre.
 - Y voir son nom, son adresse e-mail et, pour l'administrateur, la mention « Admin ».
-- Y choisir son thème et se déconnecter.
+- Y ouvrir ses « Préférences », choisir son thème et se déconnecter.
 
 **Règles**
 
-1. R-APP-10 · Le rond affiche la première lettre du nom, en majuscule.
+1. R-APP-10 · Remplacée : le rond affiche la photo de profil quand il y en a une (R-APP-55). Il affichait la première lettre du nom, en majuscule.
 2. R-APP-11 · La mention « Admin » s'affiche à côté du nom de l'administrateur, dans le menu du compte et dans le menu mobile.
+3. R-APP-55 · Le rond de profil, dans le menu du compte, montre la photo de profil de la personne quand elle en a une, et sa première lettre en majuscule sinon. « Préférences » ouvre la page décrite dans [preferences.md](preferences.md).
 
 **Messages affichés**
 
-| Situation                       | Message                                                                    |
-| ------------------------------- | -------------------------------------------------------------------------- |
-| Nom du bouton (lecture d'écran) | « Menu du compte »                                                         |
-| Contenu                         | [nom], « Admin » (administrateur), [e-mail], « Thème », « Se déconnecter » |
+| Situation                       | Message                                                                                     |
+| ------------------------------- | ------------------------------------------------------------------------------------------- |
+| Nom du bouton (lecture d'écran) | « Menu du compte »                                                                          |
+| Contenu                         | [nom], « Admin » (administrateur), [e-mail], « Préférences », « Thème », « Se déconnecter » |
 
 **Ce qui n'est pas possible**
 
-- Ajouter une photo de profil : prévu, voir [a-venir.md](a-venir.md).
-- Ouvrir une page de préférences du compte : prévu, voir [a-venir.md](a-venir.md).
+- Rien de particulier.
 
 ## Menu mobile (écran étroit)
 
 **Ce que l'on peut faire**
 
 - Ouvrir le menu avec le bouton à trois traits, à gauche de la barre : il glisse depuis le bord gauche.
-- Y retrouver son nom, son adresse e-mail, les entrées de navigation, le choix du thème et « Se déconnecter ».
+- Y retrouver son nom, son adresse e-mail, les entrées de navigation, « Préférences », le choix du thème et « Se déconnecter ».
 
 **Règles**
 
@@ -70,6 +70,7 @@ Comment on se déplace dans l'application, comment on choisit son thème, et les
 | ------------------------------- | ------------------ |
 | Nom du bouton (lecture d'écran) | « Ouvrir le menu » |
 | Titre du menu                   | « FamilyFrame »    |
+| Entrée du compte                | « Préférences »    |
 
 **Ce qui n'est pas possible**
 

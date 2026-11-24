@@ -9,7 +9,7 @@ export function UserBadge(): JSX.Element | null {
 
   return (
     <div className="flex min-w-0 items-center gap-3">
-      <UserAvatar name={user.displayName} />
+      <UserAvatar name={user.displayName} avatarUrl={user.avatarUrl} />
       <div className="flex min-w-0 flex-col leading-tight">
         <span className="flex items-center gap-2 truncate text-sm font-medium">
           {user.displayName}

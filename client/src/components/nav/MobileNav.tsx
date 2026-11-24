@@ -1,4 +1,4 @@
-import { MenuIcon } from 'lucide-react'
+import { MenuIcon, SettingsIcon } from 'lucide-react'
 import { type JSX, useState } from 'react'
 import { NavLink } from 'react-router'
 import { LogoutButton } from '@/components/auth/LogoutButton.tsx'
@@ -55,7 +55,12 @@ export function MobileNav(): JSX.Element {
             </NavLink>
           ))}
         </nav>
-        <div className="mt-auto border-t p-2">
+        <div className="mt-auto flex flex-col border-t p-2">
+          {/* With the account actions, not in the pages list: it is about me, not a place. */}
+          <NavLink to="/settings" className={navLinkClasses} onClick={() => setIsOpen(false)}>
+            <SettingsIcon aria-hidden className="size-4" />
+            Préférences
+          </NavLink>
           <ThemeToggle />
           <LogoutButton />
         </div>

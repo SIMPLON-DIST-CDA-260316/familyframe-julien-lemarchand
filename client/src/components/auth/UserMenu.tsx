@@ -1,5 +1,6 @@
-import { LogOutIcon } from 'lucide-react'
+import { LogOutIcon, SettingsIcon } from 'lucide-react'
 import type { JSX } from 'react'
+import { Link } from 'react-router'
 import { useAuth } from '@/auth/AuthContext.ts'
 import { UserAvatar } from '@/components/auth/UserAvatar.tsx'
 import { UserBadge } from '@/components/auth/UserBadge.tsx'
@@ -23,13 +24,19 @@ export function UserMenu(): JSX.Element | null {
         className="rounded-full focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
         aria-label="Menu du compte"
       >
-        <UserAvatar name={user.displayName} />
+        <UserAvatar name={user.displayName} avatarUrl={user.avatarUrl} />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64">
         <DropdownMenuLabel className="font-normal">
           <UserBadge />
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link to="/settings">
+            <SettingsIcon aria-hidden />
+            Préférences
+          </Link>
+        </DropdownMenuItem>
         <ThemeToggle />
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={logout}>

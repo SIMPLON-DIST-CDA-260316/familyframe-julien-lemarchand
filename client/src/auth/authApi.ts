@@ -7,8 +7,8 @@ export type LoginResult =
 
 export type InvitationAcceptance = { token: string; displayName: string; password: string }
 
-// /login, /me and /invitations/accept all answer { user }.
-function readUser(body: unknown): PublicUser | null {
+// /login, /me, /invitations/accept and the account routes all answer { user }.
+export function readUser(body: unknown): PublicUser | null {
   if (typeof body === 'object' && body !== null && 'user' in body && isPublicUser(body.user)) {
     return body.user
   }

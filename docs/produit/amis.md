@@ -12,13 +12,14 @@ Deux membres deviennent amis quand l'un envoie une demande et que l'autre l'acce
 
 **Règles**
 
-1. R-AMI-01 · Chaque ligne montre l'initiale, le nom et l'adresse e-mail de l'autre personne. L'adresse permet de distinguer deux personnes qui ont le même nom.
+1. R-AMI-01 · Remplacée : le rond montre désormais la photo de profil quand il y en a une (R-AMI-45). Chaque ligne montre le nom et l'adresse e-mail de l'autre personne. L'adresse permet de distinguer deux personnes qui ont le même nom.
 2. R-AMI-02 · Le nombre affiché sur « En attente » additionne les demandes reçues et envoyées. Il est mis en évidence en rouge dès qu'au moins une demande reçue attend une réponse.
 3. R-AMI-03 · À l'ouverture de la page, la vue « En attente » s'affiche d'office s'il y a au moins une demande reçue ; sinon, la vue « Mes amis ». Une fois que la personne a choisi une vue, celle-ci reste affichée.
 4. R-AMI-04 · Dans « En attente », les demandes reçues passent avant les demandes envoyées. Une section vide n'est pas affichée.
 5. R-AMI-05 · Dans chaque liste, les plus récentes sont en haut.
 6. R-AMI-06 · Les listes ne se mettent pas à jour toutes seules quand l'autre personne agit : il faut recharger la page pour voir sa réponse. Elles se rechargent en revanche après chacune de ses propres actions, réussie ou non.
 7. R-AMI-07 · L'administrateur est un membre comme les autres sur cette page : il a ses propres amis et demandes.
+8. R-AMI-45 · Chaque ligne montre un rond qui porte la photo de profil de l'autre personne, ou sa première lettre en majuscule quand elle n'en a pas.
 
 **Messages affichés**
 

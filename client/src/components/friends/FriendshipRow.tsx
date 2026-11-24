@@ -10,11 +10,11 @@ type FriendshipRowProps = {
 
 // The email tells two « Mamie » apart.
 export function FriendshipRow({ friendship, children }: FriendshipRowProps): JSX.Element {
-  const { displayName, email } = friendship.user
+  const { displayName, email, avatarUrl } = friendship.user
   return (
     <li className="flex items-center justify-between gap-3 px-4 py-3">
       <div className="flex min-w-0 items-center gap-3">
-        <UserAvatar name={displayName} className="bg-muted text-foreground" />
+        <UserAvatar name={displayName} avatarUrl={avatarUrl} className="bg-muted text-foreground" />
         <div className="flex min-w-0 flex-col">
           <span className="truncate font-medium">{displayName}</span>
           <span className="truncate text-sm text-muted-foreground">{email}</span>

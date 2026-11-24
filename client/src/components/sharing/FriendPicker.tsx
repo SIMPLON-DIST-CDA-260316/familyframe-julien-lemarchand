@@ -39,6 +39,7 @@ function FriendToggle({
       <span className="relative">
         <UserAvatar
           name={friend.displayName}
+          avatarUrl={friend.avatarUrl}
           className="size-14 bg-muted text-lg text-foreground ring-offset-2 ring-offset-popover group-aria-pressed:ring-2 group-aria-pressed:ring-primary"
         />
         <span

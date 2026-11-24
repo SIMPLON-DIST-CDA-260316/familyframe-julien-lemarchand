@@ -40,6 +40,7 @@ Cette documentation décrit ce que l'application permet de faire et selon quelle
 | [partage.md](partage.md)                                 | Envoi d'une photo à un ami, depuis sa bibliothèque ou depuis son appareil.                          |
 | [cadre.md](cadre.md)                                     | Vue cadre, diaporama, arrivée des photos en direct, comportement sans activité ou sans connexion.   |
 | [apparence-et-navigation.md](apparence-et-navigation.md) | Barre du haut, menus, thème, page introuvable, messages d'erreur communs.                           |
+| [preferences.md](preferences.md)                         | Page « Préférences » : nom affiché, adresse e-mail, photo dans les ronds de profil.                 |
 | [a-venir.md](a-venir.md)                                 | Fonctionnalités prévues mais pas encore livrées.                                                    |
 
 ## Conventions

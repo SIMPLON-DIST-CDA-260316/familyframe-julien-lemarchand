@@ -8,15 +8,9 @@ Les règles ci-dessous décrivent l'intention ; elles recevront leur identifiant
 
 **Prévu**
 
-- Une page « Préférences », ouverte depuis le menu du compte et le menu mobile, juste au-dessus du choix du thème.
-- Quatre encarts, chacun enregistré séparément avec son propre bouton « Enregistrer » (« Enregistrement… » pendant l'envoi, « Enregistré. » ensuite) :
+- Deux encarts restent à venir, chacun enregistré séparément avec son propre bouton « Enregistrer » (« Enregistrement… » pendant l'envoi, « Enregistré. » ensuite) :
   - **Photo de profil** : choisir une image, la prévisualiser, l'enregistrer (« Changer la photo », « Annuler »), ou retirer la photo actuelle (« Retirer »). L'image est recadrée en carré, au centre, sans outil de recadrage. Mêmes formats et même poids maximal qu'une photo de la bibliothèque (JPEG, PNG ou WebP, 10 Mo). Retirer une photo absente ne provoque pas d'erreur.
-  - **Nom affiché** : le modifier, de 1 à 50 caractères (espaces au début et à la fin retirés).
-  - **Adresse e-mail** : affichée, non modifiable, avec la mention « Bientôt ».
   - **Mot de passe** : saisir le mot de passe actuel, le nouveau et sa confirmation. Le mot de passe actuel est exigé (« Mot de passe actuel incorrect. » sinon) ; le nouveau suit les règles habituelles (12 à 128 caractères). Après le changement, tous les autres appareils du compte, le cadre compris, sont déconnectés : ils reviennent à la page de connexion à leur prochaine action, à leur prochaine reconnexion ou au rechargement quotidien du cadre. L'appareil utilisé reste connecté. L'encart prévient de cette conséquence.
-- Après chaque enregistrement, la barre du haut et les menus montrent le changement sans recharger la page.
-- La photo de profil remplace l'initiale partout où un rond de profil apparaît : barre du haut, menus, page Amis et panneau d'envoi d'une photo.
-- Le nouveau nom apparaît aussi sur les photos déjà envoyées (« Envoyée par »), puisque c'est toujours le nom actuel de l'expéditeur qui s'affiche (R-PAR-32).
 
 **Restera impossible** : changer son adresse e-mail, réinitialiser un mot de passe oublié, supprimer son compte.
 

@@ -56,7 +56,10 @@ function useSessionState(): {
   return { user, setUser, isLoading }
 }
 
-type AuthActions = Pick<AuthContextValue, 'login' | 'acceptInvitation' | 'logout' | 'dropUser'>
+type AuthActions = Pick<
+  AuthContextValue,
+  'login' | 'acceptInvitation' | 'logout' | 'dropUser' | 'replaceUser'
+>
 
 // Both ways in set the user on success only: a failed attempt keeps the current state.
 function useAuthActions(setUser: (user: PublicUser | null) => void): AuthActions {
@@ -85,17 +88,16 @@ function useAuthActions(setUser: (user: PublicUser | null) => void): AuthActions
 
   const dropUser = useCallback((): void => setUser(null), [setUser])
 
-  return { login, acceptInvitation, logout, dropUser }
+  const replaceUser = useCallback((user: PublicUser): void => setUser(user), [setUser])
+
+  return { login, acceptInvitation, logout, dropUser, replaceUser }
 }
 
 export function AuthProvider({ children }: { children: ReactNode }): JSX.Element {
   const { user, setUser, isLoading } = useSessionState()
-  const { login, acceptInvitation, logout, dropUser } = useAuthActions(setUser)
+  const actions = useAuthActions(setUser)
 
-  const value = useMemo(
-    () => ({ user, isLoading, login, acceptInvitation, logout, dropUser }),
-    [user, isLoading, login, acceptInvitation, logout, dropUser],
-  )
+  const value = useMemo(() => ({ user, isLoading, ...actions }), [user, isLoading, actions])
 
   return <AuthContext value={value}>{children}</AuthContext>
 }
