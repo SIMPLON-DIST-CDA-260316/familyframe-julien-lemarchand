@@ -67,14 +67,15 @@ function toggledIds(ids: string[], friendId: string): string[] {
   return ids.includes(friendId) ? ids.filter((id) => id !== friendId) : [...ids, friendId]
 }
 
+function selectedUsers(friends: Friendship[], selectedIds: string[]): Friendship['user'][] {
+  return friends.map(({ user }) => user).filter(({ id }) => selectedIds.includes(id))
+}
+
 // The selection survives the search: a friend chosen then filtered out is still sent the photo.
 function FriendSelection({ friends, target, onSent }: FriendSelectionProps): JSX.Element {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [query, setQuery] = useState('')
   const sending = useShareSending(target, onSent)
-  const selectedFriends = friends
-    .map(({ user }) => user)
-    .filter(({ id }) => selectedIds.includes(id))
 
   return (
     <div className="flex flex-col gap-4">
@@ -92,7 +93,7 @@ function FriendSelection({ friends, target, onSent }: FriendSelectionProps): JSX
       <Button
         size="lg"
         disabled={selectedIds.length === 0 || sending.isSending}
-        onClick={() => sending.sendTo(selectedFriends)}
+        onClick={() => sending.sendTo(selectedUsers(friends, selectedIds))}
       >
         {sending.isSending ? 'Envoi…' : sendButtonLabel(selectedIds.length)}
       </Button>

@@ -15,14 +15,17 @@ Envoyer une photo à un ou plusieurs amis la fait entrer dans sa bibliothèque e
 **Règles**
 
 1. R-PAR-01 · Seuls les amis acceptés apparaissent ; les demandes en attente, dans un sens comme dans l'autre, ne permettent pas d'envoyer.
-1. R-PAR-02 · La liste des amis est chargée à chaque ouverture.
-1. R-PAR-04 · Le champ « Rechercher un ami » n'apparaît qu'à partir de 6 amis. La recherche porte sur le nom et l'adresse e-mail, sans tenir compte des majuscules ni des accents (« elodie » trouve « Élodie »). Un ami déjà coché le reste quand la recherche le masque.
-1. R-PAR-07 · Une photo que le destinataire possède déjà (identique octet pour octet, ajoutée par lui ou reçue de quelqu'un d'autre) est refusée.
-1. R-PAR-08 · Une personne retirée des amis entre l'ouverture et l'envoi ne peut pas recevoir la photo.
-1. R-PAR-09 · Le panneau garde la photo choisie à son ouverture : si le diaporama passe à une autre photo pendant ce temps, c'est bien la photo d'origine qui est envoyée.
-1. R-PAR-44 · Les proches apparaissent avec leurs initiales et leur prénom ; le nom complet s'affiche au survol. Leur adresse e-mail n'est pas montrée.
-1. R-PAR-45 · Le bouton indique combien de personnes recevront la photo et reste grisé tant que personne n'est choisi.
-1. R-PAR-46 · Dès qu'au moins une personne a reçu la photo, le panneau se ferme et une notification dit à qui elle est partie, ainsi que pour qui l'envoi a échoué. Si personne ne l'a reçue, le panneau reste ouvert avec les raisons, et le choix est gardé.
+2. R-PAR-02 · La liste des amis est chargée à chaque ouverture.
+3. R-PAR-03 · Remplacée : les amis se choisissent désormais en touchant leur rond (R-PAR-44).
+4. R-PAR-04 · Le champ « Rechercher un ami » n'apparaît qu'à partir de 6 amis. La recherche porte sur le nom et l'adresse e-mail, sans tenir compte des majuscules ni des accents (« elodie » trouve « Élodie »). Un ami déjà coché le reste quand la recherche le masque.
+5. R-PAR-05 · Remplacée : le bouton d'envoi indique le nombre de personnes choisies (R-PAR-45).
+6. R-PAR-06 · Remplacée : l'issue de l'envoi est décrite par la fermeture du panneau et la notification (R-PAR-46).
+7. R-PAR-07 · Une photo que le destinataire possède déjà (identique octet pour octet, ajoutée par lui ou reçue de quelqu'un d'autre) est refusée.
+8. R-PAR-08 · Une personne retirée des amis entre l'ouverture et l'envoi ne peut pas recevoir la photo.
+9. R-PAR-09 · Le panneau garde la photo choisie à son ouverture : si le diaporama passe à une autre photo pendant ce temps, c'est bien la photo d'origine qui est envoyée.
+10. R-PAR-44 · Les proches apparaissent avec leurs initiales et leur prénom ; le nom complet s'affiche au survol. Leur adresse e-mail n'est pas montrée.
+11. R-PAR-45 · Le bouton indique combien de personnes recevront la photo et reste grisé tant que personne n'est choisi.
+12. R-PAR-46 · Dès qu'au moins une personne a reçu la photo, le panneau se ferme et une notification dit à qui elle est partie, ainsi que pour qui l'envoi a échoué. Si personne ne l'a reçue, le panneau reste ouvert avec les raisons, et le choix est gardé.
 
 **Messages affichés**
 

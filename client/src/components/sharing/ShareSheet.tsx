@@ -1,4 +1,4 @@
-import type { JSX } from 'react'
+import type { JSX, ReactNode } from 'react'
 import { ShareFriendsForm } from '@/components/sharing/ShareFriendsForm.tsx'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog.tsx'
 import { Sheet, SheetContent } from '@/components/ui/sheet.tsx'
@@ -21,9 +21,12 @@ type ShareSheetProps = {
   className?: string
 }
 
-type ShareBodyProps = {
+type ShareBodyProps = Pick<ShareSheetProps, 'onShared' | 'onClose'> & {
   target: ShareTarget
-  onSent: () => void
+}
+
+type ShellProps = Pick<ShareSheetProps, 'onClose' | 'onCloseAutoFocus' | 'className'> & {
+  children: ReactNode
 }
 
 function ShareThumbnail({ target }: { target: ShareTarget }): JSX.Element | null {
@@ -35,7 +38,11 @@ function ShareThumbnail({ target }: { target: ShareTarget }): JSX.Element | null
 }
 
 // Sheet and Dialog are the same Radix dialog underneath: one title and description serve both.
-function ShareBody({ target, onSent }: ShareBodyProps): JSX.Element {
+function ShareBody({ target, onShared, onClose }: ShareBodyProps): JSX.Element {
+  function closeAfterSending(): void {
+    onShared?.()
+    onClose()
+  }
   return (
     <>
       {/* pr-10 keeps the text clear of the ✕ in the corner. */}
@@ -48,8 +55,44 @@ function ShareBody({ target, onSent }: ShareBodyProps): JSX.Element {
           </DialogDescription>
         </div>
       </div>
-      <ShareFriendsForm target={target} onSent={onSent} />
+      <ShareFriendsForm target={target} onSent={closeAfterSending} />
     </>
+  )
+}
+
+function DesktopDialog({
+  onClose,
+  onCloseAutoFocus,
+  className,
+  children,
+}: ShellProps): JSX.Element {
+  return (
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent className={cn('sm:max-w-md', className)} onCloseAutoFocus={onCloseAutoFocus}>
+        {children}
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+// A phone gets the sheet from the bottom, under the thumb.
+function PhoneSheet({ onClose, onCloseAutoFocus, className, children }: ShellProps): JSX.Element {
+  return (
+    <Sheet open onOpenChange={onClose}>
+      <SheetContent
+        side="bottom"
+        // bg-popover matches the ring offset of the friend avatars, as in the dialog.
+        className={cn(
+          'max-h-[90svh] rounded-t-2xl bg-popover px-4 pt-4 pb-6 text-popover-foreground',
+          className,
+        )}
+        onCloseAutoFocus={onCloseAutoFocus}
+        // Focusing the search field would raise the keyboard over the friend grid.
+        onOpenAutoFocus={(event) => event.preventDefault()}
+      >
+        {children}
+      </SheetContent>
+    </Sheet>
   )
 }
 
@@ -62,30 +105,10 @@ export function ShareSheet({
 }: ShareSheetProps): JSX.Element | null {
   const isDesktop = useMediaQuery(DESKTOP_QUERY)
   if (!target) return null
-  function closeAfterSending(): void {
-    onShared?.()
-    onClose()
-  }
-  const body = <ShareBody target={target} onSent={closeAfterSending} />
-  if (isDesktop) {
-    return (
-      <Dialog open onOpenChange={onClose}>
-        <DialogContent className={cn('sm:max-w-md', className)} onCloseAutoFocus={onCloseAutoFocus}>
-          {body}
-        </DialogContent>
-      </Dialog>
-    )
-  }
+  const Shell = isDesktop ? DesktopDialog : PhoneSheet
   return (
-    // A phone gets the sheet from the bottom, under the thumb.
-    <Sheet open onOpenChange={onClose}>
-      <SheetContent
-        side="bottom"
-        className={cn('max-h-[90svh] rounded-t-2xl px-4 pt-4 pb-6', className)}
-        onCloseAutoFocus={onCloseAutoFocus}
-      >
-        {body}
-      </SheetContent>
-    </Sheet>
+    <Shell onClose={onClose} onCloseAutoFocus={onCloseAutoFocus} className={className}>
+      <ShareBody target={target} onShared={onShared} onClose={onClose} />
+    </Shell>
   )
 }
