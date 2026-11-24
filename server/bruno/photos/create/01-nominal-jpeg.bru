@@ -20,6 +20,7 @@ assert {
   res.body.url: contains res.cloudinary.com
   res.body.id: isString
   res.body.cloudinaryId: isUndefined
+  res.body.senderName: isNull
 }
 
 script:post-response {
@@ -56,7 +57,8 @@ script:post-response {
 
 docs {
   NOMINAL → 201 avec la photo créée, dans la bibliothèque du compte connecté :
-  la réponse ne porte plus de nom d'expéditeur (`uploaderName`).
+  la réponse ne porte plus de nom d'expéditeur (`uploaderName`) ; `senderName`
+  vaut `null`, car le membre a envoyé la photo lui-même.
   `cloudinaryId` n'est pas exposé : le serveur envoie des URL prêtes, `url`
   (photo entière) et `thumbnailUrl` (miniature), toutes deux en
   `f_auto,q_auto`. Le test télécharge les deux URL : une transformation

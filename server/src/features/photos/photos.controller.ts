@@ -13,12 +13,14 @@ export type PhotosController = {
   remove: (req: Request<{ id: string }>, res: Response) => Promise<void>
 }
 
-// cloudinaryId and ownerId stay on the server: the client gets ready-made URLs.
+// cloudinaryId, ownerId and senderId stay on the server: the client gets ready-made URLs
+// and the sender's name.
 function toPhotoDto(record: PhotoRecord): Photo {
   return {
     id: record.id,
     ...deliveryUrls(record.cloudinaryId),
     createdAt: record.createdAt.toISOString(),
+    senderName: record.sender?.displayName ?? null,
   }
 }
 

@@ -78,12 +78,14 @@ export type FriendshipList = {
   outgoing: Friendship[]
 }
 
-// createdAt is an ISO 8601 string: JSON has no dates.
+// createdAt is an ISO 8601 string: JSON has no dates. senderName is the display name of the
+// friend who sent the photo, null for a photo its owner uploaded.
 export type Photo = {
   id: string
   url: string
   thumbnailUrl: string
   createdAt: string
+  senderName: string | null
 }
 
 // nextCursor is the id to send as cursor for the next page; null on the last page.

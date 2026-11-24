@@ -8,8 +8,10 @@ docs {
   appartient au compte qui l'a envoyée : la liste, la suppression et les
   événements Socket.IO ne concernent que les photos du compte connecté.
 
-  Une photo renvoyée par l'API : `{ id, url, thumbnailUrl, createdAt }`
-  (`createdAt` en ISO 8601). Une erreur : `{ error }`, un code
+  Une photo renvoyée par l'API : `{ id, url, thumbnailUrl, createdAt,
+  senderName }` (`createdAt` en ISO 8601 ; `senderName`, le nom de l'ami qui
+  l'a envoyée, `null` pour une photo ajoutée par son propriétaire). Une
+  erreur : `{ error }`, un code
   (`PHOTO_MISSING`, `UPLOAD_INVALID`, `QUERY_INVALID`, `UNAUTHENTICATED`,
   `PHOTO_NOT_FOUND`, `PHOTO_DUPLICATE`, `PHOTO_TOO_LARGE`, `FORMAT_UNSUPPORTED`,
   `IMAGE_UNREADABLE`, `SERVER_ERROR`) que le client traduit en français.
