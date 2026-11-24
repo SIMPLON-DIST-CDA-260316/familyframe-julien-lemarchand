@@ -14,6 +14,8 @@ export type Credentials = { email: unknown; password: unknown }
 
 export type LoginResult = { user: PublicUser; token: string; expiresAt: Date }
 
+export type OpenedSession = { token: string; expiresAt: Date }
+
 export type AuthenticatedSession = { user: PublicUser; expiresAt: Date; isRenewed: boolean }
 
 export type AuthServiceDeps = {
@@ -27,6 +29,7 @@ export type AuthServiceDeps = {
 
 export type AuthService = {
   login: (credentials: Credentials) => Promise<LoginResult>
+  openSession: (userId: string) => Promise<OpenedSession>
   logout: (token: string | null) => Promise<void>
   authenticate: (token: string | null) => Promise<AuthenticatedSession>
   authenticateAndSlide: (token: string | null) => Promise<AuthenticatedSession>
@@ -82,14 +85,21 @@ async function findValidSession(
   return session
 }
 
-async function login(deps: AuthServiceDeps, credentials: Credentials): Promise<LoginResult> {
-  const { repository, hashToken, generateToken, now, logger } = deps
-  const user = await findUserByCredentials(deps, credentials)
+// The one place that creates sessions: login, and accepting an invitation.
+// Each new session also purges the expired ones, so no scheduled job is needed.
+async function openSession(deps: AuthServiceDeps, userId: string): Promise<OpenedSession> {
+  const { repository, hashToken, generateToken, now } = deps
   await repository.deleteExpiredSessions(now())
   const token = generateToken()
   const expiresAt = sessionEnd(deps)
-  await repository.createSession({ tokenHash: hashToken(token), userId: user.id, expiresAt })
-  logger.info('auth.login_succeeded', { userId: user.id })
+  await repository.createSession({ tokenHash: hashToken(token), userId, expiresAt })
+  return { token, expiresAt }
+}
+
+async function login(deps: AuthServiceDeps, credentials: Credentials): Promise<LoginResult> {
+  const user = await findUserByCredentials(deps, credentials)
+  const { token, expiresAt } = await openSession(deps, user.id)
+  deps.logger.info('auth.login_succeeded', { userId: user.id })
   return { user: toPublicUser(user), token, expiresAt }
 }
 
@@ -134,6 +144,7 @@ async function authenticateAndSlide(
 export function createAuthService(deps: AuthServiceDeps): AuthService {
   return {
     login: (credentials) => login(deps, credentials),
+    openSession: (userId) => openSession(deps, userId),
     logout: (token) => logout(deps, token),
     authenticate: (token) => authenticate(deps, token),
     authenticateAndSlide: (token) => authenticateAndSlide(deps, token),

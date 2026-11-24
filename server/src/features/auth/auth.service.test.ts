@@ -152,6 +152,22 @@ describe('login', () => {
   })
 })
 
+describe('openSession', () => {
+  it('purges the expired sessions, then stores the hash of a new 90-day session', async () => {
+    const deps = makeDeps()
+
+    const session = await createAuthService(deps).openSession(USER.id)
+
+    expect(deps.repository.deleteExpiredSessions).toHaveBeenCalledWith(NOW)
+    expect(deps.repository.createSession).toHaveBeenCalledWith({
+      tokenHash: TOKEN_HASH,
+      userId: USER.id,
+      expiresAt: SESSION_END,
+    })
+    expect(session).toEqual({ token: TOKEN, expiresAt: SESSION_END })
+  })
+})
+
 describe('logout', () => {
   it('deletes the session of the token and logs the user id', async () => {
     const deps = makeDeps()
