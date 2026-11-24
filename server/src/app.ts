@@ -12,7 +12,10 @@ import { type AuthService, createAuthService } from './features/auth/auth.servic
 import { createFriendshipsController } from './features/friendships/friendships.controller.js'
 import { createFriendshipsRepository } from './features/friendships/friendships.repository.js'
 import { createFriendshipsRouter } from './features/friendships/friendships.routes.js'
-import { createFriendshipsService } from './features/friendships/friendships.service.js'
+import {
+  createFriendshipsService,
+  type FriendshipsService,
+} from './features/friendships/friendships.service.js'
 import { createInvitationsController } from './features/invitations/invitations.controller.js'
 import { createInvitationsRepository } from './features/invitations/invitations.repository.js'
 import { createInvitationsRouter } from './features/invitations/invitations.routes.js'
@@ -20,7 +23,7 @@ import { createInvitationsService } from './features/invitations/invitations.ser
 import { createPhotosController } from './features/photos/photos.controller.js'
 import { createPhotosRepository } from './features/photos/photos.repository.js'
 import { createPhotosRouter } from './features/photos/photos.routes.js'
-import { createPhotosService } from './features/photos/photos.service.js'
+import { createPhotosService, type PhotosServiceDeps } from './features/photos/photos.service.js'
 import { deleteImage, uploadImage } from './lib/cloudinary.js'
 import { prisma } from './lib/db.js'
 import { toFrameJpeg } from './lib/image.js'
@@ -42,22 +45,29 @@ export function assembleAuthService(): AuthService {
   })
 }
 
-function assemblePhotosRouter(io: SocketServer): Router {
+function assemblePhotosRouter(
+  io: SocketServer,
+  areFriends: PhotosServiceDeps['areFriends'],
+): Router {
   const service = createPhotosService({
     repository: createPhotosRepository(prisma),
     toFrameJpeg,
     uploadImage,
     deleteImage,
+    areFriends,
     logger,
   })
   return createPhotosRouter(createPhotosController(service, io))
 }
 
-function assembleFriendshipsRouter(): Router {
-  const service = createFriendshipsService({
+function assembleFriendshipsService(): FriendshipsService {
+  return createFriendshipsService({
     repository: createFriendshipsRepository(prisma),
     logger,
   })
+}
+
+function assembleFriendshipsRouter(service: FriendshipsService): Router {
   return createFriendshipsRouter(createFriendshipsController(service))
 }
 
@@ -81,6 +91,8 @@ function assembleInvitationsRouter(
 export function createApp(io: SocketServer, authService: AuthService): Express {
   const requireAuth = createRequireAuth(authService)
   const requireAdmin = requireRole('admin')
+  // One instance for both routers: the photos service asks it who is friends.
+  const friendships = assembleFriendshipsService()
   const app = express()
 
   // First, so every request is timed and logged, 404s included.
@@ -92,10 +104,10 @@ export function createApp(io: SocketServer, authService: AuthService): Express {
   })
 
   app.use('/api/auth', createAuthRouter(createAuthController(authService), requireAuth))
-  app.use('/api/photos', requireAuth, assemblePhotosRouter(io))
+  app.use('/api/photos', requireAuth, assemblePhotosRouter(io, friendships.areFriends))
   // Unlike photos, the router gets requireAuth itself: its accept route is public.
   app.use('/api/invitations', assembleInvitationsRouter(authService, requireAuth, requireAdmin))
-  app.use('/api/friendships', requireAuth, assembleFriendshipsRouter())
+  app.use('/api/friendships', requireAuth, assembleFriendshipsRouter(friendships))
 
   app.use(notFound)
   app.use(errorHandler)

@@ -3,18 +3,22 @@ import { AppError } from '../../errors/app-error.js'
 import type { UploadedImage } from '../../lib/cloudinary.js'
 import type { Logger } from '../../lib/logger.js'
 import {
+  OBJECT_ID_PATTERN,
   parseCursor,
   parseFile,
   parseLimit,
   parsePhotoId,
   type UploadedFile,
 } from './photos.input.js'
-import type { NewPhoto, PhotoRecord, PhotosRepository } from './photos.repository.js'
+import type { NewPhoto, PhotoRecord, PhotosRepository, StoredPhoto } from './photos.repository.js'
 
 // ownerId is the logged-in account: a photo belongs to whoever uploaded it.
 export type NewPhotoInput = { ownerId: string; file: UploadedFile | undefined }
 
 export type PhotoDeletion = { ownerId: string; id: string }
+
+// photoId comes from the URL, friendId straight from the JSON body: validated here.
+export type LibraryShare = { senderId: string; photoId: string; friendId: unknown }
 
 // cursor and limit come straight from the query string: validated here, at the boundary.
 export type PageInput = { ownerId: string; cursor: unknown; limit: unknown }
@@ -26,6 +30,8 @@ export type PhotosServiceDeps = {
   toFrameJpeg: (input: Buffer) => Promise<Buffer>
   uploadImage: (jpeg: Buffer) => Promise<UploadedImage>
   deleteImage: (cloudinaryId: string) => Promise<void>
+  // The friendships service's rule: a photo goes only to an accepted friend.
+  areFriends: (userId: string, otherUserId: string) => Promise<boolean>
   logger: Logger
 }
 
@@ -33,6 +39,8 @@ export type PhotosService = {
   listPage: (input: PageInput) => Promise<RecordPage>
   createPhoto: (input: NewPhotoInput) => Promise<PhotoRecord>
   deletePhoto: (deletion: PhotoDeletion) => Promise<string>
+  // Returns the friend's new photo: the controller sends it to the friend's room.
+  shareFromLibrary: (share: LibraryShare) => Promise<PhotoRecord>
 }
 
 // The original bytes, before sharp: its output is not guaranteed to be stable.
@@ -104,7 +112,7 @@ async function saveRecord(deps: PhotosServiceDeps, photo: NewPhoto): Promise<Pho
   throw new AppError('PHOTO_DUPLICATE')
 }
 
-// A share (step 5) points to the same image: it goes with the last photo using it.
+// A shared photo points to the same image: it goes with the last photo using it.
 // Counted after the deletion, so the deleted photo does not count itself.
 async function destroyUnusedImage(deps: PhotosServiceDeps, cloudinaryId: string): Promise<boolean> {
   let remainingCount: number
@@ -162,6 +170,65 @@ async function deletePhoto(
   return record.id
 }
 
+// Missing, malformed, unknown, pending or oneself: one answer, the id is no accepted friend's.
+// A malformed id never reaches the database: Prisma would fail on it.
+async function requireFriend(
+  { areFriends, logger }: PhotosServiceDeps,
+  friendId: unknown,
+  senderId: string,
+): Promise<string> {
+  const isObjectId = typeof friendId === 'string' && OBJECT_ID_PATTERN.test(friendId)
+  if (isObjectId && (await areFriends(senderId, friendId))) {
+    return friendId
+  }
+  logger.warn('photo.share_refused', { reason: 'not_friends', userId: senderId })
+  throw new AppError('NOT_FRIENDS')
+}
+
+async function findOwnedPhoto(
+  { repository }: PhotosServiceDeps,
+  id: string,
+  ownerId: string,
+): Promise<StoredPhoto> {
+  const photo = await repository.findOwned(id, ownerId)
+  if (!photo) {
+    throw new AppError('PHOTO_NOT_FOUND')
+  }
+  return photo
+}
+
+// A concurrent share of the same file won. Unlike a fresh upload, the image stays:
+// the original photo still uses it.
+async function saveCopy(deps: PhotosServiceDeps, photo: NewPhoto): Promise<PhotoRecord> {
+  const record = await deps.repository.create(photo)
+  if (record) {
+    return record
+  }
+  deps.logger.info('photo.duplicate', { userId: photo.ownerId, cloudinaryId: photo.cloudinaryId })
+  throw new AppError('PHOTO_DUPLICATE')
+}
+
+// The friend gets a new photo pointing to the same Cloudinary image: nothing is uploaded again.
+async function shareFromLibrary(
+  deps: PhotosServiceDeps,
+  { senderId, photoId, friendId }: LibraryShare,
+): Promise<PhotoRecord> {
+  const validPhotoId = parsePhotoId(photoId)
+  const recipientId = await requireFriend(deps, friendId, senderId)
+  const { id, url, cloudinaryId, sha256 } = await findOwnedPhoto(deps, validPhotoId, senderId)
+  await rejectKnownFile(deps, recipientId, sha256)
+  const record = await saveCopy(deps, { ownerId: recipientId, senderId, url, cloudinaryId, sha256 })
+  deps.logger.info('photo.shared', {
+    photoId: record.id,
+    sourcePhotoId: id,
+    cloudinaryId,
+    userId: senderId,
+    recipientId,
+    source: 'library',
+  })
+  return record
+}
+
 // One record more than asked tells whether a next page exists, without a count query.
 async function listPage(
   { repository }: PhotosServiceDeps,
@@ -182,5 +249,6 @@ export function createPhotosService(deps: PhotosServiceDeps): PhotosService {
     listPage: (input) => listPage(deps, input),
     createPhoto: (input) => createPhoto(deps, input),
     deletePhoto: (deletion) => deletePhoto(deps, deletion),
+    shareFromLibrary: (share) => shareFromLibrary(deps, share),
   }
 }

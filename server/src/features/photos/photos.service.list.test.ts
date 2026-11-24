@@ -41,6 +41,7 @@ function makeDeps() {
     toFrameJpeg: vi.fn<PhotosServiceDeps['toFrameJpeg']>(),
     uploadImage: vi.fn<PhotosServiceDeps['uploadImage']>(),
     deleteImage: vi.fn<PhotosServiceDeps['deleteImage']>(),
+    areFriends: vi.fn<PhotosServiceDeps['areFriends']>(),
     logger: {
       info: vi.fn<Logger['info']>(),
       warn: vi.fn<Logger['warn']>(),

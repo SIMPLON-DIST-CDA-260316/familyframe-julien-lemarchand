@@ -4,7 +4,7 @@ export const DEFAULT_PAGE_SIZE = 30
 export const MAX_PAGE_SIZE = 100
 const DIGITS_PATTERN = /^\d+$/
 const ALLOWED_TYPES: string[] = ['image/jpeg', 'image/png', 'image/webp']
-const OBJECT_ID_PATTERN = /^[0-9a-f]{24}$/i
+export const OBJECT_ID_PATTERN = /^[0-9a-f]{24}$/i
 
 export type UploadedFile = { buffer: Buffer; mimetype: string }
 

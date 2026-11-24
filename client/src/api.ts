@@ -11,6 +11,7 @@ export type ApiErrorCode =
   | 'UNAUTHENTICATED'
   | 'INVALID_CREDENTIALS'
   | 'FORBIDDEN'
+  | 'NOT_FRIENDS'
   | 'ROUTE_NOT_FOUND'
   | 'PHOTO_NOT_FOUND'
   | 'INVITATION_NOT_FOUND'
@@ -39,6 +40,7 @@ const ERROR_MESSAGES: Record<ApiErrorCode, string> = {
   UNAUTHENTICATED: 'Votre session a expiré. Reconnectez-vous.',
   INVALID_CREDENTIALS: 'E-mail ou mot de passe incorrect.',
   FORBIDDEN: "Cette action est réservée à l'administrateur.",
+  NOT_FRIENDS: 'Cette personne ne fait pas partie de vos amis.',
   ROUTE_NOT_FOUND: "Cette adresse n'existe pas sur le serveur.",
   PHOTO_NOT_FOUND: 'Cette photo a déjà été supprimée.',
   INVITATION_NOT_FOUND: "Ce lien d'invitation n'est pas valide. Demandez-en un nouveau.",
