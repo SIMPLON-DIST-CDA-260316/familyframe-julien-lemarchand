@@ -1,0 +1,27 @@
+meta {
+  name: Edge - adresse sans compte
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/friendships
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "inconnu@familyframe.test"
+  }
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq USER_NOT_FOUND
+}
+
+docs {
+  EDGE → 404 USER_NOT_FOUND : aucun compte n'utilise cette adresse. Le
+  client conseille de demander une invitation à l'administrateur.
+}

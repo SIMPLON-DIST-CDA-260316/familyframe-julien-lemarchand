@@ -1,0 +1,31 @@
+meta {
+  name: Nominal - le membre annule sa demande
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/api/friendships/{{pendingFriendshipId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const axios = require('axios')
+  // A script request does not get the collection headers: send the cookie itself.
+  const { data } = await axios.post(
+    `${bru.getEnvVar('baseUrl')}/api/friendships`,
+    { email: bru.getEnvVar('adminEmail') },
+    { headers: { Cookie: bru.getVar('sessionCookie') } },
+  )
+  bru.setVar('pendingFriendshipId', data.friendship.id)
+}
+
+assert {
+  res.status: eq 204
+}
+
+docs {
+  NOMINAL → 204 : le script envoie une nouvelle demande du membre à
+  l'admin ; le membre, son auteur, l'annule.
+}

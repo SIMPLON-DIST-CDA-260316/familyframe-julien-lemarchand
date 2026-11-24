@@ -33,7 +33,11 @@ docs {
 
   Chaque lancement crée aussi un compte membre à une adresse neuve
   (`invitations/accept/05`, `invite-<horodatage>@familyframe.test`) : ces
-  comptes restent jusqu'au prochain `pnpm db:seed`.
+  comptes restent jusqu'au prochain `pnpm db:seed`. Son cookie va dans
+  `inviteeCookie` : le dossier `friendships/` s'en sert comme tiers, ni
+  membre ni admin. Ce dossier crée et supprime ses propres amitiés entre le
+  membre et l'admin : il n'en laisse aucune, et commence par effacer celles
+  d'un lancement interrompu.
 
   Chemins `@file()` relatifs à la racine de la collection (`server/bruno/`).
 }

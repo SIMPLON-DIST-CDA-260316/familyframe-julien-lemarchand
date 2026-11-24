@@ -1,0 +1,29 @@
+meta {
+  name: Edge - JSON malformé
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/api/friendships
+  body: text
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:text {
+  {"email": "admin@familyframe.test"
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq BODY_INVALID
+}
+
+docs {
+  EDGE → 400 BODY_INVALID : le routeur des amitiés monte son propre
+  `express.json()`, qui refuse un corps JSON illisible.
+}

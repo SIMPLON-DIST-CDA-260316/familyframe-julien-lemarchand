@@ -1,0 +1,57 @@
+meta {
+  name: Nominal - demande d'ami à l'admin
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/friendships
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{friendEmailTyped}}"
+  }
+}
+
+script:pre-request {
+  const axios = require('axios')
+  const baseUrl = bru.getEnvVar('baseUrl')
+  const adminEmail = bru.getEnvVar('adminEmail')
+  // A script request does not get the collection headers: send the cookie itself.
+  const headers = { Cookie: bru.getVar('sessionCookie') }
+  // An interrupted run may have left a link with the admin: remove it, the run starts clean.
+  const { data } = await axios.get(`${baseUrl}/api/friendships`, { headers })
+  const leftovers = [...data.friends, ...data.incoming, ...data.outgoing].filter(
+    ({ user }) => user.email === adminEmail,
+  )
+  for (const { id } of leftovers) {
+    await axios.delete(`${baseUrl}/api/friendships/${id}`, { headers })
+  }
+  // Typed carelessly: the server must trim and lowercase it.
+  bru.setVar('friendEmailTyped', `  ${adminEmail.toUpperCase()} `)
+}
+
+assert {
+  res.status: eq 201
+  res.body.friendship.user.email: eq {{adminEmail}}
+  res.body.friendship.user.displayName: eq Admin
+  res.body.friendship.user.role: isUndefined
+  res.body.friendship.user.passwordHash: isUndefined
+}
+
+script:post-response {
+  if (res.body.friendship) {
+    bru.setVar('friendshipId', res.body.friendship.id)
+  }
+}
+
+docs {
+  NOMINAL → 201 `{ friendship }`. L'adresse de l'admin part en majuscules,
+  entourée d'espaces : le serveur la normalise comme au login. `user` est
+  l'admin, sans rôle ni hash. L'id va dans `friendshipId`. Le script de
+  départ supprime d'abord tout lien membre-admin laissé par un lancement
+  interrompu.
+}

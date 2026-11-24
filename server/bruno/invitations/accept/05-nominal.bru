@@ -42,6 +42,10 @@ script:post-response {
   test('un cookie de session pour le nouveau membre', () => {
     expect(newCookie).to.match(/^ff_session=[0-9a-f]{64};/)
   })
+  // friendships/ needs a third account, on neither side of the member-admin link.
+  if (newCookie) {
+    bru.setVar('inviteeCookie', newCookie.split(';')[0])
+  }
   test('ce cookie ouvre une session du nouveau compte', async () => {
     // A script request does not get the collection headers: send the cookie itself.
     const me = await axios.get(`${baseUrl}/api/auth/me`, {
@@ -62,5 +66,6 @@ docs {
   NOMINAL → 201 `{ user }`, un compte `member` à l'adresse de l'invitation,
   et un cookie `ff_session`. Le script vérifie que ce cookie ouvre bien une
   session du nouveau compte (`GET /api/auth/me`), puis que l'admin voit
-  l'invitation « utilisée » (`GET /api/invitations`).
+  l'invitation « utilisée » (`GET /api/invitations`). Le cookie du nouveau
+  compte va dans `inviteeCookie` : `friendships/` s'en sert comme tiers.
 }

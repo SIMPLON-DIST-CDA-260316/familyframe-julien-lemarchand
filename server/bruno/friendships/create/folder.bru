@@ -1,0 +1,11 @@
+meta {
+  name: create
+  seq: 1
+}
+
+docs {
+  `POST /api/friendships`, JSON `{ email }` → 201 `{ friendship }` : une
+  demande en attente vers le compte qui se connecte avec cet e-mail
+  (adresse exacte, sans recherche). Une seule ligne par paire, dans les deux
+  sens : l'index unique sur `pairKey` refuse le doublon.
+}

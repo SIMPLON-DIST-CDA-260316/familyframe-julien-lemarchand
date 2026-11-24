@@ -1,0 +1,10 @@
+meta {
+  name: list
+  seq: 2
+}
+
+docs {
+  `GET /api/friendships` → 200 `{ friends, incoming, outgoing }` : les amis,
+  les demandes reçues et les demandes envoyées du compte connecté, la plus
+  récente en premier, sans pagination.
+}

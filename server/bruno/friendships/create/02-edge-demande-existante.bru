@@ -1,0 +1,27 @@
+meta {
+  name: Edge - demande déjà envoyée
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/friendships
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{adminEmail}}"
+  }
+}
+
+assert {
+  res.status: eq 409
+  res.body.error: eq FRIEND_REQUEST_EXISTS
+}
+
+docs {
+  EDGE → 409 FRIEND_REQUEST_EXISTS : le membre redemande l'admin, sa
+  première demande attend toujours.
+}

@@ -1,0 +1,21 @@
+meta {
+  name: Edge - lien déjà supprimé
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{baseUrl}}/api/friendships/{{friendshipId}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq FRIENDSHIP_NOT_FOUND
+}
+
+docs {
+  EDGE → 404 FRIENDSHIP_NOT_FOUND : `02` l'a déjà supprimé (comme quand
+  l'autre côté agit en premier).
+}
