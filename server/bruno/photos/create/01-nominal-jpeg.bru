@@ -16,7 +16,7 @@ body:multipart-form {
 
 assert {
   res.status: eq 201
-  res.body.uploaderName: eq {{memberDisplayName}}
+  res.body.uploaderName: isUndefined
   res.body.url: contains res.cloudinary.com
   res.body.id: isString
   res.body.cloudinaryId: isUndefined
@@ -55,11 +55,12 @@ script:post-response {
 }
 
 docs {
-  NOMINAL → 201 avec la photo créée, au nom d'affichage du compte connecté
-  (`uploaderName`) : le client n'envoie plus de pseudo. `cloudinaryId` n'est
-  pas exposé : le serveur envoie des URL prêtes, `url` (photo entière) et `thumbnailUrl`
-  (miniature), toutes deux en `f_auto,q_auto`. Le test télécharge les deux
-  URL : une transformation refusée par Cloudinary ferait échouer le test.
+  NOMINAL → 201 avec la photo créée, dans la bibliothèque du compte connecté :
+  la réponse ne porte plus de nom d'expéditeur (`uploaderName`).
+  `cloudinaryId` n'est pas exposé : le serveur envoie des URL prêtes, `url`
+  (photo entière) et `thumbnailUrl` (miniature), toutes deux en
+  `f_auto,q_auto`. Le test télécharge les deux URL : une transformation
+  refusée par Cloudinary ferait échouer le test.
 
   Les URL sont signées (`s--…--`). Le test de l'URL modifiée suppose
   « Strict transformations » activé dans la console Cloudinary (Settings →

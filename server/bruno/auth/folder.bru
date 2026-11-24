@@ -5,11 +5,14 @@ meta {
 
 docs {
   Lancé avant les autres dossiers (`seq: 1`). `login/01` range le cookie de
-  session dans la variable `sessionCookie` ; `logout/` ferme cette session,
-  vérifie qu'elle ne sert plus, puis se reconnecte : les dossiers suivants
-  gardent une session valide.
+  session du membre dans la variable `sessionCookie` ; `login/05` connecte
+  aussi l'admin et range son cookie dans `adminCookie`. `logout/` ferme la
+  session du membre, vérifie qu'elle ne sert plus, puis se reconnecte : les
+  dossiers suivants gardent une session valide.
 
-  Identifiants : ceux du membre créé par `pnpm db:seed`, dans
-  `environments/Local.bru`. Un utilisateur renvoyé par l'API vaut
-  `{ id, email, displayName, role }`, jamais le hash du mot de passe.
+  Identifiants : ceux des deux comptes créés par `pnpm db:seed`, dans
+  `environments/Local.bru`. Le membre est le compte de toutes les requêtes ;
+  l'admin sert à vérifier qu'un compte ne touche pas aux photos d'un autre.
+  Un utilisateur renvoyé par l'API vaut `{ id, email, displayName, role }`,
+  jamais le hash du mot de passe.
 }

@@ -22,8 +22,8 @@ const SEED_USERS: SeedUser[] = [
 ]
 
 async function seed(): Promise<void> {
-  // Sessions first: Prisma emulates the relation on MongoDB and refuses to delete
-  // a user that still has sessions.
+  // Sessions and photos first: Prisma emulates the relations on MongoDB and refuses
+  // to delete a user that still has sessions or photos.
   await prisma.session.deleteMany()
   await prisma.photo.deleteMany()
   await prisma.user.deleteMany()

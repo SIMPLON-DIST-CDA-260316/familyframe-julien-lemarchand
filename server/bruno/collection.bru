@@ -22,8 +22,11 @@ docs {
   `Cookie` ci-dessus. Le CLI tourne avec `--disable-cookies` : sa propre boîte
   à cookies renverrait sinon la session même aux requêtes « sans cookie ».
 
-  Les envois nominaux publient de vraies photos (Cloudinary + MongoDB) au nom
-  du membre de test (`Membre`) : elles apparaissent sur le cadre.
+  Les envois nominaux publient de vraies photos (Cloudinary + MongoDB) dans
+  la bibliothèque du membre de test : elles apparaissent sur son cadre, et
+  `photos/delete` les supprime en fin de lancement. Le second compte (l'admin,
+  `auth/login/05`, cookie dans la variable `adminCookie`) vérifie qu'un compte
+  ne touche pas aux photos d'un autre.
 
   Chemins `@file()` relatifs à la racine de la collection (`server/bruno/`).
 }

@@ -3,13 +3,14 @@ import type { Logger } from '../../lib/logger.js'
 import type { PhotoRecord, PhotosRepository } from './photos.repository.js'
 import { createPhotosService, type PhotosServiceDeps, type UploadedFile } from './photos.service.js'
 
+const OWNER_ID = '6b044f9d56a44767c7079b01'
 const JPEG_FILE: UploadedFile = { buffer: Buffer.from('raw upload'), mimetype: 'image/jpeg' }
 const FRAME_JPEG = Buffer.from('frame jpeg')
 const IMAGE = { url: 'https://res.cloudinary.com/demo/photo.jpg', cloudinaryId: 'familyframe/abc' }
 const RECORD: PhotoRecord = {
   id: '6b044f9d56a44767c7079a01',
+  ownerId: OWNER_ID,
   ...IMAGE,
-  uploaderName: 'Mamie',
   createdAt: new Date('2026-11-23T10:00:00Z'),
 }
 const LATEST_PHOTOS_LIMIT = 20
@@ -20,7 +21,7 @@ function makeDeps() {
     repository: {
       findLatest: vi.fn<PhotosRepository['findLatest']>().mockResolvedValue([RECORD]),
       create: vi.fn<PhotosRepository['create']>().mockResolvedValue(RECORD),
-      deleteById: vi.fn<PhotosRepository['deleteById']>().mockResolvedValue(RECORD),
+      deleteOwned: vi.fn<PhotosRepository['deleteOwned']>().mockResolvedValue(RECORD),
     },
     toFrameJpeg: vi.fn<PhotosServiceDeps['toFrameJpeg']>().mockResolvedValue(FRAME_JPEG),
     uploadImage: vi.fn<PhotosServiceDeps['uploadImage']>().mockResolvedValue(IMAGE),
@@ -34,37 +35,37 @@ function makeDeps() {
 }
 
 describe('createPhoto', () => {
-  it('saves the uploaded image with the uploader name and returns the record', async () => {
+  it('saves the uploaded image for its owner and returns the record', async () => {
     const deps = makeDeps()
 
     const record = await createPhotosService(deps).createPhoto({
-      uploaderName: 'Mamie',
+      ownerId: OWNER_ID,
       file: JPEG_FILE,
     })
 
     expect(record).toBe(RECORD)
     expect(deps.toFrameJpeg).toHaveBeenCalledWith(JPEG_FILE.buffer)
     expect(deps.uploadImage).toHaveBeenCalledWith(FRAME_JPEG)
-    expect(deps.repository.create).toHaveBeenCalledWith({ ...IMAGE, uploaderName: 'Mamie' })
+    expect(deps.repository.create).toHaveBeenCalledWith({ ownerId: OWNER_ID, ...IMAGE })
   })
 
-  it('logs the created photo by its identifiers, never by its uploader name', async () => {
+  it('logs the created photo by its identifiers and its owner id', async () => {
     const deps = makeDeps()
 
-    await createPhotosService(deps).createPhoto({ uploaderName: 'Mamie', file: JPEG_FILE })
+    await createPhotosService(deps).createPhoto({ ownerId: OWNER_ID, file: JPEG_FILE })
 
     expect(deps.logger.info).toHaveBeenCalledWith('photo.created', {
       photoId: RECORD.id,
       cloudinaryId: RECORD.cloudinaryId,
+      userId: OWNER_ID,
     })
-    expect(JSON.stringify(deps.logger.info.mock.calls)).not.toContain('Mamie')
   })
 
   it('rejects a missing file', async () => {
     const deps = makeDeps()
 
     await expect(
-      createPhotosService(deps).createPhoto({ uploaderName: 'Mamie', file: undefined }),
+      createPhotosService(deps).createPhoto({ ownerId: OWNER_ID, file: undefined }),
     ).rejects.toMatchObject({ code: 'PHOTO_MISSING' })
   })
 
@@ -73,7 +74,7 @@ describe('createPhoto', () => {
     const gif: UploadedFile = { buffer: Buffer.from('gif'), mimetype: 'image/gif' }
 
     await expect(
-      createPhotosService(deps).createPhoto({ uploaderName: 'Mamie', file: gif }),
+      createPhotosService(deps).createPhoto({ ownerId: OWNER_ID, file: gif }),
     ).rejects.toMatchObject({ code: 'FORMAT_UNSUPPORTED' })
     expect(deps.toFrameJpeg).not.toHaveBeenCalled()
   })
@@ -82,7 +83,7 @@ describe('createPhoto', () => {
     const deps = makeDeps()
     const file: UploadedFile = { buffer: Buffer.from('image'), mimetype }
 
-    await createPhotosService(deps).createPhoto({ uploaderName: 'Mamie', file })
+    await createPhotosService(deps).createPhoto({ ownerId: OWNER_ID, file })
 
     expect(deps.toFrameJpeg).toHaveBeenCalledWith(file.buffer)
   })
@@ -93,7 +94,7 @@ describe('createPhoto', () => {
     deps.toFrameJpeg.mockRejectedValue(sharpError)
 
     await expect(
-      createPhotosService(deps).createPhoto({ uploaderName: 'Mamie', file: JPEG_FILE }),
+      createPhotosService(deps).createPhoto({ ownerId: OWNER_ID, file: JPEG_FILE }),
     ).rejects.toMatchObject({ code: 'IMAGE_UNREADABLE' })
     expect(deps.uploadImage).not.toHaveBeenCalled()
     expect(deps.logger.warn).toHaveBeenCalledWith('photo.unreadable', { error: sharpError })
@@ -105,7 +106,7 @@ describe('createPhoto', () => {
     deps.uploadImage.mockRejectedValue(cloudinaryError)
 
     await expect(
-      createPhotosService(deps).createPhoto({ uploaderName: 'Mamie', file: JPEG_FILE }),
+      createPhotosService(deps).createPhoto({ ownerId: OWNER_ID, file: JPEG_FILE }),
     ).rejects.toBe(cloudinaryError)
     expect(deps.repository.create).not.toHaveBeenCalled()
   })
@@ -116,7 +117,7 @@ describe('createPhoto', () => {
     deps.repository.create.mockRejectedValue(databaseError)
 
     await expect(
-      createPhotosService(deps).createPhoto({ uploaderName: 'Mamie', file: JPEG_FILE }),
+      createPhotosService(deps).createPhoto({ ownerId: OWNER_ID, file: JPEG_FILE }),
     ).rejects.toBe(databaseError)
     expect(deps.logger.error).toHaveBeenCalledWith('photo.orphaned', {
       cloudinaryId: IMAGE.cloudinaryId,
@@ -127,66 +128,73 @@ describe('createPhoto', () => {
 })
 
 describe('listLatest', () => {
-  it('returns the latest photos from the repository', async () => {
+  it("returns the owner's latest photos from the repository", async () => {
     const deps = makeDeps()
 
-    const records = await createPhotosService(deps).listLatest()
+    const records = await createPhotosService(deps).listLatest(OWNER_ID)
 
     expect(records).toEqual([RECORD])
-    expect(deps.repository.findLatest).toHaveBeenCalledWith(LATEST_PHOTOS_LIMIT)
+    expect(deps.repository.findLatest).toHaveBeenCalledWith(OWNER_ID, LATEST_PHOTOS_LIMIT)
   })
 })
 
 describe('deletePhoto', () => {
-  it('deletes the record, then its Cloudinary image, and returns the stored id', async () => {
+  it("deletes the owner's record, then its Cloudinary image, and returns the stored id", async () => {
     const deps = makeDeps()
 
-    const deletedId = await createPhotosService(deps).deletePhoto(RECORD.id)
+    const deletedId = await createPhotosService(deps).deletePhoto({
+      ownerId: OWNER_ID,
+      id: RECORD.id,
+    })
 
     expect(deletedId).toBe(RECORD.id)
-    expect(deps.repository.deleteById).toHaveBeenCalledWith(RECORD.id)
+    expect(deps.repository.deleteOwned).toHaveBeenCalledWith(RECORD.id, OWNER_ID)
     expect(deps.deleteImage).toHaveBeenCalledWith(IMAGE.cloudinaryId)
-    expect(deps.repository.deleteById.mock.invocationCallOrder[0]).toBeLessThan(
+    expect(deps.repository.deleteOwned.mock.invocationCallOrder[0]).toBeLessThan(
       deps.deleteImage.mock.invocationCallOrder[0],
     )
   })
 
-  it('logs the deleted photo by its identifiers', async () => {
+  it('logs the deleted photo by its identifiers and its owner id', async () => {
     const deps = makeDeps()
 
-    await createPhotosService(deps).deletePhoto(RECORD.id)
+    await createPhotosService(deps).deletePhoto({ ownerId: OWNER_ID, id: RECORD.id })
 
     expect(deps.logger.info).toHaveBeenCalledWith('photo.deleted', {
       photoId: RECORD.id,
       cloudinaryId: RECORD.cloudinaryId,
+      userId: OWNER_ID,
     })
   })
 
   it('returns the stored id when the URL has it in upper case', async () => {
     const deps = makeDeps()
 
-    const deletedId = await createPhotosService(deps).deletePhoto(RECORD.id.toUpperCase())
+    const deletedId = await createPhotosService(deps).deletePhoto({
+      ownerId: OWNER_ID,
+      id: RECORD.id.toUpperCase(),
+    })
 
     expect(deletedId).toBe(RECORD.id)
   })
 
-  it('rejects an id with no record, also when another request deleted it first', async () => {
+  it("rejects an id with no photo of this owner: unknown, already deleted, or someone else's", async () => {
     const deps = makeDeps()
-    deps.repository.deleteById.mockResolvedValue(null)
+    deps.repository.deleteOwned.mockResolvedValue(null)
 
-    await expect(createPhotosService(deps).deletePhoto(RECORD.id)).rejects.toMatchObject({
-      code: 'PHOTO_NOT_FOUND',
-    })
+    await expect(
+      createPhotosService(deps).deletePhoto({ ownerId: OWNER_ID, id: RECORD.id }),
+    ).rejects.toMatchObject({ code: 'PHOTO_NOT_FOUND' })
     expect(deps.deleteImage).not.toHaveBeenCalled()
   })
 
   it('rejects an id that is not an ObjectId without querying the database', async () => {
     const deps = makeDeps()
 
-    await expect(createPhotosService(deps).deletePhoto('abc')).rejects.toMatchObject({
-      code: 'PHOTO_NOT_FOUND',
-    })
-    expect(deps.repository.deleteById).not.toHaveBeenCalled()
+    await expect(
+      createPhotosService(deps).deletePhoto({ ownerId: OWNER_ID, id: 'abc' }),
+    ).rejects.toMatchObject({ code: 'PHOTO_NOT_FOUND' })
+    expect(deps.repository.deleteOwned).not.toHaveBeenCalled()
   })
 
   it('still succeeds when Cloudinary fails, and logs the orphaned image', async () => {
@@ -194,7 +202,9 @@ describe('deletePhoto', () => {
     const cloudinaryError = new Error('Cloudinary is down')
     deps.deleteImage.mockRejectedValue(cloudinaryError)
 
-    await expect(createPhotosService(deps).deletePhoto(RECORD.id)).resolves.toBe(RECORD.id)
+    await expect(
+      createPhotosService(deps).deletePhoto({ ownerId: OWNER_ID, id: RECORD.id }),
+    ).resolves.toBe(RECORD.id)
     expect(deps.logger.error).toHaveBeenCalledWith('photo.orphaned', {
       cloudinaryId: IMAGE.cloudinaryId,
       error: cloudinaryError,
@@ -204,9 +214,11 @@ describe('deletePhoto', () => {
   it('lets a database failure through without touching Cloudinary', async () => {
     const deps = makeDeps()
     const databaseError = new Error('database is down')
-    deps.repository.deleteById.mockRejectedValue(databaseError)
+    deps.repository.deleteOwned.mockRejectedValue(databaseError)
 
-    await expect(createPhotosService(deps).deletePhoto(RECORD.id)).rejects.toBe(databaseError)
+    await expect(
+      createPhotosService(deps).deletePhoto({ ownerId: OWNER_ID, id: RECORD.id }),
+    ).rejects.toBe(databaseError)
     expect(deps.deleteImage).not.toHaveBeenCalled()
   })
 })

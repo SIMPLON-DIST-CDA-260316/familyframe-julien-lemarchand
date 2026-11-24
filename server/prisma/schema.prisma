@@ -20,6 +20,7 @@ model User {
   role         Role      @default(member)
   createdAt    DateTime  @default(now())
   sessions     Session[]
+  photos       Photo[]
 }
 
 model Session {
@@ -35,10 +36,12 @@ model Session {
 
 model Photo {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  ownerId      String   @db.ObjectId
+  owner        User     @relation(fields: [ownerId], references: [id])
   url          String
-  cloudinaryId String   @unique
-  uploaderName String
+  cloudinaryId String
   createdAt    DateTime @default(now())
 
-  @@index([createdAt])
+  @@index([ownerId, id])
+  @@index([cloudinaryId])
 }

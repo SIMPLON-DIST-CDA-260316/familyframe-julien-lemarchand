@@ -13,6 +13,11 @@ function toHandshakeError(error: unknown): Error {
   return new Error('SERVER_ERROR')
 }
 
+// One spelling of the room name: the socket joins it, the photos controller emits to it.
+export function userRoom(userId: string): string {
+  return `user:${userId}`
+}
+
 // No sliding here: a handshake has no HTTP response to carry a renewed cookie.
 export function createSocketAuth(service: AuthService): SocketMiddleware {
   return async (socket, next) => {
@@ -26,8 +31,7 @@ export function createSocketAuth(service: AuthService): SocketMiddleware {
     }
     // Outside the try: a failure here must surface as a crash, not hang the handshake.
     socket.data.userId = userId
-    // Step 2 sends each user's photos to this room; broadcasting stays global for now.
-    socket.join(`user:${userId}`)
+    socket.join(userRoom(userId))
     next()
   }
 }
