@@ -1,9 +1,28 @@
 import { errorMessage, UNAUTHORIZED_STATUS } from '@/api.ts'
-import { type CreatedInvitation, isCreatedInvitation } from '@/invitation.ts'
+import {
+  type CreatedInvitation,
+  type Invitation,
+  isCreatedInvitation,
+  isInvitation,
+} from '@/invitation.ts'
 
 export type CreateInvitationResult =
   | { isSuccess: true; created: CreatedInvitation }
   | { isSuccess: false; message: string }
+
+export type InvitationListResult =
+  | { isSuccess: true; invitations: Invitation[] }
+  | { isSuccess: false; message: string }
+
+function isInvitationList(value: unknown): value is { invitations: Invitation[] } {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'invitations' in value &&
+    Array.isArray(value.invitations) &&
+    value.invitations.every(isInvitation)
+  )
+}
 
 // A 401 calls onUnauthenticated: the session ended on the server, the provider drops the user.
 export async function postInvitation(
@@ -23,6 +42,20 @@ export async function postInvitation(
     return { isSuccess: false, message: errorMessage(data) }
   } catch {
     // fetch rejects only on network failure.
+    return { isSuccess: false, message: errorMessage(null) }
+  }
+}
+
+export async function fetchInvitations(
+  onUnauthenticated: () => void,
+): Promise<InvitationListResult> {
+  try {
+    const res = await fetch('/api/invitations')
+    if (res.status === UNAUTHORIZED_STATUS) onUnauthenticated()
+    const data: unknown = await res.json().catch(() => null)
+    if (res.ok && isInvitationList(data)) return { isSuccess: true, invitations: data.invitations }
+    return { isSuccess: false, message: errorMessage(data) }
+  } catch {
     return { isSuccess: false, message: errorMessage(null) }
   }
 }
