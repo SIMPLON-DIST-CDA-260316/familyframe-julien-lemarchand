@@ -3101,7 +3101,7 @@ function App(): JSX.Element {
 export default App
 ```
 
-- [ ] **Step 5: Gates and manual checks**
+- [x] **Step 5: Gates and manual checks**
 
 Run: `pnpm check && pnpm typecheck && pnpm build`
 Expected: all green (run `pnpm check:fix` first if only import order or formatting differs).
@@ -3395,7 +3395,7 @@ export function usePhotoFeed(): Photo[] {
 }
 ```
 
-- [ ] **Step 4: Gates and manual checks**
+- [x] **Step 4: Gates and manual checks**
 
 Run: `pnpm check && pnpm typecheck && pnpm build`
 Expected: all green.
@@ -3488,9 +3488,9 @@ Message: `docs: describe the login page` + attribution lines.
 
 - [x] `pnpm check && pnpm typecheck && pnpm build && pnpm test` on `feat/client-login`: green, `Tests  70 passed (70)`.
 - [x] `pnpm test:bruno` against the running API: 24/24.
-- [ ] The spec's manual scenario: `pnpm db:seed`, log in on `/login`, upload, the frame updates live, log out, `/frame` redirects to `/login`.
+- [x] The spec's manual scenario: `pnpm db:seed`, log in on `/login`, upload, the frame updates live, log out, `/frame` redirects to `/login`.
 - [x] `git log --oneline develop..feat/client-login`: one concern per commit; no `.env` file in any diff (`git diff --stat develop..feat/client-login`).
-- [ ] Fresh-context review of the whole stack diff (`superpowers:requesting-code-review`), then `gh stack submit --auto` (draft PRs) and `gh stack view --json`.
+- [x] Fresh-context review of the whole stack diff (`superpowers:requesting-code-review`), then `gh stack submit --auto` (draft PRs) and `gh stack view --json`.
 
 ---
 
@@ -3511,6 +3511,7 @@ Format: `date · task/step · what the plan said · what was done · why`.
 | 2026-11-24 | final review | — | fix wave: frame reloads photos daily so its session slides (f28a0cb); `/api/auth/me` unreachable (network, 5xx, bad body) is retried every 5 s instead of sending the frame to `/login` (3da91bb); session check extracted so every function is ≤ 30 lines (f28a0cb, 4a39ac0); login error cleared on resubmit, `@/` import (4b85f63); docs paths, SPA fallback `/login`, `Secure` cookie note for J2 (2fd84e0) | two Important findings about an unattended frame, plus the 30-line rule |
 | 2026-11-24 | final review | — | deferred: logging in again leaves the previous session of that browser valid; an already-open socket is not re-checked when its session expires or is logged out (documented); blank page while the session check waits | out of this step's scope; left for the author to triage |
 | 2026-11-24 | Tasks 11–12, final verification | manual browser checks | not run by the agents: left unchecked for the author (login, logout, upload, live frame, `/frame` redirect, API down at boot then up) | the author tests the UI locally before merge |
+| 2026-11-24 | Tasks 11–12, final verification | manual checks left to the author | run by the controller in Chrome (Claude in Chrome) on the author's request: `/frame` without session → `/login`; wrong password → "E-mail ou mot de passe incorrect."; login → back to `/frame`; upload without pseudo → frame 20 → 21 live, caption "Membre"; logout → `/login`, `/frame` → `/login`; API stopped at boot → blank page, `/api/auth/me` retried every ~5 s (502), API restarted → frame back without reload; session logged out server-side then socket reconnect → `/login`; cookie `HttpOnly; SameSite=Lax`, no `Secure` in dev. Seen, not changed: the frame counter shows 20 after a reload (the API returns at most 20 photos; step 2 paginates) | the author asked for the checks before their own pass |
 
 ---
 
