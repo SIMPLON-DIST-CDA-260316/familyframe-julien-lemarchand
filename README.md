@@ -48,11 +48,11 @@ Quand le schéma change sur une base qui contient déjà des photos, lancer `pnp
 | Service       | URL                         |
 | ------------- | --------------------------- |
 | Connexion     | http://localhost:5180/login |
-| Envoi         | http://localhost:5180       |
+| Bibliothèque  | http://localhost:5180       |
 | Cadre         | http://localhost:5180/frame |
 | API (Express) | http://localhost:3000       |
 
-Sans session, l'envoi et le cadre redirigent vers `/login` ; le cadre se connecte une fois avec un compte et reste connecté tant qu'il est allumé : il recharge ses photos chaque jour, ce qui prolonge la session glissante de 90 jours.
+Sans session, la bibliothèque et le cadre redirigent vers `/login` ; le cadre se connecte une fois avec un compte et reste connecté tant qu'il est allumé : il recharge ses photos chaque jour, ce qui prolonge la session glissante de 90 jours.
 
 Depuis un smartphone sur le même réseau : `http://<ip-du-pc>:5180` (le pare-feu Windows doit autoriser Node sur les réseaux privés, et le Wi-Fi ne doit pas isoler les appareils entre eux).
 
