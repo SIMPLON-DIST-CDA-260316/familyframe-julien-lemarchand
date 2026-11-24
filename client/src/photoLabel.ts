@@ -11,7 +11,8 @@ export function formatPhotoDay(iso: string): string {
   return new Date(iso).toLocaleDateString('fr-FR', PHOTO_DAY_FORMAT)
 }
 
-// Alt texts and aria-labels: with no sender name until step 5, the day names the photo.
-export function photoLabel({ createdAt }: Photo): string {
-  return `Photo du ${formatPhotoDay(createdAt)}`
+// Alt texts and aria-labels: the day names the photo, the sender tells a received one apart.
+export function photoLabel({ createdAt, senderName }: Photo): string {
+  const day = formatPhotoDay(createdAt)
+  return senderName === null ? `Photo du ${day}` : `Photo envoyée par ${senderName}, du ${day}`
 }

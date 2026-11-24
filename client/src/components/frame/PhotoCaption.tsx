@@ -12,6 +12,11 @@ export function PhotoCaption({ photo }: PhotoCaptionProps): JSX.Element {
       <p className="text-3xl font-medium tracking-tight text-white tabular-nums drop-shadow-md">
         <time dateTime={photo.createdAt}>{formatPhotoDay(photo.createdAt)}</time>
       </p>
+      {photo.senderName !== null && (
+        <p className="mt-1 text-xl font-medium tracking-tight text-white drop-shadow-md">
+          Envoyée par {photo.senderName}
+        </p>
+      )}
     </div>
   )
 }

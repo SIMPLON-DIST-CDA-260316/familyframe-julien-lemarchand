@@ -32,9 +32,14 @@ export function PhotoListRow({ photo, isCurrent, onSelect }: PhotoListRowProps):
           loading="lazy"
           decoding="async"
         />
-        <time dateTime={photo.createdAt} className="min-w-0 flex-1 text-lg tabular-nums">
-          {ROW_DATE_FORMAT.format(new Date(photo.createdAt))}
-        </time>
+        <span className="flex min-w-0 flex-1 flex-col">
+          <time dateTime={photo.createdAt} className="text-lg tabular-nums">
+            {ROW_DATE_FORMAT.format(new Date(photo.createdAt))}
+          </time>
+          {photo.senderName !== null && (
+            <span className="truncate text-sm text-white/70">Envoyée par {photo.senderName}</span>
+          )}
+        </span>
       </button>
       <PhotoActionsMenu
         photo={photo}
