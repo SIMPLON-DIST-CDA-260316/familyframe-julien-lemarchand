@@ -9,14 +9,18 @@ export type ApiErrorCode =
   | 'QUERY_INVALID'
   | 'DISPLAY_NAME_INVALID'
   | 'PASSWORD_INVALID'
+  | 'SELF_FRIEND'
   | 'UNAUTHENTICATED'
   | 'INVALID_CREDENTIALS'
   | 'FORBIDDEN'
   | 'ROUTE_NOT_FOUND'
   | 'PHOTO_NOT_FOUND'
   | 'INVITATION_NOT_FOUND'
+  | 'USER_NOT_FOUND'
   | 'PHOTO_DUPLICATE'
   | 'ACCOUNT_EXISTS'
+  | 'ALREADY_FRIENDS'
+  | 'FRIEND_REQUEST_EXISTS'
   | 'INVITATION_EXPIRED'
   | 'INVITATION_USED'
   | 'PHOTO_TOO_LARGE'
@@ -51,6 +55,26 @@ export type Invitation = {
 export type CreatedInvitation = {
   invitation: Invitation
   token: string
+}
+
+// What a friend sees of another account: never its role or its password hash.
+export type FriendUser = {
+  id: string
+  displayName: string
+  email: string
+}
+
+// id is the friendship's, user the other side; createdAt is an ISO 8601 string.
+export type Friendship = {
+  id: string
+  user: FriendUser
+  createdAt: string
+}
+
+export type FriendshipList = {
+  friends: Friendship[]
+  incoming: Friendship[]
+  outgoing: Friendship[]
 }
 
 // createdAt is an ISO 8601 string: JSON has no dates.

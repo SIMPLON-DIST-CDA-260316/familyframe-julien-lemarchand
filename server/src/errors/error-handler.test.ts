@@ -39,6 +39,13 @@ describe('toErrorResponse', () => {
     })
   })
 
+  it('answers a friend request to an unknown email with 404', () => {
+    expect(toErrorResponse(new AppError('USER_NOT_FOUND'))).toEqual({
+      status: 404,
+      body: { error: 'USER_NOT_FOUND' },
+    })
+  })
+
   it('answers an invitation past its 7 days with 410', () => {
     expect(toErrorResponse(new AppError('INVITATION_EXPIRED'))).toEqual({
       status: 410,
@@ -64,6 +71,20 @@ describe('toErrorResponse', () => {
     expect(toErrorResponse(new AppError('ACCOUNT_EXISTS'))).toEqual({
       status: 409,
       body: { error: 'ACCOUNT_EXISTS' },
+    })
+  })
+
+  it('answers a friend request between friends with 409', () => {
+    expect(toErrorResponse(new AppError('ALREADY_FRIENDS'))).toEqual({
+      status: 409,
+      body: { error: 'ALREADY_FRIENDS' },
+    })
+  })
+
+  it('answers a friend request while one is pending with 409', () => {
+    expect(toErrorResponse(new AppError('FRIEND_REQUEST_EXISTS'))).toEqual({
+      status: 409,
+      body: { error: 'FRIEND_REQUEST_EXISTS' },
     })
   })
 
@@ -100,6 +121,13 @@ describe('toErrorResponse', () => {
     expect(toErrorResponse(new AppError('DISPLAY_NAME_INVALID'))).toEqual({
       status: 400,
       body: { error: 'DISPLAY_NAME_INVALID' },
+    })
+  })
+
+  it('answers a friend request to oneself with 400', () => {
+    expect(toErrorResponse(new AppError('SELF_FRIEND'))).toEqual({
+      status: 400,
+      body: { error: 'SELF_FRIEND' },
     })
   })
 
