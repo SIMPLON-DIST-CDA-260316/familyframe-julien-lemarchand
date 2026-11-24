@@ -5,7 +5,9 @@ export type LoginResult =
   | { isSuccess: true; user: PublicUser }
   | { isSuccess: false; message: string }
 
-// Both /login and /me answer { user }.
+export type InvitationAcceptance = { token: string; displayName: string; password: string }
+
+// /login, /me and /invitations/accept all answer { user }.
 function readUser(body: unknown): PublicUser | null {
   if (typeof body === 'object' && body !== null && 'user' in body && isPublicUser(body.user)) {
     return body.user
@@ -31,12 +33,13 @@ export async function fetchCurrentUser(): Promise<CurrentUserResult> {
   }
 }
 
-export async function postLogin(email: string, password: string): Promise<LoginResult> {
+// Both ways in (login, accepting an invitation) post JSON and get the user and a cookie back.
+async function postForUser(url: string, payload: object): Promise<LoginResult> {
   try {
-    const res = await fetch('/api/auth/login', {
+    const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify(payload),
     })
     // Not JSON when the dev proxy answers for a stopped API.
     const data: unknown = await res.json().catch(() => null)
@@ -45,6 +48,15 @@ export async function postLogin(email: string, password: string): Promise<LoginR
   } catch {
     return { isSuccess: false, message: errorMessage(null) }
   }
+}
+
+export function postLogin(email: string, password: string): Promise<LoginResult> {
+  return postForUser('/api/auth/login', { email, password })
+}
+
+// The token goes in the body: the server logs every API path.
+export function postAcceptInvitation(acceptance: InvitationAcceptance): Promise<LoginResult> {
+  return postForUser('/api/invitations/accept', acceptance)
 }
 
 // The client forgets the user even if the call fails: the next page load asks /me again.

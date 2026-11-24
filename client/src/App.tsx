@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router'
 import { AuthProvider } from './auth/AuthProvider.tsx'
 import { RequireAuth } from './auth/RequireAuth.tsx'
 import FramePage from './pages/FramePage.tsx'
+import InvitePage from './pages/InvitePage.tsx'
 import LibraryPage from './pages/LibraryPage.tsx'
 import LoginPage from './pages/LoginPage.tsx'
 
@@ -12,6 +13,7 @@ function App(): JSX.Element {
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/invite/:token" element={<InvitePage />} />
           <Route
             path="/"
             element={

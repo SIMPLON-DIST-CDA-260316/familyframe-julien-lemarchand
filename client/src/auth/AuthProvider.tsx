@@ -1,6 +1,13 @@
 import { type JSX, type ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
-import { AuthContext } from '@/auth/AuthContext.ts'
-import { fetchCurrentUser, type LoginResult, postLogin, postLogout } from '@/auth/authApi.ts'
+import { AuthContext, type AuthContextValue } from '@/auth/AuthContext.ts'
+import {
+  fetchCurrentUser,
+  type InvitationAcceptance,
+  type LoginResult,
+  postAcceptInvitation,
+  postLogin,
+  postLogout,
+} from '@/auth/authApi.ts'
 import type { PublicUser } from '@/auth/user.ts'
 
 // A frame powered back on can boot before the Wi-Fi or the API: ask again instead of showing /login.
@@ -49,12 +56,22 @@ function useSessionState(): {
   return { user, setUser, isLoading }
 }
 
-export function AuthProvider({ children }: { children: ReactNode }): JSX.Element {
-  const { user, setUser, isLoading } = useSessionState()
+type AuthActions = Pick<AuthContextValue, 'login' | 'acceptInvitation' | 'logout' | 'dropUser'>
 
+// Both ways in set the user on success only: a failed attempt keeps the current state.
+function useAuthActions(setUser: (user: PublicUser | null) => void): AuthActions {
   const login = useCallback(
     async (email: string, password: string): Promise<LoginResult> => {
       const result = await postLogin(email, password)
+      if (result.isSuccess) setUser(result.user)
+      return result
+    },
+    [setUser],
+  )
+
+  const acceptInvitation = useCallback(
+    async (acceptance: InvitationAcceptance): Promise<LoginResult> => {
+      const result = await postAcceptInvitation(acceptance)
       if (result.isSuccess) setUser(result.user)
       return result
     },
@@ -68,9 +85,16 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
 
   const dropUser = useCallback((): void => setUser(null), [setUser])
 
+  return { login, acceptInvitation, logout, dropUser }
+}
+
+export function AuthProvider({ children }: { children: ReactNode }): JSX.Element {
+  const { user, setUser, isLoading } = useSessionState()
+  const { login, acceptInvitation, logout, dropUser } = useAuthActions(setUser)
+
   const value = useMemo(
-    () => ({ user, isLoading, login, logout, dropUser }),
-    [user, isLoading, login, logout, dropUser],
+    () => ({ user, isLoading, login, acceptInvitation, logout, dropUser }),
+    [user, isLoading, login, acceptInvitation, logout, dropUser],
   )
 
   return <AuthContext value={value}>{children}</AuthContext>
