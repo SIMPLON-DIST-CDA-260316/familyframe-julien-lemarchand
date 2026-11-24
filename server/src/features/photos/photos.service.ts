@@ -120,7 +120,15 @@ async function saveRecord(deps: PhotosServiceDeps, photo: NewPhoto): Promise<Pho
 // A share (step 5) points to the same image: it goes with the last photo using it.
 // Counted after the deletion, so the deleted photo does not count itself.
 async function destroyUnusedImage(deps: PhotosServiceDeps, cloudinaryId: string): Promise<boolean> {
-  const remainingCount = await deps.repository.countByCloudinaryId(cloudinaryId)
+  let remainingCount: number
+  try {
+    remainingCount = await deps.repository.countByCloudinaryId(cloudinaryId)
+  } catch (error: unknown) {
+    // The record is gone and without the count we cannot tell whether another photo
+    // still uses the image, so we keep it and log it.
+    deps.logger.error('photo.orphaned', { cloudinaryId, error })
+    return false
+  }
   if (remainingCount > 0) {
     return false
   }

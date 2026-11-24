@@ -216,6 +216,25 @@ describe('deletePhoto', () => {
       userId: OWNER_ID,
       isImageDestroyed: false,
     })
+    expect(deps.logger.error).not.toHaveBeenCalled()
+  })
+
+  it('keeps the deletion and the image when the reference count fails', async () => {
+    const deps = makeDeps()
+    deps.repository.countByCloudinaryId.mockRejectedValue(new Error('database down'))
+
+    await expect(
+      createPhotosService(deps).deletePhoto({ ownerId: OWNER_ID, id: RECORD.id }),
+    ).resolves.toBe(RECORD.id)
+    expect(deps.deleteImage).not.toHaveBeenCalled()
+    expect(deps.logger.error).toHaveBeenCalledWith('photo.orphaned', {
+      cloudinaryId: IMAGE.cloudinaryId,
+      error: expect.any(Error),
+    })
+    expect(deps.logger.info).toHaveBeenCalledWith(
+      'photo.deleted',
+      expect.objectContaining({ isImageDestroyed: false }),
+    )
   })
 
   it('logs the deleted photo by its identifiers and its owner id', async () => {
