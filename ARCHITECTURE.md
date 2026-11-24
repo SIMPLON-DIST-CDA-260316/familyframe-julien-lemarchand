@@ -55,11 +55,15 @@ Le routage est fait côté navigateur (`react-router`). En production (J2), le s
 | `POST /api/auth/login`                  | JSON `{ email, password }` → `200 { user }` + cookie `ff_session`                                                                                                                                                  |
 | `POST /api/auth/logout`                 | `204` ; supprime la session et efface le cookie (répond `204` aussi sans session)                                                                                                                                  |
 | `GET /api/auth/me`                      | `200 { user }`, l'utilisateur de la session                                                                                                                                                                        |
+| `POST /api/invitations`                 | JSON `{ email }` → `201 { invitation, token }` : réservé à l'admin ; le jeton brut n'est envoyé qu'une fois, le client en fait le lien                                                                             |
+| `GET /api/invitations`                  | `200 { invitations }` : réservé à l'admin ; toutes les invitations, la plus récente en premier                                                                                                                     |
 | `GET /api/photos?cursor=<id>&limit=<n>` | `200 { photos, nextCursor }` : photos du compte connecté, la plus récente en premier ; `limit` de 1 à 100 (30 par défaut) ; `nextCursor` est l'id à passer en `cursor` pour la page suivante, `null` à la dernière |
 | `POST /api/photos`                      | `multipart/form-data` avec `photo` (fichier) → `201 Photo`                                                                                                                                                         |
 | `DELETE /api/photos/:id`                | `204` sans corps, pour une photo du compte connecté ; supprime l'enregistrement, puis l'image Cloudinary (cache CDN compris) si plus aucune photo n'y renvoie                                                      |
 
-Toutes les routes `/api/photos` et `GET /api/auth/me` demandent une session ; sans elle : `401 UNAUTHENTICATED`. Un `user` vaut `{ id, email, displayName, role }` (`role` : `member` ou `admin`), jamais le hash du mot de passe.
+Toutes les routes `/api/photos`, `GET /api/auth/me` et les routes admin de `/api/invitations` demandent une session ; sans elle : `401 UNAUTHENTICATED`. Les routes admin répondent `403 FORBIDDEN` à un membre. Un `user` vaut `{ id, email, displayName, role }` (`role` : `member` ou `admin`), jamais le hash du mot de passe.
+
+Une `Invitation` vaut `{ id, email, status, createdAt, expiresAt }` (dates en ISO 8601) ; `status` vaut `pending` (en attente), `used` (utilisée) ou `expired` (expirée), calculé à chaque lecture. Le hash du jeton et l'admin qui l'a créée restent côté serveur.
 
 Une `Photo` vaut `{ id, url, thumbnailUrl, createdAt }` (`createdAt` en ISO 8601). Chaque photo appartient au compte qui l'a envoyée (`ownerId`, côté serveur seulement) : la liste, la suppression et les événements ne concernent que les photos du compte connecté. L'identifiant Cloudinary reste côté serveur : le client reçoit des URL prêtes à l'emploi.
 
@@ -71,7 +75,8 @@ En cas d'erreur, l'API renvoie `{ "error": code }` ; le client traduit le code e
 | ------------------------------------------------------------------------ | ------ | --------------------- |
 | aucun fichier                                                            | 400    | `PHOTO_MISSING`       |
 | autre erreur Multer (mauvais champ, plusieurs fichiers)                  | 400    | `UPLOAD_INVALID`      |
-| corps JSON illisible (routes `/api/auth`)                                | 400    | `BODY_INVALID`        |
+| corps JSON illisible (routes `/api/auth` et `/api/invitations`)          | 400    | `BODY_INVALID`        |
+| e-mail absent ou mal formé (création d'invitation)                       | 400    | `EMAIL_INVALID`       |
 | `limit` ou `cursor` invalide (`GET /api/photos`)                         | 400    | `QUERY_INVALID`       |
 | pas de session, session inconnue ou expirée                              | 401    | `UNAUTHENTICATED`     |
 | e-mail inconnu ou mauvais mot de passe                                   | 401    | `INVALID_CREDENTIALS` |
@@ -79,6 +84,7 @@ En cas d'erreur, l'API renvoie `{ "error": code }` ; le client traduit le code e
 | route inconnue                                                           | 404    | `ROUTE_NOT_FOUND`     |
 | photo inconnue, photo d'un autre compte, ou id qui n'est pas un ObjectId | 404    | `PHOTO_NOT_FOUND`     |
 | fichier déjà dans la bibliothèque du compte (même SHA-256)               | 409    | `PHOTO_DUPLICATE`     |
+| l'e-mail a déjà un compte (création d'invitation)                        | 409    | `ACCOUNT_EXISTS`      |
 | fichier de plus de 10 Mo                                                 | 413    | `PHOTO_TOO_LARGE`     |
 | type autre que JPEG, PNG ou WebP                                         | 415    | `FORMAT_UNSUPPORTED`  |
 | image illisible par Sharp                                                | 422    | `IMAGE_UNREADABLE`    |
@@ -93,7 +99,8 @@ En cas d'erreur, l'API renvoie `{ "error": code }` ; le client traduit le code e
 - **Expiration** : Prisma 6 ne sait pas déclarer d'index TTL MongoDB. Une session expirée est supprimée quand on la lit, et toutes les sessions expirées à chaque connexion réussie.
 - **Connexion refusée** : e-mail inconnu et mauvais mot de passe répondent tous deux `401 INVALID_CREDENTIALS`, et un e-mail inconnu coûte quand même une vérification argon2 (contre un hash factice) : ni le message ni le temps de réponse ne disent qui a un compte.
 - **Garde HTTP** : `requireAuth` (`features/auth/auth.middleware.ts`) lit le cookie avec `lib/session-token.ts` (sans `cookie-parser`), valide la session et pose `req.user`, typé par _declaration merging_ sur `Request` ; `currentUser(req)` (`features/auth/auth.guard.ts`) le relit sans cast. `requireRole(role)` (même fichier), monté après `requireAuth`, compare le rôle de la session déjà chargée (aucune requête en plus) et répond `403 FORBIDDEN` à un autre rôle. Il vit à part du middleware : `auth.middleware.ts` atteint `config.ts`, qu'un test unitaire ne peut pas charger sans variables d'environnement. `/api/photos` et `/api/auth/me` sont derrière `requireAuth` ; `/api/health`, `/api/auth/login` et `/api/auth/logout` restent publics.
-- **JSON** : `express.json()` n'est monté que sur `/api/auth`, les seules routes qui lisent du JSON ; un corps illisible répond `400 BODY_INVALID`.
+- **Invitations** : l'admin crée un lien depuis `/admin/invitations`. Le jeton suit la règle des sessions (32 octets aléatoires, `lib/session-token.ts`, seul son SHA-256 en base dans `Invitation.tokenHash`), vaut 7 jours (`INVITATION_DURATION_MS`) et sert une fois (`usedAt`). Le serveur renvoie le jeton brut une seule fois ; le client construit le lien `` `${window.location.origin}/invite/${token}` `` : l'origine que l'admin utilise est celle que la famille atteint, sans variable de configuration en plus. Une nouvelle invitation pour le même e-mail **remplace** les précédentes non utilisées (supprimées) : « j'ai perdu le lien » se règle sans bouton de révocation, et l'ancien lien répond `404 INVITATION_NOT_FOUND`. Le jeton ne passe jamais dans un chemin d'API (`http.request` journalise les chemins) : il voyage dans le corps JSON.
+- **JSON** : `express.json()` n'est monté que sur `/api/auth` et `/api/invitations`, les seules routes qui lisent du JSON ; un corps illisible répond `400 BODY_INVALID`.
 
 ## Temps réel
 
@@ -111,7 +118,7 @@ En cas d'erreur, l'API renvoie `{ "error": code }` ; le client traduit le code e
 
 ## Couches du backend
 
-Une feature par dossier (`server/src/features/photos/`, `server/src/features/auth/`), un fichier par couche. Pour les photos :
+Une feature par dossier (`server/src/features/photos/`, `server/src/features/auth/`, `server/src/features/invitations/`), un fichier par couche. Pour les photos :
 
 | Fichier                | Rôle                                                                                                                       |
 | ---------------------- | -------------------------------------------------------------------------------------------------------------------------- |
@@ -122,6 +129,7 @@ Une feature par dossier (`server/src/features/photos/`, `server/src/features/aut
 | `photos.repository.ts` | seul accès à Prisma                                                                                                        |
 
 - `features/auth/` suit le même découpage (`auth.repository.ts`, `auth.service.ts`, `auth.controller.ts`, `auth.routes.ts`), plus `auth.middleware.ts` (garde HTTP), `auth.guard.ts` (`currentUser`, `requireRole`), `auth.socket.ts` (garde Socket.IO) et `auth.cookie.ts` (pose et efface le cookie). Le service d'auth reçoit ses dépendances (`repository`, `hashToken`, `generateToken`, `verifyPassword`, `now`, `logger`) ; `app.ts` l'assemble une fois (`assembleAuthService`) et `server.ts` le partage avec Socket.IO.
+- `features/invitations/` suit le même découpage (`invitations.repository.ts`, `invitations.service.ts`, `invitations.controller.ts`, `invitations.routes.ts`). Le service reçoit `repository`, `generateToken`, `hashToken`, `now` et `logger` ; `app.ts` construit `requireAdmin = requireRole('admin')` une fois et le passe au routeur, derrière `requireAuth`.
 - Les dépendances sont passées par des fonctions-fabriques (`createPhotosService({ repository, toFrameJpeg, uploadImage, deleteImage, logger })`), assemblées dans `app.ts` : un test peut fournir de fausses implémentations.
 - `server/src/lib/` regroupe les clients techniques : Prisma (`db.ts`), Cloudinary, sharp (`image.ts`).
 - **Erreurs** : le service lève une `AppError` portant un code ; le contrôleur n'a pas de try/catch (Express 5 transmet les rejets). Une route inconnue tombe sur `errors/not-found.ts` (monté après les routes), qui lève `ROUTE_NOT_FOUND`. `errors/error-handler.ts` est le seul endroit qui écrit une réponse d'erreur, avec un statut tiré d'un `Record` exhaustif sur les codes. Une erreur de sharp devient `IMAGE_UNREADABLE` (faute de l'utilisateur) ; une erreur de Cloudinary ou de Prisma reste une 500.
@@ -149,6 +157,7 @@ Une feature par dossier (`server/src/features/photos/`, `server/src/features/aut
 | `photo.duplicate`                                           | info                          | service photos : fichier déjà dans la bibliothèque, avec `userId` et le `photoId` de la photo existante (ou le `cloudinaryId` de l'image détruite après un envoi simultané) |
 | `photo.unreadable`                                          | warn                          | service photos, erreur de sharp                                                                                                                                             |
 | `photo.orphaned`                                            | error                         | service photos : image sur Cloudinary sans enregistrement en base (échec d'enregistrement ou de suppression)                                                                |
+| `invitation.created`                                        | info                          | service invitations, avec `invitationId`, `userId` (l'admin) et `replacedCount` (invitations remplacées) ; jamais l'e-mail ni le jeton                                      |
 | `server.error`                                              | error                         | `errors/error-handler.ts` (chaque 500), `auth.socket.ts` (handshake)                                                                                                        |
 | `server.stopping` / `server.stopped` / `server.stop_failed` | info / info / error           | `server.ts`, à l'arrêt                                                                                                                                                      |
 | `process.crashed`                                           | error                         | `server.ts`, exception ou rejet non géré, puis arrêt                                                                                                                        |
@@ -187,7 +196,7 @@ Une feature par dossier (`server/src/features/photos/`, `server/src/features/aut
 - **Biome** : lint, formatage et tri des imports (remplace ESLint + Prettier). Dans `server/src`, `noConsole` interdit `console` : on passe par le logger.
 - **lefthook** : `biome check` au pre-commit, **commitlint** au commit-msg.
 - **Vitest** : tests unitaires du serveur, colocalisés (`*.test.ts`), lancés par `pnpm test` sans API ; exclus du build par `server/tsconfig.build.json`.
-- **Bruno** (`server/bruno/`) : requêtes de l'API avec assertions, un dossier par endpoint, des fichiers `NN-nominal-…` / `NN-edge-…`. Lancées par `pnpm test:bruno` contre l'API démarrée et la base remplie par le seed (CLI via `pnpm dlx`, version figée, pas de dépendance). Le dossier `auth/` passe en premier (`seq: 1`) et range le cookie de session dans une variable, envoyée à toutes les requêtes par un en-tête de collection ; le CLI tourne avec `--disable-cookies` pour que sa boîte à cookies ne renvoie pas la session aux requêtes « sans cookie ». Un second compte (l'admin, `auth/login/05`) range son cookie dans `adminCookie` : les requêtes qui vérifient qu'un compte ne touche pas aux photos d'un autre l'envoient à la place de celui du membre.
+- **Bruno** (`server/bruno/`) : requêtes de l'API avec assertions, un dossier par endpoint, des fichiers `NN-nominal-…` / `NN-edge-…`. Lancées par `pnpm test:bruno` contre l'API démarrée et la base remplie par le seed (CLI via `pnpm dlx`, version figée, pas de dépendance). Le dossier `auth/` passe en premier (`seq: 1`) et range le cookie de session dans une variable, envoyée à toutes les requêtes par un en-tête de collection ; le CLI tourne avec `--disable-cookies` pour que sa boîte à cookies ne renvoie pas la session aux requêtes « sans cookie ». Un second compte (l'admin, `auth/login/05`) range son cookie dans `adminCookie` : les requêtes qui vérifient qu'un compte ne touche pas aux photos d'un autre l'envoient à la place de celui du membre. Le dossier `invitations/` passe juste après (`seq: 2`) : l'admin y crée une invitation pour une adresse neuve à chaque lancement (`invite-<horodatage>@familyframe.test`), donc rien à remettre à zéro entre deux lancements.
 - **Hooks Claude Code** (`.claude/hooks/`) : garde-fous pour l'agent IA, testés avec `node:test`.
 
 ## Conteneurisation
