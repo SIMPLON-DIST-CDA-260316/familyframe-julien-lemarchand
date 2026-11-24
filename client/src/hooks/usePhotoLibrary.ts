@@ -122,6 +122,20 @@ function usePhotoAdder(
   )
 }
 
+// Rebuilt when the next page changes, so loadMore always fetches the page after the current one.
+function useMoreLoader(
+  liveLoads: LiveLoads,
+  nextPage: NextPage | null,
+  setters: MoreSetters,
+  dropUser: () => void,
+): () => Promise<void> {
+  const { setPhotos, setNextPage, setIsLoadingMore } = setters
+  return useMemo(() => {
+    const stableSetters = { setPhotos, setNextPage, setIsLoadingMore }
+    return createMoreLoader(liveLoads, nextPage, stableSetters, dropUser)
+  }, [liveLoads, nextPage, setPhotos, setNextPage, setIsLoadingMore, dropUser])
+}
+
 export function usePhotoLibrary(): PhotoLibrary {
   const { dropUser } = useAuth()
   // useState keeps one instance across renders: its load bookkeeping must survive them.
@@ -135,13 +149,12 @@ export function usePhotoLibrary(): PhotoLibrary {
     () => connectLibrary(liveLoads, { setPhotos, setNextPage, setIsFirstPageLoaded }, dropUser),
     [liveLoads, dropUser],
   )
-
-  // Rebuilt when the next page changes, so loadMore always fetches the page after the current one.
-  const loadMore = useMemo(() => {
-    const setters = { setPhotos, setNextPage, setIsLoadingMore }
-    return createMoreLoader(liveLoads, nextPage, setters, dropUser)
-  }, [liveLoads, nextPage, dropUser])
-
+  const loadMore = useMoreLoader(
+    liveLoads,
+    nextPage,
+    { setPhotos, setNextPage, setIsLoadingMore },
+    dropUser,
+  )
   const addPhoto = usePhotoAdder(liveLoads, setPhotos)
 
   return {
