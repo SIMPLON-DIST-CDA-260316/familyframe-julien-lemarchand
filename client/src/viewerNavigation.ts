@@ -30,8 +30,10 @@ export function missingPhotoStep(
   lastSeen: SeenPhoto | null,
   library: ViewerLibraryState,
 ): MissingPhotoStep {
-  // Seen a moment ago, gone now: it was deleted, here or on another device.
-  if (lastSeen?.id === openId) {
+  // Seen a moment ago, gone now: it was deleted, here or on another device. Unless its place is
+  // past the end of a list that has more pages: a reconnect can push it onto a page not loaded yet.
+  const isPlaceLoaded = lastSeen !== null && lastSeen.index < library.photos.length
+  if (lastSeen?.id === openId && (isPlaceLoaded || !library.hasMore)) {
     const nextId = photoIdAfterRemoval(library.photos, lastSeen.index)
     return nextId === null ? { kind: 'close' } : { kind: 'show', id: nextId }
   }
