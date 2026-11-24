@@ -11,6 +11,9 @@ import { usePreviewUrl } from '@/hooks/usePreviewUrl.ts'
 import type { Photo } from '@/photo.ts'
 import { postPhoto } from '@/photosApi.ts'
 
+// The server's accepted types: a HEIC or GIF picked here would only be refused after the upload.
+const ACCEPTED_IMAGE_TYPES = 'image/jpeg,image/png,image/webp'
+
 type UploadStatus = 'idle' | 'sending' | 'error'
 
 type PhotoUpload = {
@@ -109,7 +112,13 @@ function FileField({ id, label, capture, onChange }: FileFieldProps): JSX.Elemen
   return (
     <div className="flex flex-col gap-2">
       <Label htmlFor={id}>{label}</Label>
-      <Input id={id} type="file" accept="image/*" capture={capture} onChange={onChange} />
+      <Input
+        id={id}
+        type="file"
+        accept={ACCEPTED_IMAGE_TYPES}
+        capture={capture}
+        onChange={onChange}
+      />
     </div>
   )
 }

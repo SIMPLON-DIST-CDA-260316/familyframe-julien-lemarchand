@@ -14,7 +14,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 
 1. R-BIB-01 · Les deux boutons restent désactivés tant qu'aucune photo n'est choisie.
 2. R-BIB-02 · Une seule photo est ajoutée à la fois. Choisir une nouvelle photo remplace la précédente dans le formulaire et efface le dernier message.
-3. R-BIB-03 · Formats acceptés : JPEG, PNG et WebP. Tout autre format (GIF, HEIC, vidéo…) est refusé, même si l'appareil permet de le choisir.
+3. R-BIB-03 · Formats acceptés : JPEG, PNG et WebP. Seuls ces formats peuvent être choisis ; le téléphone convertit lui-même une photo prise avec l'appareil photo. Tout autre format (GIF, HEIC, vidéo…) est refusé.
 4. R-BIB-04 · Une photo pèse au plus 10 Mo.
 5. R-BIB-05 · Le fichier doit être une image lisible ; un fichier abîmé ou déguisé en image est refusé.
 6. R-BIB-06 · Une photo identique, octet pour octet, à une photo déjà présente dans la bibliothèque est refusée, qu'elle ait été ajoutée par soi ou reçue d'un ami. Une version retouchée, recadrée ou réenregistrée de la même photo est un autre fichier : elle est acceptée.
@@ -47,6 +47,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 - Ajouter une légende, un titre ou un lieu à une photo.
 - Retoucher, recadrer ou faire pivoter une photo dans l'application.
 - Récupérer le fichier d'origine en pleine résolution : seule la version préparée est conservée.
+- Envoyer une image HEIC ou une animation GIF : elles ne sont pas proposées au choix.
 
 ## Voir sa bibliothèque
 
