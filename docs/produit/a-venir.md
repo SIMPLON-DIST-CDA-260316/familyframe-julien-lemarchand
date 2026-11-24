@@ -15,16 +15,10 @@ Les règles ci-dessous décrivent l'intention ; elles recevront leur identifiant
   - **Adresse e-mail** : affichée, non modifiable, avec la mention « Bientôt ».
   - **Mot de passe** : saisir le mot de passe actuel, le nouveau et sa confirmation. Le mot de passe actuel est exigé (« Mot de passe actuel incorrect. » sinon) ; le nouveau suit les règles habituelles (12 à 128 caractères). Après le changement, tous les autres appareils du compte, le cadre compris, sont déconnectés : ils reviennent à la page de connexion à leur prochaine action, à leur prochaine reconnexion ou au rechargement quotidien du cadre. L'appareil utilisé reste connecté. L'encart prévient de cette conséquence.
 - Après chaque enregistrement, la barre du haut et les menus montrent le changement sans recharger la page.
-- La photo de profil remplace l'initiale partout où un rond de profil apparaît : barre du haut, menus, page Amis et fenêtre d'envoi d'une photo.
+- La photo de profil remplace l'initiale partout où un rond de profil apparaît : barre du haut, menus, page Amis et panneau d'envoi d'une photo.
 - Le nouveau nom apparaît aussi sur les photos déjà envoyées (« Envoyée par »), puisque c'est toujours le nom actuel de l'expéditeur qui s'affiche (R-PAR-32).
 
 **Restera impossible** : changer son adresse e-mail, réinitialiser un mot de passe oublié, supprimer son compte.
-
-## Étape 7 · Expérience photo
-
-**Prévu**
-
-- Une nouvelle fenêtre d'envoi : une grille de ronds de profil à sélection multiple, un seul bouton « Envoyer à N personnes », une recherche dès 6 amis.
 
 ## Étape 8 · Mode cadre
 

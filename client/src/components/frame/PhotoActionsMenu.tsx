@@ -2,7 +2,7 @@ import { EllipsisIcon, SendIcon, Trash2Icon } from 'lucide-react'
 import { type JSX, type ReactNode, useRef, useState } from 'react'
 import { COARSE_POINTER_TARGET_CLASSES } from '@/components/frame/controlClasses.ts'
 import { DeletePhotoDialog } from '@/components/frame/DeletePhotoDialog.tsx'
-import { SharePhotoDialog } from '@/components/sharing/SharePhotoDialog.tsx'
+import { ShareSheet } from '@/components/sharing/ShareSheet.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import {
   DropdownMenu,
@@ -65,8 +65,8 @@ export function PhotoActionsMenu({
         </DropdownMenuContent>
       </DropdownMenu>
       {/* Outside the menu content: closing the menu must not unmount the dialogs. */}
-      {/* `dark`: the dialog portals to body, outside the frame's dark <main>. */}
-      <SharePhotoDialog
+      {/* `dark`: the sheet portals to body, outside the frame's dark <main>. */}
+      <ShareSheet
         target={photoToShare ? { kind: 'library', photo: photoToShare } : null}
         onClose={() => setPhotoToShare(null)}
         onCloseAutoFocus={focusTrigger}

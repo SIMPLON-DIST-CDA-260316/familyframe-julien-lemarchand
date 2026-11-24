@@ -269,7 +269,7 @@ Inviter un proche : connecté en admin, ouvrir « Invitations » depuis la bibli
 
 Ajouter un ami : ouvrir « Amis » depuis la bibliothèque et saisir l'adresse e-mail exacte de son compte FamilyFrame (la personne doit déjà avoir un compte : sinon, demander une invitation à l'admin). Elle voit la demande sous « Demandes reçues » et l'accepte ou la refuse ; une fois acceptée, chacun peut retirer l'autre. Les listes ne se mettent pas à jour toutes seules : recharger la page pour voir la réponse de l'autre.
 
-Envoyer une photo à un ami : dans la bibliothèque ou sur le cadre, le menu « … » d'une photo propose « Envoyer à un ami » ; dans la carte d'envoi, choisir un fichier puis « Envoyer à un ami » plutôt que « Ajouter à ma bibliothèque ». La fenêtre liste les amis acceptés, avec un bouton « Envoyer » par ami. La photo n'entre que dans la bibliothèque de l'ami et s'affiche aussitôt sur son cadre, avec « Envoyée par » et votre nom. Chacun supprime ses photos de son côté : retirer l'ami ou supprimer l'original ne retire pas la photo reçue.
+Envoyer une photo à un ami : dans la bibliothèque ou sur le cadre, le menu « … » d'une photo propose « Envoyer à un ami » ; dans la carte d'envoi, choisir un fichier puis « Envoyer à un ami » plutôt que « Ajouter à ma bibliothèque ». Le panneau « Envoyer à des proches » montre les amis acceptés : toucher ceux qui doivent la recevoir, puis « Envoyer à N personnes » ; une notification confirme à qui elle est partie. La photo n'entre que dans la bibliothèque de l'ami et s'affiche aussitôt sur son cadre, avec « Envoyée par » et votre nom. Chacun supprime ses photos de son côté : retirer l'ami ou supprimer l'original ne retire pas la photo reçue.
 
 ## Scripts racine
 

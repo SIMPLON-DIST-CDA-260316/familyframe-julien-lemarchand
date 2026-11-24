@@ -1,46 +1,48 @@
 # Partage
 
-Envoyer une photo à un ami la fait entrer dans sa bibliothèque et l'affiche aussitôt sur son cadre. On ne peut envoyer qu'à un ami, c'est-à-dire après une demande acceptée (voir [amis.md](amis.md)).
+Envoyer une photo à un ou plusieurs amis la fait entrer dans sa bibliothèque et l'affiche aussitôt sur son cadre. On ne peut envoyer qu'à un ami, c'est-à-dire après une demande acceptée (voir [amis.md](amis.md)).
 
 ## Choisir à qui envoyer
 
 **Ce que l'on peut faire**
 
-- Ouvrir la fenêtre « Envoyer à un ami » depuis une photo de sa bibliothèque ou depuis le formulaire d'ajout (voir les deux sections suivantes).
-- Voir un aperçu de la photo, puis la liste de ses amis avec un bouton « Envoyer » pour chacun.
-- Envoyer la même photo à plusieurs amis depuis la même fenêtre, l'un après l'autre.
+- Ouvrir « Envoyer à des proches » depuis une photo de sa bibliothèque ou depuis le formulaire d'ajout (voir les deux sections suivantes).
+- Voir un aperçu de la photo, puis ses amis sous forme de ronds avec leurs initiales.
+- Envoyer une photo à plusieurs proches en une fois, en touchant leur visage puis un seul bouton.
 - Rechercher un ami par son nom ou son adresse e-mail quand on en a beaucoup.
-- Fermer la fenêtre avec « Fermer ».
+- Fermer avec la croix, la touche Échap ou en touchant à côté.
 
 **Règles**
 
-1. R-PAR-01 · Seuls les amis acceptés apparaissent dans la liste ; les demandes en attente, dans un sens comme dans l'autre, ne permettent pas d'envoyer.
-2. R-PAR-02 · La liste des amis est chargée à chaque ouverture de la fenêtre.
-3. R-PAR-03 · Chaque ligne montre l'initiale, le nom et l'adresse e-mail de l'ami.
-4. R-PAR-04 · Le champ « Rechercher un ami » n'apparaît qu'à partir de 6 amis. La recherche porte sur le nom et l'adresse e-mail, sans tenir compte des majuscules ni des accents (« elodie » trouve « Élodie »).
-5. R-PAR-05 · Le bouton d'un ami affiche « Envoi… » pendant l'envoi, puis « Envoyée » et reste désactivé : on ne peut pas renvoyer la photo au même ami depuis la même fenêtre. Les autres amis restent disponibles.
-6. R-PAR-06 · En cas d'échec, le message s'affiche au-dessus de la liste et le bouton de l'ami redevient utilisable.
-7. R-PAR-07 · Une photo que le destinataire possède déjà (identique octet pour octet, ajoutée par lui ou reçue de quelqu'un d'autre) est refusée.
-8. R-PAR-08 · Une personne retirée des amis entre l'ouverture de la fenêtre et l'envoi ne peut pas recevoir la photo.
-9. R-PAR-09 · La fenêtre garde la photo choisie à son ouverture : si le diaporama passe à une autre photo pendant ce temps, c'est bien la photo d'origine qui est envoyée.
+1. R-PAR-01 · Seuls les amis acceptés apparaissent ; les demandes en attente, dans un sens comme dans l'autre, ne permettent pas d'envoyer.
+1. R-PAR-02 · La liste des amis est chargée à chaque ouverture.
+1. R-PAR-04 · Le champ « Rechercher un ami » n'apparaît qu'à partir de 6 amis. La recherche porte sur le nom et l'adresse e-mail, sans tenir compte des majuscules ni des accents (« elodie » trouve « Élodie »). Un ami déjà coché le reste quand la recherche le masque.
+1. R-PAR-07 · Une photo que le destinataire possède déjà (identique octet pour octet, ajoutée par lui ou reçue de quelqu'un d'autre) est refusée.
+1. R-PAR-08 · Une personne retirée des amis entre l'ouverture et l'envoi ne peut pas recevoir la photo.
+1. R-PAR-09 · Le panneau garde la photo choisie à son ouverture : si le diaporama passe à une autre photo pendant ce temps, c'est bien la photo d'origine qui est envoyée.
+1. R-PAR-44 · Les proches apparaissent avec leurs initiales et leur prénom ; le nom complet s'affiche au survol. Leur adresse e-mail n'est pas montrée.
+1. R-PAR-45 · Le bouton indique combien de personnes recevront la photo et reste grisé tant que personne n'est choisi.
+1. R-PAR-46 · Dès qu'au moins une personne a reçu la photo, le panneau se ferme et une notification dit à qui elle est partie, ainsi que pour qui l'envoi a échoué. Si personne ne l'a reçue, le panneau reste ouvert avec les raisons, et le choix est gardé.
 
 **Messages affichés**
 
-| Situation                            | Message                                                                                  |
-| ------------------------------------ | ---------------------------------------------------------------------------------------- |
-| En-tête de la fenêtre                | « Envoyer à un ami » — « La photo s'affiche sur le cadre de l'ami que vous choisissez. » |
-| Chargement des amis                  | « Chargement… »                                                                          |
-| Aucun ami                            | « Vous n'avez pas encore d'amis. » et le lien « Ajouter un ami » vers la page Amis       |
-| Recherche sans résultat              | « Aucun ami ne correspond à « [texte saisi] ». »                                         |
-| Envoi en cours, puis réussi          | « Envoi… », puis « Envoyée »                                                             |
-| Le destinataire a déjà cette photo   | « Cette personne a déjà cette photo. »                                                   |
-| La personne n'est plus un ami        | « Cette personne ne fait pas partie de vos amis. »                                       |
-| La photo a été supprimée entre-temps | « Cette photo a déjà été supprimée. »                                                    |
+| Situation                            | Message                                                                            |
+| ------------------------------------ | ---------------------------------------------------------------------------------- |
+| En-tête                              | « Envoyer à des proches » — « La photo s'affichera aussitôt sur leur cadre. »      |
+| Chargement des amis                  | « Chargement… »                                                                    |
+| Aucun ami                            | « Vous n'avez pas encore d'amis. » et le lien « Ajouter un ami » vers la page Amis |
+| Recherche sans résultat              | « Aucun ami ne correspond à « [texte saisi] ». »                                   |
+| Bouton                               | « Envoyer », « Envoyer à 1 personne », « Envoyer à N personnes »                   |
+| Envoi en cours                       | « Envoi… »                                                                         |
+| Envoi réussi                         | « Envoyée à Mamie et Tata » (exemple)                                              |
+| Le destinataire a déjà cette photo   | « Tata a déjà cette photo. »                                                       |
+| La personne n'est plus un ami        | « Cette personne ne fait pas partie de vos amis. »                                 |
+| La photo a été supprimée entre-temps | « Cette photo a déjà été supprimée. »                                              |
 
 **Ce qui n'est pas possible**
 
 - Envoyer à une personne qui n'est pas un ami, ou à soi-même.
-- Cocher plusieurs amis et envoyer en une seule fois : prévu, voir [a-venir.md](a-venir.md).
+- Fermer le panneau en le faisant glisser vers le bas : il se ferme avec la croix, la touche Échap ou en touchant à côté.
 - Joindre un message à la photo : prévu, voir [a-venir.md](a-venir.md).
 
 ## Envoyer une photo de sa bibliothèque
@@ -57,7 +59,7 @@ Envoyer une photo à un ami la fait entrer dans sa bibliothèque et l'affiche au
 
 **Messages affichés**
 
-Ceux de la fenêtre d'envoi (voir [Choisir à qui envoyer](#choisir-à-qui-envoyer)).
+Ceux du panneau d'envoi (voir [Choisir à qui envoyer](#choisir-à-qui-envoyer)).
 
 **Ce qui n'est pas possible**
 
@@ -73,12 +75,12 @@ Ceux de la fenêtre d'envoi (voir [Choisir à qui envoyer](#choisir-à-qui-envoy
 
 1. R-PAR-20 · La photo entre uniquement dans la bibliothèque de l'ami : elle n'est pas ajoutée à celle de l'expéditeur.
 2. R-PAR-21 · Les règles d'ajout s'appliquent comme pour sa propre bibliothèque : formats JPEG, PNG ou WebP, 10 Mo au plus, image lisible, photo préparée pour l'affichage et informations cachées retirées (voir [bibliotheque.md](bibliotheque.md#ajouter-une-photo), R-BIB-03 à R-BIB-09). Les messages d'erreur sont les mêmes.
-3. R-PAR-22 · Après le premier envoi réussi, le formulaire d'ajout se vide, mais la fenêtre reste ouverte avec la photo pour l'envoyer à d'autres amis.
-4. R-PAR-23 · La notification « Photo ajoutée à votre bibliothèque. » du formulaire ne concerne que l'ajout à sa bibliothèque ; l'envoi à un ami se confirme dans la fenêtre, par le bouton « Envoyée ».
+3. R-PAR-22 · Après un envoi réussi, le formulaire d'ajout se vide et le panneau se ferme.
+4. R-PAR-23 · La notification « Photo ajoutée à votre bibliothèque. » du formulaire ne concerne que l'ajout à sa bibliothèque ; l'envoi à des amis se confirme par sa propre notification (« Envoyée à … »).
 
 **Messages affichés**
 
-Ceux de la fenêtre d'envoi (voir [Choisir à qui envoyer](#choisir-à-qui-envoyer)) et ceux de l'ajout d'une photo (voir [bibliotheque.md](bibliotheque.md#ajouter-une-photo)).
+Ceux du panneau d'envoi (voir [Choisir à qui envoyer](#choisir-à-qui-envoyer)) et ceux de l'ajout d'une photo (voir [bibliotheque.md](bibliotheque.md#ajouter-une-photo)).
 
 **Ce qui n'est pas possible**
 

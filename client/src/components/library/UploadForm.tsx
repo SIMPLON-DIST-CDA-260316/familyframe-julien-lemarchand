@@ -2,7 +2,7 @@ import { SendIcon } from 'lucide-react'
 import { type ChangeEvent, type JSX, type SubmitEvent, useState } from 'react'
 import { toast } from 'sonner'
 import { useAuth } from '@/auth/AuthContext.ts'
-import { SharePhotoDialog } from '@/components/sharing/SharePhotoDialog.tsx'
+import { ShareSheet } from '@/components/sharing/ShareSheet.tsx'
 import { Alert, AlertDescription } from '@/components/ui/alert.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import { Input } from '@/components/ui/input.tsx'
@@ -187,7 +187,7 @@ function FilePreview({ file }: { file: File | null }): JSX.Element | null {
 export function UploadForm({ onUploaded }: UploadFormProps): JSX.Element {
   const { upload, file, inputsKey, handleFileChange, handleSubmit, clearFile } =
     useUploadForm(onUploaded)
-  // The dialog keeps its own file: emptying the form after a send leaves it open.
+  // The sheet keeps its own file: emptying the form's inputs must not pull the photo from under it.
   const [fileToShare, setFileToShare] = useState<File | null>(null)
 
   return (
@@ -203,7 +203,7 @@ export function UploadForm({ onUploaded }: UploadFormProps): JSX.Element {
         <UploadAlert status={upload.status} error={upload.error} />
       </form>
       {/* The file goes to the friend only: the own library does not change. */}
-      <SharePhotoDialog
+      <ShareSheet
         target={fileToShare ? { kind: 'device', file: fileToShare } : null}
         onClose={() => setFileToShare(null)}
         onShared={clearFile}
