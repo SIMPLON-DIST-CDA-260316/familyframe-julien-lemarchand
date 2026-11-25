@@ -153,12 +153,12 @@ La page où chacun règle son compte : sa photo de profil, son nom affiché et s
 
 **Ce que l'on peut faire**
 
-- Choisir, pour le cadre de l'appareil utilisé, le modèle d'affichage, l'ordre de lecture et la vitesse, dans l'encart « Cadre de cet appareil ».
+- Choisir, pour le cadre de l'appareil utilisé, les photos lues (toute la bibliothèque ou une collection), le modèle d'affichage, l'ordre de lecture et la vitesse, dans l'encart « Cadre de cet appareil ».
 
 **Règles**
 
 1. R-PRF-50 · Cet encart n'a pas de bouton « Enregistrer » : chaque choix est retenu aussitôt. Un choix déjà sélectionné le reste quand on le touche de nouveau.
-2. R-PRF-51 · Ces réglages sont ceux du menu « … » du cadre (voir [cadre.md](cadre.md#diaporama), R-CAD-62, R-CAD-66, R-CAD-70) : ils ne valent que pour cet appareil, dans ce navigateur. Changés d'un côté, ils s'appliquent de l'autre.
+2. R-PRF-51 · Ces réglages sont ceux du menu « … » du cadre (voir [cadre.md](cadre.md#diaporama), R-CAD-62, R-CAD-66, R-CAD-70, R-CAD-77) : ils ne valent que pour cet appareil, dans ce navigateur. Changés d'un côté, ils s'appliquent de l'autre.
 3. R-PRF-52 · Un cadre ouvert dans un autre onglet du même navigateur applique un choix aussitôt, sans recharger.
 
 **Messages affichés**
@@ -166,6 +166,7 @@ La page où chacun règle son compte : sa photo de profil, son nom affiché et s
 | Situation         | Message                                                                       |
 | ----------------- | ----------------------------------------------------------------------------- |
 | Titre de l'encart | « Cadre de cet appareil » — « Ces réglages ne concernent que cet appareil. »  |
+| Choix des photos  | « Photos » : « Toute la bibliothèque », puis le nom de chaque collection      |
 | Choix du modèle   | « Affichage » : « Ajusté », « Plein format », « Passe-partout », « Polaroïd » |
 | Choix de l'ordre  | « Lecture » : « Dans l'ordre », « Aléatoire »                                 |
 | Choix de vitesse  | « Vitesse » : « 5 s », « 10 s », « 20 s »                                     |

@@ -1,5 +1,7 @@
-import { EllipsisIcon, PencilIcon, Trash2Icon } from 'lucide-react'
+import { EllipsisIcon, MonitorIcon, PencilIcon, Trash2Icon } from 'lucide-react'
 import { type JSX, type RefObject, useRef, useState } from 'react'
+import { useNavigate } from 'react-router'
+import { toast } from 'sonner'
 import type { Collection } from '@/collections/collection.ts'
 import { CollectionNameDialog } from '@/components/collections/CollectionNameDialog.tsx'
 import { DeleteCollectionDialog } from '@/components/collections/DeleteCollectionDialog.tsx'
@@ -10,14 +12,21 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu.tsx'
+import { type FrameSettings, readFrameSettings, writeFrameSettings } from '@/frameSettings.ts'
+import { enterFullscreen } from '@/fullscreen.ts'
+import { LIBRARY_BELOW_STATE } from '@/viewerHistory.ts'
 
 type RowDialog = 'rename' | 'delete' | null
+
+const UNSAVED_SOURCE_MESSAGE =
+  'Cet appareil ne peut pas retenir ce choix. Choisissez la collection depuis le menu « … » du cadre.'
 
 type CollectionRowProps = { collection: Collection; onDeleted: () => void }
 
 type CollectionMenuProps = {
   name: string
   onSelect: (dialog: RowDialog) => void
+  onPlay: () => void
   triggerRef: RefObject<HTMLButtonElement | null>
 }
 
@@ -34,7 +43,26 @@ function photoCountLabel(count: number): string {
   return count === 1 ? '1 photo' : `${count} photos`
 }
 
-function CollectionMenu({ name, onSelect, triggerRef }: CollectionMenuProps): JSX.Element {
+// The frame reads its settings as it opens: the choice is stored first. A device that cannot store
+// it would open the frame on its old photos, so the frame stays closed. Full screen comes from the
+// click itself, browsers grant it only during a gesture.
+function usePlayOnFrame(collectionId: string): () => void {
+  const navigate = useNavigate()
+  return () => {
+    const settings: FrameSettings = {
+      ...readFrameSettings(),
+      source: { kind: 'collection', collectionId },
+    }
+    if (!writeFrameSettings(settings)) {
+      toast.error(UNSAVED_SOURCE_MESSAGE)
+      return
+    }
+    enterFullscreen()
+    navigate('/frame', { state: LIBRARY_BELOW_STATE })
+  }
+}
+
+function CollectionMenu({ name, onSelect, onPlay, triggerRef }: CollectionMenuProps): JSX.Element {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -43,6 +71,10 @@ function CollectionMenu({ name, onSelect, triggerRef }: CollectionMenuProps): JS
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        <DropdownMenuItem onSelect={onPlay}>
+          <MonitorIcon />
+          Lire sur le cadre
+        </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => onSelect('rename')}>
           <PencilIcon />
           Renommer
@@ -83,6 +115,7 @@ function RowDialogs({ collection, dialog, onClose, ...props }: RowDialogsProps):
 export function CollectionRow({ collection, onDeleted }: CollectionRowProps): JSX.Element {
   const [dialog, setDialog] = useState<RowDialog>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
+  const playOnFrame = usePlayOnFrame(collection.id)
 
   return (
     <li className="flex items-center justify-between gap-3 px-4 py-3">
@@ -92,7 +125,12 @@ export function CollectionRow({ collection, onDeleted }: CollectionRowProps): JS
           {photoCountLabel(collection.photoIds.length)}
         </span>
       </div>
-      <CollectionMenu name={collection.name} onSelect={setDialog} triggerRef={triggerRef} />
+      <CollectionMenu
+        name={collection.name}
+        onSelect={setDialog}
+        onPlay={playOnFrame}
+        triggerRef={triggerRef}
+      />
       <RowDialogs
         collection={collection}
         onDeleted={onDeleted}

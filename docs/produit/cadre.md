@@ -125,6 +125,8 @@ Le cadre n'a plus de vue bibliothèque : voir R-CAD-53. Les règles ci-dessous g
 **Ce que l'on peut faire**
 
 - Dans le menu « … » du diaporama, « Photos », choisir « Toute la bibliothèque » ou l'une de ses collections.
+- Faire ce choix depuis la page « Préférences », encart « Cadre de cet appareil » (voir [preferences.md](preferences.md#cadre-de-cet-appareil)).
+- Depuis la carte « Mes collections » de la bibliothèque, choisir « Lire sur le cadre » dans le menu « … » d'une collection : le cadre s'ouvre en plein écran sur elle (voir [collections.md](collections.md)).
 
 **Règles**
 

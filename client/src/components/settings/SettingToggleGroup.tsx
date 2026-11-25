@@ -1,10 +1,14 @@
 import { type JSX, useId } from 'react'
 import { optionSelector, type SettingOption } from '@/components/frame/frameSettingOptions.ts'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group.tsx'
+import { cn } from '@/lib/utils.ts'
 
 // The muted pressed background barely shows on the dark card: the chosen item is inverted.
-const ITEM_CLASSES =
-  'data-[state=on]:bg-foreground data-[state=on]:text-background data-[state=on]:hover:bg-foreground/90'
+// A collection's name can be long: the item grows and wraps instead of leaving the card.
+const ITEM_CLASSES = cn(
+  'data-[state=on]:bg-foreground data-[state=on]:text-background data-[state=on]:hover:bg-foreground/90',
+  'h-auto min-h-8 shrink py-1 whitespace-normal wrap-anywhere',
+)
 
 type SettingToggleGroupProps<Value extends string | number> = {
   label: string

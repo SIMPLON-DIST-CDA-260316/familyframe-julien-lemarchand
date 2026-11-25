@@ -8,7 +8,7 @@ Une collection est une liste de photos de sa bibliothèque, rangées sous un nom
 
 - Dans la carte « Mes collections » de la bibliothèque, créer une collection avec « Nouvelle collection ».
 - Voir ses collections, chacune avec son nom et son nombre de photos.
-- Depuis le menu « … » d'une collection, la renommer ou la supprimer.
+- Depuis le menu « … » d'une collection, la lire sur le cadre de cet appareil, la renommer ou la supprimer.
 
 **Règles**
 
@@ -19,23 +19,26 @@ Une collection est une liste de photos de sa bibliothèque, rangées sous un nom
 5. R-COL-05 · Supprimer une collection demande une confirmation ; « Annuler » ferme la fenêtre sans rien changer. Ses photos restent dans la bibliothèque ; un cadre qui la lisait repasse à toute la bibliothèque (R-CAD-81).
 6. R-COL-06 · Une collection créée, renommée ou supprimée l'est aussitôt sur tous les appareils connectés au compte, sans recharger la page.
 7. R-COL-07 · Les collections sont privées : personne d'autre ne les voit, pas même les amis.
+8. R-COL-14 · « Lire sur le cadre » ouvre le cadre en plein écran sur cette collection ; l'appareil retient ce choix (voir [cadre.md](cadre.md#choisir-les-photos-du-cadre), R-CAD-77). Si l'appareil ne peut rien retenir (navigateur qui bloque les données des sites), le cadre ne s'ouvre pas : un message invite à choisir la collection depuis le menu « … » du cadre.
 
 **Messages affichés**
 
-| Situation                     | Message                                                                                                                                                                               |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| En-tête de la carte           | « Mes collections » — « Rangez vos photos par thème : Noël, les vacances, le jardin… » et le bouton « Nouvelle collection »                                                           |
-| Aucune collection             | « Aucune collection pour l'instant. »                                                                                                                                                 |
-| Chargement                    | « Chargement… »                                                                                                                                                                       |
-| Chargement impossible         | « Vos collections n'ont pas pu être chargées. »                                                                                                                                       |
-| Nombre de photos              | « Aucune photo », « 1 photo », « 12 photos »                                                                                                                                          |
-| Création                      | « Nouvelle collection » — « Donnez-lui un nom, puis rangez-y vos photos depuis leur menu « … ». » Champ « Nom de la collection », bouton « Créer »                                    |
-| Renommage                     | « Renommer la collection » — « Le nouveau nom s'affiche partout, sur tous vos appareils. » Champ « Nom de la collection », bouton « Renommer »                                        |
-| Enregistrement en cours       | « Enregistrement… »                                                                                                                                                                   |
-| Nom vide ou trop long         | « Choisissez un nom de 1 à 50 caractères. »                                                                                                                                           |
-| Nom déjà pris                 | « Vous avez déjà une collection de ce nom. »                                                                                                                                          |
-| Collection supprimée ailleurs | « Cette collection n'existe plus. »                                                                                                                                                   |
-| Confirmation de suppression   | « Supprimer la collection « Noël » ? » — « Les photos restent dans votre bibliothèque. Un cadre qui la lisait repasse à toute la bibliothèque. » Boutons « Annuler » et « Supprimer » |
+| Situation                       | Message                                                                                                                                                                               |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| En-tête de la carte             | « Mes collections » — « Rangez vos photos par thème : Noël, les vacances, le jardin… » et le bouton « Nouvelle collection »                                                           |
+| Aucune collection               | « Aucune collection pour l'instant. »                                                                                                                                                 |
+| Chargement                      | « Chargement… »                                                                                                                                                                       |
+| Chargement impossible           | « Vos collections n'ont pas pu être chargées. »                                                                                                                                       |
+| Nombre de photos                | « Aucune photo », « 1 photo », « 12 photos »                                                                                                                                          |
+| Création                        | « Nouvelle collection » — « Donnez-lui un nom, puis rangez-y vos photos depuis leur menu « … ». » Champ « Nom de la collection », bouton « Créer »                                    |
+| Renommage                       | « Renommer la collection » — « Le nouveau nom s'affiche partout, sur tous vos appareils. » Champ « Nom de la collection », bouton « Renommer »                                        |
+| Enregistrement en cours         | « Enregistrement… »                                                                                                                                                                   |
+| Nom vide ou trop long           | « Choisissez un nom de 1 à 50 caractères. »                                                                                                                                           |
+| Nom déjà pris                   | « Vous avez déjà une collection de ce nom. »                                                                                                                                          |
+| Collection supprimée ailleurs   | « Cette collection n'existe plus. »                                                                                                                                                   |
+| Menu d'une collection           | « Lire sur le cadre », « Renommer », « Supprimer »                                                                                                                                    |
+| Choix non retenu par l'appareil | « Cet appareil ne peut pas retenir ce choix. Choisissez la collection depuis le menu « … » du cadre. »                                                                                |
+| Confirmation de suppression     | « Supprimer la collection « Noël » ? » — « Les photos restent dans votre bibliothèque. Un cadre qui la lisait repasse à toute la bibliothèque. » Boutons « Annuler » et « Supprimer » |
 
 **Ce qui n'est pas possible**
 
@@ -50,7 +53,7 @@ Une collection est une liste de photos de sa bibliothèque, rangées sous un nom
 - Dans le menu « … » d'une photo (bibliothèque, photo ouverte en grand ou diaporama), ouvrir « Collections » : une case par collection, cochée quand la photo y est.
 - Cocher une case pour ranger la photo dans cette collection, la décocher pour l'en retirer. Le menu reste ouvert : on peut cocher plusieurs cases à la suite.
 - Choisir « Nouvelle collection… » pour créer une collection et y ranger aussitôt la photo.
-- Faire passer une collection sur le cadre, en boucle ou en ordre aléatoire (voir [cadre.md](cadre.md#choisir-les-photos-du-cadre)).
+- Faire passer une collection sur le cadre, en boucle ou en ordre aléatoire : « Lire sur le cadre » dans la carte « Mes collections », « Photos » dans le menu « … » du cadre ou dans les préférences (voir [cadre.md](cadre.md#choisir-les-photos-du-cadre)).
 
 **Règles**
 

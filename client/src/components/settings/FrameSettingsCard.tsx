@@ -1,16 +1,33 @@
 import type { JSX } from 'react'
+import { useCollections } from '@/collections/CollectionsContext.ts'
 import {
   INTERVAL_OPTIONS,
   ORDER_OPTIONS,
+  sourceOptions,
   TEMPLATE_OPTIONS,
 } from '@/components/frame/frameSettingOptions.ts'
 import { SettingToggleGroup } from '@/components/settings/SettingToggleGroup.tsx'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.tsx'
 import { type FrameSettingsControls, useFrameSettings } from '@/hooks/useFrameSettings.ts'
+import { playedSourceKey, sourceFromKey } from '@/photoSource.ts'
+
+// What the frame plays, as in its menu: the library or one collection.
+function SourceToggleGroup({ settings }: { settings: FrameSettingsControls }): JSX.Element {
+  const { collections } = useCollections()
+  return (
+    <SettingToggleGroup
+      label="Photos"
+      options={sourceOptions(collections)}
+      value={playedSourceKey(settings.source, collections)}
+      onValueChange={(key) => settings.onSourceChange(sourceFromKey(key))}
+    />
+  )
+}
 
 function FrameSettingsGroups({ settings }: { settings: FrameSettingsControls }): JSX.Element {
   return (
     <>
+      <SourceToggleGroup settings={settings} />
       <SettingToggleGroup
         label="Affichage"
         options={TEMPLATE_OPTIONS}

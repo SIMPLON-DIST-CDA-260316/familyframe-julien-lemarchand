@@ -65,10 +65,13 @@ export function readFrameSettings(): FrameSettings {
   }
 }
 
-export function writeFrameSettings(settings: FrameSettings): void {
+// Answers whether the device remembered the settings.
+export function writeFrameSettings(settings: FrameSettings): boolean {
   try {
     localStorage.setItem(FRAME_SETTINGS_KEY, JSON.stringify(settings))
+    return true
   } catch (_error: unknown) {
     // Not remembered on this device: the choice holds until the page closes.
+    return false
   }
 }
