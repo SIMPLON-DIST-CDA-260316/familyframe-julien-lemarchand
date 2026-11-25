@@ -11,7 +11,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
 } from '@/components/ui/dropdown-menu.tsx'
-import { SLIDESHOW_INTERVALS_MS } from '@/hooks/useSlideshow.ts'
+import { SLIDESHOW_INTERVALS_MS } from '@/frameSettings.ts'
 import type { Photo } from '@/photo.ts'
 
 const MS_PER_SECOND = 1000

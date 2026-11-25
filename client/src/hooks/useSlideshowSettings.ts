@@ -1,27 +1,25 @@
 import { useState } from 'react'
-import { DEFAULT_SLIDESHOW_INTERVAL_MS } from '@/hooks/useSlideshow.ts'
+import { type FrameSettingsControls, useFrameSettings } from '@/hooks/useFrameSettings.ts'
 
-export type SlideshowSettings = {
+// Pause and the strip are for whoever stands in front of the frame: they are not remembered.
+export type SlideshowSettings = FrameSettingsControls & {
   isPlaying: boolean
-  intervalMs: number
   isStripVisible: boolean
   onPlayingChange: (isPlaying: boolean) => void
-  onIntervalChange: (intervalMs: number) => void
   onStripVisibleChange: (isStripVisible: boolean) => void
 }
 
 // Called by the page, not the slideshow screen: the page's photo selection reads isPlaying too.
 export function useSlideshowSettings(): SlideshowSettings {
+  const frameSettings = useFrameSettings()
   const [isPlaying, setIsPlaying] = useState(true)
-  const [intervalMs, setIntervalMs] = useState(DEFAULT_SLIDESHOW_INTERVAL_MS)
   const [isStripVisible, setIsStripVisible] = useState(false)
 
   return {
+    ...frameSettings,
     isPlaying,
-    intervalMs,
     isStripVisible,
     onPlayingChange: setIsPlaying,
-    onIntervalChange: setIntervalMs,
     onStripVisibleChange: setIsStripVisible,
   }
 }

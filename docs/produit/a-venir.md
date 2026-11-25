@@ -10,7 +10,6 @@ Les règles ci-dessous décrivent l'intention ; elles recevront leur identifiant
 
 - Trois modèles d'affichage : plein format, passe-partout, polaroïd.
 - Lecture en boucle ou aléatoire.
-- Réglages retenus par appareil : chaque cadre garde ses propres choix d'un jour à l'autre.
 
 ## Étape 9 · Courrier photo
 

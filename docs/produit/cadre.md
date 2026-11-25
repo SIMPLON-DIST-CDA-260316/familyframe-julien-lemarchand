@@ -71,7 +71,7 @@ Le cadre n'a plus de vue bibliothèque : voir R-CAD-53. Les règles ci-dessous g
 - Regarder les photos une à une, en grand, avec leur date et, pour une photo reçue, « Envoyée par » suivi du nom de l'expéditeur.
 - Passer à la photo précédente ou suivante avec les flèches à l'écran, les flèches gauche et droite du clavier, ou en faisant glisser la photo du doigt.
 - Mettre en pause ou relancer la lecture automatique.
-- Choisir la vitesse : 5 s, 10 s ou 20 s par photo (menu « … », « Vitesse »).
+- Choisir la vitesse : 5 s, 10 s ou 20 s par photo (menu « … », « Vitesse ») ; l'appareil la retient.
 - Afficher ou masquer un bandeau de vignettes (« Vignettes ») et toucher une vignette pour aller à cette photo.
 - Envoyer la photo affichée à un ami ou la supprimer (menu « … »).
 - Quitter le mode cadre (bouton ✕, touche Échap ou sortie du plein écran) pour revenir à la bibliothèque, sur la photo affichée.
@@ -79,7 +79,7 @@ Le cadre n'a plus de vue bibliothèque : voir R-CAD-53. Les règles ci-dessous g
 **Règles**
 
 1. R-CAD-20 · Réglages au premier affichage : lecture automatique, 10 secondes par photo, bandeau de vignettes masqué.
-2. R-CAD-21 · La vitesse, la lecture ou la pause et l'affichage du bandeau reviennent aux réglages par défaut quand la page du cadre est rechargée ou rouverte. Le rechargement quotidien des photos (R-CAD-05) ne les modifie pas.
+2. R-CAD-21 · Remplacée : la vitesse est désormais retenue sur l'appareil ; seules la pause et l'affichage du bandeau reviennent aux réglages par défaut (R-CAD-62).
 3. R-CAD-22 · La lecture automatique passe à la photo suivante, plus ancienne, à chaque intervalle. Après la plus ancienne, elle repart de la plus récente, en boucle et sans retour en arrière visible.
 4. R-CAD-23 · La lecture automatique attend pendant que quelqu'un utilise le cadre : elle ne change pas de photo tant qu'il y a eu une activité dans les 4 dernières secondes, ni tant qu'un menu ou une fenêtre est ouvert.
 5. R-CAD-24 · Les boutons (✕, « … », flèches, lecture, vignettes) et le bandeau s'affichent dès qu'il y a une activité et s'effacent après 4 secondes sans activité ; le pointeur de la souris se cache aussi. Ils restent affichés tant qu'un menu ou une fenêtre est ouvert.
@@ -88,7 +88,9 @@ Le cadre n'a plus de vue bibliothèque : voir R-CAD-53. Les règles ci-dessous g
 8. R-CAD-27 · La photo affichée s'agrandit très lentement et légèrement (zoom lent) pendant 20 secondes. Cet effet est désactivé sur les appareils réglés pour réduire les animations.
 9. R-CAD-28 · Le bandeau de vignettes garde la photo affichée au centre. Il défile au doigt, à la molette ou en le faisant glisser à la souris ; un glissement ne déclenche pas l'ouverture de la vignette où il se termine.
 10. R-CAD-29 · Si la photo affichée est supprimée (ici ou depuis un autre appareil), le diaporama passe à la photo la plus récente.
-11. R-CAD-30 · La légende montre la date d'ajout ou de réception (« 24 novembre 2026 »), sans l'heure.
+11. R-CAD-62 · La vitesse choisie est retenue sur l'appareil, dans ce navigateur : elle reste la même quand la page du cadre est rechargée ou rouverte, le lendemain comme après un redémarrage. La lecture ou la pause et l'affichage du bandeau reviennent aux réglages par défaut (lecture automatique, bandeau masqué). Le rechargement quotidien des photos (R-CAD-05) ne change rien.
+12. R-CAD-63 · En navigation privée, ou si le navigateur bloque l'enregistrement, le réglage vaut jusqu'à la fermeture de la page. Un réglage devenu illisible revient à sa valeur par défaut sans effacer les autres.
+13. R-CAD-30 · La légende montre la date d'ajout ou de réception (« 24 novembre 2026 »), sans l'heure.
 
 **Messages affichés**
 
@@ -103,7 +105,7 @@ Le cadre n'a plus de vue bibliothèque : voir R-CAD-53. Les règles ci-dessous g
 - Choisir une autre vitesse que 5, 10 ou 20 secondes.
 - Lire les photos dans un ordre aléatoire : prévu, voir [a-venir.md](a-venir.md).
 - Choisir un modèle d'affichage (passe-partout, polaroïd…) : prévu, voir [a-venir.md](a-venir.md).
-- Retenir ses réglages de diaporama d'un jour à l'autre : prévu, voir [a-venir.md](a-venir.md).
+- Retrouver ses réglages sur un autre appareil ou dans un autre navigateur : chaque appareil garde les siens.
 
 ## Arrivée d'une nouvelle photo
 
