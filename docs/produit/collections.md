@@ -78,7 +78,7 @@ Une collection est une liste de photos de sa bibliothèque, rangées sous un nom
 
 **Ce que l'on peut faire**
 
-- Dans la bibliothèque, choisir une collection dans la rangée placée sous l'annonce des photos reçues : seules ses photos s'affichent, sous son nom.
+- Dans la bibliothèque, choisir une collection dans la rangée placée sous l'annonce des photos reçues : seules ses photos s'affichent, et son nom devient le titre de la page.
 - Revenir à toutes les photos avec « Toutes », au début de la rangée.
 - Ouvrir une photo de la collection en grand et passer d'une photo à l'autre sans sortir de la collection.
 - Ajouter une photo avec « Ajouter » pendant qu'une collection est affichée : elle y est rangée aussitôt.
@@ -93,6 +93,7 @@ Une collection est une liste de photos de sa bibliothèque, rangées sous un nom
 6. R-COL-20 · Une collection supprimée sur un autre appareil, ou un lien vers une collection qui n'existe pas affiche « Cette collection n'existe plus. » et propose « Voir toutes les photos ».
 7. R-COL-21 · La collection affichée suit les changements sans recharger la page : une photo rangée ou retirée, sur cet appareil ou un autre, y apparaît ou en disparaît. Une photo ajoutée pendant qu'une collection est affichée entre dans la bibliothèque et est rangée dans cette collection ; si le rangement échoue, un message le dit et la photo reste dans la bibliothèque.
 8. R-COL-22 · Chaque carte montre une image carrée, puis sous elle le nom et le nombre de photos (« Aucune photo », « 1 photo », « 12 photos »). L'image d'une collection est sa photo la plus récente, quel que soit l'ordre dans lequel les photos y ont été rangées, et change d'elle-même quand une photo plus récente y entre ou que celle-ci en sort ; une collection vide montre un dossier gris. « Toutes » montre une pile de photos, sans nombre, et « Nouvelle collection », au bout, un « + ». Un nom trop long est coupé, mais s'affiche en entier au survol. Sur un téléphone, une carte fait environ 150 px de large, et la troisième est coupée au bord de l'écran ; sur un ordinateur, environ 180 px.
+9. R-COL-23 · Une collection affichée prend la place de « Bibliothèque » en tête de page : son nom en grand titre, suivi de son menu « … » (« Lire sur le cadre », « Renommer », « Supprimer »), et dessous le nombre de ses photos et les dates de la plus ancienne à la plus récente (« 12 photos · 1 nov. 2022 – 22 nov. 2026 »). Une seule date quand toutes ses photos sont du même jour, aucune quand elle est vide (« Aucune photo »). Avec « Toutes », l'en-tête redevient « Bibliothèque » et le nombre de photos de la bibliothèque.
 
 **Messages affichés**
 

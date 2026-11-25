@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router'
 import { toast } from 'sonner'
 import type { Collection } from '@/collections/collection.ts'
 import { CollectionNameDialog } from '@/components/collections/CollectionNameDialog.tsx'
+import { collectionSummary } from '@/components/collections/collectionSummary.ts'
 import { DeleteCollectionDialog } from '@/components/collections/DeleteCollectionDialog.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import {
@@ -39,7 +40,7 @@ type BarDialogsProps = {
   triggerRef: RefObject<HTMLButtonElement | null>
 }
 
-type SelectedCollectionBarProps = {
+type CollectionTitleProps = {
   collection: Collection
   fallbackRef: RefObject<HTMLElement | null>
 }
@@ -90,8 +91,9 @@ function CollectionMenu({ name, onSelect, onPlay, triggerRef }: CollectionMenuPr
           <EllipsisIcon />
         </Button>
       </DropdownMenuTrigger>
-      {/* Start: the button follows the name, at the left of the page. */}
-      <DropdownMenuContent align="start">
+      {/* Start: the button follows the name, at the left of the page. w-max: the content would
+          take the button's width and wrap its items. */}
+      <DropdownMenuContent align="start" className="w-max">
         <CollectionMenuItems onSelect={onSelect} onPlay={onPlay} />
       </DropdownMenuContent>
     </DropdownMenu>
@@ -123,7 +125,7 @@ function BarDialogs({ collection, dialog, onClose, ...props }: BarDialogsProps):
 }
 
 // Replace: back must not return to a collection that no longer exists. The dialog closed at the
-// click, before the server agreed, and gave focus back to the menu button that leaves with the bar
+// click, before the server agreed, and gave focus back to the menu button that leaves with the title
 // now: « Toutes » stays on the page.
 function useLeaveDeletedCollection(fallbackRef: RefObject<HTMLElement | null>): () => void {
   const navigate = useNavigate()
@@ -133,18 +135,15 @@ function useLeaveDeletedCollection(fallbackRef: RefObject<HTMLElement | null>): 
   }
 }
 
-export function SelectedCollectionBar({
-  collection,
-  fallbackRef,
-}: SelectedCollectionBarProps): JSX.Element {
+// The « … » beside the name: the menu and the dialogs it opens.
+function CollectionActions({ collection, fallbackRef }: CollectionTitleProps): JSX.Element {
   const [dialog, setDialog] = useState<BarDialog>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const playOnFrame = usePlayOnFrame(collection.id)
   const leaveDeletedCollection = useLeaveDeletedCollection(fallbackRef)
 
   return (
-    <div className="flex min-w-0 items-center gap-2">
-      <h2 className="text-lg font-medium wrap-anywhere">{collection.name}</h2>
+    <>
       <CollectionMenu
         name={collection.name}
         onSelect={setDialog}
@@ -158,6 +157,21 @@ export function SelectedCollectionBar({
         onClose={() => setDialog(null)}
         triggerRef={triggerRef}
       />
+    </>
+  )
+}
+
+// The page's title while a collection is shown: its name, what it holds and its own menu.
+export function CollectionTitle({ collection, fallbackRef }: CollectionTitleProps): JSX.Element {
+  return (
+    <div className="flex min-w-0 flex-col">
+      <div className="flex min-w-0 items-center gap-1">
+        <h1 className="text-2xl font-semibold tracking-tight wrap-anywhere sm:text-3xl">
+          {collection.name}
+        </h1>
+        <CollectionActions collection={collection} fallbackRef={fallbackRef} />
+      </div>
+      <p className="min-h-5 text-sm text-muted-foreground">{collectionSummary(collection)}</p>
     </div>
   )
 }

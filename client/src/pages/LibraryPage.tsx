@@ -1,9 +1,9 @@
 import { type JSX, type RefObject, useRef, useState } from 'react'
 import { CollectionsRow } from '@/components/collections/CollectionsRow.tsx'
-import { SelectedCollectionBar } from '@/components/collections/SelectedCollectionBar.tsx'
+import { CollectionTitle } from '@/components/collections/CollectionTitle.tsx'
 import { AddPhotoFab } from '@/components/library/AddPhotoFab.tsx'
 import { AddPhotoPanel } from '@/components/library/AddPhotoPanel.tsx'
-import { LibraryHeader } from '@/components/library/LibraryHeader.tsx'
+import { LibraryHeader, LibraryTitle } from '@/components/library/LibraryHeader.tsx'
 import {
   EmptyCollection,
   EmptyLibrary,
@@ -86,6 +86,18 @@ function LibraryBody(props: LibraryBodyProps): JSX.Element {
   )
 }
 
+type PageTitleProps = Pick<LibraryContentProps, 'selected' | 'library'> & {
+  allCardRef: RefObject<HTMLAnchorElement | null>
+}
+
+// A shown collection titles the page with its own name; « Toutes » keeps « Bibliothèque ».
+function PageTitle({ selected, library, allCardRef }: PageTitleProps): JSX.Element {
+  if (selected.status === 'found') {
+    return <CollectionTitle collection={selected.collection} fallbackRef={allCardRef} />
+  }
+  return <LibraryTitle library={library} showsCount={isShowingPhotos(selected)} />
+}
+
 function LibraryContent(props: LibraryContentProps): JSX.Element {
   const [layout, setLayout] = useLibraryLayout()
   const { selected, library, onAdd, addButtonRef } = props
@@ -94,19 +106,15 @@ function LibraryContent(props: LibraryContentProps): JSX.Element {
   return (
     <>
       <LibraryHeader
-        library={library}
+        title={<PageTitle selected={selected} library={library} allCardRef={allCardRef} />}
         layout={layout}
         onLayoutChange={setLayout}
         onAdd={onAdd}
-        showsCount={isShowingPhotos(selected)}
         addButtonRef={addButtonRef}
       />
       {/* Above the photos: news from the family comes first. */}
       <LibraryMail />
       <CollectionsRow selectedId={selectedCollectionId(selected)} allCardRef={allCardRef} />
-      {selected.status === 'found' && (
-        <SelectedCollectionBar collection={selected.collection} fallbackRef={allCardRef} />
-      )}
       <LibraryBody {...props} layout={layout} />
     </>
   )
