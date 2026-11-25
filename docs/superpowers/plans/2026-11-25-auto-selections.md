@@ -1,13 +1,13 @@
 ---
 plan: auto-selections
-status: draft
+status: done
 spec: docs/superpowers/specs/2026-11-25-auto-selections-design.md
 branch: feat/selections-server (PR A), feat/selections-daily (PR B), feat/selections-radio (PR C)
 worktree: false
 tasks_total: 4
 tasks_done: 4
 current_task: null
-last_commit: null
+last_commit: 815f010
 last_updated: 2026-11-25
 ---
 
@@ -17,7 +17,7 @@ last_updated: 2026-11-25
 
 **Working agreement (mandatory):** keep this plan in sync with reality. Check a step only when it is finished and its gate is green. Append every divergence to the Drift Log. When a drift changes a decision of the spec, add a new spec doc rather than rewriting this one.
 
-**Status:** every task below was built and committed by the AI in a throwaway clone, then replayed as the three stacked branches (gates per commit in the report to the controller). The diffs are the final ones, after the fresh-context review. What is left: the controller's Bruno run, the Chrome checks and the author's UX walkthrough (Final verification).
+**Status:** every task below was built and committed by the AI in a throwaway clone as the three stacked branches (gates per commit in the report to the controller). A first agent wrote the spec, this plan and its diffs, then was stopped by a reboot before committing; a second agent replayed the diffs on `f212b85`, fixed what the build and a fresh-context review found (Drift Log), and regenerated the diffs below from the final commits. The diffs are the final ones, after the fresh-context review. What is left: the controller's Bruno run, the Chrome checks and the author's UX walkthrough (Final verification).
 
 **Goal:** the frame plays « Sélection du jour » (20 opened photos drawn at random, the same lot all day in Paris time, a new lot every day) as a stored source like a collection, and a « radio » started from any photo's « … » menu: the start photo, then the photos linked to it (same friend sender, at most 7 days apart, same collections), topped up at random, 30 photos at most.
 
@@ -452,10 +452,10 @@ index 0000000..7cfbbf4
 +}
 diff --git a/server/bruno/selections/daily/folder.bru b/server/bruno/selections/daily/folder.bru
 new file mode 100644
-index 0000000..7fcc6c2
+index 0000000..ebc63e0
 --- /dev/null
 +++ b/server/bruno/selections/daily/folder.bru
-@@ -0,0 +1,16 @@
+@@ -0,0 +1,17 @@
 +meta {
 +  name: daily
 +  seq: 1
@@ -470,7 +470,8 @@ index 0000000..7fcc6c2
 +  Toutes les photos de ce dossier arrivent le jour même et le compte en a
 +  moins de 20 : le lot les contient toutes. Le tirage lui-même (même lot
 +  toute la journée, autre lot le lendemain, minuit à Paris) est vérifié par
-+  les tests unitaires, qui choisissent l'heure.
++  les tests unitaires, qui choisissent l'heure. Un lancement à cheval sur
++  minuit (heure de Paris) peut échouer : le relancer.
 +}
 diff --git a/server/bruno/selections/folder.bru b/server/bruno/selections/folder.bru
 new file mode 100644
@@ -653,10 +654,10 @@ index 0000000..a04826e
 +}
 diff --git a/server/src/features/selections/selections.service.daily.test.ts b/server/src/features/selections/selections.service.daily.test.ts
 new file mode 100644
-index 0000000..44aecf5
+index 0000000..fba3f3e
 --- /dev/null
 +++ b/server/src/features/selections/selections.service.daily.test.ts
-@@ -0,0 +1,103 @@
+@@ -0,0 +1,107 @@
 +import { describe, expect, it, vi } from 'vitest'
 +import { DAILY_SELECTION_SIZE, dayOf } from './selections.daily.js'
 +import type { SelectionPhoto, SelectionsRepository } from './selections.repository.js'
@@ -678,6 +679,9 @@ index 0000000..44aecf5
 +}
 +
 +const LIBRARY = photosOn(YESTERDAY, 30)
++// Ranked 6th of the library on MORNING's day if it counted as an older photo: a test that keeps it
++// out of the lot fails when the rule on photos of the day breaks.
++const RANKED_IN_LOT_NUMBER = 103
 +
 +function makeDeps(photos: SelectionPhoto[] = LIBRARY, now: Date = MORNING) {
 +  return {
@@ -735,13 +739,13 @@ index 0000000..44aecf5
 +  })
 +
 +  it('keeps the lot when a photo arrives during the day', async () => {
-+    const todaysPhoto = photosOn(MORNING, 1, 100)
++    const todaysPhoto = photosOn(MORNING, 1, RANKED_IN_LOT_NUMBER)
 +
 +    expect(await drawOn(EVENING, [...LIBRARY, ...todaysPhoto])).toEqual(await drawOn(MORNING))
 +  })
 +
 +  it('counts a photo of 00:30 in Paris as one of the day', async () => {
-+    const justAfterMidnight = photosOn(new Date('2026-11-24T23:30:00Z'), 1, 100)
++    const justAfterMidnight = photosOn(new Date('2026-11-24T23:30:00Z'), 1, RANKED_IN_LOT_NUMBER)
 +    const { photoIds } = await drawOn(MORNING, [...LIBRARY, ...justAfterMidnight])
 +
 +    expect(photoIds).not.toContain(justAfterMidnight[0].id)
@@ -749,7 +753,8 @@ index 0000000..44aecf5
 +
 +  it('fills a lot with room left with the photos of the day, after the older ones', async () => {
 +    const olderPhotos = photosOn(YESTERDAY, 3)
-+    const todaysPhotos = photosOn(MORNING, 2, 100)
++    // Numbered after the whole library: apart from the older photos' ids.
++    const todaysPhotos = photosOn(MORNING, 2, LIBRARY.length + 1)
 +    const { photoIds } = await drawOn(MORNING, [...todaysPhotos, ...olderPhotos])
 +
 +    expect(photoIds.slice(0, 3).sort()).toEqual(olderPhotos.map(({ id }) => id))
@@ -825,7 +830,7 @@ index 73eda96..d1c8a4a 100644
 
 ~~~~diff
 diff --git a/ARCHITECTURE.md b/ARCHITECTURE.md
-index f52bf4d..7955bc1 100644
+index f52bf4d..5edf383 100644
 --- a/ARCHITECTURE.md
 +++ b/ARCHITECTURE.md
 @@ -105,6 +105,7 @@ Le routage est fait côté navigateur (`react-router`). En production (J2), le s
@@ -840,7 +845,7 @@ index f52bf4d..7955bc1 100644
  
  Une `Selection` vaut `{ photoIds }` : des ids de photos ouvertes de la bibliothèque du compte, jamais les photos elles-mêmes, que le cadre a déjà chargées. La sélection du jour (`features/selections/selections.daily.ts`) range chaque photo selon le SHA-256 de `<ownerId>:<jour>:<photoId>`, le jour étant la date à Paris (`Intl.DateTimeFormat`, fuseau `Europe/Paris`) : le même jour donne le même ordre sur tous les appareils et à chaque rechargement, sans rien enregistrer, et le lendemain un autre. Les photos arrivées avant aujourd'hui passent d'abord, celles du jour ensuite, et le lot garde les 20 premières (`DAILY_SELECTION_SIZE`) : une photo ajoutée aujourd'hui n'entre que dans un lot qui a encore de la place. Limite connue : une photo reçue hier et ouverte aujourd'hui compte comme arrivée hier (sa date est celle de la réception) et peut remplacer une photo du lot en cours de journée.
  
-+La radio (`features/selections/selections.radio.ts`) part d'une photo ouverte du compte (sinon `404 PHOTO_NOT_FOUND`, comme l'ouverture, id comparé en minuscules comme pour les collections) et compte, pour chaque autre photo, un point par lien : le même ami expéditeur (deux photos ajoutées par le compte lui-même ne comptent pas, ce serait presque toute la bibliothèque), moins de 7 jours d'écart entre leurs dates d'arrivée, et chaque collection qui contient les deux. Les photos liées passent de la plus liée à la moins liée, la plus proche dans le temps d'abord à égalité ; les photos sans lien complètent ensuite dans un ordre tiré au hasard (Fisher-Yates, `random` reçu en dépendance), jusqu'à 30 photos (`RADIO_LENGTH`) départ compris. La date est celle de l'ajout ou de la réception : Sharp retire les métadonnées, la date de prise de vue n'existe plus. Les collections sont lues en une requête (leurs `photoIds` seulement) ; un id de photo supprimée qui y traîne ne compte pas, la photo n'étant plus dans la bibliothèque lue.
++La radio (`features/selections/selections.radio.ts`) part d'une photo ouverte du compte (sinon `404 PHOTO_NOT_FOUND`, comme l'ouverture, id comparé en minuscules comme pour les collections) et compte, pour chaque autre photo, un point par lien : le même ami expéditeur (deux photos ajoutées par le compte lui-même ne comptent pas, ce serait presque toute la bibliothèque), 7 jours d'écart au plus entre leurs dates d'arrivée, et chaque collection qui contient les deux. Les photos liées passent de la plus liée à la moins liée, la plus proche dans le temps d'abord à égalité ; les photos sans lien complètent ensuite dans un ordre tiré au hasard (Fisher-Yates, `random` reçu en dépendance), jusqu'à 30 photos (`RADIO_LENGTH`) départ compris. La date est celle de l'ajout ou de la réception : Sharp retire les métadonnées, la date de prise de vue n'existe plus. Les collections sont lues en une requête (leurs `photoIds` seulement) ; un id de photo supprimée qui y traîne ne compte pas, la photo n'étant plus dans la bibliothèque lue.
 +
  La liste est paginée par curseur (_keyset_) sur l'id : un ObjectId commence par sa date de création, trier par id revient donc à trier par date, et `id < cursor` est une seule requête sur l'index `(ownerId, id)`. Une photo ajoutée ou supprimée entre deux pages ne décale rien, contrairement à une pagination par numéro de page.
  
@@ -1297,7 +1302,7 @@ index 0000000..f21e77a
 +}
 diff --git a/server/bruno/selections/radio/folder.bru b/server/bruno/selections/radio/folder.bru
 new file mode 100644
-index 0000000..a9daa6b
+index 0000000..2d377bb
 --- /dev/null
 +++ b/server/bruno/selections/radio/folder.bru
 @@ -0,0 +1,19 @@
@@ -1310,7 +1315,7 @@ index 0000000..a9daa6b
 +  `GET /api/selections/radio/:photoId` → 200 `{ photoIds }` : la radio
 +  construite sur une photo de la bibliothèque, 30 photos au plus. La photo
 +  de départ d'abord, puis les photos qui lui sont liées (même ami
-+  expéditeur, arrivées à moins de 7 jours d'écart, collections en commun),
++  expéditeur, arrivées à 7 jours d'écart au plus, collections en commun),
 +  les plus liées d'abord, puis les autres au hasard. Une photo d'un autre
 +  compte, inconnue, reçue pas encore ouverte, supprimée ou un id mal formé :
 +  404 `PHOTO_NOT_FOUND`.
@@ -1493,7 +1498,7 @@ index a04826e..8ac6a68 100644
    return router
  }
 diff --git a/server/src/features/selections/selections.service.daily.test.ts b/server/src/features/selections/selections.service.daily.test.ts
-index 44aecf5..f0a2052 100644
+index fba3f3e..ba1fe24 100644
 --- a/server/src/features/selections/selections.service.daily.test.ts
 +++ b/server/src/features/selections/selections.service.daily.test.ts
 @@ -15,6 +15,7 @@ function photosOn(createdAt: Date, count: number, firstNumber = 1): SelectionPho
@@ -1504,7 +1509,7 @@ index 44aecf5..f0a2052 100644
    }))
  }
  
-@@ -24,8 +25,10 @@ function makeDeps(photos: SelectionPhoto[] = LIBRARY, now: Date = MORNING) {
+@@ -27,8 +28,10 @@ function makeDeps(photos: SelectionPhoto[] = LIBRARY, now: Date = MORNING) {
    return {
      repository: {
        findOpenedPhotos: vi.fn<SelectionsRepository['findOpenedPhotos']>().mockResolvedValue(photos),
@@ -1517,10 +1522,10 @@ index 44aecf5..f0a2052 100644
  
 diff --git a/server/src/features/selections/selections.service.radio.test.ts b/server/src/features/selections/selections.service.radio.test.ts
 new file mode 100644
-index 0000000..c13c6e6
+index 0000000..bc4361b
 --- /dev/null
 +++ b/server/src/features/selections/selections.service.radio.test.ts
-@@ -0,0 +1,137 @@
+@@ -0,0 +1,141 @@
 +import { describe, expect, it, vi } from 'vitest'
 +import { AppError } from '../../errors/app-error.js'
 +import { RADIO_LENGTH } from './selections.radio.js'
@@ -1616,17 +1621,21 @@ index 0000000..c13c6e6
 +    expect(await radioFrom(ownStart.id, deps)).toEqual([ownStart.id, ownFarther.id, ownCloser.id])
 +  })
 +
-+  it('tops up with the unlinked photos in random order', async () => {
++  it('tops up with the unlinked photos in the order the draw gives', async () => {
 +    const deps = makeDeps()
++    // Close to 1, Fisher-Yates swaps nothing: the library's order, where a draw of 0 reverses it.
++    const drawWithoutSwap = 0.99
++    deps.random.mockReturnValue(drawWithoutSwap)
 +
-+    await radioFrom(START.id, deps)
++    const unlinkedTail = (await radioFrom(START.id, deps)).slice(-2)
 +
-+    expect(deps.random).toHaveBeenCalled()
++    expect(unlinkedTail).toEqual([EIGHT_DAYS_LATER.id, UNRELATED.id])
 +  })
 +
 +  it('stops at RADIO_LENGTH photos, without a draw when the linked photos fill it', async () => {
-+    const sameWeek = Array.from({ length: 40 }, (_, index) =>
-+      photo(100 + index, '2026-06-02T10:00:00Z'),
++    const moreThanRadioLength = RADIO_LENGTH + 10
++    const sameWeek = Array.from({ length: moreThanRadioLength }, (_, index) =>
++      photo(LIBRARY.length + 1 + index, '2026-06-02T10:00:00Z'),
 +    )
 +    const deps = makeDeps([START, ...sameWeek], [])
 +
@@ -1733,7 +1742,7 @@ index 003b881..6c287f6 100644
 
 ~~~~diff
 diff --git a/ARCHITECTURE.md b/ARCHITECTURE.md
-index 7955bc1..ccc565e 100644
+index 5edf383..709e1c9 100644
 --- a/ARCHITECTURE.md
 +++ b/ARCHITECTURE.md
 @@ -48,9 +48,9 @@ Le détail des fichiers n'est pas listé ici : il change trop vite pour rester j
@@ -2223,7 +2232,7 @@ index 48b7125..60569e8 100644
 
 ~~~~diff
 diff --git a/ARCHITECTURE.md b/ARCHITECTURE.md
-index ccc565e..2ad3976 100644
+index 709e1c9..1a1ba60 100644
 --- a/ARCHITECTURE.md
 +++ b/ARCHITECTURE.md
 @@ -43,15 +43,15 @@ Le détail des fichiers n'est pas listé ici : il change trop vite pour rester j
@@ -2727,7 +2736,7 @@ index 7c325e8..8733fa7 100644
  - Découvrir les photos envoyées par ses proches depuis l'annonce en haut de la page (voir [partage.md](partage.md#recevoir-une-photo)).
  - Gérer ses collections dans la carte « Mes collections » (voir [collections.md](collections.md)).
 diff --git a/docs/produit/cadre.md b/docs/produit/cadre.md
-index d18793e..5f68a24 100644
+index d18793e..c28121b 100644
 --- a/docs/produit/cadre.md
 +++ b/docs/produit/cadre.md
 @@ -77,7 +77,7 @@ Le cadre n'a plus de vue bibliothèque : voir R-CAD-53. Les règles ci-dessous g
@@ -2751,7 +2760,7 @@ index d18793e..5f68a24 100644
 +
 +**Règles**
 +
-+1. R-CAD-90 · La radio commence par la photo choisie, puis passe les photos qui lui sont liées : envoyées par le même ami, arrivées à moins de 7 jours d'écart, ou rangées dans les mêmes collections. Plus une photo a de liens, plus elle passe tôt ; à égalité, la plus proche dans le temps passe d'abord.
++1. R-CAD-90 · La radio commence par la photo choisie, puis passe les photos qui lui sont liées : envoyées par le même ami, arrivées à 7 jours d'écart au plus, ou rangées dans les mêmes collections. Plus une photo a de liens, plus elle passe tôt ; à égalité, la plus proche dans le temps passe d'abord.
 +2. R-CAD-91 · Deux photos que l'on a ajoutées soi-même ne comptent pas comme venant du même expéditeur : ce lien ne vaut que pour les photos reçues d'un ami.
 +3. R-CAD-92 · Quand les photos liées ne suffisent pas, d'autres photos de la bibliothèque, tirées au hasard, complètent la radio, jusqu'à 30 photos en tout. Une photo reçue n'y entre qu'une fois découverte.
 +4. R-CAD-93 · « Dans l'ordre » lit la radio dans cet ordre, en boucle ; « Aléatoire » la mélange. La vitesse et le modèle d'affichage restent ceux choisis.
@@ -2791,7 +2800,7 @@ index d18793e..5f68a24 100644
   - `/frame?radio=<unknown id>`: the library plays, no message;
   - nothing scrolls sideways on a phone width.
 - [ ] Left to the author (UX walkthrough): whether « Lancer la radio » belongs at the top of the photo menu, and how the selection feels on the wall over a few days (midnight switch).
-- [ ] Fresh-context review of the whole stack diff: done while planning (see Drift Log); the controller may run another on the pushed branches. Rien n'est mergé.
+- [x] Fresh-context review of the whole stack diff: done while planning, and again on the built stack (`f212b85..feat/selections-radio`, see Drift Log); the controller may run another on the pushed branches. Rien n'est mergé.
 
 ---
 
@@ -2814,6 +2823,12 @@ Format: `date · task/step · what the plan said · what was done · why`.
 | 2026-11-25 | Planning (review), Task 4 | the menu guard compared the click with the played key | compares with the stored or radio key (`sourceKey(settings.source)`) | review: with a deleted stored collection, choosing « Toute la bibliothèque » did nothing and the stale choice stayed stored |
 | 2026-11-25 | Planning (review), Task 4 | R-CAD-97 silent on the menu | « Le menu garde « Radio » coché », same in ARCHITECTURE | review: the daily rule said it, the radio rule did not |
 | 2026-11-25 | Planning (review) | false « nouvelle photo » badge after a re-drawn lot; a selection whose photos all left shows « En attente de la première photo… » | not changed: spec Open questions 11 and 12 | rare; the first needs a change to the step 8 `useFrameSelection`, the second an extra fallback rule |
+| 2026-11-25 | Build (clone), Task 1 | « keeps the lot when a photo arrives » and « 00:30 in Paris » used photo number 100 | `RANKED_IN_LOT_NUMBER = 103` | photo 100 ranks 21st of the library even as an older photo, so both tests passed with the day rule broken; 103 ranks 6th. Checked by mutation (`<` → `<=`): 3 tests fail |
+| 2026-11-25 | Review (built stack), Tasks 2, 4 | ARCHITECTURE, R-CAD-90 and `radio/folder.bru` said « moins de 7 jours d'écart » | « 7 jours d'écart au plus » | the code links at `<=` 7 days, as the spec says (« at most ») |
+| 2026-11-25 | Review (built stack), Task 2 | « tops up with the unlinked photos in random order » only checked that `random` was called | asserts the unlinked tail with a draw that swaps nothing (`0.99`), the library's order | the old test passed even if the draw was ignored |
+| 2026-11-25 | Review (built stack), Tasks 1, 2 | unnamed numbers in the tests (`100`, `40`) | `LIBRARY.length + 1`, `RADIO_LENGTH + 10` | « no magic numbers » covers `src/**` tests too |
+| 2026-11-25 | Review (built stack), Task 1 | Bruno `daily/folder.bru` silent on midnight | notes that a run across midnight (Paris) may fail and should be run again | `daily/04` and `radio/03` assume the upload and the read fall on the same day |
+| 2026-11-25 | Review (built stack), Task 4 | a radio that fails at launch is never retried | not changed: spec Open question 7 (R-CAD-97) | a choice, not a bug: the library plays, « Radio » stays checked until another choice |
 
 ---
 
