@@ -37,7 +37,6 @@ type BarDialogsProps = {
   dialog: BarDialog
   onClose: () => void
   triggerRef: RefObject<HTMLButtonElement | null>
-  fallbackRef: RefObject<HTMLElement | null>
 }
 
 type SelectedCollectionBarProps = {
@@ -108,11 +107,9 @@ function CollectionMenu({ name, onSelect, onPlay, triggerRef }: CollectionMenuPr
 // Outside the menu: closing the menu must not unmount the dialogs.
 function BarDialogs({ collection, dialog, onClose, ...props }: BarDialogsProps): JSX.Element {
   // Radix would focus the menu item that opened the dialog, gone by now: focus would fall to body.
-  // After a deletion the bar is gone too, the trigger with it: the fallback outlives it. Here, not in
-  // onDeleted: the dialog's focus trap still holds then and would pull focus back.
   function focusTrigger(event: Event): void {
     event.preventDefault()
-    ;(props.triggerRef.current ?? props.fallbackRef.current)?.focus()
+    props.triggerRef.current?.focus()
   }
   return (
     <>
@@ -131,7 +128,17 @@ function BarDialogs({ collection, dialog, onClose, ...props }: BarDialogsProps):
   )
 }
 
-// Replace on deletion: back must not return to a collection that no longer exists.
+// Replace: back must not return to a collection that no longer exists. The dialog closed at the
+// click, before the server agreed, and gave focus back to the menu button that leaves with the bar
+// now: « Toutes » stays on the page.
+function useLeaveDeletedCollection(fallbackRef: RefObject<HTMLElement | null>): () => void {
+  const navigate = useNavigate()
+  return () => {
+    navigate('/', { replace: true })
+    fallbackRef.current?.focus()
+  }
+}
+
 export function SelectedCollectionBar({
   collection,
   fallbackRef,
@@ -139,7 +146,7 @@ export function SelectedCollectionBar({
   const [dialog, setDialog] = useState<BarDialog>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const playOnFrame = usePlayOnFrame(collection.id)
-  const navigate = useNavigate()
+  const leaveDeletedCollection = useLeaveDeletedCollection(fallbackRef)
 
   return (
     <div className="flex min-w-0 items-center gap-2">
@@ -152,11 +159,10 @@ export function SelectedCollectionBar({
       />
       <BarDialogs
         collection={collection}
-        onDeleted={() => navigate('/', { replace: true })}
+        onDeleted={leaveDeletedCollection}
         dialog={dialog}
         onClose={() => setDialog(null)}
         triggerRef={triggerRef}
-        fallbackRef={fallbackRef}
       />
     </div>
   )
