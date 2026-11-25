@@ -30,6 +30,9 @@ export function usePlaybackPhotos(
     const photoIds = photos.map(({ id }) => id)
     const nextIds = nextShuffledIds({ drawnIds, photoIds, shownId, currentId }, Math.random)
     if (!isSameOrder(nextIds, drawnIds)) setDrawn({ sourceKey, ids: nextIds })
+  } else if (drawnIds.length > 0) {
+    // Forgotten in order: picking « Aléatoire » again mixes anew rather than resuming the old round.
+    setDrawn({ sourceKey, ids: [] })
   }
 
   const shuffledPhotos = useMemo(() => inPlaybackOrder(photos, drawnIds), [photos, drawnIds])
