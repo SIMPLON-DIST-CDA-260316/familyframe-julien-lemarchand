@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { errorMessage } from '@/api.ts'
 import { useAuth } from '@/auth/AuthContext.ts'
 import {
   failureMessages,
@@ -11,6 +12,7 @@ import {
 import type { FriendUser } from '@/friendship.ts'
 import type { Photo } from '@/photo.ts'
 import { postDeviceShare, postLibraryShare, type ShareResult } from '@/photosApi.ts'
+import type { SendOutcome } from '@/sentPhoto.ts'
 import { preparePhoto } from '@/upload/preparePhoto.ts'
 
 export type ShareTarget = { kind: 'library'; photo: Photo } | { kind: 'device'; file: File }
@@ -21,32 +23,29 @@ export type ShareSending = {
   sendTo: (friends: FriendUser[], message: string) => Promise<void>
 }
 
-function postShare(target: ShareTarget, friendId: string, message: string): Promise<ShareResult> {
+function postShare(
+  target: ShareTarget,
+  friendIds: string[],
+  message: string,
+): Promise<ShareResult> {
   return target.kind === 'library'
-    ? postLibraryShare(target.photo.id, friendId, message)
-    : postDeviceShare(target.file, friendId, message)
+    ? postLibraryShare(target.photo.id, friendIds, message)
+    : postDeviceShare(target.file, friendIds, message)
 }
 
-// Prepared once, before the first friend: each one then gets the same file.
+// Prepared on the device first: a very large photo would be refused by the server.
 async function preparedTarget(target: ShareTarget): Promise<ShareTarget> {
   if (target.kind === 'library') return target
   return { kind: 'device', file: await preparePhoto(target.file) }
 }
 
-// One friend after the other: a device share uploads the whole file each time. null: the
-// session ended, nothing more can be sent.
-async function shareWithEach(
-  target: ShareTarget,
-  friends: FriendUser[],
-  message: string,
-): Promise<ShareOutcome[] | null> {
-  const outcomes: ShareOutcome[] = []
-  for (const friend of friends) {
-    const result = await postShare(target, friend.id, message)
-    if (result.status === 'unauthenticated') return null
-    outcomes.push({ ...result, name: firstName(friend.displayName) })
-  }
-  return outcomes
+// The server answers by id; the sheet names each friend.
+function namedOutcome(friend: FriendUser, outcomes: SendOutcome[]): ShareOutcome {
+  const name = firstName(friend.displayName)
+  const status = outcomes.find(({ friendId }) => friendId === friend.id)?.status
+  if (status === 'sent') return { name, status: 'shared' }
+  if (status === 'duplicate') return { name, status: 'duplicate' }
+  return { name, status: 'failed', message: errorMessage({ error: 'NOT_FRIENDS' }) }
 }
 
 function announceSent(names: string[], failures: string[]): void {
@@ -66,13 +65,19 @@ export function useShareSending(target: ShareTarget, onSent: () => void): ShareS
   async function sendTo(friends: FriendUser[], message: string): Promise<void> {
     setIsSending(true)
     setError('')
-    const outcomes = await shareWithEach(await preparedTarget(target), friends, message)
+    const friendIds = friends.map(({ id }) => id)
+    const result = await postShare(await preparedTarget(target), friendIds, message)
     setIsSending(false)
     // The session ended on the server: RequireAuth sends the user to /login.
-    if (outcomes === null) {
+    if (result.status === 'unauthenticated') {
       dropUser()
       return
     }
+    if (result.status === 'failed') {
+      setError(result.message)
+      return
+    }
+    const outcomes = friends.map((friend) => namedOutcome(friend, result.outcomes))
     const names = sharedNames(outcomes)
     // Nobody got it: the sheet stays open with the reasons, so the choice can change.
     if (names.length === 0) {

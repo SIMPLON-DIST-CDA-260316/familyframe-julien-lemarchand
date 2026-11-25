@@ -2,6 +2,7 @@ import { AppError } from '../../errors/app-error.js'
 import type { UploadedImage } from '../../lib/cloudinary.js'
 import { destroyUnusedImage } from '../../lib/image-uses.js'
 import type { Logger } from '../../lib/logger.js'
+import type { NewSend, SendRecord } from '../sends/sends.repository.js'
 import {
   parseCollectionFilter,
   parseCursor,
@@ -14,6 +15,7 @@ import type { PhotoRecord, PhotosRepository } from './photos.repository.js'
 import {
   type DeviceShare,
   type LibraryShare,
+  type ShareResult,
   shareFromDevice,
   shareFromLibrary,
 } from './photos.share.js'
@@ -45,6 +47,8 @@ export type PhotosServiceDeps = {
   deleteImage: (cloudinaryId: string) => Promise<void>
   // The friendships service's rule: a photo goes only to an accepted friend.
   areFriends: (userId: string, otherUserId: string) => Promise<boolean>
+  // The sends repository's create: one history line per send action.
+  recordSend: (send: NewSend) => Promise<SendRecord>
   logger: Logger
 }
 
@@ -55,10 +59,10 @@ export type PhotosService = {
   listUnopened: (ownerId: string) => Promise<PhotoRecord[]>
   // The opened photo joins the library: the controller sends it to the owner's room.
   openPhoto: (opening: PhotoOpening) => Promise<PhotoRecord>
-  // Returns the friend's new photo: the controller sends it to the friend's room.
-  shareFromLibrary: (share: LibraryShare) => Promise<PhotoRecord>
-  // The file lands in the friend's library only, not in the sender's.
-  shareFromDevice: (share: DeviceShare) => Promise<PhotoRecord>
+  // Returns the friends' new photos: the controller sends each one to its owner's room.
+  shareFromLibrary: (share: LibraryShare) => Promise<ShareResult>
+  // The file lands in the friends' libraries only, not in the sender's.
+  shareFromDevice: (share: DeviceShare) => Promise<ShareResult>
 }
 
 // The image stays while another photo or a send uses it.

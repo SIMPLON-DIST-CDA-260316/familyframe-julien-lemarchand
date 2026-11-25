@@ -51,6 +51,9 @@ docs {
   (`memberId`, `adminId`, par `GET /api/auth/me`), rend les deux comptes amis
   le temps de ses requêtes, puis supprime cette amitié. Les photos que l'admin
   y reçoit restent après la fin de l'amitié : `photos/delete` les supprime.
+  Chaque envoi entre dans l'historique du membre ; ceux de `photos/share/`
+  gardent leur image Cloudinary jusqu'à `sends/`, lancé après `photos/`
+  (ordre alphabétique des dossiers sans `seq`), qui les retire.
 
   Environnement `Prod` : la stack de prod ne publie pas le port 3000, l'API
   se joint par le proxy du client (`http://localhost:5180/api`). La prod n'a

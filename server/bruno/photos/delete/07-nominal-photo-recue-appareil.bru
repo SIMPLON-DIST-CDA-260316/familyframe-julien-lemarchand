@@ -37,6 +37,7 @@ script:post-response {
 docs {
   NOMINAL → 204 : l'admin supprime le fichier reçu dans `share/08`, jamais
   ouvert : une photo non ouverte se supprime comme les autres. Aucune
-  autre photo ne renvoie à cette image : elle est détruite sur Cloudinary.
-  Le lancement finit sans photo de test ni amitié.
+  autre photo ne renvoie à cette image, mais l'envoi du membre
+  (`deviceSendId`) la garde jusqu'à `sends/delete`. Le dossier finit sans
+  photo de test ni amitié.
 }

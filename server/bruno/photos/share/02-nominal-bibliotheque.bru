@@ -12,7 +12,7 @@ post {
 
 body:json {
   {
-    "friendId": "{{adminId}}",
+    "friendIds": ["{{adminId}}", "{{memberId}}"],
     "message": "  Joyeux anniversaire !  "
   }
 }
@@ -38,16 +38,14 @@ script:pre-request {
 
 assert {
   res.status: eq 201
-  res.body.id: isString
-  res.body.senderName: eq {{memberDisplayName}}
-  res.body.message: eq Joyeux anniversaire !
+  res.body.send.id: isString
+  res.body.send.message: eq Joyeux anniversaire !
+  res.body.send.recipients: length 1
+  res.body.send.recipients[0].id: eq {{adminId}}
 }
 
 script:post-response {
   const axios = require('axios')
-  if (res.body.id) {
-    bru.setVar('sharedPhotoId', res.body.id)
-  }
   // path is /api/photos (the library) or /api/photos/unopened (the photos waiting).
   const photosOf = async (cookie, path) => {
     const list = await axios.get(`${bru.getEnvVar('baseUrl')}${path}`, {
@@ -55,31 +53,45 @@ script:post-response {
     })
     return list.data.photos
   }
-  test('la photo reçue attend l\'admin, non ouverte, avec le nom et le message', async () => {
-    const received = (await photosOf(bru.getVar('adminCookie'), '/api/photos/unopened')).find(
-      ({ id }) => id === res.body.id,
-    )
-    expect(received?.senderName).to.equal(bru.getEnvVar('memberDisplayName'))
+  // The newest photo the member sent to the admin: the list is newest first.
+  const received = (await photosOf(bru.getVar('adminCookie'), '/api/photos/unopened')).find(
+    ({ senderName }) => senderName === bru.getEnvVar('memberDisplayName'),
+  )
+  if (res.body.send?.id && received) {
+    bru.setVar('librarySendId', res.body.send.id)
+    bru.setVar('sharedPhotoId', received.id)
+  }
+  test('une issue par ami : l\'admin l\'a reçue, pas le membre lui-même', () => {
+    const statusOf = (friendId) =>
+      res.body.outcomes.find((outcome) => outcome.friendId === friendId)?.status
+    expect(statusOf(bru.getVar('adminId'))).to.equal('sent')
+    expect(statusOf(bru.getVar('memberId'))).to.equal('not_friends')
+  })
+  test('la photo reçue attend l\'admin, non ouverte, avec le message', () => {
     expect(received?.message).to.equal('Joyeux anniversaire !')
   })
   test('elle n\'est pas encore dans la bibliothèque de l\'admin', async () => {
     const ids = (await photosOf(bru.getVar('adminCookie'), '/api/photos')).map(({ id }) => id)
-    expect(ids).to.not.include(res.body.id)
+    expect(ids).to.not.include(received?.id)
   })
   test('la bibliothèque du membre ne change pas', async () => {
     const ids = (await photosOf(bru.getVar('sessionCookie'), '/api/photos')).map(({ id }) => id)
-    expect(ids).to.not.include(res.body.id)
+    expect(ids).to.not.include(received?.id)
     expect(ids).to.include(bru.getVar('createdPhotoId'))
   })
 }
 
 docs {
-  NOMINAL → 201 avec la nouvelle photo de l'admin, `senderName` `Membre`.
-  Le script de départ rend le membre et l'admin amis (demande puis
-  acceptation, id dans `shareFriendshipId`). La photo reçue pointe vers la
-  même image Cloudinary que celle du membre, et le message sans les espaces
-  autour (« Joyeux anniversaire ! »). Son id va dans `sharedPhotoId`.
-  Le script vérifie qu'elle attend l'admin dans `GET /api/photos/unopened`
-  avec le nom du membre et le message, qu'elle n'est pas encore dans sa
-  bibliothèque, et que la bibliothèque du membre ne gagne pas de photo.
+  NOMINAL → 201 avec l'envoi enregistré (`send`) et une issue par ami. Le
+  script de départ rend le membre et l'admin amis (demande puis
+  acceptation, id dans `shareFriendshipId`). La photo part à l'admin et au
+  membre lui-même, en une requête : l'admin la reçoit (`sent`), le membre
+  non (`not_friends`), et l'envoi ne nomme que l'admin. Le message est
+  gardé sans les espaces autour (« Joyeux anniversaire ! »). L'id de
+  l'envoi va dans `librarySendId` (repris par `sends/`), celui de la photo
+  reçue, lue dans `GET /api/photos/unopened` de l'admin, dans
+  `sharedPhotoId`. Elle pointe vers la même image Cloudinary que celle du
+  membre ; le script vérifie qu'elle porte le message, qu'elle n'est pas
+  encore dans la bibliothèque de l'admin, et que celle du membre ne gagne
+  pas de photo.
 }

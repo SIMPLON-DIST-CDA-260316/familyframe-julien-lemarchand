@@ -25,13 +25,6 @@ describe('toErrorResponse', () => {
     })
   })
 
-  it('answers a share to someone who is not an accepted friend with 403', () => {
-    expect(toErrorResponse(new AppError('NOT_FRIENDS'))).toEqual({
-      status: 403,
-      body: { error: 'NOT_FRIENDS' },
-    })
-  })
-
   it('answers an unknown route with 404', () => {
     expect(toErrorResponse(new AppError('ROUTE_NOT_FOUND'))).toEqual({
       status: 404,

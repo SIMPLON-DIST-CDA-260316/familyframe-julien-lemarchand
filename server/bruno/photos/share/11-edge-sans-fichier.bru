@@ -11,7 +11,7 @@ post {
 }
 
 body:multipart-form {
-  friendId: {{adminId}}
+  friendIds: {{adminId}}
 }
 
 assert {
@@ -20,6 +20,6 @@ assert {
 }
 
 docs {
-  EDGE → 400 PHOTO_MISSING : un `friendId` mais aucun fichier dans le champ
+  EDGE → 400 PHOTO_MISSING : un ami dans `friendIds` mais aucun fichier dans le champ
   `photo`. Le fichier est vérifié en premier.
 }

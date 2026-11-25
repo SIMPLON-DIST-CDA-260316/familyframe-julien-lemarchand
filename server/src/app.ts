@@ -36,6 +36,7 @@ import { createSelectionsController } from './features/selections/selections.con
 import { createSelectionsRepository } from './features/selections/selections.repository.js'
 import { createSelectionsRouter } from './features/selections/selections.routes.js'
 import { createSelectionsService } from './features/selections/selections.service.js'
+import { createSendsRepository } from './features/sends/sends.repository.js'
 import {
   avatarUrl,
   deleteImage,
@@ -74,6 +75,7 @@ function assemblePhotosRouter(
     uploadImage,
     deleteImage,
     areFriends,
+    recordSend: createSendsRepository(prisma).create,
     logger,
   })
   return createPhotosRouter(createPhotosController(service, io))

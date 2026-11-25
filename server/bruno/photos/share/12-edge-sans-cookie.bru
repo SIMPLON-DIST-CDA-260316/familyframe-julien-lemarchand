@@ -12,7 +12,7 @@ post {
 
 body:multipart-form {
   photo: @file(fixtures/photo.png) @contentType(image/png)
-  friendId: {{adminId}}
+  friendIds: {{adminId}}
 }
 
 script:pre-request {

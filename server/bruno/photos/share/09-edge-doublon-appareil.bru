@@ -12,16 +12,18 @@ post {
 
 body:multipart-form {
   photo: @file(fixtures/photo.jpg) @contentType(image/jpeg)
-  friendId: {{adminId}}
+  friendIds: {{adminId}}
 }
 
 assert {
-  res.status: eq 409
-  res.body.error: eq PHOTO_DUPLICATE
+  res.status: eq 200
+  res.body.send: isNull
+  res.body.outcomes[0].status: eq duplicate
 }
 
 docs {
-  EDGE → 409 PHOTO_DUPLICATE : `photo.jpg`, que l'admin a reçu dans `02`.
-  Le SHA-256 est comparé à la bibliothèque de l'ami avant Sharp et
-  Cloudinary : aucune image n'est envoyée.
+  EDGE → 200, `send` à `null` et l'issue `duplicate` : `photo.jpg`, que
+  l'admin a reçu dans `02`. Le SHA-256 est comparé à la bibliothèque de
+  l'ami avant Sharp et Cloudinary : personne ne peut la recevoir, aucune
+  image n'est envoyée.
 }

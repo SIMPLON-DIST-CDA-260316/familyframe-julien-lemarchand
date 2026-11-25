@@ -8,6 +8,9 @@ export const OBJECT_ID_PATTERN = /^[0-9a-f]{24}$/i
 // A note on a postcard, not a letter: it has to fit under the photo on a frame.
 export const MAX_MESSAGE_LENGTH = 200
 
+// A family send is a handful of people: a longer list is no form the page sends.
+export const MAX_RECIPIENTS = 50
+
 export type UploadedFile = { buffer: Buffer; mimetype: string }
 
 export function parseFile(file: UploadedFile | undefined): UploadedFile {
@@ -35,6 +38,21 @@ export function parseMessage(message: unknown): string | undefined {
     throw new AppError('MESSAGE_INVALID')
   }
   return trimmedMessage === '' ? undefined : trimmedMessage
+}
+
+// JSON gives an array; multipart gives a string for one friend, an array for several. Each id
+// stays as sent: one that is no accepted friend's is answered per friend, not here. A friend
+// chosen twice receives the photo once.
+export function parseFriendIds(friendIds: unknown): string[] {
+  const list = typeof friendIds === 'string' ? [friendIds] : friendIds
+  if (!Array.isArray(list) || list.length === 0 || list.length > MAX_RECIPIENTS) {
+    throw new AppError('BODY_INVALID')
+  }
+  const textIds = list.filter((friendId): friendId is string => typeof friendId === 'string')
+  if (textIds.length !== list.length) {
+    throw new AppError('BODY_INVALID')
+  }
+  return [...new Set(textIds)]
 }
 
 // Prisma fails on an id that is not an ObjectId: that would be a 500, not a 404.

@@ -12,7 +12,7 @@ post {
 
 body:json {
   {
-    "friendId": "{{adminId}}"
+    "friendIds": ["{{adminId}}"]
   }
 }
 
@@ -43,13 +43,15 @@ script:pre-request {
 }
 
 assert {
-  res.status: eq 403
-  res.body.error: eq NOT_FRIENDS
+  res.status: eq 200
+  res.body.send: isNull
+  res.body.outcomes[0].status: eq not_friends
 }
 
 docs {
-  EDGE → 403 NOT_FRIENDS : le membre envoie sa photo (`create/01`) à
-  l'admin, qui n'est pas encore son ami. Le script de départ range les ids
+  EDGE → 200, `send` à `null` et l'issue `not_friends` pour l'admin : le
+  membre envoie sa photo (`create/01`) à l'admin, qui n'est pas encore son
+  ami. Personne ne l'a reçue : aucun envoi n'entre dans l'historique. Le script de départ range les ids
   des deux comptes dans `memberId` et `adminId`, puis supprime toute amitié
   membre-admin laissée par un lancement interrompu.
 }

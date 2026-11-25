@@ -36,5 +36,7 @@ script:post-response {
 docs {
   NOMINAL → 204 : l'admin supprime la photo reçue dans `share/02`. Le
   membre a déjà supprimé l'original (`02`) : c'était la dernière photo qui
-  renvoyait à l'image, le serveur détruit donc l'image Cloudinary.
+  renvoyait à l'image, mais l'envoi du membre (`librarySendId`) y renvoie
+  encore. L'image reste jusqu'à `sends/delete`, qui retire cet envoi de
+  l'historique.
 }

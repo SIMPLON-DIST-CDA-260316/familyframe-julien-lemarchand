@@ -1,13 +1,13 @@
 import { createHash } from 'node:crypto'
 import { AppError } from '../../errors/app-error.js'
+import type { UploadedImage } from '../../lib/cloudinary.js'
 import type { NewPhoto, PhotoRecord } from './photos.repository.js'
 import type { PhotosServiceDeps } from './photos.service.js'
 
-// senderId and message only when the file goes to a friend's library.
-export type NewUpload = { ownerId: string; senderId?: string; message?: string; buffer: Buffer }
+export type NewUpload = { ownerId: string; buffer: Buffer }
 
 // The original bytes, before sharp: its output is not guaranteed to be stable.
-function sha256Of(buffer: Buffer): string {
+export function sha256Of(buffer: Buffer): string {
   return createHash('sha256').update(buffer).digest('hex')
 }
 
@@ -75,18 +75,23 @@ async function saveRecord(deps: PhotosServiceDeps, photo: NewPhoto): Promise<Pho
   throw new AppError('PHOTO_DUPLICATE')
 }
 
-// From the received bytes to a saved photo of ownerId: the same steps for an upload to
-// one's own library and for a file sent to a friend.
+// The same steps for an upload to one's own library and for a file sent to friends.
+export async function uploadFrameImage(
+  deps: PhotosServiceDeps,
+  buffer: Buffer,
+): Promise<UploadedImage> {
+  const jpeg = await convertToFrameJpeg(deps, buffer)
+  // Cloudinary and database failures are ours: they stay 500s.
+  return deps.uploadImage(jpeg)
+}
+
+// From the received bytes to a saved photo of ownerId. A photo one adds oneself is already seen.
 export async function storeNewPhoto(
   deps: PhotosServiceDeps,
-  { ownerId, senderId, message, buffer }: NewUpload,
+  { ownerId, buffer }: NewUpload,
 ): Promise<PhotoRecord> {
   const sha256 = sha256Of(buffer)
   await rejectKnownFile(deps, ownerId, sha256)
-  const jpeg = await convertToFrameJpeg(deps, buffer)
-  // Cloudinary and database failures are ours: they stay 500s.
-  const image = await deps.uploadImage(jpeg)
-  // A photo one adds oneself is already seen; one a friend sends waits to be opened.
-  const isOpened = senderId === undefined
-  return saveRecord(deps, { ownerId, senderId, message, isOpened, ...image, sha256 })
+  const image = await uploadFrameImage(deps, buffer)
+  return saveRecord(deps, { ownerId, isOpened: true, ...image, sha256 })
 }

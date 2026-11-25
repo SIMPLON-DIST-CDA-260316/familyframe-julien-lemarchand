@@ -1,5 +1,6 @@
 import { errorMessage, UNAUTHORIZED_STATUS } from '@/api.ts'
 import { isPhoto, isPhotoPage, type Photo, type PhotoPage } from '@/photo.ts'
+import { isSendResult, type SendOutcome } from '@/sentPhoto.ts'
 import { postWithProgress } from '@/upload/postWithProgress.ts'
 
 // The server's MAX_PAGE_SIZE: the fewest requests for many photos.
@@ -13,10 +14,10 @@ export type UploadResult =
   | { status: 'failed'; message: string }
   | { status: 'unauthenticated' }
 
-// duplicate apart from failed: the share sheet names the friend who already has the photo.
+// done: the server answered for each friend; failed: the whole send was refused (photo gone,
+// network…), nobody received it.
 export type ShareResult =
-  | { status: 'shared' }
-  | { status: 'duplicate' }
+  | { status: 'done'; outcomes: SendOutcome[] }
   | { status: 'failed'; message: string }
   | { status: 'unauthenticated' }
 
@@ -109,21 +110,14 @@ export async function postPhoto(
   return { status: 'failed', message: errorMessage(response.body) }
 }
 
-function isDuplicateError(body: unknown): boolean {
-  return (
-    typeof body === 'object' && body !== null && 'error' in body && body.error === 'PHOTO_DUPLICATE'
-  )
-}
-
-// The sender's screen shows nothing of the new photo: the result carries no Photo.
+// One request for every friend chosen: the server records one send and answers per friend.
 async function sendShare(url: string, init: RequestInit): Promise<ShareResult> {
   try {
     const res = await fetch(url, { method: 'POST', ...init })
     if (res.status === UNAUTHORIZED_STATUS) return { status: 'unauthenticated' }
-    if (res.ok) return { status: 'shared' }
     // Not JSON when the dev proxy answers for a stopped API.
     const data: unknown = await res.json().catch(() => null)
-    if (isDuplicateError(data)) return { status: 'duplicate' }
+    if (res.ok && isSendResult(data)) return { status: 'done', outcomes: data.outcomes }
     return { status: 'failed', message: errorMessage(data) }
   } catch {
     // fetch rejects only on network failure.
@@ -134,27 +128,28 @@ async function sendShare(url: string, init: RequestInit): Promise<ShareResult> {
 // A blank message is no message: the field stays out of the request.
 export function postLibraryShare(
   photoId: string,
-  friendId: string,
+  friendIds: string[],
   message: string,
 ): Promise<ShareResult> {
   const trimmedMessage = message.trim()
   return sendShare(`/api/photos/${photoId}/share`, {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(
-      trimmedMessage === '' ? { friendId } : { friendId, message: trimmedMessage },
+      trimmedMessage === '' ? { friendIds } : { friendIds, message: trimmedMessage },
     ),
   })
 }
 
+// One friendIds field per friend: multipart has no arrays, the server reads the repeats as one.
 export function postDeviceShare(
   file: File,
-  friendId: string,
+  friendIds: string[],
   message: string,
 ): Promise<ShareResult> {
   const trimmedMessage = message.trim()
   const body = new FormData()
   body.append('photo', file)
-  body.append('friendId', friendId)
+  for (const friendId of friendIds) body.append('friendIds', friendId)
   if (trimmedMessage !== '') body.append('message', trimmedMessage)
   return sendShare('/api/photos/share', { body })
 }

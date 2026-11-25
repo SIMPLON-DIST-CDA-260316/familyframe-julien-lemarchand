@@ -1,8 +1,10 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { Logger } from '../../lib/logger.js'
+import type { SendRecord } from '../sends/sends.repository.js'
 import { MAX_MESSAGE_LENGTH, type UploadedFile } from './photos.input.js'
 import type { PhotoRecord, PhotosRepository, StoredPhoto } from './photos.repository.js'
 import { createPhotosService, type PhotosServiceDeps } from './photos.service.js'
+import type { ShareResult } from './photos.share.js'
 
 const SENDER_ID = '6b044f9d56a44767c7079b01'
 const FRIEND_ID = '6b044f9d56a44767c7079b02'
@@ -28,6 +30,15 @@ const COPY: PhotoRecord = {
   message: 'Joyeux anniversaire !',
   isOpened: false,
 }
+const SEND: SendRecord = {
+  id: '6b044f9d56a44767c7079c01',
+  senderId: SENDER_ID,
+  recipientIds: [FRIEND_ID],
+  ...IMAGE,
+  message: 'Joyeux anniversaire !',
+  createdAt: new Date('2026-11-24T10:00:00Z'),
+  recipients: [{ id: FRIEND_ID, displayName: 'Mamie' }],
+}
 const PNG_FILE: UploadedFile = { buffer: Buffer.from('raw png'), mimetype: 'image/png' }
 const NOT_TEXT_MESSAGES: unknown[] = [42, ['un', 'deux'], { text: 'bonjour' }]
 
@@ -51,6 +62,7 @@ function makeDeps() {
     uploadImage: vi.fn<PhotosServiceDeps['uploadImage']>().mockResolvedValue(IMAGE),
     deleteImage: vi.fn<PhotosServiceDeps['deleteImage']>().mockResolvedValue(undefined),
     areFriends: vi.fn<PhotosServiceDeps['areFriends']>().mockResolvedValue(true),
+    recordSend: vi.fn<PhotosServiceDeps['recordSend']>().mockResolvedValue(SEND),
     logger: {
       info: vi.fn<Logger['info']>(),
       warn: vi.fn<Logger['warn']>(),
@@ -59,20 +71,20 @@ function makeDeps() {
   }
 }
 
-function shareWithMessage(deps: PhotosServiceDeps, message: unknown): Promise<PhotoRecord> {
+function shareWithMessage(deps: PhotosServiceDeps, message: unknown): Promise<ShareResult> {
   return createPhotosService(deps).shareFromLibrary({
     senderId: SENDER_ID,
     photoId: ORIGINAL.id,
-    friendId: FRIEND_ID,
+    friendIds: [FRIEND_ID],
     message,
   })
 }
 
-function sendFileWithMessage(deps: PhotosServiceDeps, message: unknown): Promise<PhotoRecord> {
+function sendFileWithMessage(deps: PhotosServiceDeps, message: unknown): Promise<ShareResult> {
   return createPhotosService(deps).shareFromDevice({
     senderId: SENDER_ID,
     file: PNG_FILE,
-    friendId: FRIEND_ID,
+    friendIds: [FRIEND_ID],
     message,
   })
 }
@@ -85,6 +97,16 @@ describe('the message of a shared photo', () => {
 
     expect(deps.repository.create).toHaveBeenCalledWith(
       expect.objectContaining({ ownerId: FRIEND_ID, message: 'Joyeux anniversaire !' }),
+    )
+  })
+
+  it('goes with the history line too, trimmed', async () => {
+    const deps = makeDeps()
+
+    await shareWithMessage(deps, '  Joyeux anniversaire !  ')
+
+    expect(deps.recordSend).toHaveBeenCalledWith(
+      expect.objectContaining({ message: 'Joyeux anniversaire !' }),
     )
   })
 

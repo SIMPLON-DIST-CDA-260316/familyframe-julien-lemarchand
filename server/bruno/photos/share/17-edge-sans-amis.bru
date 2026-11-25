@@ -1,0 +1,28 @@
+meta {
+  name: Edge - aucun ami choisi
+  type: http
+  seq: 17
+}
+
+post {
+  url: {{baseUrl}}/api/photos/{{createdPhotoId}}/share
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "friendIds": []
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq BODY_INVALID
+}
+
+docs {
+  EDGE → 400 BODY_INVALID : une liste d'amis vide. La page ne l'envoie
+  jamais (le bouton reste grisé) : c'est une requête mal formée, refusée
+  avant toute lecture en base.
+}

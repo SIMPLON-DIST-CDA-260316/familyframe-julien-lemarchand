@@ -16,7 +16,6 @@ export type ApiErrorCode =
   | 'UNAUTHENTICATED'
   | 'INVALID_CREDENTIALS'
   | 'FORBIDDEN'
-  | 'NOT_FRIENDS'
   | 'ROUTE_NOT_FOUND'
   | 'PHOTO_NOT_FOUND'
   | 'INVITATION_NOT_FOUND'
@@ -107,6 +106,38 @@ export type PhotoPage = {
 
 // Newest first, all at once: a handful of photos waiting, not a library to page through.
 export type UnopenedPhotos = { photos: Photo[] }
+
+// A friend named in a history line, under their current name, as on a received photo.
+export type SendRecipient = { id: string; displayName: string }
+
+// One line of the sender's history: one send action, even to several friends. recipients lists
+// only the friends who received it; createdAt is an ISO 8601 string.
+export type SentPhoto = {
+  id: string
+  url: string
+  thumbnailUrl: string
+  createdAt: string
+  message: string | null
+  recipients: SendRecipient[]
+}
+
+// Newest first; nextCursor as for the library's pages.
+export type SendPage = {
+  sends: SentPhoto[]
+  nextCursor: string | null
+}
+
+// not_friends: no accepted friend's id (unknown, pending, oneself, malformed); duplicate: the
+// friend already has this file.
+export type SendOutcomeStatus = 'sent' | 'duplicate' | 'not_friends'
+
+export type SendOutcome = { friendId: string; status: SendOutcomeStatus }
+
+// send is null when nobody received the photo: nothing joins the history then.
+export type SendResult = {
+  send: SentPhoto | null
+  outcomes: SendOutcome[]
+}
 
 // photoIds: the owner's photos, in the order they were added; a deleted photo is not listed.
 // coverUrl: the signed thumbnail of its newest photo. oldestPhotoAt and newestPhotoAt: ISO dates

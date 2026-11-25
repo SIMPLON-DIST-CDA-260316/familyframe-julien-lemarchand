@@ -1,11 +1,13 @@
 import type { Request, Response } from 'express'
 import { deliveryUrls } from '../../lib/cloudinary.js'
 import type { SocketServer } from '../../lib/socket-types.js'
-import type { Photo, PhotoPage, UnopenedPhotos } from '../../types.js'
+import type { Photo, PhotoPage, SendResult, UnopenedPhotos } from '../../types.js'
 import { currentUser } from '../auth/auth.guard.js'
 import { userRoom } from '../auth/auth.socket.js'
+import { toSentPhotoDto } from '../sends/sends.dto.js'
 import type { PhotoRecord } from './photos.repository.js'
 import type { PhotosService } from './photos.service.js'
+import type { ShareResult } from './photos.share.js'
 
 export type PhotosController = {
   list: (req: Request, res: Response) => Promise<void>
@@ -38,11 +40,15 @@ function announceNewPhoto({ io }: ControllerDeps, res: Response, record: PhotoRe
   res.status(201).json(photo)
 }
 
-// A shared photo waits unopened: the friend's pages announce it instead of showing it.
-function announceReceivedPhoto({ io }: ControllerDeps, res: Response, record: PhotoRecord): void {
-  const photo = toPhotoDto(record)
-  io.to(userRoom(record.ownerId)).emit('photo:received', photo)
-  res.status(201).json(photo)
+// A shared photo waits unopened: each friend's pages announce it instead of showing it. 201 only
+// when the send was recorded, that is when at least one friend received the photo.
+function announceSend({ io }: ControllerDeps, res: Response, result: ShareResult): void {
+  for (const copy of result.copies) {
+    io.to(userRoom(copy.ownerId)).emit('photo:received', toPhotoDto(copy))
+  }
+  const send = result.send === null ? null : toSentPhotoDto(result.send)
+  const body: SendResult = { send, outcomes: result.outcomes }
+  res.status(send === null ? 200 : 201).json(body)
 }
 
 async function list({ service }: ControllerDeps, req: Request, res: Response): Promise<void> {
@@ -94,30 +100,30 @@ async function open(
   res.json(photo)
 }
 
-// The new photo is the friend's: it goes to their room, the sender's library does not change.
+// The new photos are the friends': they go to their rooms, the sender's library does not change.
 async function shareFromLibrary(
   deps: ControllerDeps,
   req: Request<{ id: string }>,
   res: Response,
 ): Promise<void> {
-  const record = await deps.service.shareFromLibrary({
+  const result = await deps.service.shareFromLibrary({
     senderId: currentUser(req).id,
     photoId: req.params.id,
-    friendId: req.body?.friendId,
+    friendIds: req.body?.friendIds,
     message: req.body?.message,
   })
-  announceReceivedPhoto(deps, res, record)
+  announceSend(deps, res, result)
 }
 
-// multer fills req.body with the text fields: friendId and message are two of them.
+// multer fills req.body with the text fields: friendIds and message are two of them.
 async function shareFromDevice(deps: ControllerDeps, req: Request, res: Response): Promise<void> {
-  const record = await deps.service.shareFromDevice({
+  const result = await deps.service.shareFromDevice({
     senderId: currentUser(req).id,
     file: req.file,
-    friendId: req.body?.friendId,
+    friendIds: req.body?.friendIds,
     message: req.body?.message,
   })
-  announceReceivedPhoto(deps, res, record)
+  announceSend(deps, res, result)
 }
 
 export function createPhotosController(service: PhotosService, io: SocketServer): PhotosController {

@@ -12,7 +12,7 @@ post {
 
 body:multipart-form {
   photo: @file(fixtures/photo.png) @contentType(image/png)
-  friendId: {{inviteeId}}
+  friendIds: {{inviteeId}}
 }
 
 script:pre-request {
@@ -38,21 +38,27 @@ script:pre-request {
 
 assert {
   res.status: eq 201
-  res.body.id: isString
+  res.body.send.id: isString
 }
 
 script:post-response {
   const axios = require('axios')
-  bru.setVar('unopenedPhotoId', res.body.id)
+  const baseUrl = bru.getEnvVar('baseUrl')
+  // The answer is the member's send: the photo itself is read on the throwaway account's side,
+  // newest first.
+  const { data } = await axios.get(`${baseUrl}/api/photos/unopened`, {
+    headers: { Cookie: bru.getVar('inviteeCookie') },
+  })
+  bru.setVar('unopenedPhotoId', data.photos[0].id)
   // The friendship was only for this photo: the member keeps no tie to the throwaway account.
-  await axios.delete(
-    `${bru.getEnvVar('baseUrl')}/api/friendships/${bru.getVar('collectionFriendshipId')}`,
-    { headers: { Cookie: bru.getVar('sessionCookie') } },
-  )
+  await axios.delete(`${baseUrl}/api/friendships/${bru.getVar('collectionFriendshipId')}`, {
+    headers: { Cookie: bru.getVar('sessionCookie') },
+  })
 }
 
 docs {
   NOMINAL → 201. Préparation : le membre devient l'ami du compte jetable,
   lui envoie un fichier, puis l'amitié est supprimée. La photo attend le
-  compte jetable, non ouverte ; son id va dans `unopenedPhotoId`.
+  compte jetable, non ouverte ; son id, lu dans `GET /api/photos/unopened`
+  du compte jetable, va dans `unopenedPhotoId`.
 }

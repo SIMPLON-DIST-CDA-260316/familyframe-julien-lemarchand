@@ -44,6 +44,7 @@ function makeDeps() {
     uploadImage: vi.fn<PhotosServiceDeps['uploadImage']>().mockResolvedValue(IMAGE),
     deleteImage: vi.fn<PhotosServiceDeps['deleteImage']>().mockResolvedValue(undefined),
     areFriends: vi.fn<PhotosServiceDeps['areFriends']>(),
+    recordSend: vi.fn<PhotosServiceDeps['recordSend']>(),
     logger: {
       info: vi.fn<Logger['info']>(),
       warn: vi.fn<Logger['warn']>(),

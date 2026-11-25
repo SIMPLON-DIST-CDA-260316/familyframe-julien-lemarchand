@@ -12,16 +12,18 @@ post {
 
 body:json {
   {
-    "friendId": "{{adminId}}"
+    "friendIds": ["{{adminId}}"]
   }
 }
 
 assert {
-  res.status: eq 409
-  res.body.error: eq PHOTO_DUPLICATE
+  res.status: eq 200
+  res.body.send: isNull
+  res.body.outcomes[0].status: eq duplicate
 }
 
 docs {
-  EDGE → 409 PHOTO_DUPLICATE : la même photo, une seconde fois. L'admin a
-  déjà ce fichier (même SHA-256) depuis `02` : rien n'est écrit.
+  EDGE → 200, `send` à `null` et l'issue `duplicate` : la même photo, une
+  seconde fois. L'admin a déjà ce fichier (même SHA-256) depuis `02` : rien
+  n'est écrit, ni photo ni envoi.
 }

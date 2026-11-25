@@ -12,17 +12,19 @@ post {
 
 body:json {
   {
-    "friendId": "{{memberId}}"
+    "friendIds": ["{{memberId}}"]
   }
 }
 
 assert {
-  res.status: eq 403
-  res.body.error: eq NOT_FRIENDS
+  res.status: eq 200
+  res.body.send: isNull
+  res.body.outcomes[0].status: eq not_friends
 }
 
 docs {
-  EDGE → 403 NOT_FRIENDS : le membre s'envoie sa propre photo. On n'est pas
+  EDGE → 200, `send` à `null` et l'issue `not_friends` : le membre s'envoie
+  sa propre photo. On n'est pas
   son propre ami : même réponse qu'un compte inconnu ou une demande en
   attente.
 }

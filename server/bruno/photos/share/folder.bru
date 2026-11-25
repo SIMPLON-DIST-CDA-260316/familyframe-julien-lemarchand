@@ -4,23 +4,29 @@ meta {
 }
 
 docs {
-  `POST /api/photos/:id/share`, JSON `{ friendId, message }` : envoie une photo de sa
-  bibliothèque à un ami accepté. L'ami reçoit une nouvelle photo qui pointe
-  vers la même image Cloudinary (rien n'est renvoyé à Cloudinary), avec
-  `senderName`, le nom de l'expéditeur. `POST /api/photos/share`, multipart
-  (`photo`, `friendId` et `message`) : envoie un fichier de l'appareil, converti et
-  envoyé à Cloudinary comme un envoi normal, mais qui n'entre que dans la
-  bibliothèque de l'ami. Réponse : 201 avec la photo de l'ami, telle qu'il
-  la voit. Elle arrive non ouverte : hors de sa bibliothèque (`GET
-  /api/photos`), elle attend dans `GET /api/photos/unopened`. L'événement
-  Socket.IO `photo:received` part vers les connexions de l'ami seulement.
+  Un envoi est une seule requête pour un ou plusieurs amis.
+  `POST /api/photos/:id/share`, JSON `{ friendIds, message }` : envoie une
+  photo de sa bibliothèque ; chaque ami reçoit une nouvelle photo qui
+  pointe vers la même image Cloudinary (rien n'est renvoyé à Cloudinary).
+  `POST /api/photos/share`, multipart (`photo`, un champ `friendIds` par
+  ami, `message`) : envoie un fichier de l'appareil, converti et envoyé à
+  Cloudinary une seule fois, qui n'entre que dans les bibliothèques des
+  amis. Les photos reçues arrivent non ouvertes : hors de la bibliothèque
+  (`GET /api/photos`), elles attendent dans `GET /api/photos/unopened`, et
+  l'événement Socket.IO `photo:received` part vers les connexions de
+  chaque ami seulement.
 
-  Un `friendId` absent, mal formé, inconnu, en attente ou le sien répond
-  403 `NOT_FRIENDS` ; une photo d'un autre compte ou un id mal formé, 404
-  `PHOTO_NOT_FOUND` ; un fichier que l'ami a déjà (même SHA-256), 409
-  `PHOTO_DUPLICATE`. `message` est facultatif : du texte de 200 caractères au
-  plus, espaces autour retirés ; vide ou absent, pas de message. Trop long ou
-  pas du texte : 400 `MESSAGE_INVALID`, vérifié avant l'ami (`14` à `16`
+  Réponse : `{ send, outcomes }`. `outcomes` donne une issue par ami :
+  `sent`, `duplicate` (il a déjà ce fichier, même SHA-256) ou
+  `not_friends` (id mal formé, inconnu, en attente ou le sien). `send` est
+  la ligne d'historique de l'expéditeur, `{ id, url, thumbnailUrl,
+  createdAt, message, recipients }`, qui ne nomme que les amis qui ont
+  reçu la photo : 201 dans ce cas, 200 avec `send` à `null` quand personne
+  ne l'a reçue. Erreurs de toute la requête : `friendIds` absent, vide, de
+  plus de 50 ids ou pas fait de textes, 400 `BODY_INVALID` ; une photo d'un
+  autre compte ou un id de photo mal formé, 404 `PHOTO_NOT_FOUND` ;
+  `message` trop long (plus de 200 caractères, espaces autour retirés) ou
+  pas du texte, 400 `MESSAGE_INVALID`, vérifié avant les amis (`14` à `16`
   passent après la fin de l'amitié).
 
   Le membre envoie à l'admin. `01` lit les deux ids (`memberId`, `adminId`)
@@ -28,5 +34,7 @@ docs {
   interrompu ; `02` rend le membre et l'admin amis (`shareFriendshipId`) ;
   `13` supprime cette amitié. Les photos reçues par l'admin
   (`sharedPhotoId`, `deviceSharedPhotoId`) restent après la fin de
-  l'amitié : `delete/` les supprime en fin de lancement.
+  l'amitié : `delete/` les supprime en fin de lancement. Les deux envois
+  (`librarySendId`, `deviceSendId`) restent dans l'historique du membre
+  jusqu'à `sends/`.
 }

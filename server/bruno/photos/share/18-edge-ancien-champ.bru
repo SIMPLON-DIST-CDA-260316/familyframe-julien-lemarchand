@@ -1,0 +1,28 @@
+meta {
+  name: Edge - ancien champ friendId
+  type: http
+  seq: 18
+}
+
+post {
+  url: {{baseUrl}}/api/photos/{{createdPhotoId}}/share
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "friendId": "{{adminId}}"
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq BODY_INVALID
+}
+
+docs {
+  EDGE → 400 BODY_INVALID : l'ancien champ `friendId`, sans `friendIds`.
+  La liste est obligatoire et faite de textes : un nombre ou un objet à la
+  place d'un id répond de même.
+}
