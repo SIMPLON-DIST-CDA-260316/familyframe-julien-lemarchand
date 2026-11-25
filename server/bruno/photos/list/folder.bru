@@ -9,6 +9,13 @@ docs {
   100 (30 par défaut) ; `nextCursor` est l'id à passer en `cursor` pour la
   page suivante, `null` à la dernière.
 
+  `collectionId=<id>` ne garde que les photos de cette collection du compte
+  connecté, dans le même ordre et avec la même pagination. Une collection
+  d'un autre compte, inconnue ou un id mal formé : 404
+  `COLLECTION_NOT_FOUND` ; le paramètre répété : 400 `QUERY_INVALID`. `07` à
+  `13` passent par une collection neuve du membre, créée par `07` et
+  supprimée par `13`.
+
   Lancé entre `create` et `delete` (`seq: 2`) : il voit les deux photos que
   `create` vient d'ajouter, donc au moins deux pages de une photo.
 }

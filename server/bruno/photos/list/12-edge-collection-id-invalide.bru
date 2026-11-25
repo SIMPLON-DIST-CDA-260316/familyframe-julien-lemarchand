@@ -1,0 +1,23 @@
+meta {
+  name: Edge - id de collection invalide
+  type: http
+  seq: 12
+}
+
+get {
+  url: {{baseUrl}}/api/photos?collectionId=pas-un-id
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq COLLECTION_NOT_FOUND
+}
+
+docs {
+  EDGE → 404 COLLECTION_NOT_FOUND : un id qui n'est pas un ObjectId est une
+  collection inconnue de plus, comme sur les routes `/api/collections`. Un
+  paramètre répété (`?collectionId=a&collectionId=b`) répond 400
+  `QUERY_INVALID` : ce cas est dans `photos.service.list.test.ts`.
+}

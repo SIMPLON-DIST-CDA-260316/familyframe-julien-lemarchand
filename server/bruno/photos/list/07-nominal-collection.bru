@@ -1,0 +1,52 @@
+meta {
+  name: Nominal - photos d'une collection
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/photos?collectionId={{listCollectionId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const axios = require('axios')
+  if (!bru.getVar('createdPhotoId')) {
+    throw new Error('createdPhotoId absent : lancer le dossier photos en entier, create/01 doit passer')
+  }
+  // A script request does not get the collection headers: send the member's cookie itself.
+  const headers = { Cookie: bru.getVar('sessionCookie') }
+  const baseUrl = bru.getEnvVar('baseUrl')
+  // A new name at each run: the member's collections are those of the shared dev database.
+  const created = await axios.post(
+    `${baseUrl}/api/collections`,
+    { name: `Bruno liste ${Date.now()}` },
+    { headers },
+  )
+  bru.setVar('listCollectionId', created.data.id)
+  await axios.put(
+    `${baseUrl}/api/collections/${created.data.id}/photos/${bru.getVar('createdPhotoId')}`,
+    null,
+    { headers },
+  )
+}
+
+assert {
+  res.status: eq 200
+  res.body.photos.length: eq 1
+  res.body.nextCursor: isNull
+}
+
+script:post-response {
+  test('la photo attendue', () => {
+    expect(res.body.photos[0].id).to.equal(bru.getVar('createdPhotoId'))
+  })
+}
+
+docs {
+  NOMINAL → 200 : seules les photos de la collection, ici celle de
+  `create/01`, alors que la bibliothèque du membre en compte bien d'autres.
+  Le script de départ crée une collection neuve au nom du membre (un nom
+  horodaté, sa base est partagée) et y range la photo ; `13` la supprime.
+}

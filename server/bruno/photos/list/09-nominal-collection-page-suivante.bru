@@ -1,0 +1,36 @@
+meta {
+  name: Nominal - collection, page suivante
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/api/photos?collectionId={{listCollectionId}}&cursor={{collectionNextCursor}}&limit=1
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  // Without it the request would test the first page again.
+  if (!bru.getVar('collectionNextCursor')) {
+    throw new Error('collectionNextCursor absent : lancer le dossier photos en entier, list/08 doit passer')
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.photos.length: eq 1
+  res.body.nextCursor: isNull
+}
+
+script:post-response {
+  test('la photo attendue', () => {
+    expect(res.body.photos[0].id).to.equal(bru.getVar('createdPhotoId'))
+  })
+}
+
+docs {
+  NOMINAL → 200 : la page qui suit `08` reste dans la collection. Elle
+  donne la photo de `create/01`, et pas une photo plus ancienne de la
+  bibliothèque ; c'est la dernière page.
+}

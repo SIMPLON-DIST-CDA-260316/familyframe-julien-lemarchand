@@ -23,7 +23,13 @@ export type NewPhoto = {
   sha256: string
 }
 
-export type PageQuery = { ownerId: string; beforeId: string | undefined; take: number }
+// photoIds: only these photos, a collection's; undefined for the whole library.
+export type PageQuery = {
+  ownerId: string
+  beforeId: string | undefined
+  take: number
+  photoIds: string[] | undefined
+}
 
 export type PhotosRepository = {
   // Opened photos only: the library and the slideshow.
@@ -39,6 +45,8 @@ export type PhotosRepository = {
   // null unless this owner has a photo with this id, like findOwned.
   openOwned: (id: string, ownerId: string) => Promise<PhotoRecord | null>
   countByCloudinaryId: (cloudinaryId: string) => Promise<number>
+  // null unless id is one of ownerId's collections: someone else's answers like a missing one.
+  findCollectionPhotoIds: (id: string, ownerId: string) => Promise<string[] | null>
 }
 
 // isOpened is unset on photos saved before step 9: they count as opened. Prisma's
@@ -98,17 +106,35 @@ async function openOwned(
   return prisma.photo.findFirst({ where: { id, ownerId }, include: SENDER_NAME })
 }
 
+// Keyset on the id: an ObjectId starts with its creation time, so by id is newest first, and
+// "older than the cursor" is a single indexed range. A collection's dead ids match no photo.
+function findPage(
+  prisma: PrismaClient,
+  { ownerId, beforeId, take, photoIds }: PageQuery,
+): Promise<PhotoRecord[]> {
+  return prisma.photo.findMany({
+    where: { ownerId, id: { lt: beforeId, in: photoIds }, ...IS_OPENED },
+    orderBy: { id: 'desc' },
+    take,
+    include: SENDER_NAME,
+  })
+}
+
+async function findCollectionPhotoIds(
+  prisma: PrismaClient,
+  id: string,
+  ownerId: string,
+): Promise<string[] | null> {
+  const collection = await prisma.collection.findFirst({
+    where: { id, ownerId },
+    select: { photoIds: true },
+  })
+  return collection?.photoIds ?? null
+}
+
 export function createPhotosRepository(prisma: PrismaClient): PhotosRepository {
   return {
-    // Keyset on the id: an ObjectId starts with its creation time, so by id is newest
-    // first, and "older than the cursor" is a single indexed range.
-    findPage: ({ ownerId, beforeId, take }) =>
-      prisma.photo.findMany({
-        where: { ownerId, id: beforeId ? { lt: beforeId } : undefined, ...IS_OPENED },
-        orderBy: { id: 'desc' },
-        take,
-        include: SENDER_NAME,
-      }),
+    findPage: (query) => findPage(prisma, query),
     findUnopened: (ownerId) =>
       prisma.photo.findMany({
         where: { ownerId, isOpened: false },
@@ -122,5 +148,6 @@ export function createPhotosRepository(prisma: PrismaClient): PhotosRepository {
     deleteOwned: (id, ownerId) => deleteOwned(prisma, id, ownerId),
     openOwned: (id, ownerId) => openOwned(prisma, id, ownerId),
     countByCloudinaryId: (cloudinaryId) => prisma.photo.count({ where: { cloudinaryId } }),
+    findCollectionPhotoIds: (id, ownerId) => findCollectionPhotoIds(prisma, id, ownerId),
   }
 }

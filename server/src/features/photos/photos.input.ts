@@ -69,3 +69,18 @@ export function parseCursor(cursor: unknown): string | undefined {
   }
   return cursor
 }
+
+// undefined: the whole library. A repeated key is a malformed query; a malformed id is one more
+// unknown collection, as on the collections routes.
+export function parseCollectionFilter(collectionId: unknown): string | undefined {
+  if (collectionId === undefined) {
+    return undefined
+  }
+  if (typeof collectionId !== 'string') {
+    throw new AppError('QUERY_INVALID')
+  }
+  if (!OBJECT_ID_PATTERN.test(collectionId)) {
+    throw new AppError('COLLECTION_NOT_FOUND')
+  }
+  return collectionId
+}

@@ -2,6 +2,7 @@ import { AppError } from '../../errors/app-error.js'
 import type { UploadedImage } from '../../lib/cloudinary.js'
 import type { Logger } from '../../lib/logger.js'
 import {
+  parseCollectionFilter,
   parseCursor,
   parseFile,
   parseLimit,
@@ -25,8 +26,14 @@ export type PhotoDeletion = { ownerId: string; id: string }
 // id comes straight from the URL: validated here.
 export type PhotoOpening = { ownerId: string; id: string }
 
-// cursor and limit come straight from the query string: validated here, at the boundary.
-export type PageInput = { ownerId: string; cursor: unknown; limit: unknown }
+// cursor, limit and collectionId come straight from the query string: validated here, at the
+// boundary.
+export type PageInput = {
+  ownerId: string
+  cursor: unknown
+  limit: unknown
+  collectionId: unknown
+}
 
 export type RecordPage = { records: PhotoRecord[]; nextCursor: string | null }
 
@@ -119,14 +126,32 @@ async function openPhoto(
   return record
 }
 
+// undefined: the whole library. Someone else's collection answers like a missing one.
+async function findFilterPhotoIds(
+  repository: PhotosRepository,
+  ownerId: string,
+  collectionId: string | undefined,
+): Promise<string[] | undefined> {
+  if (collectionId === undefined) {
+    return undefined
+  }
+  const photoIds = await repository.findCollectionPhotoIds(collectionId, ownerId)
+  if (photoIds === null) {
+    throw new AppError('COLLECTION_NOT_FOUND')
+  }
+  return photoIds
+}
+
 // One record more than asked tells whether a next page exists, without a count query.
 async function listPage(
   { repository }: PhotosServiceDeps,
-  { ownerId, cursor, limit }: PageInput,
+  { ownerId, cursor, limit, collectionId }: PageInput,
 ): Promise<RecordPage> {
   const pageSize = parseLimit(limit)
   const beforeId = parseCursor(cursor)
-  const records = await repository.findPage({ ownerId, beforeId, take: pageSize + 1 })
+  const filterId = parseCollectionFilter(collectionId)
+  const photoIds = await findFilterPhotoIds(repository, ownerId, filterId)
+  const records = await repository.findPage({ ownerId, beforeId, take: pageSize + 1, photoIds })
   if (records.length <= pageSize) {
     return { records, nextCursor: null }
   }

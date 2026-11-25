@@ -1,0 +1,21 @@
+meta {
+  name: Edge - collection inconnue
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{baseUrl}}/api/photos?collectionId=000000000000000000000000
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq COLLECTION_NOT_FOUND
+}
+
+docs {
+  EDGE → 404 COLLECTION_NOT_FOUND : un ObjectId bien formé qui ne désigne
+  aucune collection.
+}

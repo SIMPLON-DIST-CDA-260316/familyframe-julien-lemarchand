@@ -1,0 +1,30 @@
+meta {
+  name: Edge - collection d'un autre compte
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/api/photos?collectionId={{listCollectionId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('listCollectionId') || !bru.getVar('adminCookie')) {
+    throw new Error('listCollectionId ou adminCookie absent : lancer toute la collection, auth/login/05 et photos/list/07 doivent passer')
+  }
+  // The admin asks for the member's collection.
+  req.setHeader('Cookie', bru.getVar('adminCookie'))
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq COLLECTION_NOT_FOUND
+}
+
+docs {
+  EDGE → 404 COLLECTION_NOT_FOUND : l'admin demande les photos d'une
+  collection du membre. Elle répond comme une collection inconnue : son
+  existence ne fuit pas.
+}

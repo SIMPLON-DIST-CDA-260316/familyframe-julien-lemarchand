@@ -50,6 +50,7 @@ async function list({ service }: ControllerDeps, req: Request, res: Response): P
     ownerId: currentUser(req).id,
     cursor: req.query.cursor,
     limit: req.query.limit,
+    collectionId: req.query.collectionId,
   })
   const page: PhotoPage = { photos: records.map(toPhotoDto), nextCursor }
   res.json(page)
