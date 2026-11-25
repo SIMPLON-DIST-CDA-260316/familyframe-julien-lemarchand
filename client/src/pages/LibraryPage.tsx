@@ -91,11 +91,13 @@ type PageTitleProps = Pick<LibraryContentProps, 'selected' | 'library'> & {
 }
 
 // A shown collection titles the page with its own name; « Toutes » keeps « Bibliothèque ».
+// The library's count only under « Toutes »: while a collection loads, the photos are its own
+// and « Bibliothèque · 3 photos » would count them as the library's.
 function PageTitle({ selected, library, allCardRef }: PageTitleProps): JSX.Element {
   if (selected.status === 'found') {
     return <CollectionTitle collection={selected.collection} fallbackRef={allCardRef} />
   }
-  return <LibraryTitle library={library} showsCount={isShowingPhotos(selected)} />
+  return <LibraryTitle library={library} showsCount={selected.status === 'all'} />
 }
 
 function LibraryContent(props: LibraryContentProps): JSX.Element {

@@ -21,7 +21,7 @@ type LibraryHeaderProps = {
 
 type LibraryTitleProps = {
   library: PhotoLibrary
-  // false over a collection that cannot be shown: its photos, if any were loaded, are stale.
+  // Only under « Toutes »: over a collection, the loaded photos are not the library's.
   showsCount: boolean
 }
 
