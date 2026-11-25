@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { errorMessage } from '@/api.ts'
 import { useAuth } from '@/auth/AuthContext.ts'
 import {
   failureMessages,
   firstName,
+  NOT_FRIEND_MESSAGE,
   type ShareOutcome,
   sentTitle,
   sharedNames,
@@ -45,7 +45,7 @@ function namedOutcome(friend: FriendUser, outcomes: SendOutcome[]): ShareOutcome
   const status = outcomes.find(({ friendId }) => friendId === friend.id)?.status
   if (status === 'sent') return { name, status: 'shared' }
   if (status === 'duplicate') return { name, status: 'duplicate' }
-  return { name, status: 'failed', message: errorMessage({ error: 'NOT_FRIENDS' }) }
+  return { name, status: 'failed', message: NOT_FRIEND_MESSAGE }
 }
 
 function announceSent(names: string[], failures: string[]): void {

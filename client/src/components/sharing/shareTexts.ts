@@ -4,6 +4,9 @@ export type ShareOutcome =
   | { name: string; status: 'duplicate' }
   | { name: string; status: 'failed'; message: string }
 
+// The not_friends outcome: unknown, pending, oneself, or removed from the friends meanwhile.
+export const NOT_FRIEND_MESSAGE = 'Cette personne ne fait pas partie de vos amis.'
+
 // A grid of faces has room for one word: « Marie-Claire Dupont » shows as « Marie-Claire ».
 export function firstName(displayName: string): string {
   return displayName.trim().split(/\s+/)[0]
