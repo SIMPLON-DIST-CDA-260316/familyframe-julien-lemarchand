@@ -2,6 +2,7 @@ import { type JSX, useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button.tsx'
 import { Input } from '@/components/ui/input.tsx'
 import { Label } from '@/components/ui/label.tsx'
+import { canShareLinks, shareLink } from '@/nativeShare.ts'
 
 const COPIED_FEEDBACK_MS = 2000
 
@@ -44,6 +45,12 @@ export function InvitationLink({ link }: { link: string }): JSX.Element {
       {'clipboard' in navigator && (
         <Button type="button" variant="outline" onClick={copy}>
           {isCopied ? 'Lien copié' : 'Copier le lien'}
+        </Button>
+      )}
+      {/* The phone's share sheet: the link goes straight into a message. Cancelling says nothing. */}
+      {canShareLinks() && (
+        <Button type="button" variant="outline" onClick={() => shareLink(link)}>
+          Partager le lien
         </Button>
       )}
       <p className="text-sm text-muted-foreground">

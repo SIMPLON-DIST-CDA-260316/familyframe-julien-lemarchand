@@ -3,6 +3,7 @@ import type { JSX } from 'react'
 import { PhotoActionsMenu } from '@/components/frame/PhotoActionsMenu.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import { PHOTO_INFO_ID } from '@/components/viewer/PhotoInfo.tsx'
+import { SharePhotoItem } from '@/components/viewer/SharePhotoItem.tsx'
 import { chromeClasses, VIEWER_BUTTON_CLASSES } from '@/components/viewer/viewerClasses.ts'
 import { cn } from '@/lib/utils.ts'
 import type { Photo } from '@/photo.ts'
@@ -98,7 +99,9 @@ export function ViewerTopBar({
         photo={photo}
         label="Actions sur la photo"
         className={VIEWER_BUTTON_CLASSES}
-      />
+      >
+        <SharePhotoItem photo={photo} />
+      </PhotoActionsMenu>
     </div>
   )
 }

@@ -9,6 +9,7 @@ Personne ne s'inscrit seul dans FamilyFrame : l'administrateur crée un lien d'i
 - Ouvrir la page « Invitations » depuis la barre du haut (entrée « Invitations » ; sur un téléphone, dans le menu du compte) ou depuis la bibliothèque (bouton « Inviter un proche sur FamilyFrame »). Ces deux accès n'apparaissent que pour l'administrateur.
 - Saisir l'adresse e-mail de la personne à inviter et créer le lien.
 - Copier le lien d'un clic avec « Copier le lien », ou le sélectionner pour le copier à la main.
+- Sur un téléphone, l'envoyer directement dans un message avec « Partager le lien ».
 - Transmettre le lien soi-même, par le moyen de son choix (SMS, message, e-mail personnel).
 
 **Règles**
@@ -24,6 +25,7 @@ Personne ne s'inscrit seul dans FamilyFrame : l'administrateur crée un lien d'i
 9. R-INV-09 · Le bouton « Copier le lien » n'apparaît que si l'appareil autorise la copie automatique ; sinon, le champ du lien se sélectionne en entier au toucher pour une copie manuelle. Après une copie réussie, le bouton affiche « Lien copié » pendant 2 secondes.
 10. R-INV-10 · Après une création réussie, le champ e-mail se vide et la liste des invitations se met à jour.
 11. R-INV-11 · L'application n'envoie aucun e-mail : c'est l'administrateur qui transmet le lien.
+12. R-INV-41 · Le bouton « Partager le lien » n'apparaît que sur un appareil qui sait partager vers ses autres applications (la plupart des téléphones) : il ouvre le menu de partage de l'appareil (Messages, WhatsApp, e-mail…) avec le lien. Renoncer au partage ne montre aucun message ; le lien reste affiché, à copier.
 
 **Messages affichés**
 

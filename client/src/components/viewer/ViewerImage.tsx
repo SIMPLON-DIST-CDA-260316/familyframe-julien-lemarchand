@@ -20,6 +20,9 @@ function imageStyle({ zoom, dragOffset }: ViewerGestures): CSSProperties {
   return { transform: zoomTransform(zoom, dragOffset), opacity: 1 - fade }
 }
 
+// Zoomed, the photo spreads over several screens: the 1920 px one, whatever the screen.
+const ZOOMED_SIZES = '400vw'
+
 // Only the photo shown follows the fingers: the others wait whole in their slides.
 export function ViewerImage({ photo, isCurrent, gestures, chrome }: ViewerImageProps): JSX.Element {
   return (
@@ -32,6 +35,9 @@ export function ViewerImage({ photo, isCurrent, gestures, chrome }: ViewerImageP
       )}
       style={isCurrent ? imageStyle(gestures) : undefined}
       src={photo.url}
+      // A phone's screen takes the 1280 px photo, a computer's the 1920 px one.
+      srcSet={`${photo.mediumUrl} 1280w, ${photo.url} 1920w`}
+      sizes={isCurrent && gestures.isZoomed ? ZOOMED_SIZES : '100vw'}
       alt={photoLabel(photo)}
       loading={isCurrent ? 'eager' : 'lazy'}
       decoding="async"
