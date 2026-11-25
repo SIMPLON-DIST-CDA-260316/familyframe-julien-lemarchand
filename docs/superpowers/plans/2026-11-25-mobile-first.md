@@ -4,8 +4,8 @@ status: done
 spec: docs/superpowers/specs/2026-11-25-mobile-first-design.md
 branch: feat/mobile-tabbar (PR A), feat/mobile-touch-targets (PR B), feat/frame-wake-lock (PR C), feat/viewer-chrome (PR D), feat/library-surface (PR E)
 worktree: false
-tasks_total: 17
-tasks_done: 17
+tasks_total: 18
+tasks_done: 18
 current_task: null
 last_commit: null
 last_updated: 2026-11-25
@@ -54,7 +54,7 @@ last_updated: 2026-11-25
 - **PR B `feat/mobile-touch-targets`**: Tasks 4 and 5.
 - **PR C `feat/frame-wake-lock`**: Tasks 6 and 6a.
 - **PR D `feat/viewer-chrome`**: Tasks 7 to 7c.
-- **PR E `feat/library-surface`** (after the author's phone test, added on top once PRs A to D were in the repo): Tasks 8 and 9, then this plan's follow-up.
+- **PR E `feat/library-surface`** (after the author's phone test, added on top once PRs A to D were in the repo): Tasks 8 to 10, with this plan's follow-ups.
 
 ## Baselines
 
@@ -2836,7 +2836,7 @@ index 13704ac..bbee259 100644
 
 **Scope:** `useHideOnScrollDown`; `AddPhotoFab` hides and returns, ring of page colour; R-BIB-48 amended.
 
-**Gate:** `pnpm check` and `pnpm typecheck` green. `pnpm build` and `pnpm test` green at the tip.
+**Gate:** `pnpm check` and `pnpm typecheck` green.
 
 - [x] **Final diff**
 
@@ -2953,6 +2953,107 @@ index bbee259..0ff278f 100644
  
 ~~~~
 
+### Task 10: Library photos line up with the page
+
+**Commit:** `fix(client): library photos line up with the page's edges`
+
+**Scope:** `PhotoGrid` (2 columns on a phone, ~12rem columns from `sm`), `PhotoList` and `PhotoListRow` edge to edge, « Charger plus » padding. No product rule changes.
+
+**Gate:** `pnpm check` and `pnpm typecheck` green; `pnpm build` and `pnpm test` green at the tip.
+
+- [x] **Final diff**
+
+~~~~diff
+diff --git a/client/src/components/frame/PhotoGrid.tsx b/client/src/components/frame/PhotoGrid.tsx
+index 6b3fada..e417c32 100644
+--- a/client/src/components/frame/PhotoGrid.tsx
++++ b/client/src/components/frame/PhotoGrid.tsx
+@@ -9,9 +9,14 @@ type PhotoGridProps = {
+   onSelect: (id: string) => void
+ }
+ 
++// Edge to edge with the page's header. Two columns on a phone: each tile carries a 44 px « … »
++// that would hide too much of a third-width photo. From sm, as many ~12rem columns as fit.
++const GRID_CLASSES =
++  'grid grid-cols-2 gap-2 sm:grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] sm:gap-4'
++
+ export function PhotoGrid({ photos, currentId, onSelect }: PhotoGridProps): JSX.Element {
+   return (
+-    <ul className="grid grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] gap-4 p-8">
++    <ul className={GRID_CLASSES}>
+       {photos.map((photo) => (
+         <PhotoGridTile
+           key={photo.id}
+diff --git a/client/src/components/frame/PhotoList.tsx b/client/src/components/frame/PhotoList.tsx
+index 833fb5c..819efb2 100644
+--- a/client/src/components/frame/PhotoList.tsx
++++ b/client/src/components/frame/PhotoList.tsx
+@@ -11,7 +11,8 @@ type PhotoListProps = {
+ 
+ export function PhotoList({ photos, currentId, onSelect }: PhotoListProps): JSX.Element {
+   return (
+-    <ul className="mx-auto flex max-w-3xl flex-col gap-1 p-8">
++    // The page's full width: thumbnails and « … » line up with the header's edges.
++    <ul className="flex flex-col gap-1">
+       {photos.map((photo) => (
+         <PhotoListRow
+           key={photo.id}
+diff --git a/client/src/components/frame/PhotoListRow.tsx b/client/src/components/frame/PhotoListRow.tsx
+index d4d48d4..d28c244 100644
+--- a/client/src/components/frame/PhotoListRow.tsx
++++ b/client/src/components/frame/PhotoListRow.tsx
+@@ -17,7 +17,8 @@ type PhotoListRowProps = {
+ 
+ export function PhotoListRow({ photo, isCurrent, onSelect }: PhotoListRowProps): JSX.Element {
+   return (
+-    // The ellipsis is a sibling of the row button: a button cannot hold a button.
++    // The ellipsis is a sibling of the row button: a button cannot hold a button. No side padding:
++    // the thumbnail and the ellipsis sit on the header's edges; pr-12 keeps the text off the ellipsis.
+     <li className="relative">
+       <button
+         type="button"
+@@ -25,7 +26,7 @@ export function PhotoListRow({ photo, isCurrent, onSelect }: PhotoListRowProps):
+         aria-current={isCurrent}
+         // The viewer focuses this row when it closes on this photo.
+         data-photo-id={photo.id}
+-        className="flex w-full items-center gap-4 rounded-xl p-2 pr-14 text-left outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring aria-[current=true]:ring-2 aria-[current=true]:ring-frame-accent"
++        className="flex w-full items-center gap-3 rounded-xl py-2 pr-12 text-left outline-none hover:bg-muted sm:gap-4 focus-visible:ring-3 focus-visible:ring-ring aria-[current=true]:ring-2 aria-[current=true]:ring-frame-accent"
+       >
+         <img
+           className="size-14 shrink-0 rounded-lg object-cover"
+@@ -35,7 +36,7 @@ export function PhotoListRow({ photo, isCurrent, onSelect }: PhotoListRowProps):
+           decoding="async"
+         />
+         <span className="flex min-w-0 flex-1 flex-col">
+-          <time dateTime={photo.createdAt} className="text-lg tabular-nums">
++          <time dateTime={photo.createdAt} className="truncate text-base tabular-nums sm:text-lg">
+             {ROW_DATE_FORMAT.format(new Date(photo.createdAt))}
+           </time>
+           {photo.senderName !== null && (
+@@ -49,7 +50,7 @@ export function PhotoListRow({ photo, isCurrent, onSelect }: PhotoListRowProps):
+         photo={photo}
+         label={`Actions : ${photoLabel(photo)}`}
+         theme="app"
+-        className="absolute top-1/2 right-3 -translate-y-1/2 rounded-full text-muted-foreground"
++        className="absolute top-1/2 right-0 -translate-y-1/2 rounded-full text-muted-foreground"
+       />
+     </li>
+   )
+diff --git a/client/src/components/library/LibrarySection.tsx b/client/src/components/library/LibrarySection.tsx
+index 92c5364..27cce7f 100644
+--- a/client/src/components/library/LibrarySection.tsx
++++ b/client/src/components/library/LibrarySection.tsx
+@@ -17,7 +17,7 @@ type LoadMoreButtonProps = Pick<PhotoLibrary, 'isLoadingMore' | 'loadMore'>
+ 
+ function LoadMoreButton({ isLoadingMore, loadMore }: LoadMoreButtonProps): JSX.Element {
+   return (
+-    <div className="flex justify-center px-4 pb-6 sm:px-8 sm:pb-8">
++    <div className="flex justify-center pt-6">
+       <Button variant="outline" onClick={loadMore} disabled={isLoadingMore}>
+         {isLoadingMore ? 'Chargement…' : 'Charger plus'}
+       </Button>
+~~~~
+
 ---
 
 ## Final verification (controller)
@@ -2983,4 +3084,5 @@ index bbee259..0ff278f 100644
   - Task 8: the panel drops `dark` and `bg-frame-background`. `PhotoActionsMenu` forced `dark` on its menu and dialogs, which portal to `body`; on the library they now follow the theme through a `theme` prop (`'dark'` by default for the frame and the viewer, `'app'` for the library). The tile's ⋯ needed `aria-expanded:bg-black/75`: the ghost variant's `aria-expanded:bg-muted` would turn the open pill light under white icons in the light theme. Pending tiles do not exist on this stack (step 14). R-BIB-28 « Remplacée », R-BIB-53 new, R-APP-34 amended.
   - Task 9: "hidden must not keep focus" and "focusing it shows it" are met together. The hidden button stays focusable (no `inert`); keyboard focus (`:focus-visible`) keeps it shown; any other focus (a tap, or a panel returning focus to it) is dropped before it hides. Spec D21.
   - Layout: the photo grid and list keep their padding, so desktop only loses the panel colour. At 360 px nothing gets wider.
-- **Gates for PR E:** `pnpm check` and `pnpm typecheck` green on each commit; at the tip `pnpm build` green and `pnpm test` → `Test Files  25 passed (25)`, `Tests  301 passed (301)`.
+- **PR E, widths** (the author's desktop screenshots at 2000 px, and the phone: « problème de cohérence sur la largeur des éléments et des conteneurs du contenu par rapport aux listes de photos, et sur mobile c'est pas fameux non plus »): the list sat in a narrower centred column (`max-w-3xl mx-auto p-8`), the grid inset by `p-8`, both leftovers of the black panel removed in Task 8. Task 10 aligns both with the page container (spec D22). Phone grid: 2 columns, not 3, because of the tile's 44 px « … ». At 360 px the date gets about 212 px (328 px container − 56 px thumbnail − 12 px gap − 48 px for the « … ») and « 30 sept. 2026, 23:59 » at 16 px needs about 170 px. No horizontal scroll at 360, 768 or 1280 px: the phone grid is `grid-cols-2` (`minmax(0, 1fr)`), and from `sm` the container (≥ 608 px) always fits one 12rem column. No product rule mentions widths or columns: `docs/produit/` unchanged.
+- **Gates for PR E:** `pnpm check` and `pnpm typecheck` green on each of the 5 commits; at the tip `pnpm build` green and `pnpm test` → `Test Files  25 passed (25)`, `Tests  301 passed (301)`.
