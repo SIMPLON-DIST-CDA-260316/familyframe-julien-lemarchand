@@ -4,8 +4,8 @@ status: done
 spec: docs/superpowers/specs/2026-11-25-library-timeline-design.md
 branch: feat/library-timeline
 worktree: false
-tasks_total: 4
-tasks_done: 4
+tasks_total: 5
+tasks_done: 5
 current_task: null
 last_commit: null
 last_updated: 2026-11-25
@@ -1372,7 +1372,7 @@ index 1bd4aaa..a0f92e5 100644
 
 **Scope:** `CollectionTitle`, `collectionSummary`, `LibraryTitle`, `LibraryHeader({ title })`, `PageTitle`; collection menu `w-max`; ARCHITECTURE.md page row; R-COL-23 new. Spec T10, T11.
 
-**Gate:** `pnpm check` and `pnpm typecheck` green. `pnpm build` and `pnpm test` green at the tip.
+**Gate:** `pnpm check` and `pnpm typecheck` green.
 
 - [x] **Final diff**
 
@@ -1687,6 +1687,94 @@ index a0f92e5..04291d3 100644
  
 ~~~~
 
+### Task 5: Split the list row under the function size limit
+
+**Commit:** `refactor(client): split the list row under the function size limit`
+
+**Scope:** `PhotoListRow` (43 lines since before this stack) splits into `RowText` and `ROW_CLASSES`; nothing changes on screen.
+
+**Gate:** `pnpm check` and `pnpm typecheck` green; `pnpm build` and `pnpm test` green at the tip.
+
+- [x] **Final diff**
+
+~~~~diff
+diff --git a/client/src/components/frame/PhotoListRow.tsx b/client/src/components/frame/PhotoListRow.tsx
+index 62801d5..4c8b409 100644
+--- a/client/src/components/frame/PhotoListRow.tsx
++++ b/client/src/components/frame/PhotoListRow.tsx
+@@ -6,6 +6,30 @@ import { photoLabel } from '@/photoLabel.ts'
+ // The day is in the group's header: a row tells the photos of that day apart by their time.
+ const ROW_TIME_FORMAT = new Intl.DateTimeFormat('fr-FR', { timeStyle: 'short' })
+ 
++// No side padding: the thumbnail and the ellipsis sit on the header's edges; pr-12 keeps the text
++// off the ellipsis.
++const ROW_CLASSES =
++  'flex w-full items-center gap-3 rounded-xl py-2 pr-12 text-left outline-none hover:bg-muted sm:gap-4 focus-visible:ring-3 focus-visible:ring-ring aria-[current=true]:ring-2 aria-[current=true]:ring-frame-accent'
++
++// The time, and who sent a received photo.
++function RowText({ photo }: { photo: Photo }): JSX.Element {
++  return (
++    <span className="flex min-w-0 flex-1 flex-col">
++      <time
++        dateTime={photo.createdAt}
++        className="truncate text-sm font-medium tabular-nums sm:text-base"
++      >
++        {ROW_TIME_FORMAT.format(new Date(photo.createdAt))}
++      </time>
++      {photo.senderName !== null && (
++        <span className="truncate text-sm text-muted-foreground">
++          Envoyée par {photo.senderName}
++        </span>
++      )}
++    </span>
++  )
++}
++
+ type PhotoListRowProps = {
+   photo: Photo
+   isCurrent: boolean
+@@ -14,8 +38,7 @@ type PhotoListRowProps = {
+ 
+ export function PhotoListRow({ photo, isCurrent, onSelect }: PhotoListRowProps): JSX.Element {
+   return (
+-    // The ellipsis is a sibling of the row button: a button cannot hold a button. No side padding:
+-    // the thumbnail and the ellipsis sit on the header's edges; pr-12 keeps the text off the ellipsis.
++    // The ellipsis is a sibling of the row button: a button cannot hold a button.
+     <li className="relative">
+       <button
+         type="button"
+@@ -23,7 +46,7 @@ export function PhotoListRow({ photo, isCurrent, onSelect }: PhotoListRowProps):
+         aria-current={isCurrent}
+         // The viewer focuses this row when it closes on this photo.
+         data-photo-id={photo.id}
+-        className="flex w-full items-center gap-3 rounded-xl py-2 pr-12 text-left outline-none hover:bg-muted sm:gap-4 focus-visible:ring-3 focus-visible:ring-ring aria-[current=true]:ring-2 aria-[current=true]:ring-frame-accent"
++        className={ROW_CLASSES}
+       >
+         <img
+           className="size-14 shrink-0 rounded-lg object-cover"
+@@ -32,19 +55,7 @@ export function PhotoListRow({ photo, isCurrent, onSelect }: PhotoListRowProps):
+           loading="lazy"
+           decoding="async"
+         />
+-        <span className="flex min-w-0 flex-1 flex-col">
+-          <time
+-            dateTime={photo.createdAt}
+-            className="truncate text-sm font-medium tabular-nums sm:text-base"
+-          >
+-            {ROW_TIME_FORMAT.format(new Date(photo.createdAt))}
+-          </time>
+-          {photo.senderName !== null && (
+-            <span className="truncate text-sm text-muted-foreground">
+-              Envoyée par {photo.senderName}
+-            </span>
+-          )}
+-        </span>
++        <RowText photo={photo} />
+       </button>
+       <PhotoActionsMenu
+         photo={photo}
+~~~~
+
 ---
 
 ## Final verification (controller)
@@ -1704,4 +1792,5 @@ index a0f92e5..04291d3 100644
 - **Task 3:** `CollectionsRow` ran 31 lines; « Toutes » moved to `AllPhotosCard`.
 - **Task 4:** the collection rules went to `collections.md` as R-COL-22 and R-COL-23 rather than R-BIB-55+, next to the rules they extend (spec, Product docs). ARCHITECTURE.md's page row was updated here for the cards and the day groups too, since that row names the components Task 4 renamed.
 - **Before this branch, on `feat/library-surface`:** the photo menu's `w-max` (c74b15b, found by the controller in Chrome) is recorded in the mobile-first plan, Task 18.
+- **Task 5:** a size check over the files this branch touched found `PhotoListRow` at 43 lines, over the 30-line rule since before this stack; split in a refactor commit after the docs.
 - **Gates:** `pnpm check` and `pnpm typecheck` green on each commit; at the tip `pnpm build` green and `pnpm test` → `Test Files  26 passed (26)`, `Tests  305 passed (305)`.
