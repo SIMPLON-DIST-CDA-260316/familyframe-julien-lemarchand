@@ -28,7 +28,7 @@ Le détail des fichiers n'est pas listé ici : il change trop vite pour rester j
 ## Parcours d'une photo
 
 1. Le proche, connecté à son compte, prend ou choisit une photo (`<input type="file" accept="image/*" capture>`).
-2. Le client envoie l'image en `multipart/form-data` à une route Express ; **Multer** la reçoit en mémoire.
+2. Le client envoie l'image en `multipart/form-data` à une route Express ; **Multer** la reçoit en mémoire. L'envoi passe par `XMLHttpRequest` plutôt que `fetch` : seul `upload.onprogress` donne la progression, affichée sur une vignette grisée en tête de la bibliothèque (`usePhotoUploads`). Les photos partent une par une, dans une file d'attente côté client.
 3. Le serveur vérifie la session (cookie `ff_session`, voir [Authentification](#authentification)) et le fichier (10 Mo max, JPEG/PNG/WebP), calcule le **SHA-256** des octets reçus et refuse un fichier déjà présent dans la bibliothèque du compte, photos en attente d'ouverture comprises (`409 PHOTO_DUPLICATE`, sans appeler Sharp ni Cloudinary), puis le **décode et le réencode avec Sharp** : JPEG de 1920 px max, orientation EXIF appliquée, métadonnées (GPS compris) supprimées. Le type déclaré par le navigateur n'est pas fiable : c'est le décodage par Sharp qui valide vraiment l'image.
 4. L'image réencodée est envoyée à **Cloudinary**, dans le dossier `familyframe`.
 5. **Prisma** enregistre dans MongoDB l'URL, l'identifiant Cloudinary, le propriétaire (`ownerId`, le compte connecté), le SHA-256 du fichier reçu et la date. L'index unique `(ownerId, sha256)` est la vraie garantie : deux envois simultanés du même fichier passent la vérification, le second est refusé à l'enregistrement (`409` aussi) et son image Cloudinary est détruite.

@@ -99,7 +99,7 @@ Une collection est une liste de photos de sa bibliothèque, rangées sous un nom
 | ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Collection vide                            | « Cette collection est vide. » — « Ajoutez-y une photo, ou rangez-y celles de « Toutes » depuis leur menu « … ». » et le bouton « Ajouter une photo » |
 | Collection introuvable                     | « Cette collection n'existe plus. » et le bouton « Voir toutes les photos »                                                                           |
-| Photo ajoutée dans une collection affichée | « Photo ajoutée à votre bibliothèque. » puis « Photo ajoutée à « Noël ». »                                                                            |
+| Photo ajoutée dans une collection affichée | « Photo ajoutée à « Noël ». » (« 3 photos ajoutées à « Noël ». » pour plusieurs photos)                                                               |
 | Collections non chargées                   | « Cette collection n'a pas pu être chargée. » et le bouton « Voir toutes les photos »                                                                 |
 
 **Ce qui n'est pas possible**

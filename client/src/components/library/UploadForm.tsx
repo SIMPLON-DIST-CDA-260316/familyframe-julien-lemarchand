@@ -1,27 +1,13 @@
 import { CameraIcon, ImageIcon, SendIcon } from 'lucide-react'
 import { type ChangeEvent, type JSX, type SubmitEvent, useRef, useState } from 'react'
-import { toast } from 'sonner'
-import { useAuth } from '@/auth/AuthContext.ts'
-import { Alert, AlertDescription } from '@/components/ui/alert.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import { usePreviewUrl } from '@/hooks/usePreviewUrl.ts'
-import type { Photo } from '@/photo.ts'
-import { postPhoto } from '@/photosApi.ts'
 
 // The server's accepted types: a HEIC or GIF picked here would only be refused after the upload.
 const ACCEPTED_IMAGE_TYPES = 'image/jpeg,image/png,image/webp'
 
-type UploadStatus = 'idle' | 'sending' | 'error'
-
-type PhotoUpload = {
-  status: UploadStatus
-  error: string
-  send: (file: File) => Promise<void>
-  clearStatus: () => void
-}
-
 type UploadFormProps = {
-  onUploaded: (photo: Photo) => void
+  onUpload: (files: File[]) => void
   // The file goes to a friend only: the own library does not change.
   onShare: (file: File) => void
 }
@@ -35,34 +21,7 @@ type PickButtonProps = {
 
 type UploadButtonsProps = {
   hasFile: boolean
-  isSending: boolean
   onShare: () => void
-}
-
-function usePhotoUpload(onUploaded: (photo: Photo) => void): PhotoUpload {
-  const { dropUser } = useAuth()
-  const [status, setStatus] = useState<UploadStatus>('idle')
-  const [error, setError] = useState('')
-
-  async function send(file: File): Promise<void> {
-    setStatus('sending')
-    const result = await postPhoto(file)
-    // The session ended on the server: RequireAuth sends the user to /login.
-    if (result.status === 'unauthenticated') {
-      dropUser()
-      return
-    }
-    if (result.status === 'failed') {
-      setError(result.message)
-      setStatus('error')
-      return
-    }
-    // A toast, not an alert: the panel closes, and the message must outlast it.
-    toast.success('Photo ajoutée à votre bibliothèque.')
-    onUploaded(result.photo)
-  }
-
-  return { status, error, send, clearStatus: () => setStatus('idle') }
 }
 
 // A button rather than the raw file input: the browser's « Choose file » cannot be styled or
@@ -111,32 +70,17 @@ function PickButtons({ onChange }: Pick<PickButtonProps, 'onChange'>): JSX.Eleme
   )
 }
 
-function UploadButtons({ hasFile, isSending, onShare }: UploadButtonsProps): JSX.Element {
+function UploadButtons({ hasFile, onShare }: UploadButtonsProps): JSX.Element {
   return (
     <div className="flex flex-col gap-2">
-      <Button type="submit" size="lg" disabled={!hasFile || isSending}>
-        {isSending ? 'Envoi…' : 'Ajouter à ma bibliothèque'}
+      <Button type="submit" size="lg" disabled={!hasFile}>
+        Ajouter à ma bibliothèque
       </Button>
-      <Button
-        type="button"
-        variant="outline"
-        size="lg"
-        disabled={!hasFile || isSending}
-        onClick={onShare}
-      >
+      <Button type="button" variant="outline" size="lg" disabled={!hasFile} onClick={onShare}>
         <SendIcon aria-hidden data-icon="inline-start" />
         Envoyer à un ami
       </Button>
     </div>
-  )
-}
-
-function UploadAlert({ status, error }: Pick<PhotoUpload, 'status' | 'error'>): JSX.Element | null {
-  if (status !== 'error') return null
-  return (
-    <Alert variant="destructive">
-      <AlertDescription>{error}</AlertDescription>
-    </Alert>
   )
 }
 
@@ -152,30 +96,23 @@ function FilePreview({ file }: { file: File | null }): JSX.Element | null {
   )
 }
 
-export function UploadForm({ onUploaded, onShare }: UploadFormProps): JSX.Element {
-  const upload = usePhotoUpload(onUploaded)
+export function UploadForm({ onUpload, onShare }: UploadFormProps): JSX.Element {
   const [file, setFile] = useState<File | null>(null)
 
   function handleFileChange(event: ChangeEvent<HTMLInputElement>): void {
     setFile(event.target.files?.[0] ?? null)
-    upload.clearStatus()
   }
 
-  async function handleSubmit(event: SubmitEvent<HTMLFormElement>): Promise<void> {
+  function handleSubmit(event: SubmitEvent<HTMLFormElement>): void {
     event.preventDefault()
-    if (file) await upload.send(file)
+    if (file) onUpload([file])
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <PickButtons onChange={handleFileChange} />
       <FilePreview file={file} />
-      <UploadButtons
-        hasFile={file !== null}
-        isSending={upload.status === 'sending'}
-        onShare={() => file && onShare(file)}
-      />
-      <UploadAlert status={upload.status} error={upload.error} />
+      <UploadButtons hasFile={file !== null} onShare={() => file && onShare(file)} />
     </form>
   )
 }

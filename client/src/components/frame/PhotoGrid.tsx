@@ -1,4 +1,4 @@
-import type { JSX } from 'react'
+import type { JSX, ReactNode } from 'react'
 import { PhotoGridTile } from '@/components/frame/PhotoGridTile.tsx'
 import type { Photo } from '@/photo.ts'
 
@@ -7,6 +7,8 @@ type PhotoGridProps = {
   // null on the library page: no photo is on screen there.
   currentId: string | null
   onSelect: (id: string) => void
+  // Items placed before the photos: the library's uploads still on their way.
+  children?: ReactNode
 }
 
 // Edge to edge with the page's header. Three tight columns on a phone, as photo apps do, so a
@@ -14,9 +16,10 @@ type PhotoGridProps = {
 const GRID_CLASSES =
   'grid grid-cols-3 gap-1 sm:grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] sm:gap-4'
 
-export function PhotoGrid({ photos, currentId, onSelect }: PhotoGridProps): JSX.Element {
+export function PhotoGrid({ photos, currentId, onSelect, children }: PhotoGridProps): JSX.Element {
   return (
     <ul className={GRID_CLASSES}>
+      {children}
       {photos.map((photo) => (
         <PhotoGridTile
           key={photo.id}

@@ -13,19 +13,19 @@ import { LibrarySection } from '@/components/library/LibrarySection.tsx'
 import { LibraryMail } from '@/components/mail/LibraryMail.tsx'
 import { PhotoViewer } from '@/components/viewer/PhotoViewer.tsx'
 import { type LibraryLayout, useLibraryLayout } from '@/hooks/useLibraryLayout.ts'
-import { useLibraryUpload } from '@/hooks/useLibraryUpload.ts'
 import { type PhotoLibrary, usePhotoLibrary } from '@/hooks/usePhotoLibrary.ts'
+import { type PendingUpload, usePhotoUploads } from '@/hooks/usePhotoUploads.ts'
 import {
   type SelectedCollection,
   selectedCollectionId,
   useSelectedCollection,
 } from '@/hooks/useSelectedCollection.ts'
 import { useViewerParam, type ViewerParam } from '@/hooks/useViewerParam.ts'
-import type { Photo } from '@/photo.ts'
 
 type LibraryContentProps = {
   selected: SelectedCollection
   library: PhotoLibrary
+  pending: PendingUpload[]
   viewer: ViewerParam
   onAdd: () => void
   allChipRef: RefObject<HTMLAnchorElement | null>
@@ -38,11 +38,12 @@ type LibraryOverlaysProps = {
   viewer: ViewerParam
   isAdding: boolean
   onAddClose: () => void
-  onUploaded: (photo: Photo) => void
+  onUpload: (files: File[]) => void
   isShowingPhotos: boolean
 }
 
-function LibraryBody({ selected, library, layout, viewer, onAdd }: LibraryBodyProps): JSX.Element {
+function LibraryBody(props: LibraryBodyProps): JSX.Element {
+  const { selected, library, pending, layout, viewer, onAdd } = props
   if (selected.status === 'missing') {
     return <UnavailableCollection message="Cette collection n'existe plus." />
   }
@@ -55,6 +56,7 @@ function LibraryBody({ selected, library, layout, viewer, onAdd }: LibraryBodyPr
     <LibrarySection
       library={library}
       layout={layout}
+      pending={pending}
       onOpenPhoto={viewer.open}
       emptyState={emptyState}
     />
@@ -95,12 +97,12 @@ function LibraryOverlays({
   viewer,
   isAdding,
   onAddClose,
-  onUploaded,
+  onUpload,
   isShowingPhotos,
 }: LibraryOverlaysProps): JSX.Element {
   return (
     <>
-      <AddPhotoPanel isOpen={isAdding} onClose={onAddClose} onUploaded={onUploaded} />
+      <AddPhotoPanel isOpen={isAdding} onClose={onAddClose} onUpload={onUpload} />
       {viewer.openId !== null && isShowingPhotos && (
         <PhotoViewer library={library} openId={viewer.openId} viewer={viewer} />
       )}
@@ -110,9 +112,10 @@ function LibraryOverlays({
 
 export default function LibraryPage(): JSX.Element {
   const selected = useSelectedCollection()
-  const library = usePhotoLibrary(selectedCollectionId(selected))
+  const collectionId = selectedCollectionId(selected)
+  const library = usePhotoLibrary(collectionId)
   const viewer = useViewerParam()
-  const handleUploaded = useLibraryUpload(selected, library)
+  const uploads = usePhotoUploads(collectionId, library)
   const [isAdding, setIsAdding] = useState(false)
   const allChipRef = useRef<HTMLAnchorElement>(null)
 
@@ -123,6 +126,7 @@ export default function LibraryPage(): JSX.Element {
       <LibraryContent
         selected={selected}
         library={library}
+        pending={uploads.pending}
         viewer={viewer}
         onAdd={() => setIsAdding(true)}
         allChipRef={allChipRef}
@@ -132,7 +136,7 @@ export default function LibraryPage(): JSX.Element {
         viewer={viewer}
         isAdding={isAdding}
         onAddClose={() => setIsAdding(false)}
-        onUploaded={handleUploaded}
+        onUpload={uploads.enqueue}
         isShowingPhotos={isShowingPhotos(selected)}
       />
       <AddPhotoFab onAdd={() => setIsAdding(true)} />

@@ -1,5 +1,6 @@
 import { errorMessage, UNAUTHORIZED_STATUS } from '@/api.ts'
 import { isPhoto, isPhotoPage, type Photo, type PhotoPage } from '@/photo.ts'
+import { postWithProgress } from '@/upload/postWithProgress.ts'
 
 // The server's MAX_PAGE_SIZE: the fewest requests for many photos.
 const MAX_PAGE_SIZE = 100
@@ -91,20 +92,20 @@ export async function fetchNewestPhotos(
   return { photos, nextCursor: cursor ?? null }
 }
 
-export async function postPhoto(file: File): Promise<UploadResult> {
+// The same answers as the fetch calls below, with the upload's progress on the way.
+export async function postPhoto(
+  file: File,
+  onProgress: (percent: number) => void,
+): Promise<UploadResult> {
   const body = new FormData()
   body.append('photo', file)
-  try {
-    const res = await fetch('/api/photos', { method: 'POST', body })
-    if (res.status === UNAUTHORIZED_STATUS) return { status: 'unauthenticated' }
-    // Not JSON when the dev proxy answers for a stopped API.
-    const data: unknown = await res.json().catch(() => null)
-    if (res.ok && isPhoto(data)) return { status: 'uploaded', photo: data }
-    return { status: 'failed', message: errorMessage(data) }
-  } catch {
-    // fetch rejects only on network failure.
-    return { status: 'failed', message: errorMessage(null) }
+  const response = await postWithProgress('/api/photos', body, onProgress)
+  if (response === null) return { status: 'failed', message: errorMessage(null) }
+  if (response.status === UNAUTHORIZED_STATUS) return { status: 'unauthenticated' }
+  if (response.isOk && isPhoto(response.body)) {
+    return { status: 'uploaded', photo: response.body }
   }
+  return { status: 'failed', message: errorMessage(response.body) }
 }
 
 function isDuplicateError(body: unknown): boolean {

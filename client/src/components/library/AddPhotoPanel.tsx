@@ -3,12 +3,11 @@ import { UploadForm } from '@/components/library/UploadForm.tsx'
 import { ResponsivePanel } from '@/components/panel/ResponsivePanel.tsx'
 import { ShareSheet } from '@/components/sharing/ShareSheet.tsx'
 import { DialogDescription, DialogTitle } from '@/components/ui/dialog.tsx'
-import type { Photo } from '@/photo.ts'
 
 type AddPhotoPanelProps = {
   isOpen: boolean
   onClose: () => void
-  onUploaded: (photo: Photo) => void
+  onUpload: (files: File[]) => void
 }
 
 function AddPhotoHeading(): JSX.Element {
@@ -24,11 +23,12 @@ function AddPhotoHeading(): JSX.Element {
 }
 
 // « Envoyer à un ami » swaps this panel for the send panel, which keeps its own copy of the file.
-export function AddPhotoPanel({ isOpen, onClose, onUploaded }: AddPhotoPanelProps): JSX.Element {
+export function AddPhotoPanel({ isOpen, onClose, onUpload }: AddPhotoPanelProps): JSX.Element {
   const [fileToShare, setFileToShare] = useState<File | null>(null)
 
-  function handleUploaded(photo: Photo): void {
-    onUploaded(photo)
+  // Closes at once: the photos' progress shows on their tiles in the library.
+  function handleUpload(files: File[]): void {
+    onUpload(files)
     onClose()
   }
 
@@ -42,7 +42,7 @@ export function AddPhotoPanel({ isOpen, onClose, onUploaded }: AddPhotoPanelProp
       {isOpen && (
         <ResponsivePanel onClose={onClose}>
           <AddPhotoHeading />
-          <UploadForm onUploaded={handleUploaded} onShare={handleShare} />
+          <UploadForm onUpload={handleUpload} onShare={handleShare} />
         </ResponsivePanel>
       )}
       <ShareSheet
