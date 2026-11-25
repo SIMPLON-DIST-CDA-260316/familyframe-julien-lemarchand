@@ -1,6 +1,7 @@
 import type { JSX } from 'react'
 import { Link } from 'react-router'
 import { UserMenu } from '@/components/auth/UserMenu.tsx'
+import { OfflineBanner } from '@/components/feedback/OfflineBanner.tsx'
 import { DesktopNav } from '@/components/nav/DesktopNav.tsx'
 
 export function AccountBar(): JSX.Element {
@@ -17,6 +18,8 @@ export function AccountBar(): JSX.Element {
           <UserMenu />
         </div>
       </div>
+      {/* In the sticky header: the notice stays in view while the page scrolls. */}
+      <OfflineBanner />
     </header>
   )
 }
