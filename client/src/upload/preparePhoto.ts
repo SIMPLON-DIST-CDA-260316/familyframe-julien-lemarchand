@@ -40,7 +40,10 @@ function drawAsJpeg(bitmap: ImageBitmap, { width, height }: TargetSize): Promise
   canvas.width = width
   canvas.height = height
   const context = canvas.getContext('2d')
-  if (context === null) return Promise.resolve(null)
+  if (context === null) {
+    releaseCanvas(canvas)
+    return Promise.resolve(null)
+  }
   // JPEG has no transparency: white behind it, as the server does for its own copy.
   context.fillStyle = 'white'
   context.fillRect(0, 0, width, height)
@@ -63,16 +66,18 @@ function jpegName(fileName: string): string {
 
 // The original file whenever it fits the server, so nothing is lost; otherwise a lighter JPEG.
 // A file the browser cannot read goes as it is: the server decides and explains a refusal.
+// finally: the decoded pixels are freed even when drawing throws.
 export async function preparePhoto(file: File): Promise<File> {
   const decoded = await decode(file)
   if (decoded === null) return file
   const { bitmap, isUpright } = decoded
-  const decision = resizeDecision(
-    { width: bitmap.width, height: bitmap.height, isUpright },
-    file.size,
-  )
-  const blob = decision.shouldResize ? await drawAsJpeg(bitmap, decision) : null
-  bitmap.close()
-  if (blob === null) return file
-  return new File([blob], jpegName(file.name), { type: JPEG_TYPE })
+  try {
+    const size = { width: bitmap.width, height: bitmap.height, isUpright }
+    const decision = resizeDecision(size, file.size)
+    if (!decision.shouldResize) return file
+    const blob = await drawAsJpeg(bitmap, decision)
+    return blob === null ? file : new File([blob], jpegName(file.name), { type: JPEG_TYPE })
+  } finally {
+    bitmap.close()
+  }
 }
