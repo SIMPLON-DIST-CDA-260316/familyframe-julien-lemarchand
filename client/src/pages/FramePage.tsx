@@ -5,7 +5,6 @@ import { SlideshowScreen } from '@/components/frame/SlideshowScreen.tsx'
 import { MailRevealDialog } from '@/components/mail/MailRevealDialog.tsx'
 import { type FrameMode, useFrameMode } from '@/hooks/useFrameMode.ts'
 import { useMailReveal } from '@/hooks/useMailReveal.ts'
-import type { FeedStatus } from '@/hooks/usePhotoFeed.ts'
 import { usePhotoMail } from '@/hooks/usePhotoMail.ts'
 import { cn } from '@/lib/utils.ts'
 
@@ -17,9 +16,14 @@ type FrameScreenProps = {
   hasWaitingPhotos: boolean
 }
 
-// Reached only without photos: once loaded, that means an empty library, maybe with mail.
-function frameStatus(status: FeedStatus, hasWaitingPhotos: boolean): FrameStatus {
+// Reached only without photos: once loaded, that means an empty collection, or an empty library
+// maybe with mail.
+function frameStatus(
+  { status, source }: Pick<FrameMode, 'status' | 'source'>,
+  hasWaitingPhotos: boolean,
+): FrameStatus {
   if (status !== 'loaded') return status
+  if (source.kind === 'collection') return 'emptyCollection'
   return hasWaitingPhotos ? 'unopened' : 'empty'
 }
 
@@ -27,7 +31,7 @@ function FrameScreen({ frame, hasWaitingPhotos }: FrameScreenProps): JSX.Element
   if (frame.currentPhoto === undefined) {
     return (
       <FrameStatusScreen
-        status={frameStatus(frame.status, hasWaitingPhotos)}
+        status={frameStatus(frame, hasWaitingPhotos)}
         className={FRAME_CLASSES}
         onLeave={frame.leave}
       />

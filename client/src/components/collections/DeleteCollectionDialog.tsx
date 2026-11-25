@@ -48,7 +48,8 @@ export function DeleteCollectionDialog({
             Supprimer la collection « {collection.name} » ?
           </AlertDialogTitle>
           <AlertDialogDescription>
-            Les photos restent dans votre bibliothèque.
+            Les photos restent dans votre bibliothèque. Un cadre qui la lisait repasse à toute la
+            bibliothèque.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

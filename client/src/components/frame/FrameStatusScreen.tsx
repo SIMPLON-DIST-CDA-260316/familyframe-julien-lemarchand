@@ -1,19 +1,46 @@
-import { ImagesIcon, MailIcon, TriangleAlertIcon } from 'lucide-react'
-import type { JSX, ReactNode } from 'react'
+import { FolderIcon, ImagesIcon, MailIcon, TriangleAlertIcon } from 'lucide-react'
+import type { JSX } from 'react'
 import { FullscreenButton } from '@/components/frame/FullscreenButton.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import { cn } from '@/lib/utils.ts'
 
 // Why the frame shows no photo: each case needs its own words.
 // unopened: nothing in the library yet, but friends' photos wait to be discovered.
-export type FrameStatus = 'loading' | 'empty' | 'unopened' | 'failed'
+// emptyCollection: the frame plays a collection that holds no photo.
+export type FrameStatus = 'loading' | 'empty' | 'unopened' | 'failed' | 'emptyCollection'
 
 const STATUS_ICONS = {
   loading: ImagesIcon,
   empty: ImagesIcon,
   unopened: MailIcon,
   failed: TriangleAlertIcon,
+  emptyCollection: FolderIcon,
 } satisfies Record<FrameStatus, typeof ImagesIcon>
+
+// hint: the line under the message, when the case needs one.
+type StatusText = { message: string; hint?: string }
+
+const STATUS_TEXTS = {
+  loading: { message: 'Chargement des photos…' },
+  unopened: { message: 'Des photos vous attendent.' },
+  failed: {
+    message: "Les photos n'ont pas pu être chargées.",
+    hint: 'Le cadre réessaiera dès que la connexion reviendra.',
+  },
+  emptyCollection: {
+    message: 'Cette collection est vide.',
+    hint: 'Ajoutez-y des photos depuis la bibliothèque.',
+  },
+} satisfies Record<Exclude<FrameStatus, 'empty'>, StatusText>
+
+// A first visitor needs the way in, not only the news that the frame is empty.
+function statusText(status: FrameStatus): StatusText {
+  if (status !== 'empty') return STATUS_TEXTS[status]
+  return {
+    message: 'En attente de la première photo…',
+    hint: `Envoyez-en une depuis votre téléphone : ${window.location.host}`,
+  }
+}
 
 type FrameStatusScreenProps = {
   status: FrameStatus
@@ -21,27 +48,12 @@ type FrameStatusScreenProps = {
   onLeave: () => void
 }
 
-function StatusMessage({ status }: { status: FrameStatus }): ReactNode {
-  if (status === 'loading') return <p className="text-3xl font-medium">Chargement des photos…</p>
-  if (status === 'unopened')
-    return <p className="text-3xl font-medium">Des photos vous attendent.</p>
-  if (status === 'failed') {
-    return (
-      <>
-        <p className="text-3xl font-medium">Les photos n'ont pas pu être chargées.</p>
-        <p className="text-lg text-muted-foreground">
-          Le cadre réessaiera dès que la connexion reviendra.
-        </p>
-      </>
-    )
-  }
+function StatusMessage({ status }: { status: FrameStatus }): JSX.Element {
+  const { message, hint } = statusText(status)
   return (
     <>
-      <p className="text-3xl font-medium">En attente de la première photo…</p>
-      {/* A first visitor needs the way in, not only the news that the frame is empty. */}
-      <p className="text-lg text-muted-foreground">
-        Envoyez-en une depuis votre téléphone : {window.location.host}
-      </p>
+      <p className="text-3xl font-medium">{message}</p>
+      {hint !== undefined && <p className="text-lg text-muted-foreground">{hint}</p>}
     </>
   )
 }

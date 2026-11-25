@@ -4,12 +4,6 @@ Fonctionnalités prévues mais pas encore livrées, regroupées par étape. Rien
 
 Les règles ci-dessous décrivent l'intention ; elles recevront leur identifiant définitif à la livraison.
 
-## Étape 10 · Collections
-
-**Prévu**
-
-- Faire passer une collection sur le cadre, en boucle ou en ordre aléatoire.
-
 ## Étape 11 · Sélections automatiques
 
 **Prévu**

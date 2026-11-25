@@ -25,7 +25,7 @@ Cette documentation décrit ce que l'application permet de faire et selon quelle
 | **Photo reçue**        | Une photo qu'un ami a envoyée. Elle fait partie de la bibliothèque du destinataire comme les autres et porte la mention « Envoyée par » suivie du nom de l'expéditeur. |
 | **Expéditeur**         | Le membre qui a envoyé une photo reçue.                                                                                                                                |
 | **Collection**         | Une liste de photos de sa bibliothèque, rangées sous un nom (« Noël », « Les vacances »). Elle est privée.                                                             |
-| **Cadre**              | L'affichage plein écran de sa bibliothèque, pensé pour un écran posé chez soi. Il montre toutes les photos du compte connecté.                                         |
+| **Cadre**              | L'affichage plein écran de sa bibliothèque, pensé pour un écran posé chez soi. Il montre toutes les photos du compte connecté, ou celles d'une de ses collections.     |
 | **Diaporama**          | Le mode du cadre qui affiche une photo à la fois, en grand, et passe seul à la suivante.                                                                               |
 | **Modèle d'affichage** | La façon dont le cadre présente chaque photo : ajustée sur un fond flouté, en plein format, dans un passe-partout ou en polaroïd. Chaque appareil garde le sien.       |
 | **Vignette**           | La petite image carrée qui représente une photo dans une grille, une liste ou un bandeau.                                                                              |

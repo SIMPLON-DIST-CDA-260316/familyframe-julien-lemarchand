@@ -1,6 +1,6 @@
 # Cadre
 
-Le cadre est la page à laisser affichée en plein écran sur l'appareil posé chez soi (tablette, vieil ordinateur, télévision). Il montre toutes les photos de la bibliothèque du compte connecté (voir [bibliotheque.md](bibliotheque.md)) et reçoit les nouvelles en direct. On l'ouvre avec l'entrée « Cadre » de la barre du haut, ou avec « Mode cadre » depuis la bibliothèque ou une photo ouverte : il passe alors en plein écran. Il n'affiche que le diaporama (une photo à la fois) ; les vignettes et la liste sont dans la bibliothèque.
+Le cadre est la page à laisser affichée en plein écran sur l'appareil posé chez soi (tablette, vieil ordinateur, télévision). Il montre toutes les photos de la bibliothèque du compte connecté (voir [bibliotheque.md](bibliotheque.md)), ou celles d'une de ses collections (voir [collections.md](collections.md)), et reçoit les nouvelles en direct. On l'ouvre avec l'entrée « Cadre » de la barre du haut, ou avec « Mode cadre » depuis la bibliothèque ou une photo ouverte : il passe alors en plein écran. Il n'affiche que le diaporama (une photo à la fois) ; les vignettes et la liste sont dans la bibliothèque.
 
 ## Mettre en place un cadre
 
@@ -17,14 +17,14 @@ Le cadre est la page à laisser affichée en plein écran sur l'appareil posé c
 1. R-CAD-01 · Un cadre affiche les photos d'un seul compte : celui qui y est connecté.
 2. R-CAD-02 · Le cadre est toujours sombre, quel que soit le thème choisi, pour mettre les photos en valeur.
 3. R-CAD-03 · Le cadre occupe toute la page : la barre du haut et les menus de l'application n'y sont pas affichés.
-4. R-CAD-04 · Le cadre affiche toutes les photos de la bibliothèque, des plus récentes aux plus anciennes, sans limite de nombre : les anciennes photos ne disparaissent jamais du cadre.
+4. R-CAD-04 · Le cadre affiche toutes les photos de la bibliothèque, ou de la collection choisie (R-CAD-77), des plus récentes aux plus anciennes, sans limite de nombre : les anciennes photos ne disparaissent jamais du cadre.
 5. R-CAD-05 · Le cadre recharge toutes ses photos une fois par jour. Cela garde sa connexion active (voir [comptes-et-connexion.md](comptes-et-connexion.md#rester-connecté)) : un cadre allumé en continu ne se déconnecte jamais.
 6. R-CAD-06 · Un cadre rallumé alors que le réseau n'est pas encore prêt attend et réessaie seul toutes les 5 secondes, sans afficher la page de connexion (R-CNX-16).
 7. R-CAD-07 · Si sa connexion au compte a expiré ou a été fermée, le cadre revient à la page de connexion : il faut se reconnecter sur l'appareil.
 8. R-CAD-08 · Remplacée : le cadre distingue désormais le chargement de la bibliothèque vide ; seul le message « bibliothèque vide » montre l'adresse du site (R-CAD-55).
 9. R-CAD-53 · Le cadre n'affiche que le diaporama : les vignettes et la liste sont dans la bibliothèque.
 10. R-CAD-54 · Le diaporama ne démarre plus de lui-même après une minute : il est déjà la seule vue du cadre.
-11. R-CAD-55 · Sans photo à montrer, le cadre dit pourquoi : chargement en cours, aucune photo encore, ou chargement impossible ; il réessaie tout seul quand la connexion revient.
+11. R-CAD-55 · Sans photo à montrer, le cadre dit pourquoi : chargement en cours, aucune photo encore, collection lue vide (R-CAD-82), ou chargement impossible ; il réessaie tout seul quand la connexion revient.
 12. R-CAD-56 · Un bouton « Retour à la bibliothèque » permet toujours de sortir du cadre.
 13. R-CAD-57 · Lancé depuis une photo, le diaporama commence par cette photo.
 14. R-CAD-58 · Ouvert depuis l'application (« Cadre » dans la barre du haut, « Mode cadre » dans la bibliothèque ou sur une photo ouverte), le cadre passe en plein écran. Sur un appareil qui ne le permet pas (iPhone), ou si le navigateur le refuse, le cadre s'affiche dans la page, sans message.
@@ -75,6 +75,7 @@ Le cadre n'a plus de vue bibliothèque : voir R-CAD-53. Les règles ci-dessous g
 - Choisir la vitesse : 5 s, 10 s ou 20 s par photo (menu « … », « Vitesse ») ; l'appareil la retient.
 - Choisir l'ordre de lecture : « Dans l'ordre » (des plus récentes aux plus anciennes) ou « Aléatoire » (menu « … », « Lecture ») ; l'appareil le retient.
 - Faire ces mêmes réglages depuis la page « Préférences », encart « Cadre de cet appareil » (voir [preferences.md](preferences.md#cadre-de-cet-appareil)).
+- Choisir les photos lues : toute la bibliothèque ou une collection (menu « … », « Photos ») ; l'appareil le retient (voir [Choisir les photos du cadre](#choisir-les-photos-du-cadre)).
 - Afficher ou masquer un bandeau de vignettes (« Vignettes ») et toucher une vignette pour aller à cette photo.
 - Envoyer la photo affichée à un ami, la ranger dans ses collections ou la supprimer (menu « … »).
 - Quitter le mode cadre (bouton ✕, touche Échap ou sortie du plein écran) pour revenir à la bibliothèque, sur la photo affichée.
@@ -108,6 +109,7 @@ Le cadre n'a plus de vue bibliothèque : voir R-CAD-53. Les règles ci-dessous g
 | Situation                                  | Message                                                                                                                      |
 | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
 | Légende d'une photo                        | « [date] » et, pour une photo reçue, « Envoyée par [nom] » puis son message entre guillemets, sur trois lignes au plus       |
+| Choix des photos                           | « Photos » : « Toute la bibliothèque », puis le nom de chaque collection                                                     |
 | Choix du modèle                            | « Affichage » : « Ajusté », « Plein format », « Passe-partout », « Polaroïd »                                                |
 | Choix de l'ordre                           | « Lecture » : « Dans l'ordre », « Aléatoire »                                                                                |
 | Choix de vitesse                           | « Vitesse » : « 5 s », « 10 s », « 20 s »                                                                                    |
@@ -118,11 +120,38 @@ Le cadre n'a plus de vue bibliothèque : voir R-CAD-53. Les règles ci-dessous g
 - Choisir une autre vitesse que 5, 10 ou 20 secondes.
 - Retrouver ses réglages sur un autre appareil ou dans un autre navigateur : chaque appareil garde les siens.
 
+## Choisir les photos du cadre
+
+**Ce que l'on peut faire**
+
+- Dans le menu « … » du diaporama, « Photos », choisir « Toute la bibliothèque » ou l'une de ses collections.
+
+**Règles**
+
+1. R-CAD-77 · Le cadre lit toute la bibliothèque (par défaut) ou une seule collection. Le choix est retenu sur l'appareil, comme la vitesse (R-CAD-62, R-CAD-63).
+2. R-CAD-78 · Une collection se lit comme la bibliothèque : des plus récentes aux plus anciennes et en boucle, ou en ordre aléatoire, selon « Lecture » ; avec la même vitesse et le même modèle d'affichage.
+3. R-CAD-79 · Changer de photos fait repartir le diaporama de la photo la plus récente du nouveau choix ; en « Aléatoire », un nouveau mélange commence.
+4. R-CAD-80 · Une photo rangée dans la collection lue, ou retirée, depuis cet appareil ou un autre, entre dans le diaporama ou en sort en quelques instants, sans recharger. Une photo ajoutée à la bibliothèque n'arrive sur le cadre que si elle est rangée dans la collection lue.
+5. R-CAD-81 · Si la collection lue est supprimée, le cadre repasse à toute la bibliothèque. Si les collections n'ont pas pu être chargées, il lit toute la bibliothèque en attendant, puis passe à la collection dès qu'elles arrivent.
+6. R-CAD-82 · Une collection vide ne repasse pas à la bibliothèque : le cadre dit qu'elle est vide, avec le bouton « Retour à la bibliothèque » (R-CAD-56).
+7. R-CAD-83 · Lancé depuis une photo qui n'est pas dans la collection lue, le diaporama commence par la photo la plus récente de la collection (exception à R-CAD-57).
+
+**Messages affichés**
+
+| Situation       | Message                                                                           |
+| --------------- | --------------------------------------------------------------------------------- |
+| Collection vide | « Cette collection est vide. » — « Ajoutez-y des photos depuis la bibliothèque. » |
+
+**Ce qui n'est pas possible**
+
+- Lire plusieurs collections à la fois.
+- Garder le choix d'une collection sur un autre appareil : chaque appareil garde le sien.
+
 ## Arrivée d'une nouvelle photo
 
 **Ce que l'on peut faire**
 
-- Voir une photo ajoutée depuis un téléphone, ou découverte sur un autre appareil, arriver sur le cadre en quelques instants, sans recharger.
+- Voir une photo ajoutée depuis un téléphone, ou découverte sur un autre appareil, arriver sur le cadre en quelques instants, sans recharger (quand il lit toute la bibliothèque, R-CAD-80).
 - Quand quelqu'un regarde le cadre, aller à la nouvelle photo en touchant la pastille « 1 nouvelle photo ».
 
 **Règles**
@@ -133,7 +162,7 @@ Le cadre n'a plus de vue bibliothèque : voir R-CAD-53. Les règles ci-dessous g
 4. R-CAD-43 · Remplacée : le cadre n'a plus de vue bibliothèque (R-CAD-53).
 5. R-CAD-44 · La pastille additionne les photos arrivées tant qu'elle n'a pas été touchée.
 6. R-CAD-45 · Une photo supprimée depuis un autre appareil disparaît du cadre en quelques instants, sans recharger.
-7. R-CAD-76 · Une photo envoyée par un ami ne s'affiche pas à son arrivée : elle attend d'être découverte (voir [Photos reçues en attente](#photos-reçues-en-attente)). Découverte sur un autre appareil, elle entre dans le diaporama à sa date de réception ; si c'est la plus récente, les règles d'arrivée ci-dessus s'appliquent.
+7. R-CAD-76 · Une photo envoyée par un ami ne s'affiche pas à son arrivée : elle attend d'être découverte (voir [Photos reçues en attente](#photos-reçues-en-attente)). Découverte sur un autre appareil, elle entre dans le diaporama à sa date de réception, quand il lit toute la bibliothèque (R-CAD-80) ; si c'est la plus récente, les règles d'arrivée ci-dessus s'appliquent.
 
 **Messages affichés**
 
@@ -157,7 +186,7 @@ Le cadre n'a plus de vue bibliothèque : voir R-CAD-53. Les règles ci-dessous g
 
 1. R-CAD-72 · Tant qu'au moins une photo reçue attend, une pastille blanche, marquée d'une enveloppe, s'affiche en haut au centre du cadre, même quand personne ne l'utilise. Elle se place au-dessus de la pastille des nouvelles photos, sans la cacher, et se met à jour seule.
 2. R-CAD-73 · Toucher la pastille lance la découverte, comme dans la bibliothèque (voir [partage.md](partage.md#recevoir-une-photo), R-PAR-53 et R-PAR-54). Le diaporama s'arrête pendant ce temps.
-3. R-CAD-74 · Après « Terminer » ou la fermeture, le diaporama repart de la photo la plus récente. Les photos découvertes y sont déjà, à leur date de réception : la pastille des nouvelles photos ne les annonce pas.
+3. R-CAD-74 · Après « Terminer » ou la fermeture, le diaporama repart de la photo la plus récente. Les photos découvertes y sont déjà, à leur date de réception, quand il lit toute la bibliothèque (R-CAD-80) : la pastille des nouvelles photos ne les annonce pas.
 4. R-CAD-75 · Sans aucune photo dans la bibliothèque mais avec des photos en attente, le cadre affiche « Des photos vous attendent. » sous la pastille.
 
 **Messages affichés**

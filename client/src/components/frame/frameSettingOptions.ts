@@ -1,4 +1,6 @@
+import type { Collection } from '@/collections/collection.ts'
 import { type FrameTemplate, type PlaybackOrder, SLIDESHOW_INTERVALS_MS } from '@/frameSettings.ts'
+import { LIBRARY_SOURCE, sourceKey } from '@/photoSource.ts'
 
 export type SettingOption<Value> = { value: Value; label: string }
 
@@ -30,3 +32,14 @@ export const ORDER_OPTIONS: SettingOption<PlaybackOrder>[] = [
 export const INTERVAL_OPTIONS: SettingOption<number>[] = SLIDESHOW_INTERVALS_MS.map(
   (intervalMs) => ({ value: intervalMs, label: `${intervalMs / MS_PER_SECOND} s` }),
 )
+
+// The library first, then each collection by name, as the collections list shows them.
+export function sourceOptions(collections: Collection[]): SettingOption<string>[] {
+  return [
+    { value: sourceKey(LIBRARY_SOURCE), label: 'Toute la bibliothèque' },
+    ...collections.map(({ id, name }) => ({
+      value: sourceKey({ kind: 'collection', collectionId: id }),
+      label: name,
+    })),
+  ]
+}

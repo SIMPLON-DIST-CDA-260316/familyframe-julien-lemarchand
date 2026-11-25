@@ -10,6 +10,12 @@ import {
   DropdownMenuSubTrigger,
 } from '@/components/ui/dropdown-menu.tsx'
 
+// `dark`: the submenu portals to body, outside the frame's dark <main>. A long list scrolls
+// inside the screen instead of being cut. A collection's name can be one long word: it wraps
+// instead of widening the menu.
+const SUB_CONTENT_CLASS =
+  'dark max-h-(--radix-dropdown-menu-content-available-height) max-w-64 overflow-y-auto wrap-anywhere'
+
 type RadioSubmenuProps<Value extends string | number> = {
   icon: LucideIcon
   label: string
@@ -30,8 +36,7 @@ export function RadioSubmenu<Value extends string | number>({
         {props.label}
       </DropdownMenuSubTrigger>
       <DropdownMenuPortal>
-        {/* `dark`: the submenu portals to body, outside the frame's dark <main>. */}
-        <DropdownMenuSubContent className="dark">
+        <DropdownMenuSubContent className={SUB_CONTENT_CLASS}>
           <DropdownMenuRadioGroup
             value={String(props.value)}
             onValueChange={optionSelector(options, props.onValueChange)}

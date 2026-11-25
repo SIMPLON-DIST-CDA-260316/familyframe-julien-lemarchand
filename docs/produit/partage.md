@@ -121,7 +121,7 @@ Ceux du panneau d'envoi (voir [Choisir à qui envoyer](#choisir-à-qui-envoyer))
 13. R-PAR-54 · Une photo compte comme découverte dès qu'elle s'affiche, pour tous les appareils du destinataire. Fermer avant la fin, avec la croix ou la touche Échap, laisse les photos suivantes en attente.
 14. R-PAR-55 · Une fois découverte, la photo entre dans la bibliothèque à sa date de réception, sur tous les appareils connectés, sans recharger : elle n'est en tête que si rien n'a été ajouté depuis.
 15. R-PAR-56 · L'expéditeur ne voit aucun changement sur ses propres écrans et ne sait pas si la photo a été découverte.
-16. R-PAR-57 · Sur le cadre, une pastille annonce aussi les photos en attente et lance la même découverte ; une fois découvertes, elles entrent dans le diaporama (voir [cadre.md](cadre.md#photos-reçues-en-attente)).
+16. R-PAR-57 · Sur le cadre, une pastille annonce aussi les photos en attente et lance la même découverte ; une fois découvertes, elles entrent dans le diaporama quand il lit toute la bibliothèque (voir [cadre.md](cadre.md#photos-reçues-en-attente)).
 
 **Messages affichés**
 

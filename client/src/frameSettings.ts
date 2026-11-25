@@ -1,3 +1,5 @@
+import { isPhotoSource, LIBRARY_SOURCE, type PhotoSource } from '@/photoSource.ts'
+
 export type FrameTemplate = 'fit' | 'fill' | 'mat' | 'polaroid'
 export type PlaybackOrder = 'newest' | 'shuffle'
 
@@ -5,6 +7,7 @@ export type FrameSettings = {
   template: FrameTemplate
   order: PlaybackOrder
   intervalMs: number
+  source: PhotoSource
 }
 
 export const SLIDESHOW_INTERVALS_MS = [5_000, 10_000, 20_000]
@@ -15,6 +18,7 @@ export const DEFAULT_FRAME_SETTINGS: FrameSettings = {
   template: 'fit',
   order: 'newest',
   intervalMs: 10_000,
+  source: LIBRARY_SOURCE,
 }
 
 export const FRAME_SETTINGS_KEY = 'familyframe.frame-settings'
@@ -45,6 +49,8 @@ export function parseFrameSettings(raw: unknown): FrameSettings {
       'intervalMs' in raw && isSlideshowInterval(raw.intervalMs)
         ? raw.intervalMs
         : DEFAULT_FRAME_SETTINGS.intervalMs,
+    source:
+      'source' in raw && isPhotoSource(raw.source) ? raw.source : DEFAULT_FRAME_SETTINGS.source,
   }
 }
 

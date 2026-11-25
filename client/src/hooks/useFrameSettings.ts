@@ -7,11 +7,13 @@ import {
   readFrameSettings,
   writeFrameSettings,
 } from '@/frameSettings.ts'
+import type { PhotoSource } from '@/photoSource.ts'
 
 export type FrameSettingsControls = FrameSettings & {
   onTemplateChange: (template: FrameTemplate) => void
   onOrderChange: (order: PlaybackOrder) => void
   onIntervalChange: (intervalMs: number) => void
+  onSourceChange: (source: PhotoSource) => void
 }
 
 // Per device, in this browser: a kitchen tablet and a living-room TV keep their own choices.
@@ -40,5 +42,6 @@ export function useFrameSettings(): FrameSettingsControls {
     onTemplateChange: (template) => change({ template }),
     onOrderChange: (order) => change({ order }),
     onIntervalChange: (intervalMs) => change({ intervalMs }),
+    onSourceChange: (source) => change({ source }),
   }
 }
