@@ -36,6 +36,22 @@ function RevealedPhoto({ photo }: { photo: Photo }): JSX.Element {
   )
 }
 
+function RevealTopBar({ position, count }: { position: number; count: number }): JSX.Element {
+  return (
+    <div className="flex items-center gap-2 px-4 py-3">
+      <DialogPrimitive.Close asChild>
+        <Button variant="ghost" size="icon-lg" aria-label="Fermer">
+          <XIcon />
+        </Button>
+      </DialogPrimitive.Close>
+      {/* pr-9 balances the ✕, so the counter sits in the middle of the screen. */}
+      <DialogPrimitive.Title className="mx-auto pr-9 text-sm text-muted-foreground tabular-nums">
+        Nouvelle photo {position} / {count}
+      </DialogPrimitive.Title>
+    </div>
+  )
+}
+
 // A photo counts as opened once it is on screen: closing halfway keeps the others waiting.
 function useOpenOnShow(photoId: string, onOpen: (id: string) => Promise<void>): void {
   const openShownPhoto = useEffectEvent(onOpen)
@@ -58,16 +74,7 @@ export function MailRevealDialog({ photos, onOpen, onClose }: MailRevealDialogPr
           aria-describedby={undefined}
           className="dark fixed inset-0 z-50 flex flex-col gap-6 bg-frame-background pb-8 text-foreground outline-none"
         >
-          <div className="flex items-center gap-2 px-4 py-3">
-            <DialogPrimitive.Close asChild>
-              <Button variant="ghost" size="icon-lg" aria-label="Fermer">
-                <XIcon />
-              </Button>
-            </DialogPrimitive.Close>
-            <DialogPrimitive.Title className="mx-auto pr-9 text-sm text-muted-foreground tabular-nums">
-              Nouvelle photo {index + 1} / {photos.length}
-            </DialogPrimitive.Title>
-          </div>
+          <RevealTopBar position={index + 1} count={photos.length} />
           {/* The key restarts the reveal animation for each photo. */}
           <RevealedPhoto key={photo.id} photo={photo} />
           <Button
