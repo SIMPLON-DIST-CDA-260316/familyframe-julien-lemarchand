@@ -89,7 +89,8 @@ export type FriendshipList = {
 
 // createdAt is an ISO 8601 string: JSON has no dates. senderName is the display name of the
 // friend who sent the photo, null for a photo its owner uploaded. message is the note the
-// friend wrote with it, null without one.
+// friend wrote with it, null without one. width and height (px) and bytes describe the stored
+// image; all three null on a photo stored before step 15.
 export type Photo = {
   id: string
   url: string
@@ -97,6 +98,9 @@ export type Photo = {
   createdAt: string
   senderName: string | null
   message: string | null
+  width: number | null
+  height: number | null
+  bytes: number | null
 }
 
 // nextCursor is the id to send as cursor for the next page; null on the last page.

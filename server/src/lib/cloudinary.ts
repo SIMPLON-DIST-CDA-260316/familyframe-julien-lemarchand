@@ -21,16 +21,22 @@ const OPTIMIZED_DELIVERY: ImageTransformationOptions = { fetch_format: 'auto', q
 
 export type UploadedImage = { url: string; cloudinaryId: string }
 
+// Shown in a photo's info: an avatar does not keep them.
+export type UploadedPhoto = UploadedImage & { width: number; height: number; bytes: number }
+
 export type DeliveryUrls = { url: string; thumbnailUrl: string }
 
 // Data URI rather than a stream: simpler, and fine up to 10 MB.
-async function uploadToFolder(jpeg: Buffer, folder: string): Promise<UploadedImage> {
+async function uploadToFolder(jpeg: Buffer, folder: string): Promise<UploadedPhoto> {
   const dataUri = `data:image/jpeg;base64,${jpeg.toString('base64')}`
-  const result = await cloudinary.uploader.upload(dataUri, { folder })
-  return { url: result.secure_url, cloudinaryId: result.public_id }
+  const { secure_url, public_id, width, height, bytes } = await cloudinary.uploader.upload(
+    dataUri,
+    { folder },
+  )
+  return { url: secure_url, cloudinaryId: public_id, width, height, bytes }
 }
 
-export function uploadImage(jpeg: Buffer): Promise<UploadedImage> {
+export function uploadImage(jpeg: Buffer): Promise<UploadedPhoto> {
   return uploadToFolder(jpeg, 'familyframe')
 }
 

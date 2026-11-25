@@ -1,5 +1,5 @@
 import { AppError } from '../../errors/app-error.js'
-import type { UploadedImage } from '../../lib/cloudinary.js'
+import type { UploadedPhoto } from '../../lib/cloudinary.js'
 import { destroyUnusedImage } from '../../lib/image-uses.js'
 import type { Logger } from '../../lib/logger.js'
 import type { NewSend, SendRecord } from '../sends/sends.repository.js'
@@ -43,7 +43,7 @@ export type RecordPage = { records: PhotoRecord[]; nextCursor: string | null }
 export type PhotosServiceDeps = {
   repository: PhotosRepository
   toFrameJpeg: (input: Buffer) => Promise<Buffer>
-  uploadImage: (jpeg: Buffer) => Promise<UploadedImage>
+  uploadImage: (jpeg: Buffer) => Promise<UploadedPhoto>
   deleteImage: (cloudinaryId: string) => Promise<void>
   // The friendships service's rule: a photo goes only to an accepted friend.
   areFriends: (userId: string, otherUserId: string) => Promise<boolean>

@@ -10,7 +10,13 @@ const JPEG_FILE: UploadedFile = { buffer: Buffer.from('raw upload'), mimetype: '
 // Computed like the service does: the hash of the original upload bytes.
 const JPEG_SHA256 = createHash('sha256').update(JPEG_FILE.buffer).digest('hex')
 const FRAME_JPEG = Buffer.from('frame jpeg')
-const IMAGE = { url: 'https://res.cloudinary.com/demo/photo.jpg', cloudinaryId: 'familyframe/abc' }
+const IMAGE = {
+  url: 'https://res.cloudinary.com/demo/photo.jpg',
+  cloudinaryId: 'familyframe/abc',
+  width: 4000,
+  height: 3000,
+  bytes: 2_400_000,
+}
 const RECORD: PhotoRecord = {
   id: '6b044f9d56a44767c7079a01',
   ownerId: OWNER_ID,

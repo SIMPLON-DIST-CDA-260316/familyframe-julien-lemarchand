@@ -8,7 +8,13 @@ import type { ShareResult } from './photos.share.js'
 
 const SENDER_ID = '6b044f9d56a44767c7079b01'
 const FRIEND_ID = '6b044f9d56a44767c7079b02'
-const IMAGE = { url: 'https://res.cloudinary.com/demo/photo.jpg', cloudinaryId: 'familyframe/abc' }
+const IMAGE = {
+  url: 'https://res.cloudinary.com/demo/photo.jpg',
+  cloudinaryId: 'familyframe/abc',
+  width: 4000,
+  height: 3000,
+  bytes: 2_400_000,
+}
 // Received earlier with its own message: a new share must not pass that one on.
 const ORIGINAL: StoredPhoto = {
   id: '6b044f9d56a44767c7079a01',

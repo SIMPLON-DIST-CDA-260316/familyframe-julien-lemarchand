@@ -70,6 +70,15 @@ script:post-response {
   test('la photo reçue attend l\'admin, non ouverte, avec le message', () => {
     expect(received?.message).to.equal('Joyeux anniversaire !')
   })
+  test('elle garde la taille et le poids de la photo du membre', async () => {
+    const original = (await photosOf(bru.getVar('sessionCookie'), '/api/photos')).find(
+      ({ id }) => id === bru.getVar('createdPhotoId'),
+    )
+    expect(original?.width).to.be.a('number')
+    expect(received?.width).to.equal(original.width)
+    expect(received?.height).to.equal(original.height)
+    expect(received?.bytes).to.equal(original.bytes)
+  })
   test('elle n\'est pas encore dans la bibliothèque de l\'admin', async () => {
     const ids = (await photosOf(bru.getVar('adminCookie'), '/api/photos')).map(({ id }) => id)
     expect(ids).to.not.include(received?.id)
@@ -91,7 +100,8 @@ docs {
   l'envoi va dans `librarySendId` (repris par `sends/`), celui de la photo
   reçue, lue dans `GET /api/photos/unopened` de l'admin, dans
   `sharedPhotoId`. Elle pointe vers la même image Cloudinary que celle du
-  membre ; le script vérifie qu'elle porte le message, qu'elle n'est pas
+  membre ; le script vérifie qu'elle porte le message et la taille et le
+  poids de l'original (`width`, `height`, `bytes`), qu'elle n'est pas
   encore dans la bibliothèque de l'admin, et que celle du membre ne gagne
   pas de photo.
 }

@@ -20,6 +20,10 @@ function recordWithId(id: string): PhotoRecord {
     url: 'https://res.cloudinary.com/demo/photo.jpg',
     cloudinaryId: `familyframe/${id}`,
     sha256: `sha-${id}`,
+    // Stored before step 15: no size.
+    width: null,
+    height: null,
+    bytes: null,
     createdAt: new Date('2026-11-23T10:00:00Z'),
   }
 }

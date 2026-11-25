@@ -15,6 +15,9 @@ const OPENED: PhotoRecord = {
   url: 'https://res.cloudinary.com/demo/photo.jpg',
   cloudinaryId: 'familyframe/abc',
   sha256: 'sha-of-the-bytes',
+  width: 4000,
+  height: 3000,
+  bytes: 2_400_000,
   createdAt: new Date('2026-11-24T10:00:00Z'),
   sender: { displayName: 'Membre' },
 }

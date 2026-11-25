@@ -9,7 +9,13 @@ import type { ShareResult } from './photos.share.js'
 const SENDER_ID = '6b044f9d56a44767c7079b01'
 const FRIEND_ID = '6b044f9d56a44767c7079b02'
 const OTHER_FRIEND_ID = '6b044f9d56a44767c7079b03'
-const IMAGE = { url: 'https://res.cloudinary.com/demo/photo.jpg', cloudinaryId: 'familyframe/abc' }
+const IMAGE = {
+  url: 'https://res.cloudinary.com/demo/photo.jpg',
+  cloudinaryId: 'familyframe/abc',
+  width: 4000,
+  height: 3000,
+  bytes: 2_400_000,
+}
 const ORIGINAL: StoredPhoto = {
   id: '6b044f9d56a44767c7079a01',
   ownerId: SENDER_ID,
@@ -34,6 +40,9 @@ const FRAME_JPEG = Buffer.from('frame jpeg')
 const FRESH_IMAGE = {
   url: 'https://res.cloudinary.com/demo/fresh.jpg',
   cloudinaryId: 'familyframe/fresh',
+  width: 1600,
+  height: 1200,
+  bytes: 900_000,
 }
 
 // The friend's new photo, as the repository returns it: with the sender's name.
@@ -121,6 +130,18 @@ describe('shareFromLibrary', () => {
     expect(deps.uploadImage).not.toHaveBeenCalled()
   })
 
+  it('copies a photo stored before its size was kept without a size', async () => {
+    const deps = makeDeps()
+    const unsized = { ...ORIGINAL, width: null, height: null, bytes: null }
+    deps.repository.findOwned.mockResolvedValue(unsized)
+
+    await shareOriginal(deps, [FRIEND_ID])
+
+    expect(deps.repository.create).toHaveBeenCalledWith(
+      expect.objectContaining({ width: null, height: null, bytes: null }),
+    )
+  })
+
   it('records one send for the whole action, naming the friends who received it', async () => {
     const deps = makeDeps()
 
@@ -130,7 +151,8 @@ describe('shareFromLibrary', () => {
     expect(deps.recordSend).toHaveBeenCalledWith({
       senderId: SENDER_ID,
       recipientIds: [FRIEND_ID, OTHER_FRIEND_ID],
-      ...IMAGE,
+      url: IMAGE.url,
+      cloudinaryId: IMAGE.cloudinaryId,
       message: undefined,
     })
     expect(result.send?.recipientIds).toEqual([FRIEND_ID, OTHER_FRIEND_ID])

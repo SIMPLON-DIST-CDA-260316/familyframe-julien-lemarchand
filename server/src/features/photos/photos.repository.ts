@@ -13,7 +13,8 @@ export type StoredPhoto = Photo
 export type PhotoRecord = Prisma.PhotoGetPayload<{ include: typeof SENDER_NAME }>
 
 // senderId and message only on a photo sent by a friend: Prisma leaves the fields out, and
-// reads them as null.
+// reads them as null. width, height and bytes are null on a copy of a photo stored before
+// step 15.
 export type NewPhoto = {
   ownerId: string
   senderId?: string
@@ -22,6 +23,9 @@ export type NewPhoto = {
   url: string
   cloudinaryId: string
   sha256: string
+  width: number | null
+  height: number | null
+  bytes: number | null
 }
 
 // photoIds: only these photos, a collection's; undefined for the whole library.

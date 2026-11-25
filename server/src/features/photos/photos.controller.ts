@@ -30,6 +30,9 @@ function toPhotoDto(record: PhotoRecord): Photo {
     createdAt: record.createdAt.toISOString(),
     senderName: record.sender?.displayName ?? null,
     message: record.message,
+    width: record.width,
+    height: record.height,
+    bytes: record.bytes,
   }
 }
 

@@ -4,7 +4,13 @@ import type { PhotoRecord, PhotosRepository } from './photos.repository.js'
 import { createPhotosService, type PhotosServiceDeps } from './photos.service.js'
 
 const OWNER_ID = '6b044f9d56a44767c7079b01'
-const IMAGE = { url: 'https://res.cloudinary.com/demo/photo.jpg', cloudinaryId: 'familyframe/abc' }
+const IMAGE = {
+  url: 'https://res.cloudinary.com/demo/photo.jpg',
+  cloudinaryId: 'familyframe/abc',
+  width: 4000,
+  height: 3000,
+  bytes: 2_400_000,
+}
 const RECORD: PhotoRecord = {
   id: '6b044f9d56a44767c7079a01',
   ownerId: OWNER_ID,

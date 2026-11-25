@@ -59,6 +59,11 @@ model Photo {
   url          String
   cloudinaryId String
   sha256       String
+  // The stored image's size in pixels and its weight in bytes, as Cloudinary measured it at
+  // upload. Unset on photos saved before step 15: the photo's info then leaves them out.
+  width        Int?
+  height       Int?
+  bytes        Int?
   // The sender's note, 200 characters at most; absent when there is none.
   message      String?
   // false until the owner opens a photo a friend sent. Unset on photos saved before

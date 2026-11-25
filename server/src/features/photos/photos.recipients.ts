@@ -3,8 +3,16 @@ import { OBJECT_ID_PATTERN } from './photos.input.js'
 import type { PhotoRecord } from './photos.repository.js'
 import type { PhotosServiceDeps } from './photos.service.js'
 
-// The image a send gives, the sender's photo or a fresh upload: every copy points to it.
-export type SharedImage = { url: string; cloudinaryId: string; sha256: string }
+// The image a send gives, the sender's photo or a fresh upload: every copy points to it, and
+// keeps its size (null when the sender's photo was stored before step 15).
+export type SharedImage = {
+  url: string
+  cloudinaryId: string
+  sha256: string
+  width: number | null
+  height: number | null
+  bytes: number | null
+}
 
 // Who can receive the photo, and the answer for the others.
 export type SortedRecipients = { eligibleIds: string[]; refusals: SendOutcome[] }
@@ -91,7 +99,7 @@ async function saveCopy(
   request: CopyRequest,
 ): Promise<PhotoRecord | null> {
   const { senderId, message, image } = request
-  const { url, cloudinaryId, sha256 } = image
+  const { url, cloudinaryId, sha256, width, height, bytes } = image
   const copy = {
     ownerId: recipientId,
     senderId,
@@ -100,6 +108,9 @@ async function saveCopy(
     url,
     cloudinaryId,
     sha256,
+    width,
+    height,
+    bytes,
   }
   const record = await deps.repository.create(copy)
   if (!record) {

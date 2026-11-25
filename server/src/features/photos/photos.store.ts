@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
 import { AppError } from '../../errors/app-error.js'
-import type { UploadedImage } from '../../lib/cloudinary.js'
+import type { UploadedPhoto } from '../../lib/cloudinary.js'
 import type { NewPhoto, PhotoRecord } from './photos.repository.js'
 import type { PhotosServiceDeps } from './photos.service.js'
 
@@ -79,7 +79,7 @@ async function saveRecord(deps: PhotosServiceDeps, photo: NewPhoto): Promise<Pho
 export async function uploadFrameImage(
   deps: PhotosServiceDeps,
   buffer: Buffer,
-): Promise<UploadedImage> {
+): Promise<UploadedPhoto> {
   const jpeg = await convertToFrameJpeg(deps, buffer)
   // Cloudinary and database failures are ours: they stay 500s.
   return deps.uploadImage(jpeg)

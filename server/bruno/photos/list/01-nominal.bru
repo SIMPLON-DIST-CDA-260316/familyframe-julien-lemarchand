@@ -27,6 +27,13 @@ script:post-response {
       expect(photo.thumbnailUrl).to.contain('c_fill,g_auto')
     }
   })
+  test("taille et poids : des nombres, ou null pour une photo envoyée avant l'étape 15", () => {
+    for (const { width, height, bytes } of photos) {
+      for (const value of [width, height, bytes]) {
+        expect(value === null || typeof value === 'number').to.equal(true)
+      }
+    }
+  })
   test('nextCursor vaut null ou un id', () => {
     expect(nextCursor === null || typeof nextCursor === 'string').to.equal(true)
   })
@@ -34,7 +41,8 @@ script:post-response {
 
 docs {
   NOMINAL → 200 `{ photos, nextCursor }` : au plus 30 photos (taille par
-  défaut) du compte connecté, chacune avec `url` et `thumbnailUrl`. Un
+  défaut) du compte connecté, chacune avec `url`, `thumbnailUrl`, `width`,
+  `height` et `bytes` (null sur une photo envoyée avant l'étape 15). Un
   ObjectId commence par sa date de création : des ids décroissants, c'est la
   plus récente en premier.
 }

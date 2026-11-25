@@ -21,6 +21,9 @@ assert {
   res.body.id: isString
   res.body.cloudinaryId: isUndefined
   res.body.senderName: isNull
+  res.body.width: isNumber
+  res.body.height: isNumber
+  res.body.bytes: isNumber
 }
 
 script:post-response {
@@ -63,6 +66,8 @@ docs {
   NOMINAL → 201 avec la photo créée, dans la bibliothèque du compte connecté :
   la réponse ne porte plus de nom d'expéditeur (`uploaderName`) ; `senderName`
   vaut `null`, car le membre a envoyé la photo lui-même.
+  `width`, `height` (en pixels) et `bytes` (poids en octets) décrivent l'image
+  stockée, mesurée par Cloudinary à l'envoi : les infos de la photo les montrent.
   `cloudinaryId` n'est pas exposé : le serveur envoie des URL prêtes, `url`
   (photo entière, limitée à 1920 px par `c_limit` : l'image stockée va
   jusqu'à 4096 px pour l'impression) et `thumbnailUrl` (miniature), toutes
