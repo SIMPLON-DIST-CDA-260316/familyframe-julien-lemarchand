@@ -1,0 +1,19 @@
+meta {
+  name: radio
+  seq: 2
+}
+
+docs {
+  `GET /api/selections/radio/:photoId` → 200 `{ photoIds }` : la radio
+  construite sur une photo de la bibliothèque, 30 photos au plus. La photo
+  de départ d'abord, puis les photos qui lui sont liées (même ami
+  expéditeur, arrivées à 7 jours d'écart au plus, collections en commun),
+  les plus liées d'abord, puis les autres au hasard. Une photo d'un autre
+  compte, inconnue, reçue pas encore ouverte, supprimée ou un id mal formé :
+  404 `PHOTO_NOT_FOUND`.
+
+  Les deux photos de ce dossier arrivent le même jour : la seconde est liée
+  à la première par la date. Le classement lui-même (expéditeur,
+  collections, égalités, complément au hasard) est vérifié par les tests
+  unitaires.
+}

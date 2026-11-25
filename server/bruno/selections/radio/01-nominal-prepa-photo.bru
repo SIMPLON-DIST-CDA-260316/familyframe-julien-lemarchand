@@ -1,0 +1,33 @@
+meta {
+  name: Nominal - première photo du compte jetable
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/photos
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  photo: @file(fixtures/photo.jpg) @contentType(image/jpeg)
+}
+
+script:pre-request {
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 201
+  res.body.id: isString
+}
+
+script:post-response {
+  bru.setVar('radioPhotoId', res.body.id)
+}
+
+docs {
+  NOMINAL → 201. Préparation : une photo dans la bibliothèque du compte
+  jetable ; son id va dans `radioPhotoId`, et `08` la supprime.
+}

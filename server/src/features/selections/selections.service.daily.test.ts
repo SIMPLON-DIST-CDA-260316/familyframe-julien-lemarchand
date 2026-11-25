@@ -15,6 +15,7 @@ function photosOn(createdAt: Date, count: number, firstNumber = 1): SelectionPho
   return Array.from({ length: count }, (_, index) => ({
     id: (firstNumber + index).toString(16).padStart(24, '0'),
     createdAt,
+    senderId: null,
   }))
 }
 
@@ -27,8 +28,10 @@ function makeDeps(photos: SelectionPhoto[] = LIBRARY, now: Date = MORNING) {
   return {
     repository: {
       findOpenedPhotos: vi.fn<SelectionsRepository['findOpenedPhotos']>().mockResolvedValue(photos),
+      findCollectionPhotoIds: vi.fn<SelectionsRepository['findCollectionPhotoIds']>(),
     },
     now: () => now,
+    random: Math.random,
   }
 }
 

@@ -1,0 +1,34 @@
+meta {
+  name: Nominal - radio à partir d'une photo
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/selections/radio/{{radioPhotoId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('radioPhotoId') || !bru.getVar('radioSecondPhotoId')) {
+    throw new Error('radioPhotoId ou radioSecondPhotoId absent : lancer tout le dossier, radio/01 et 02 doivent passer')
+  }
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 200
+  res.body.photoIds.length: eq 2
+}
+
+script:post-response {
+  test('la radio commence par sa photo, puis la photo du même jour', () => {
+    expect(res.body.photoIds).to.eql([bru.getVar('radioPhotoId'), bru.getVar('radioSecondPhotoId')])
+  })
+}
+
+docs {
+  NOMINAL → 200 : la photo de `01` d'abord, puis celle de `02`, arrivée le
+  même jour.
+}

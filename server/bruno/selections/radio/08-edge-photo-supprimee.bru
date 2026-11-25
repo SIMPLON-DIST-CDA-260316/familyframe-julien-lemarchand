@@ -1,0 +1,43 @@
+meta {
+  name: Edge - photo supprimée
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/api/selections/radio/{{radioPhotoId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const axios = require('axios')
+  if (!bru.getVar('radioPhotoId') || !bru.getVar('radioSecondPhotoId')) {
+    throw new Error('radioPhotoId ou radioSecondPhotoId absent : lancer tout le dossier, radio/01 et 02 doivent passer')
+  }
+  const headers = { Cookie: bru.getVar('inviteeCookie') }
+  req.setHeader('Cookie', headers.Cookie)
+  // The photo leaves the library first, then this request asks for its radio.
+  await axios.delete(`${bru.getEnvVar('baseUrl')}/api/photos/${bru.getVar('radioPhotoId')}`, {
+    headers,
+  })
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq PHOTO_NOT_FOUND
+}
+
+script:post-response {
+  const axios = require('axios')
+  // The second photo was only for this folder: deleted, its image leaves Cloudinary.
+  await axios.delete(`${bru.getEnvVar('baseUrl')}/api/photos/${bru.getVar('radioSecondPhotoId')}`, {
+    headers: { Cookie: bru.getVar('inviteeCookie') },
+  })
+}
+
+docs {
+  EDGE → 404 PHOTO_NOT_FOUND : le script de départ supprime la photo de
+  `01`, puis la requête demande sa radio. Le script de fin supprime la
+  photo de `02` : le compte jetable n'a plus de photo.
+}

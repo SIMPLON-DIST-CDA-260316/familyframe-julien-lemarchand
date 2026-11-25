@@ -1,0 +1,41 @@
+meta {
+  name: Edge - photo reçue pas encore ouverte
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/api/selections/radio/{{radioUnopenedPhotoId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('radioUnopenedPhotoId')) {
+    throw new Error('radioUnopenedPhotoId absent : lancer tout le dossier, radio/09 doit passer')
+  }
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq PHOTO_NOT_FOUND
+}
+
+script:post-response {
+  const axios = require('axios')
+  const baseUrl = bru.getEnvVar('baseUrl')
+  const headers = { Cookie: bru.getVar('inviteeCookie') }
+  test('la sélection du jour ne la tire pas non plus', async () => {
+    const lot = await axios.get(`${baseUrl}/api/selections/daily`, { headers })
+    expect(lot.data.photoIds).to.eql([])
+  })
+  // The photo was only for this test: deleted, its image leaves Cloudinary.
+  await axios.delete(`${baseUrl}/api/photos/${bru.getVar('radioUnopenedPhotoId')}`, { headers })
+}
+
+docs {
+  EDGE → 404 PHOTO_NOT_FOUND : une photo reçue n'entre dans les sélections
+  qu'une fois ouverte, comme dans la bibliothèque. Le script vérifie que la
+  sélection du jour reste vide, puis supprime la photo reçue.
+}
