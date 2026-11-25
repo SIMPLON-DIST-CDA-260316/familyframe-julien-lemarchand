@@ -46,8 +46,17 @@ export function idsInDrawOrder(photos: SelectionPhoto[], seed: string): string[]
 }
 
 // A received photo joins the library when it is opened, not when it arrives.
-function libraryDayOf({ createdAt, openedAt }: SelectionPhoto): string {
-  return dayOf(openedAt ?? createdAt)
+function joinedLibraryAt({ createdAt, openedAt }: SelectionPhoto): Date {
+  return openedAt ?? createdAt
+}
+
+// Not drawn: a photo added later in the day would then outrank one already in the lot and push it
+// out. In the order they joined, a newcomer only ever takes the room left.
+function idsInJoiningOrder(photos: SelectionPhoto[]): string[] {
+  return photos
+    .map((photo) => ({ id: photo.id, joinedAt: joinedLibraryAt(photo).getTime() }))
+    .sort((a, b) => a.joinedAt - b.joinedAt || a.id.localeCompare(b.id))
+    .map(({ id }) => id)
 }
 
 // Photos from before today come first: one added or opened today only fills a lot with room left.
@@ -56,8 +65,8 @@ function libraryDayOf({ createdAt, openedAt }: SelectionPhoto): string {
 export function drawDailySelection(photos: SelectionPhoto[], ownerId: string, now: Date): string[] {
   const today = dayOf(now)
   const seed = `${ownerId}:${today}`
-  const olderPhotos = photos.filter((photo) => libraryDayOf(photo) < today)
-  const todaysPhotos = photos.filter((photo) => libraryDayOf(photo) >= today)
-  const drawnIds = [...idsInDrawOrder(olderPhotos, seed), ...idsInDrawOrder(todaysPhotos, seed)]
+  const olderPhotos = photos.filter((photo) => dayOf(joinedLibraryAt(photo)) < today)
+  const todaysPhotos = photos.filter((photo) => dayOf(joinedLibraryAt(photo)) >= today)
+  const drawnIds = [...idsInDrawOrder(olderPhotos, seed), ...idsInJoiningOrder(todaysPhotos)]
   return drawnIds.slice(0, DAILY_SELECTION_SIZE)
 }

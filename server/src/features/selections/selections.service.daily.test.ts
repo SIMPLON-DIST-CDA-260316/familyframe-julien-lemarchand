@@ -24,6 +24,9 @@ const LIBRARY = photosOn(YESTERDAY, 30)
 // Ranked 6th of the library on MORNING's day if it counted as an older photo: a test that keeps it
 // out of the lot fails when the rule on photos of the day breaks.
 const RANKED_IN_LOT_NUMBER = 103
+// Ranked first of the photos of the day if they were drawn: a test that keeps it out of a lot with
+// room left fails when photos of the day are drawn by rank again.
+const LATE_ARRIVAL_NUMBER = 203
 
 function makeDeps(photos: SelectionPhoto[] = LIBRARY, now: Date = MORNING) {
   return {
@@ -113,6 +116,17 @@ describe('dailySelection', () => {
 
     expect(photoIds.slice(0, 3).sort()).toEqual(olderPhotos.map(({ id }) => id))
     expect(photoIds.slice(3).sort()).toEqual(todaysPhotos.map(({ id }) => id))
+  })
+
+  it('keeps a lot holding photos of the day when one more arrives later that day', async () => {
+    const olderPhotos = photosOn(YESTERDAY, 15)
+    const morningPhotos = photosOn(MORNING, 10, LIBRARY.length + 1)
+    const [eveningPhoto] = photosOn(EVENING, 1, LATE_ARRIVAL_NUMBER)
+    const morningLot = await drawOn(MORNING, [...olderPhotos, ...morningPhotos])
+
+    expect(await drawOn(EVENING, [...olderPhotos, ...morningPhotos, eveningPhoto])).toEqual(
+      morningLot,
+    )
   })
 
   it('answers an empty lot for an empty library', async () => {
