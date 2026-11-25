@@ -16,6 +16,10 @@ const THEME_OPTIONS: ThemeOption[] = [
   { value: 'system', label: 'Système', icon: MonitorIcon },
 ]
 
+// The muted pressed background barely shows on the dark menu: the chosen item is inverted.
+const SELECTED_ITEM_CLASSES =
+  'data-[state=on]:bg-foreground data-[state=on]:text-background data-[state=on]:hover:bg-foreground/90'
+
 // Lives in the avatar menu, on a computer and on a phone.
 export function ThemeToggle(): JSX.Element {
   const [preference, setPreference] = useState(readThemePreference)
@@ -38,7 +42,13 @@ export function ThemeToggle(): JSX.Element {
         aria-label="Thème"
       >
         {THEME_OPTIONS.map(({ value, label, icon: Icon }) => (
-          <ToggleGroupItem key={value} value={value} aria-label={label} title={label}>
+          <ToggleGroupItem
+            key={value}
+            value={value}
+            aria-label={label}
+            title={label}
+            className={SELECTED_ITEM_CLASSES}
+          >
             <Icon aria-hidden />
           </ToggleGroupItem>
         ))}

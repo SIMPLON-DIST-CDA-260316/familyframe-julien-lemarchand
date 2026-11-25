@@ -4,8 +4,8 @@ status: done
 spec: docs/superpowers/specs/2026-11-25-design-tokens-design.md
 branch: feat/design-tokens
 worktree: false
-tasks_total: 8
-tasks_done: 8
+tasks_total: 9
+tasks_done: 9
 current_task: null
 last_commit: null
 last_updated: 2026-11-26
@@ -47,3 +47,4 @@ Each task: `pnpm check`, `pnpm typecheck`; tasks 6 and 7 also `pnpm build`. Then
 1. **D11, how the colour reaches the meta.** A fresh-context review flagged that `syncThemeColor` wrote the computed `--background` as is, an `oklch()` string, and a browser may not accept it in a `theme-color` meta. `themeColor.ts` now paints the colour on a one-pixel canvas and writes the `rgb(…)` it reads back (task 8). The decision (the meta follows the token) is unchanged.
 2. **Product rules.** R-APP-78 (Encre by default, Actuelle kept, accent follows the palette), R-APP-79 (browser bar follows the chosen theme and palette, replaces R-APP-57 for the bar), R-APP-80 (palette independent of the theme, applied at once), R-APP-81 (remembered per device and browser). Other branches may claim numbers in the same range: renumber on merge if they collide.
 3. **The frame gradient's `via` stop** was kept dropped after review: recorded in spec D5.
+4. **Selected item in the account menu toggles.** The controller's Chrome pass found the chosen « Thème » and « Palette » item barely visible in dark (Encre `muted` 0.27 on `popover` 0.23; already true of `ThemeToggle` before). Both toggles now invert the chosen item (`bg-foreground` / `text-background`), as `SettingToggleGroup` does: about 14:1 against the menu in every palette and mode.

@@ -9,6 +9,10 @@ const PALETTE_OPTIONS: PaletteOption[] = [
   { value: 'actuelle', label: 'Actuelle' },
 ]
 
+// The muted pressed background barely shows on the dark menu: the chosen item is inverted.
+const SELECTED_ITEM_CLASSES =
+  'data-[state=on]:bg-foreground data-[state=on]:text-background data-[state=on]:hover:bg-foreground/90'
+
 // Under the theme toggle, in the avatar menu: the palette and the theme combine freely.
 export function PaletteToggle(): JSX.Element {
   const [palette, setPalette] = useState(readPalette)
@@ -31,7 +35,7 @@ export function PaletteToggle(): JSX.Element {
         aria-label="Palette"
       >
         {PALETTE_OPTIONS.map(({ value, label }) => (
-          <ToggleGroupItem key={value} value={value} className="px-2.5">
+          <ToggleGroupItem key={value} value={value} className={`px-2.5 ${SELECTED_ITEM_CLASSES}`}>
             {label}
           </ToggleGroupItem>
         ))}
