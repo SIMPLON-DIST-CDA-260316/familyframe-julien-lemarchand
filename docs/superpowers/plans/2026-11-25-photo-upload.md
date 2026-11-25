@@ -2,10 +2,10 @@
 plan: photo-upload
 status: done
 spec: docs/superpowers/specs/2026-11-25-photo-upload-design.md
-branch: feat/upload-progress (PR A), feat/upload-multiple (PR B), feat/upload-downscale (PR C)
+branch: feat/upload-progress (PR A), feat/upload-multiple (PR B), feat/upload-downscale (PR C), feat/upload-print-size (PR D)
 worktree: false
-tasks_total: 8
-tasks_done: 8
+tasks_total: 9
+tasks_done: 9
 current_task: null
 last_commit: null
 last_updated: 2026-11-25
@@ -25,7 +25,7 @@ last_updated: 2026-11-25
 
 ## Global Constraints
 
-- **No new dependency**, server or client. **No server change**, so no Bruno or unit test change and no `pnpm db:push` checkpoint.
+- **No new dependency**, server or client. **No server change in Tasks 1 to 3a**; Task 4 (controller decision) changes only the stored size and the display URL, with unit tests and one Bruno file. No schema change, no `pnpm db:push` checkpoint.
 - **Never Docker, never start the API or Vite, never `pnpm db:push` / `db:seed`, never read `.env` files** (controller's hard rules for this step). Bruno is counted from the files, not run.
 - **No client test runner** (none added, controller): the pure rules (`resizeDecision`, `uploadSummary`, the labels) live in their own files and were exercised once with Node; client tasks are verified by `pnpm check`, `pnpm typecheck`, `pnpm build` and the Chrome checklist.
 - **TypeScript (AGENTS.md):** no `as` casts, explicit return types on exported functions, literal unions rather than `enum`.
@@ -48,16 +48,19 @@ last_updated: 2026-11-25
 - `components/library/uploadTexts.ts`: `UploadTally`, `uploadSummary`, `pendingAnnouncement`, `pendingProgressLabel`, `chosenPhotosLabel`, `tooManyPhotosMessage`.
 - Components: `PendingGridTile`, `PendingListRow`, `PendingAnnouncement`, `UploadPreview`; `PhotoGrid` and `PhotoList` take optional `children` rendered before the photos; `LibrarySection` takes `pending`; `AddPhotoPanel({ isOpen, onClose, onUpload, returnFocusRefs })`; `UploadForm({ onUpload, onShare })`; `LibraryHeader` gains `addButtonRef`; step 13's `AddPhotoFab` gains `buttonRef` and `useHideOnScrollDown(ref)` takes the button's ref instead of returning one.
 
+- Server (Task 4): `PRINT_SIZE = 4096` in `lib/image.ts` (was `MAX_SIZE = 1920`); `DISPLAY_SIZE = 1920` in `lib/cloudinary.ts`, full `url` transformation `[{ crop: 'limit', width: 1920, height: 1920 }, { fetch_format: 'auto', quality: 'auto' }]`, built by the same signed `deliveryUrl`.
+
 ## Stack and branches
 
 - **PR A `feat/upload-progress`** on top of step 13's `feat/library-surface` (2af118f; rebased from bd9e332, first built on `feat/library-collections`, d58d3b8): the spec and this plan, then Tasks 1 to 1b.
 - **PR B `feat/upload-multiple`**: Tasks 2 to 2b.
 - **PR C `feat/upload-downscale`**: Tasks 3 and 3a.
+- **PR D `feat/upload-print-size`**: Task 4, then the docs commit that records it in the spec and this plan.
 
 ## Baselines
 
-- `pnpm test` at d58d3b8, bd9e332 and 2af118f (step 13 left the server untouched): `Test Files  25 passed (25)`, `Tests  301 passed (301)`; unchanged by every task (server only).
-- Bruno files at d58d3b8, bd9e332 and 2af118f: 184 requests; unchanged.
+- `pnpm test` at d58d3b8, bd9e332 and 2af118f (step 13 left the server untouched): `Test Files  25 passed (25)`, `Tests  301 passed (301)`; unchanged by Tasks 1 to 3a. After Task 4: `Test Files  26 passed (26)`, `Tests  308 passed (308)` (3 new `toFrameJpeg` tests, 4 in the new `cloudinary.test.ts`).
+- Bruno files at d58d3b8, bd9e332 and 2af118f: 184 requests; unchanged in count. Task 4 adds one `test()` to `photos/create/01-nominal-jpeg` and a second tampered URL in its signature test.
 
 ---
 
@@ -2732,9 +2735,283 @@ index b1bb43a..a1d108a 100644
  **Messages affichés**
 ~~~~
 
+## PR D — `feat/upload-print-size`
+
+### Task 4: Keep photos at print size, show them at screen size
+
+**Commit:** `feat(server): keep photos at print size, show them at screen size`
+
+**Scope:** Controller decision on spec open question 1 (spec D20 to D23): sharp cap 4096 px, signed `c_limit` 1920 px on the full URL, unit tests, Bruno `photos/create/01-nominal-jpeg`, R-BIB-08, R-BIB-63, R-PAR-21, ARCHITECTURE steps 3 and 7.
+
+**Gate:** `pnpm check` and `pnpm typecheck` green; `pnpm test` → `Test Files  26 passed (26)`, `Tests  308 passed (308)`.
+
+- [x] **Final diff**
+
+~~~~diff
+diff --git a/ARCHITECTURE.md b/ARCHITECTURE.md
+index c5a1fef..373e32a 100644
+--- a/ARCHITECTURE.md
++++ b/ARCHITECTURE.md
+@@ -29,11 +29,11 @@ Le détail des fichiers n'est pas listé ici : il change trop vite pour rester j
+ 
+ 1. Le proche, connecté à son compte, prend une photo (`<input type="file" accept="image/jpeg,image/png,image/webp" capture="environment">`) ou en choisit jusqu'à 20 (même `accept`, `multiple`).
+ 2. Le client envoie l'image en `multipart/form-data` à une route Express ; **Multer** la reçoit en mémoire. L'envoi passe par `XMLHttpRequest` plutôt que `fetch` : seul `upload.onprogress` donne la progression, affichée sur une vignette grisée en tête de la bibliothèque. Les photos partent une par une, dans une file d'attente côté client (`upload/uploadQueue.ts`) tenue par `UploadsProvider`, monté au-dessus des routes comme `CollectionsProvider` : quitter la bibliothèque n'arrête pas la file et ses vignettes reviennent au retour. La page ouverte reçoit chaque photo envoyée par un écouteur (`usePhotoUploads`) ; le rangement dans une collection se fait dans la file, page ouverte ou non. Juste avant l'envoi, une photo de plus de 4096 px sur son grand côté ou de plus de 10 Mo est redessinée dans un `canvas` à 4096 px au plus sur son grand côté (jamais agrandie : une photo de plus de 10 Mo mais plus petite garde sa taille, seul l'encodage l'allège) et encodée en JPEG qualité 0,92 ; `createImageBitmap` est appelé avec `imageOrientation: 'from-image'`, puis sans option si le navigateur refuse l'option (`TypeError`), et le `canvas` est vidé après `toBlob` (mémoire limitée sur iOS) (`upload/preparePhoto.ts`, règle pure dans `upload/photoResize.ts`) : un capteur de 48 Mpx dépasse sinon la limite du serveur. Les autres partent intactes ; un fichier que le navigateur ne sait pas décoder (HEIC sur ordinateur) part tel quel, le serveur tranche. L'envoi à un ami depuis l'appareil passe par la même préparation.
+-3. Le serveur vérifie la session (cookie `ff_session`, voir [Authentification](#authentification)) et le fichier (10 Mo max, JPEG/PNG/WebP), calcule le **SHA-256** des octets reçus et refuse un fichier déjà présent dans la bibliothèque du compte, photos en attente d'ouverture comprises (`409 PHOTO_DUPLICATE`, sans appeler Sharp ni Cloudinary), puis le **décode et le réencode avec Sharp** : JPEG de 1920 px max, orientation EXIF appliquée, métadonnées (GPS compris) supprimées. Le type déclaré par le navigateur n'est pas fiable : c'est le décodage par Sharp qui valide vraiment l'image.
++3. Le serveur vérifie la session (cookie `ff_session`, voir [Authentification](#authentification)) et le fichier (10 Mo max, JPEG/PNG/WebP), calcule le **SHA-256** des octets reçus et refuse un fichier déjà présent dans la bibliothèque du compte, photos en attente d'ouverture comprises (`409 PHOTO_DUPLICATE`, sans appeler Sharp ni Cloudinary), puis le **décode et le réencode avec Sharp** : JPEG de 4096 px max (`PRINT_SIZE` dans `lib/image.ts` : un tirage 20×30 cm à 300 dpi demande 3543 px), orientation EXIF appliquée, métadonnées (GPS compris) supprimées. Le type déclaré par le navigateur n'est pas fiable : c'est le décodage par Sharp qui valide vraiment l'image.
+ 4. L'image réencodée est envoyée à **Cloudinary**, dans le dossier `familyframe`.
+ 5. **Prisma** enregistre dans MongoDB l'URL, l'identifiant Cloudinary, le propriétaire (`ownerId`, le compte connecté), le SHA-256 du fichier reçu et la date. L'index unique `(ownerId, sha256)` est la vraie garantie : deux envois simultanés du même fichier passent la vérification, le second est refusé à l'enregistrement (`409` aussi) et son image Cloudinary est détruite.
+ 6. Le serveur émet un événement **Socket.IO** vers les connexions de ce compte ; son cadre affiche la nouvelle photo sans rechargement.
+-7. À l'affichage, le serveur construit deux URL Cloudinary depuis l'identifiant : la photo entière et une miniature carrée de 640 px recadrée sur le sujet (`c_fill,g_auto`). Les deux portent `f_auto,q_auto` : Cloudinary livre du WebP si le navigateur l'accepte et que c'est plus léger, sinon du JPEG. Une seule image est stockée. Les URL sont **signées** et le compte Cloudinary a « Strict transformations » activé : une URL dont on modifie la transformation est refusée, personne ne peut consommer le quota à notre place.
++7. À l'affichage, le serveur construit deux URL Cloudinary depuis l'identifiant : la photo entière limitée à 1920 px (`c_limit`, jamais agrandie : le cadre et la visionneuse reçoivent le même poids qu'avant, l'image stockée garde ses 4096 px pour l'impression) et une miniature carrée de 640 px recadrée sur le sujet (`c_fill,g_auto`). Les photos enregistrées avant le passage à 4096 px restent à 1920 px, sans migration. Les deux portent `f_auto,q_auto` : Cloudinary livre du WebP si le navigateur l'accepte et que c'est plus léger, sinon du JPEG. Une seule image est stockée. Les URL sont **signées** et le compte Cloudinary a « Strict transformations » activé : une URL dont on modifie la transformation est refusée, personne ne peut consommer le quota à notre place.
+ 
+ **Envoi à un ami depuis la bibliothèque** (`POST /api/photos/:id/share`) : le serveur vérifie la session, que `friendId` est un ami accepté (`areFriends`, du service amis, sinon `403 NOT_FRIENDS`), que la photo appartient au compte connecté (sinon `404 PHOTO_NOT_FOUND`) et que l'ami n'a pas déjà ce fichier (même SHA-256, `409 PHOTO_DUPLICATE`), puis crée chez l'ami une nouvelle photo qui pointe vers **la même image Cloudinary** (`senderId` = l'expéditeur, `message` = le mot facultatif de l'expéditeur, 200 caractères au plus, vérifié avant l'ami : `400 MESSAGE_INVALID`) : ni Sharp ni Cloudinary ne sont appelés. Le message de la photo d'origine ne suit pas la copie. La copie arrive **non ouverte** (`isOpened: false`) : l'événement `photo:received` part vers les connexions de l'ami, qui l'annoncent sans l'afficher ; l'image n'est détruite qu'avec la dernière photo qui y renvoie.
+ 
+diff --git a/docs/produit/bibliotheque.md b/docs/produit/bibliotheque.md
+index a1d108a..4d2a541 100644
+--- a/docs/produit/bibliotheque.md
++++ b/docs/produit/bibliotheque.md
+@@ -22,7 +22,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
+ 6. R-BIB-06 · Remplacée : une photo reçue en attente d'être découverte compte aussi (R-BIB-43).
+ 7. R-BIB-43 · Une photo identique, octet pour octet, à une photo déjà présente dans la bibliothèque, ou reçue d'un ami et en attente d'être découverte, est refusée, qu'elle ait été ajoutée par soi ou reçue d'un ami. Une version retouchée, recadrée ou réenregistrée de la même photo est un autre fichier : elle est acceptée.
+ 8. R-BIB-07 · Supprimer une photo permet de l'ajouter de nouveau ensuite.
+-9. R-BIB-08 · La photo ajoutée est préparée pour l'affichage : elle est remise dans le bon sens (photo prise téléphone tourné), réduite à 1920 pixels au plus sur son plus grand côté (jamais agrandie), et les zones transparentes deviennent blanches.
++9. R-BIB-08 · La photo ajoutée est préparée avant d'être gardée : elle est remise dans le bon sens (photo prise téléphone tourné), réduite à 4096 pixels au plus sur son plus grand côté (jamais agrandie), assez pour un tirage 20×30 cm, et les zones transparentes deviennent blanches. Le cadre et la bibliothèque l'affichent à la taille d'un écran, 1920 pixels au plus : elle ne s'affiche pas plus lentement qu'avant. Les photos ajoutées avant ce changement restent gardées à 1920 pixels au plus : assez pour l'écran, pas pour un tirage 20×30 cm.
+ 10. R-BIB-09 · Les informations cachées de la photo, dont le lieu de prise de vue, sont retirées à l'ajout : elles ne sont jamais conservées ni montrées.
+ 11. R-BIB-10 · Une photo ajoutée porte la date et l'heure de son ajout. La date de prise de vue n'est pas utilisée.
+ 12. R-BIB-11 · Remplacée : le panneau n'attend plus la fin de l'envoi (R-BIB-54).
+@@ -40,7 +40,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
+ 24. R-BIB-60 · « Choisir des images » permet de choisir jusqu'à 20 photos d'un coup ; « Prendre une photo » en prend une à la fois. Choisir de nouveau remplace les photos choisies dans le panneau. Refermer le sélecteur sans rien choisir garde les photos déjà choisies ; choisir de nouveau la même photo fonctionne.
+ 25. R-BIB-61 · Au-delà de 20 photos choisies d'un coup, aucune n'est gardée et un message demande d'en choisir moins.
+ 26. R-BIB-62 · Chaque photo choisie a sa propre vignette grisée. Une photo refusée n'arrête pas les suivantes : sa vignette disparaît, sa raison s'affiche, et le message de fin compte les photos ajoutées et refusées.
+-27. R-BIB-63 · Une très grande photo, de plus de 4096 pixels sur son plus grand côté, est réduite sur l'appareil avant l'envoi, à 4096 pixels sur ce côté, pour pouvoir être envoyée. Une photo de plus de 10 Mo mais moins grande garde sa taille : elle est seulement réenregistrée plus légère. Cette réduction garde toujours assez de détail pour un tirage 20×30 cm. Les autres photos partent telles quelles, sans aucune retouche. Il n'y a rien à régler. La photo gardée dans la bibliothèque reste ensuite celle préparée pour l'affichage (R-BIB-08).
++27. R-BIB-63 · Une très grande photo, de plus de 4096 pixels sur son plus grand côté, est réduite sur l'appareil avant l'envoi, à 4096 pixels sur ce côté, pour pouvoir être envoyée. Une photo de plus de 10 Mo mais moins grande garde sa taille : elle est seulement réenregistrée plus légère. Les autres photos partent telles quelles, sans aucune retouche. Il n'y a rien à régler. Une photo assez grande au départ reste imprimable en 20×30 cm jusqu'au bout : réduite sur l'appareil puis gardée à 4096 pixels au plus (R-BIB-08).
+ 28. R-BIB-64 · Une image que l'appareil ne sait pas lire part telle quelle : l'application l'accepte ou la refuse avec sa raison, comme toute photo.
+ 
+ **Messages affichés**
+diff --git a/docs/produit/partage.md b/docs/produit/partage.md
+index 70aa7a8..0c4467a 100644
+--- a/docs/produit/partage.md
++++ b/docs/produit/partage.md
+@@ -83,7 +83,7 @@ Ceux du panneau d'envoi (voir [Choisir à qui envoyer](#choisir-à-qui-envoyer))
+ **Règles**
+ 
+ 1. R-PAR-20 · La photo entre uniquement dans la bibliothèque de l'ami : elle n'est pas ajoutée à celle de l'expéditeur.
+-2. R-PAR-21 · Les règles d'ajout s'appliquent comme pour sa propre bibliothèque : formats JPEG, PNG ou WebP, 10 Mo au plus (une photo très grande ou plus lourde étant d'abord réduite, R-BIB-63), image lisible, photo préparée pour l'affichage et informations cachées retirées (voir [bibliotheque.md](bibliotheque.md#ajouter-une-photo), R-BIB-03 à R-BIB-09). Les messages d'erreur sont les mêmes.
++2. R-PAR-21 · Les règles d'ajout s'appliquent comme pour sa propre bibliothèque : formats JPEG, PNG ou WebP, 10 Mo au plus (une photo très grande ou plus lourde étant d'abord réduite, R-BIB-63), image lisible, photo préparée avant d'être gardée (4096 pixels au plus, assez pour un tirage 20×30 cm) et informations cachées retirées (voir [bibliotheque.md](bibliotheque.md#ajouter-une-photo), R-BIB-03 à R-BIB-09). Les messages d'erreur sont les mêmes.
+ 3. R-PAR-22 · « Envoyer à un ami » ferme le panneau « Ajouter une photo » et ouvre le panneau d'envoi avec la photo choisie. Après un envoi réussi, il se ferme ; le fermer sans envoyer abandonne la photo.
+ 4. R-PAR-23 · La notification « Photo ajoutée à votre bibliothèque. » et la vignette grisée de l'envoi en cours ne concernent que l'ajout à sa bibliothèque ; l'envoi à des amis se confirme par sa propre notification (« Envoyée à … »).
+ 5. R-PAR-24 · « Envoyer à un ami » envoie une seule photo : quand plusieurs photos sont choisies, le bouton reste désactivé et le panneau demande d'en choisir une seule. Chaque photo envoyée garde ainsi son propre message.
+diff --git a/server/bruno/photos/create/01-nominal-jpeg.bru b/server/bruno/photos/create/01-nominal-jpeg.bru
+index af5d04f..2d5e257 100644
+--- a/server/bruno/photos/create/01-nominal-jpeg.bru
++++ b/server/bruno/photos/create/01-nominal-jpeg.bru
+@@ -32,6 +32,9 @@ script:post-response {
+     expect(url).to.contain('f_auto,q_auto')
+     expect(thumbnailUrl).to.contain('f_auto,q_auto')
+   })
++  test('photo entière limitée à 1920 px pour les écrans, jamais agrandie', () => {
++    expect(url).to.contain('c_limit,h_1920,w_1920')
++  })
+   test('miniature carrée de 640 px, recadrée sur le sujet', () => {
+     expect(thumbnailUrl).to.contain('c_fill,g_auto,h_640,w_640')
+   })
+@@ -45,13 +48,14 @@ script:post-response {
+   test('URL signées : une transformation modifiée est refusée', async () => {
+     expect(url).to.match(/\/s--[\w-]+--\//)
+     expect(thumbnailUrl).to.match(/\/s--[\w-]+--\//)
+-    const tampered = thumbnailUrl.replace('w_640', 'w_641')
+     // Bruno's axios throws on 4xx even with validateStatus: read the status from the error.
+-    const status = await axios.get(tampered).then(
+-      (image) => image.status,
+-      (error) => error.response?.status,
+-    )
+-    expect(status).to.equal(401)
++    for (const tampered of [thumbnailUrl.replace('w_640', 'w_641'), url.replace('w_1920', 'w_4096')]) {
++      const status = await axios.get(tampered).then(
++        (image) => image.status,
++        (error) => error.response?.status,
++      )
++      expect(status).to.equal(401)
++    }
+   })
+ }
+ 
+@@ -60,11 +64,13 @@ docs {
+   la réponse ne porte plus de nom d'expéditeur (`uploaderName`) ; `senderName`
+   vaut `null`, car le membre a envoyé la photo lui-même.
+   `cloudinaryId` n'est pas exposé : le serveur envoie des URL prêtes, `url`
+-  (photo entière) et `thumbnailUrl` (miniature), toutes deux en
+-  `f_auto,q_auto`. Le test télécharge les deux URL : une transformation
++  (photo entière, limitée à 1920 px par `c_limit` : l'image stockée va
++  jusqu'à 4096 px pour l'impression) et `thumbnailUrl` (miniature), toutes
++  deux en `f_auto,q_auto`. Le test télécharge les deux URL : une transformation
+   refusée par Cloudinary ferait échouer le test.
+ 
+-  Les URL sont signées (`s--…--`). Le test de l'URL modifiée suppose
++  Les URL sont signées (`s--…--`). Les tests des URL modifiées (miniature
++  agrandie, photo entière demandée à 4096 px) supposent
+   « Strict transformations » activé dans la console Cloudinary (Settings →
+   Security) : sans ce réglage, Cloudinary accepte n'importe quelle
+   transformation et le test échoue.
+diff --git a/server/src/lib/cloudinary.test.ts b/server/src/lib/cloudinary.test.ts
+new file mode 100644
+index 0000000..565ed6e
+--- /dev/null
++++ b/server/src/lib/cloudinary.test.ts
+@@ -0,0 +1,38 @@
++import { describe, expect, it, vi } from 'vitest'
++
++// The URLs are built and signed locally: a fake account is enough, nothing reaches Cloudinary.
++vi.mock('../config.js', () => ({
++  config: { cloudinary: { cloudName: 'demo', apiKey: 'key', apiSecret: 'secret' } },
++}))
++
++const { deliveryUrls } = await import('./cloudinary.js')
++
++const CLOUDINARY_ID = 'familyframe/abc'
++const SIGNATURE = /\/s--[\w-]{8}--\//
++
++describe('deliveryUrls', () => {
++  it('limits the full photo to 1920 px for the screens, without enlarging it', () => {
++    const { url } = deliveryUrls(CLOUDINARY_ID)
++
++    expect(url).toContain('/c_limit,h_1920,w_1920/f_auto,q_auto/')
++  })
++
++  it('keeps the 640 px square thumbnail', () => {
++    const { thumbnailUrl } = deliveryUrls(CLOUDINARY_ID)
++
++    expect(thumbnailUrl).toContain('/c_fill,g_auto,h_640,w_640/f_auto,q_auto/')
++  })
++
++  it('signs both URLs, as strict transformations require', () => {
++    const { url, thumbnailUrl } = deliveryUrls(CLOUDINARY_ID)
++
++    expect(url).toMatch(SIGNATURE)
++    expect(thumbnailUrl).toMatch(SIGNATURE)
++  })
++
++  it('gives each transformation its own signature', () => {
++    const { url, thumbnailUrl } = deliveryUrls(CLOUDINARY_ID)
++
++    expect(url.match(SIGNATURE)?.[0]).not.toBe(thumbnailUrl.match(SIGNATURE)?.[0])
++  })
++})
+diff --git a/server/src/lib/cloudinary.ts b/server/src/lib/cloudinary.ts
+index 1fa8173..451c878 100644
+--- a/server/src/lib/cloudinary.ts
++++ b/server/src/lib/cloudinary.ts
+@@ -12,6 +12,9 @@ cloudinary.config({
+ // Covers a contact sheet cell (up to about 320 CSS px) on a 2x screen.
+ const THUMBNAIL_SIZE = 640
+ 
++// The frame and the viewer: a full HD screen. The stored photo is larger, kept for printing.
++const DISPLAY_SIZE = 1920
++
+ // Decided per request: WebP when the browser takes it and it is lighter, else JPEG.
+ // Compression is picked from the image content.
+ const OPTIMIZED_DELIVERY: ImageTransformationOptions = { fetch_format: 'auto', quality: 'auto' }
+@@ -57,8 +60,14 @@ function deliveryUrl(cloudinaryId: string, transformation: ImageTransformationOp
+   })
+ }
+ 
+-// No resize for the full photo: sharp already capped it at upload.
++// limit: shrinks a larger photo, never enlarges one; photos stored before the 4096 px cap stay
++// at 1920 px and go through unchanged.
+ export function deliveryUrls(cloudinaryId: string): DeliveryUrls {
++  const display: ImageTransformationOptions = {
++    crop: 'limit',
++    width: DISPLAY_SIZE,
++    height: DISPLAY_SIZE,
++  }
+   const thumbnail: ImageTransformationOptions = {
+     crop: 'fill',
+     gravity: 'auto',
+@@ -66,7 +75,7 @@ export function deliveryUrls(cloudinaryId: string): DeliveryUrls {
+     height: THUMBNAIL_SIZE,
+   }
+   return {
+-    url: deliveryUrl(cloudinaryId, [OPTIMIZED_DELIVERY]),
++    url: deliveryUrl(cloudinaryId, [display, OPTIMIZED_DELIVERY]),
+     thumbnailUrl: deliveryUrl(cloudinaryId, [thumbnail, OPTIMIZED_DELIVERY]),
+   }
+ }
+diff --git a/server/src/lib/image.test.ts b/server/src/lib/image.test.ts
+index fa3a1e6..f5cb244 100644
+--- a/server/src/lib/image.test.ts
++++ b/server/src/lib/image.test.ts
+@@ -1,6 +1,6 @@
+ import sharp from 'sharp'
+ import { describe, expect, it } from 'vitest'
+-import { toAvatarJpeg } from './image.js'
++import { toAvatarJpeg, toFrameJpeg } from './image.js'
+ 
+ // Built in memory: a test fixture file would hide the size the test depends on.
+ function landscapePng(): Promise<Buffer> {
+@@ -11,6 +11,35 @@ function landscapePng(): Promise<Buffer> {
+     .toBuffer()
+ }
+ 
++function photoOfSize(width: number, height: number): Promise<Buffer> {
++  return sharp({ create: { width, height, channels: 3, background: '#808080' } })
++    .jpeg()
++    .toBuffer()
++}
++
++describe('toFrameJpeg', () => {
++  it('keeps 4096 px on the long side of a larger photo, enough to print 20x30 cm', async () => {
++    const photo = await toFrameJpeg(await photoOfSize(6000, 4000))
++
++    const { format, width, height } = await sharp(photo).metadata()
++    expect({ format, width, height }).toEqual({ format: 'jpeg', width: 4096, height: 2731 })
++  })
++
++  it('never enlarges a smaller photo', async () => {
++    const photo = await toFrameJpeg(await photoOfSize(1200, 800))
++
++    const { width, height } = await sharp(photo).metadata()
++    expect({ width, height }).toEqual({ width: 1200, height: 800 })
++  })
++
++  it('turns transparency white', async () => {
++    const photo = await toFrameJpeg(await landscapePng())
++
++    const { channels } = await sharp(photo).stats()
++    expect(channels.slice(0, 3).map((channel) => channel.min)).toEqual([255, 255, 255])
++  })
++})
++
+ describe('toAvatarJpeg', () => {
+   it('turns a landscape PNG into a 256 px JPEG square', async () => {
+     const avatar = await toAvatarJpeg(await landscapePng())
+diff --git a/server/src/lib/image.ts b/server/src/lib/image.ts
+index 67126b8..3cf2eff 100644
+--- a/server/src/lib/image.ts
++++ b/server/src/lib/image.ts
+@@ -1,6 +1,8 @@
+ import sharp from 'sharp'
+ 
+-const MAX_SIZE = 1920
++// The stored photo must print at 20x30 cm, 300 dpi: 3543 px on the long side. Screens get a
++// lighter copy from Cloudinary (DISPLAY_SIZE in cloudinary.ts).
++const PRINT_SIZE = 4096
+ // Shown at most 128 CSS px wide (the settings page) on a 2x screen.
+ const AVATAR_SIZE = 256
+ const JPEG_QUALITY = 85
+@@ -9,7 +11,7 @@ const JPEG_QUALITY = 85
+ export async function toFrameJpeg(input: Buffer): Promise<Buffer> {
+   return sharp(input)
+     .rotate() // EXIF orientation of phone photos
+-    .resize({ width: MAX_SIZE, height: MAX_SIZE, fit: 'inside', withoutEnlargement: true })
++    .resize({ width: PRINT_SIZE, height: PRINT_SIZE, fit: 'inside', withoutEnlargement: true })
+     .flatten({ background: '#ffffff' }) // JPEG has no transparency
+     .jpeg({ quality: JPEG_QUALITY })
+     .toBuffer() // drops metadata, GPS included
+~~~~
+
 ## Final verification (controller)
 
-- No Bruno run needed for this step (no endpoint change); a regression run of `pnpm test:bruno` against a running API should still show 184 requests green.
+- `pnpm test:bruno` against a running API: 184 requests green. `photos/create/01-nominal-jpeg` now downloads the `c_limit` URL and expects 401 for `url` tampered to `w_4096`: this needs « Strict transformations » on, as before.
 - Chrome checklist and real-phone gestures: see the report to the controller.
 
 ## Drift Log
@@ -2757,11 +3034,12 @@ index b1bb43a..a1d108a 100644
   - Fix 9, `aria-valuenow` of a waiting tile: `undefined` when progress is `null`, so the bar is indeterminate (Task 1a).
   - Fix 10, R-BIB-63 said « légèrement réduite »: reworded, and ARCHITECTURE says a heavy photo under 4096 px is only re-encoded (Task 3a).
   - Fix 11, ARCHITECTURE step 1 showed `accept="image/*"` without `multiple`: the real `accept` list, `capture="environment"`, `multiple` (Task 2a).
-  - Won't fix 12, `toReversed()` needs Safari 16+: the client already relies on ES2023-era APIs (spec open question 8).
+  - Won't fix 12, `toReversed()` needs Safari 16+: the client already relies on ES2023-era APIs (spec open question 7).
   - Won't fix 13, the full decode just to read the size: accepted (spec open question 6).
 - **Step 12 minors handed over by the stabilisation step:**
   - M5 (Task 1b, spec D18): focus goes to the header's « Ajouter ». Why that target: it is always rendered (the empty library's « Ajouter une photo » unmounts with the first tile, and the send panel is opened from an add panel already closed, so Radix has no trigger to return to), and it is where the next photo is added from. An `isHandingOver` ref keeps it from stealing focus from the send panel while the panels swap.
   - M6 (Task 2b, spec D19): `input.value = ''` after reading, an empty `files` is ignored.
+- **Task 4, print size end to end** (controller, after the first report): spec open question 1 said the 20×30 promise held only on the client, since sharp still cut every photo to 1920 px. The controller made it hold end to end: sharp keeps 4096 px, the full URL is limited to 1920 px by a signed `c_limit`, older photos stay at 1920 px with no migration, duplicate detection checked unaffected (hash before sharp). Spec D17 reworded, D20 to D23 and open questions 9 and 10 added, open question 1 closed, in a docs commit after Task 4 (the spec and plan are not delivered yet, so they are updated rather than superseded). Size budget measured with sharp at 4096×3072: 3.2 MB for photo-like content at quality 92, 11.5 MB for pure noise, so the Chrome downscale check must use a photo-like test image, not pure noise.
 - **Rebase on step 13** (`feat/library-surface`, bd9e332), controller's go after step 13 landed:
   - **Rules renumbered:** step 13 uses R-BIB-48 to R-BIB-53, so step 14's R-BIB-48 to R-BIB-59 became R-BIB-54 to R-BIB-65, in the product docs, ARCHITECTURE, this plan, the spec and the commit messages. Done first, as a renumbered copy of the stack on its old base (step 14's commits only ever referred to their own rules above R-BIB-47), so the rebase itself only met real conflicts.
   - **Conflicts:** the rule list of `bibliotheque.md` at every commit (step 13's R-BIB-48 kept before step 14's rules, lists renumbered), its first bullet (step 13's floating « + » wording kept, the multi-photo wording added), ARCHITECTURE's pages table (step 13's row kept, « Choisir des images (jusqu'à 20 ; » applied to it), `LibrarySection` (step 13's plain section, the live line added), `UploadForm` (step 13 dropped `pointer-coarse:h-11`: the Button has it built in now, so the multi-photo buttons drop it too), `LibraryHeader` (step 13's `hidden md:inline-flex`, the ref added).
