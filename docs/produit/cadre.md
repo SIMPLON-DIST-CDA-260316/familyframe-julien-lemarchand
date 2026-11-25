@@ -98,15 +98,16 @@ Le cadre n'a plus de vue bibliothèque : voir R-CAD-53. Les règles ci-dessous g
 15. R-CAD-66 · L'ordre choisi est retenu sur l'appareil, comme la vitesse (R-CAD-62, R-CAD-63). Le bandeau de vignettes suit l'ordre de lecture.
 16. R-CAD-67 · Quatre modèles d'affichage. « Ajusté » (par défaut) : la photo entière, sans être coupée, l'espace autour rempli par une version floutée d'elle-même. « Plein format » : la photo remplit tout l'écran, quitte à couper ses bords. « Passe-partout » : la photo entière dans un large carton clair, sur un mur sombre. « Polaroïd » : la photo entière sur un tirage blanc légèrement penché, avec une bande en bas.
 17. R-CAD-68 · Avec « Ajusté » et « Plein format », la photo affichée s'agrandit très lentement et légèrement (zoom lent) pendant 20 secondes ; « Passe-partout » et « Polaroïd » restent immobiles. Le zoom lent est désactivé sur les appareils réglés pour réduire les animations.
-18. R-CAD-69 · Avec « Polaroïd », la date et, pour une photo reçue, « Envoyée par [nom] » s'écrivent dans la bande du tirage, et non plus en bas de l'écran. Une même photo penche toujours du même côté.
+18. R-CAD-69 · Remplacée : la bande du tirage porte aussi le message de l'expéditeur (R-CAD-71).
 19. R-CAD-70 · Le modèle choisi est retenu sur l'appareil, comme la vitesse et l'ordre (R-CAD-62, R-CAD-63).
 20. R-CAD-30 · La légende montre la date d'ajout ou de réception (« 24 novembre 2026 »), sans l'heure.
+21. R-CAD-71 · Avec « Polaroïd », la date, puis pour une photo reçue « Envoyée par [nom] » et le message de l'expéditeur, s'écrivent dans la bande du tirage, et non plus en bas de l'écran. Une même photo penche toujours du même côté.
 
 **Messages affichés**
 
 | Situation                                  | Message                                                                                                                      |
 | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
-| Légende d'une photo                        | « [date] » et, pour une photo reçue, « Envoyée par [nom] »                                                                   |
+| Légende d'une photo                        | « [date] » et, pour une photo reçue, « Envoyée par [nom] » puis son message entre guillemets, sur trois lignes au plus       |
 | Choix du modèle                            | « Affichage » : « Ajusté », « Plein format », « Passe-partout », « Polaroïd »                                                |
 | Choix de l'ordre                           | « Lecture » : « Dans l'ordre », « Aléatoire »                                                                                |
 | Choix de vitesse                           | « Vitesse » : « 5 s », « 10 s », « 20 s »                                                                                    |
