@@ -14,6 +14,7 @@ const ORIGINAL: StoredPhoto = {
   senderId: null,
   message: null,
   isOpened: true,
+  openedAt: null,
   ...IMAGE,
   sha256: 'sha-of-the-original-bytes',
   createdAt: new Date('2026-11-23T10:00:00Z'),

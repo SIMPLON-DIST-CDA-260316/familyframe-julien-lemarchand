@@ -11,6 +11,7 @@ const OPENED: PhotoRecord = {
   senderId: '6b044f9d56a44767c7079b01',
   message: 'Joyeux anniversaire !',
   isOpened: true,
+  openedAt: null,
   url: 'https://res.cloudinary.com/demo/photo.jpg',
   cloudinaryId: 'familyframe/abc',
   sha256: 'sha-of-the-bytes',

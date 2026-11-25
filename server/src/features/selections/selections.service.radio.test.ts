@@ -8,7 +8,8 @@ const OWNER_ID = '6b044f9d56a44767c7079b02'
 const MAMIE_ID = '6b044f9d56a44767c7079b05'
 
 function photo(number: number, createdAt: string, senderId: string | null = null): SelectionPhoto {
-  return { id: number.toString(16).padStart(24, 'a'), createdAt: new Date(createdAt), senderId }
+  const id = number.toString(16).padStart(24, 'a')
+  return { id, createdAt: new Date(createdAt), openedAt: null, senderId }
 }
 
 // Sent by Mamie on 1 June: the radio starts from it.

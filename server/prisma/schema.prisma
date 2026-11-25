@@ -62,6 +62,9 @@ model Photo {
   // false until the owner opens a photo a friend sent. Unset on photos saved before
   // step 9: they count as opened.
   isOpened     Boolean?
+  // When the owner first opened it; unset on every other photo. The day's selection counts a
+  // photo opened today as one of today's, wherever it was received.
+  openedAt     DateTime?
   createdAt    DateTime @default(now())
 
   @@unique([ownerId, sha256])

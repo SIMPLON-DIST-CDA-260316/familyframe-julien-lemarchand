@@ -15,6 +15,7 @@ function photosOn(createdAt: Date, count: number, firstNumber = 1): SelectionPho
   return Array.from({ length: count }, (_, index) => ({
     id: (firstNumber + index).toString(16).padStart(24, '0'),
     createdAt,
+    openedAt: null,
     senderId: null,
   }))
 }
@@ -92,6 +93,13 @@ describe('dailySelection', () => {
     const { photoIds } = await drawOn(MORNING, [...LIBRARY, ...justAfterMidnight])
 
     expect(photoIds).not.toContain(justAfterMidnight[0].id)
+  })
+
+  it('keeps the lot when a photo received yesterday is opened today', async () => {
+    const [received] = photosOn(YESTERDAY, 1, RANKED_IN_LOT_NUMBER)
+    const openedToday = { ...received, openedAt: MORNING }
+
+    expect(await drawOn(EVENING, [...LIBRARY, openedToday])).toEqual(await drawOn(MORNING))
   })
 
   it('fills a lot with room left with the photos of the day, after the older ones', async () => {

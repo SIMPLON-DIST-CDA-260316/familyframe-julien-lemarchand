@@ -84,24 +84,18 @@ async function deleteOwned(
   }
 }
 
-// Same atomic query as deleteOwned. Opening twice changes nothing and answers the photo again.
+// Only the first opening is dated: opening again changes nothing, it must not move the photo
+// into today's draw, and it answers the photo again.
 async function openOwned(
   prisma: PrismaClient,
   id: string,
   ownerId: string,
 ): Promise<PhotoRecord | null> {
-  try {
-    return await prisma.photo.update({
-      where: { id, ownerId },
-      data: { isOpened: true },
-      include: SENDER_NAME,
-    })
-  } catch (error: unknown) {
-    if (isRecordNotFound(error)) {
-      return null
-    }
-    throw error
-  }
+  await prisma.photo.updateMany({
+    where: { id, ownerId, isOpened: false },
+    data: { isOpened: true, openedAt: new Date() },
+  })
+  return prisma.photo.findFirst({ where: { id, ownerId }, include: SENDER_NAME })
 }
 
 export function createPhotosRepository(prisma: PrismaClient): PhotosRepository {

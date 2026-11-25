@@ -14,6 +14,7 @@ function recordWithId(id: string): PhotoRecord {
     senderId: null,
     message: null,
     isOpened: true,
+    openedAt: null,
     sender: null,
     url: 'https://res.cloudinary.com/demo/photo.jpg',
     cloudinaryId: `familyframe/${id}`,

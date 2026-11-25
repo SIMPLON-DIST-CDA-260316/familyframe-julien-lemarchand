@@ -32,14 +32,19 @@ function idsInDrawOrder(photos: SelectionPhoto[], seed: string): string[] {
     .map(({ id }) => id)
 }
 
-// Photos from before today come first: one added today only fills a lot with room left. The lot
-// still changes during the day when a photo leaves it (deleted, the next one in draw order takes
-// its place), or when a photo received before today is opened: its date is its reception.
+// A received photo joins the library when it is opened, not when it arrives.
+function libraryDayOf({ createdAt, openedAt }: SelectionPhoto): string {
+  return dayOf(openedAt ?? createdAt)
+}
+
+// Photos from before today come first: one added or opened today only fills a lot with room left.
+// The lot still changes during the day when a photo leaves it: deleted, the next one in draw
+// order takes its place.
 export function drawDailySelection(photos: SelectionPhoto[], ownerId: string, now: Date): string[] {
   const today = dayOf(now)
   const seed = `${ownerId}:${today}`
-  const olderPhotos = photos.filter(({ createdAt }) => dayOf(createdAt) < today)
-  const todaysPhotos = photos.filter(({ createdAt }) => dayOf(createdAt) >= today)
+  const olderPhotos = photos.filter((photo) => libraryDayOf(photo) < today)
+  const todaysPhotos = photos.filter((photo) => libraryDayOf(photo) >= today)
   const drawnIds = [...idsInDrawOrder(olderPhotos, seed), ...idsInDrawOrder(todaysPhotos, seed)]
   return drawnIds.slice(0, DAILY_SELECTION_SIZE)
 }

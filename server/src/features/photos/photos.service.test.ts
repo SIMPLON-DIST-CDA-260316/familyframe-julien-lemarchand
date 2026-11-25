@@ -17,6 +17,7 @@ const RECORD: PhotoRecord = {
   senderId: null,
   message: null,
   isOpened: true,
+  openedAt: null,
   sender: null,
   ...IMAGE,
   sha256: JPEG_SHA256,

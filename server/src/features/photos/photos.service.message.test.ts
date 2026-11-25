@@ -16,6 +16,7 @@ const ORIGINAL: StoredPhoto = {
   sha256: 'sha-of-the-original-bytes',
   message: 'Le message reçu avec la photo',
   isOpened: true,
+  openedAt: null,
   createdAt: new Date('2026-11-23T10:00:00Z'),
 }
 const COPY: PhotoRecord = {
