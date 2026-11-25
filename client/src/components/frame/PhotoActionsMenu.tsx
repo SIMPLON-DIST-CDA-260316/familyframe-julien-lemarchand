@@ -5,7 +5,6 @@ import { useCollections } from '@/collections/CollectionsContext.ts'
 import type { Collection } from '@/collections/collection.ts'
 import { CollectionNameDialog } from '@/components/collections/CollectionNameDialog.tsx'
 import { CollectionsSubmenu } from '@/components/collections/CollectionsSubmenu.tsx'
-import { COARSE_POINTER_TARGET_CLASSES } from '@/components/frame/controlClasses.ts'
 import { DeletePhotoDialog } from '@/components/frame/DeletePhotoDialog.tsx'
 import { ShareSheet } from '@/components/sharing/ShareSheet.tsx'
 import { Button } from '@/components/ui/button.tsx'
@@ -16,7 +15,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu.tsx'
 import { useStartRadio } from '@/hooks/useStartRadio.ts'
-import { cn } from '@/lib/utils.ts'
 import type { Photo } from '@/photo.ts'
 
 type PhotoActionsMenuProps = {
@@ -99,7 +97,7 @@ function MenuTrigger({ label, className, triggerRef }: MenuTriggerProps): JSX.El
         variant="ghost"
         size="icon-sm"
         aria-label={label}
-        className={cn(COARSE_POINTER_TARGET_CLASSES, className)}
+        className={className}
       >
         <EllipsisIcon />
       </Button>

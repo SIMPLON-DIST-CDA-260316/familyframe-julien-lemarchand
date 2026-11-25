@@ -27,9 +27,7 @@ export function MailAnnouncementCard({
           {sendersLabel([...photos].reverse())}
         </p>
       </div>
-      <Button className="pointer-coarse:h-11" onClick={onDiscover}>
-        Découvrir
-      </Button>
+      <Button onClick={onDiscover}>Découvrir</Button>
     </section>
   )
 }

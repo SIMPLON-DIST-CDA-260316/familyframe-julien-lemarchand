@@ -20,7 +20,7 @@ function StartFrameButton({ onStartFrame }: Pick<ViewerTopBarProps, 'onStartFram
       size="sm"
       onClick={onStartFrame}
       // The glass, but a pill wide enough for its label.
-      className={cn(VIEWER_BUTTON_CLASSES, 'w-auto px-3 pointer-coarse:w-auto')}
+      className={cn(VIEWER_BUTTON_CLASSES, 'w-auto px-3')}
     >
       <PlayIcon data-icon="inline-start" />
       Mode cadre

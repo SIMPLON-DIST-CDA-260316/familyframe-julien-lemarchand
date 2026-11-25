@@ -9,7 +9,7 @@ type AddProps = { onAdd: () => void }
 
 function AddPhotoButton({ onAdd }: AddProps): JSX.Element {
   return (
-    <Button size="lg" className="pointer-coarse:h-11" onClick={onAdd}>
+    <Button size="lg" onClick={onAdd}>
       <ImagePlusIcon aria-hidden data-icon="inline-start" />
       Ajouter une photo
     </Button>
@@ -42,7 +42,7 @@ export function UnavailableCollection({ message }: { message: string }): JSX.Ele
   return (
     <div className={NOTICE_CLASSES}>
       <p className="text-muted-foreground">{message}</p>
-      <Button asChild variant="outline" className="pointer-coarse:h-11">
+      <Button asChild variant="outline">
         <Link to="/">Voir toutes les photos</Link>
       </Button>
     </div>

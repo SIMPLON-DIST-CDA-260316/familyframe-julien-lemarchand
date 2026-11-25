@@ -114,19 +114,13 @@ function PickButtons({ onChange }: Pick<PickButtonProps, 'onChange'>): JSX.Eleme
 function UploadButtons({ hasFile, isSending, onShare }: UploadButtonsProps): JSX.Element {
   return (
     <div className="flex flex-col gap-2">
-      <Button
-        type="submit"
-        size="lg"
-        className="pointer-coarse:h-11"
-        disabled={!hasFile || isSending}
-      >
+      <Button type="submit" size="lg" disabled={!hasFile || isSending}>
         {isSending ? 'Envoi…' : 'Ajouter à ma bibliothèque'}
       </Button>
       <Button
         type="button"
         variant="outline"
         size="lg"
-        className="pointer-coarse:h-11"
         disabled={!hasFile || isSending}
         onClick={onShare}
       >

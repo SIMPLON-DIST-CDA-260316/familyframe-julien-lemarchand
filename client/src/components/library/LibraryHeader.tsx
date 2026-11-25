@@ -24,7 +24,7 @@ function FrameModeButton(): JSX.Element {
       asChild
       size="lg"
       // A phone opens the frame from the tab bar instead.
-      className="hidden rounded-full bg-frame-accent px-4 text-black hover:bg-frame-accent/85 pointer-coarse:h-11 md:inline-flex"
+      className="hidden rounded-full bg-frame-accent px-4 text-black hover:bg-frame-accent/85 md:inline-flex"
     >
       {/* The state: leaving the frame comes back to this library entry. Full screen is asked on
           the click itself: browsers grant it only during a user gesture. */}
@@ -55,7 +55,7 @@ export function LibraryHeader({
         </p>
       </div>
       <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
-        <Button size="lg" className="hidden pointer-coarse:h-11 md:inline-flex" onClick={onAdd}>
+        <Button size="lg" className="hidden md:inline-flex" onClick={onAdd}>
           <PlusIcon aria-hidden data-icon="inline-start" />
           Ajouter
         </Button>

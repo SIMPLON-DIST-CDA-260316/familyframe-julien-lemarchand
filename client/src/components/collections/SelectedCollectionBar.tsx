@@ -86,13 +86,7 @@ function CollectionMenu({ name, onSelect, onPlay, triggerRef }: CollectionMenuPr
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          ref={triggerRef}
-          variant="ghost"
-          size="icon"
-          className="pointer-coarse:size-11"
-          aria-label={`Actions pour ${name}`}
-        >
+        <Button ref={triggerRef} variant="ghost" size="icon" aria-label={`Actions pour ${name}`}>
           <EllipsisIcon />
         </Button>
       </DropdownMenuTrigger>

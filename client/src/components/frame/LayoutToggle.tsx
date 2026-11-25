@@ -15,8 +15,6 @@ export function LayoutToggle({ layout, onLayoutChange }: LayoutToggleProps): JSX
       variant="outline"
       size="lg"
       spacing={0}
-      // Each item 44 px under a finger, the size touch guidelines ask for.
-      className="*:pointer-coarse:size-11"
       value={layout}
       // Radix sends '' when the pressed item is clicked again: keep the current layout.
       onValueChange={(value) => {
