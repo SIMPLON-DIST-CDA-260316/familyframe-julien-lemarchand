@@ -37,6 +37,7 @@ type LibraryOverlaysProps = {
   isAdding: boolean
   onAddClose: () => void
   onUploaded: (photo: Photo) => void
+  isShowingPhotos: boolean
 }
 
 function LibraryBody({ selected, library, layout, viewer, onAdd }: LibraryBodyProps): JSX.Element {
@@ -73,6 +74,11 @@ function LibraryContent(props: LibraryContentProps): JSX.Element {
   )
 }
 
+// A collection that cannot be shown never loads a page: its viewer would wait forever.
+function isShowingPhotos(selected: SelectedCollection): boolean {
+  return selected.status !== 'missing' && selected.status !== 'failed'
+}
+
 // The viewer browses the photos shown, so a collection's photo never leads out of it.
 function LibraryOverlays({
   library,
@@ -80,11 +86,12 @@ function LibraryOverlays({
   isAdding,
   onAddClose,
   onUploaded,
+  isShowingPhotos,
 }: LibraryOverlaysProps): JSX.Element {
   return (
     <>
       <AddPhotoPanel isOpen={isAdding} onClose={onAddClose} onUploaded={onUploaded} />
-      {viewer.openId !== null && (
+      {viewer.openId !== null && isShowingPhotos && (
         <PhotoViewer library={library} openId={viewer.openId} viewer={viewer} />
       )}
     </>
@@ -112,6 +119,7 @@ export default function LibraryPage(): JSX.Element {
         isAdding={isAdding}
         onAddClose={() => setIsAdding(false)}
         onUploaded={handleUploaded}
+        isShowingPhotos={isShowingPhotos(selected)}
       />
     </main>
   )
