@@ -1,6 +1,7 @@
 import { AppError } from '../../errors/app-error.js'
+import { destroyUnusedImage } from '../../lib/image-uses.js'
 import type { SendOutcome } from '../../types.js'
-import type { SendRecord } from '../sends/sends.repository.js'
+import type { NewSend, SendRecord } from '../sends/sends.repository.js'
 import {
   parseFile,
   parseFriendIds,
@@ -55,6 +56,21 @@ async function findOwnedPhoto(
   return photo
 }
 
+// The friends have the photo already: a failed history line must not turn the send into an
+// error, the answer stays a success without the line.
+async function trySaveSend(deps: PhotosServiceDeps, send: NewSend): Promise<SendRecord | null> {
+  try {
+    return await deps.recordSend(send)
+  } catch (error: unknown) {
+    deps.logger.error('send.record_failed', {
+      cloudinaryId: send.cloudinaryId,
+      userId: send.senderId,
+      error,
+    })
+    return null
+  }
+}
+
 // One history line for the whole action, naming only the friends who received it.
 async function recordSend(
   deps: PhotosServiceDeps,
@@ -66,7 +82,10 @@ async function recordSend(
   }
   const { url, cloudinaryId } = image
   const recipientIds = copies.map(({ ownerId }) => ownerId)
-  const send = await deps.recordSend({ senderId, recipientIds, url, cloudinaryId, message })
+  const send = await trySaveSend(deps, { senderId, recipientIds, url, cloudinaryId, message })
+  if (!send) {
+    return null
+  }
   deps.logger.info('send.created', {
     sendId: send.id,
     cloudinaryId,
@@ -111,6 +130,23 @@ export async function shareFromLibrary(
   return toResult(await recordSend(deps, request, saved.copies), refusals, saved)
 }
 
+// A database failure after the upload: the fresh image goes, unless a copy saved before the
+// failure already uses it. destroyUnusedImage logs it as orphaned if it cannot tell.
+async function saveDeviceCopies(
+  deps: PhotosServiceDeps,
+  recipientIds: string[],
+  request: CopyRequest,
+): Promise<SavedCopies> {
+  try {
+    return await saveCopies(deps, recipientIds, request)
+  } catch (error: unknown) {
+    const { repository, deleteImage, logger } = deps
+    const imageUses = { countImageUses: repository.countImageUses, deleteImage, logger }
+    await destroyUnusedImage(imageUses, request.image.cloudinaryId)
+    throw error
+  }
+}
+
 // Uploaded once, only if someone can receive it, then shared like a library photo. It never
 // enters the sender's own library.
 export async function shareFromDevice(
@@ -127,7 +163,7 @@ export async function shareFromDevice(
   }
   const image: SharedImage = { ...(await uploadFrameImage(deps, buffer)), sha256 }
   const request: CopyRequest = { senderId, message: validMessage, image, source: 'device' }
-  const saved = await saveCopies(deps, eligibleIds, request)
+  const saved = await saveDeviceCopies(deps, eligibleIds, request)
   // Concurrent sends reached every friend first: this fresh image is referenced by nothing.
   if (saved.copies.length === 0) {
     await deleteStoredImage(deps, image.cloudinaryId)

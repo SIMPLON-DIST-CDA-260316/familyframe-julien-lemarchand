@@ -67,12 +67,30 @@ export async function sortRecipients(
   return sorted
 }
 
+// Identifiers only: the copy's owner is the recipient.
+function logCopy(
+  { logger }: PhotosServiceDeps,
+  record: PhotoRecord,
+  { senderId, message, image, source, sourcePhotoId }: CopyRequest,
+): void {
+  logger.info('photo.shared', {
+    photoId: record.id,
+    sourcePhotoId,
+    cloudinaryId: image.cloudinaryId,
+    userId: senderId,
+    recipientId: record.ownerId,
+    source,
+    hasMessage: message !== undefined,
+  })
+}
+
 // null: a concurrent send of the same file reached this friend first.
 async function saveCopy(
   deps: PhotosServiceDeps,
   recipientId: string,
-  { senderId, message, image, source, sourcePhotoId }: CopyRequest,
+  request: CopyRequest,
 ): Promise<PhotoRecord | null> {
+  const { senderId, message, image } = request
   const { url, cloudinaryId, sha256 } = image
   const copy = {
     ownerId: recipientId,
@@ -88,15 +106,7 @@ async function saveCopy(
     deps.logger.info('photo.duplicate', { userId: recipientId, cloudinaryId })
     return null
   }
-  deps.logger.info('photo.shared', {
-    photoId: record.id,
-    sourcePhotoId,
-    cloudinaryId,
-    userId: senderId,
-    recipientId,
-    source,
-    hasMessage: message !== undefined,
-  })
+  logCopy(deps, record, request)
   return record
 }
 

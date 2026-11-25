@@ -184,6 +184,42 @@ describe('shareFromDevice', () => {
     expect(deps.deleteImage).not.toHaveBeenCalled()
   })
 
+  it('destroys the fresh image and fails when saving the first copy fails', async () => {
+    const deps = makeDeps()
+    deps.repository.create.mockRejectedValue(new Error('database down'))
+    deps.repository.countImageUses.mockResolvedValue(0)
+
+    await expect(sharePng(deps, [FRIEND_ID])).rejects.toThrow('database down')
+    expect(deps.deleteImage).toHaveBeenCalledWith(FRESH_IMAGE.cloudinaryId)
+  })
+
+  it('keeps the fresh image when a copy saved before the failure uses it', async () => {
+    const deps = makeDeps()
+    deps.repository.create.mockImplementationOnce(async (photo) => copyOf(photo))
+    deps.repository.create.mockRejectedValueOnce(new Error('database down'))
+    deps.repository.countImageUses.mockResolvedValue(1)
+
+    await expect(sharePng(deps, [FRIEND_ID, OTHER_FRIEND_ID])).rejects.toThrow('database down')
+    expect(deps.deleteImage).not.toHaveBeenCalled()
+  })
+
+  it('still answers the copies when the history line cannot be saved', async () => {
+    const deps = makeDeps()
+    deps.recordSend.mockRejectedValue(new Error('database down'))
+
+    const result = await sharePng(deps, [FRIEND_ID])
+
+    expect(result.send).toBeNull()
+    expect(result.copies).toHaveLength(1)
+    expect(result.outcomes).toEqual([{ friendId: FRIEND_ID, status: 'sent' }])
+    expect(deps.logger.error).toHaveBeenCalledWith('send.record_failed', {
+      cloudinaryId: FRESH_IMAGE.cloudinaryId,
+      userId: SENDER_ID,
+      error: expect.any(Error),
+    })
+    expect(deps.deleteImage).not.toHaveBeenCalled()
+  })
+
   it('rejects a missing file before asking who is friends', async () => {
     const deps = makeDeps()
 
