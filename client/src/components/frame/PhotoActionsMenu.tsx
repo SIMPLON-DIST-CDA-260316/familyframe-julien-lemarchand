@@ -30,6 +30,9 @@ type PhotoActionsMenuProps = {
   className?: string
   // Items above "Supprimer": the slideshow adds its speed.
   children?: ReactNode
+  // Set by a grid tile, whose long press opens the menu too; left out, the menu runs itself.
+  open?: boolean
+  onOpenChange?: (isOpen: boolean) => void
 }
 
 // The photo picked when a dialog opened: the slideshow may move on while it stays open.
@@ -152,6 +155,8 @@ export function PhotoActionsMenu({
   theme = 'dark',
   className,
   children,
+  open,
+  onOpenChange,
 }: PhotoActionsMenuProps): JSX.Element {
   const [dialog, setDialog] = useState<MenuDialog>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -159,7 +164,7 @@ export function PhotoActionsMenu({
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu open={open} onOpenChange={onOpenChange}>
         <MenuTrigger label={label} className={className} triggerRef={triggerRef} />
         <MenuItems photo={photo} themeClass={themeClass} onOpen={setDialog}>
           {children}
