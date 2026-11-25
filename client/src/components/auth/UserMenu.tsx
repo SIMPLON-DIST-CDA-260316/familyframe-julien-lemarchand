@@ -4,6 +4,7 @@ import { Link } from 'react-router'
 import { useAuth } from '@/auth/AuthContext.ts'
 import { UserAvatar } from '@/components/auth/UserAvatar.tsx'
 import { UserBadge } from '@/components/auth/UserBadge.tsx'
+import { PaletteToggle } from '@/components/theme/PaletteToggle.tsx'
 import { ThemeToggle } from '@/components/theme/ThemeToggle.tsx'
 import {
   DropdownMenu,
@@ -52,6 +53,7 @@ export function UserMenu(): JSX.Element | null {
         </DropdownMenuItem>
         {user.role === 'admin' && <PhoneInvitationsItem />}
         <ThemeToggle />
+        <PaletteToggle />
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={logout}>
           <LogOutIcon aria-hidden />

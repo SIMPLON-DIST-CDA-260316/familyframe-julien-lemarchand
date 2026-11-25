@@ -33,7 +33,7 @@ Comment on se déplace dans l'application, comment on choisit son thème et ses 
 
 - Ouvrir le menu en touchant le rond de son profil (sa photo, ou son initiale), à droite de la barre du haut, sur un ordinateur comme sur un téléphone.
 - Y voir son nom, son adresse e-mail et, pour l'administrateur, la mention « Admin ».
-- Y ouvrir ses « Préférences », choisir son thème et se déconnecter.
+- Y ouvrir ses « Préférences », choisir son thème et ses couleurs, et se déconnecter.
 - Sur un téléphone, pour l'administrateur, y ouvrir aussi « Invitations ».
 
 **Règles**
@@ -45,10 +45,10 @@ Comment on se déplace dans l'application, comment on choisit son thème et ses 
 
 **Messages affichés**
 
-| Situation                       | Message                                                                                                                                         |
-| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| Nom du bouton (lecture d'écran) | « Menu du compte »                                                                                                                              |
-| Contenu                         | [nom], « Admin » (administrateur), [e-mail], « Préférences », « Invitations » (administrateur, sur un téléphone), « Thème », « Se déconnecter » |
+| Situation                       | Message                                                                                                                                                      |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Nom du bouton (lecture d'écran) | « Menu du compte »                                                                                                                                           |
+| Contenu                         | [nom], « Admin » (administrateur), [e-mail], « Préférences », « Invitations » (administrateur, sur un téléphone), « Thème », « Palette », « Se déconnecter » |
 
 **Ce qui n'est pas possible**
 
@@ -92,19 +92,25 @@ Le menu à trois traits a laissé sa place à la barre d'onglets (R-APP-60) et a
 **Ce que l'on peut faire**
 
 - Profiter des couleurs « Encre » : un bleu ardoise pour les boutons principaux, sur un fond papier légèrement chaud, en clair comme en sombre.
+- Choisir, dans le menu du compte, sur la ligne « Palette » : « Encre » ou « Actuelle ».
 
 **Règles**
 
 1. R-APP-78 · Par défaut, l'application prend les couleurs « Encre ». Les couleurs d'avant, en gris neutres, restent disponibles sous le nom « Actuelle ». Le doré du « Mode cadre », du contour de la photo affichée sur le cadre et de l'annonce des photos reçues suit ces couleurs : plus doux avec « Encre », inchangé avec « Actuelle ». Le cadre et une photo ouverte en grand restent sur fond sombre (R-APP-34), dans les deux.
 2. R-APP-79 · Remplace R-APP-57 pour la couleur de la barre du navigateur : une fois la page chargée, la barre autour de l'adresse prend la couleur de fond de l'application, selon le thème choisi (« Sombre » sur un appareil réglé en clair donne une barre sombre) et selon les couleurs choisies.
+3. R-APP-80 · Les couleurs se choisissent indépendamment du thème : « Encre » et « Actuelle » existent en clair et en sombre. Le choix s'applique immédiatement à toute l'application, cadre compris.
+4. R-APP-81 · Comme le thème (R-APP-33), le choix est retenu sur cet appareil et dans ce navigateur seulement. Si l'appareil ne permet pas de le retenir, il vaut jusqu'à la fermeture de la page, puis l'application revient à « Encre ».
 
 **Messages affichés**
 
-Aucun message.
+| Situation | Message                               |
+| --------- | ------------------------------------- |
+| Choix     | « Palette » : « Encre », « Actuelle » |
 
 **Ce qui n'est pas possible**
 
 - Composer ses propres couleurs.
+- Retrouver ses couleurs sur un nouvel appareil sans les choisir de nouveau.
 
 ## Page introuvable
 
