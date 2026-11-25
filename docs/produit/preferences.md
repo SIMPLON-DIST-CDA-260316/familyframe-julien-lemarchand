@@ -13,7 +13,7 @@ La page où chacun règle son compte : sa photo de profil, son nom affiché et s
 1. R-PRF-01 · L'entrée « Préférences » est dans le menu du compte, juste au-dessus du choix du thème ; dans le menu mobile, elle est avec « Se déconnecter », sous la liste des pages.
 2. R-PRF-02 · Toucher « Préférences » dans le menu mobile ferme le menu et ouvre la page.
 3. R-PRF-03 · La page est réservée aux personnes connectées, comme les autres pages (R-CNX-30). Elle a la barre du haut.
-4. R-PRF-04 · Chaque encart s'enregistre seul : « Enregistrer » n'envoie que les changements de son encart, ce qui est saisi dans les autres reste en place.
+4. R-PRF-04 · Chaque encart s'enregistre seul : « Enregistrer » n'envoie que les changements de son encart, ce qui est saisi dans les autres reste en place. L'encart « Cadre de cet appareil » n'a pas de bouton : un choix s'applique aussitôt (R-PRF-50).
 
 **Messages affichés**
 

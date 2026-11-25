@@ -2,6 +2,10 @@ import { type JSX, useId } from 'react'
 import { optionSelector, type SettingOption } from '@/components/frame/frameSettingOptions.ts'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group.tsx'
 
+// The muted pressed background barely shows on the dark card: the chosen item is inverted.
+const ITEM_CLASSES =
+  'data-[state=on]:bg-foreground data-[state=on]:text-background data-[state=on]:hover:bg-foreground/90'
+
 type SettingToggleGroupProps<Value extends string | number> = {
   label: string
   options: SettingOption<Value>[]
@@ -32,7 +36,7 @@ export function SettingToggleGroup<Value extends string | number>({
         className="flex-wrap"
       >
         {options.map((option) => (
-          <ToggleGroupItem key={option.value} value={String(option.value)}>
+          <ToggleGroupItem key={option.value} value={String(option.value)} className={ITEM_CLASSES}>
             {option.label}
           </ToggleGroupItem>
         ))}
