@@ -32,8 +32,13 @@ function focusPhotoTile(event: Event, photoId: string): void {
 
 function ViewerPhoto({ library, viewer, photo, index }: ViewerPhotoProps): JSX.Element {
   const chrome = useViewerChrome()
+  const counter = viewerCounter(index, library)
   return (
     <>
+      {/* Outside the top bar, which turns inert when hidden: ← → still announce the position. */}
+      <p aria-live="polite" className="sr-only">
+        {counter}
+      </p>
       <ViewerCarousel
         photos={library.photos}
         currentId={photo.id}
@@ -44,7 +49,7 @@ function ViewerPhoto({ library, viewer, photo, index }: ViewerPhotoProps): JSX.E
       <ViewerTopBar
         photo={photo}
         isVisible={chrome.isVisible}
-        counter={viewerCounter(index, library)}
+        counter={counter}
         onClose={viewer.close}
         onStartFrame={() => viewer.startFrame(photo.id)}
       />

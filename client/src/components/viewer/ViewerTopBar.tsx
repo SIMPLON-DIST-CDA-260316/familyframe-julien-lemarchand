@@ -64,7 +64,8 @@ export function ViewerTopBar({
       )}
     >
       <CloseViewerButton onClose={onClose} />
-      <p aria-live="polite" className="mx-auto text-sm text-white/80 tabular-nums">
+      {/* Announced by PhotoViewer instead: the hidden bar is inert, out of screen readers' reach. */}
+      <p aria-hidden className="mx-auto text-sm text-white/80 tabular-nums">
         {counter}
       </p>
       <StartFrameButton onStartFrame={onStartFrame} />
