@@ -16,7 +16,7 @@ const THEME_OPTIONS: ThemeOption[] = [
   { value: 'system', label: 'Système', icon: MonitorIcon },
 ]
 
-// Lives in the account menus: the desktop avatar menu and the mobile burger.
+// Lives in the avatar menu, on a computer and on a phone.
 export function ThemeToggle(): JSX.Element {
   const [preference, setPreference] = useState(readThemePreference)
 

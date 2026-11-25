@@ -8,6 +8,8 @@
 :root {
   /* The color-scheme meta lets the browser pick dark: a page left light by the theme keeps light controls. */
   color-scheme: light;
+  /* One height for the phone's tab bar, the room the pages leave for it, and what floats above it. */
+  --tab-bar-height: 4rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);

@@ -5,6 +5,7 @@ import { RequireAdmin } from './auth/RequireAdmin.tsx'
 import { RequireAuth } from './auth/RequireAuth.tsx'
 import { CollectionsProvider } from './collections/CollectionsProvider.tsx'
 import { AccountBar } from './components/auth/AccountBar.tsx'
+import { MobileTabBar } from './components/nav/MobileTabBar.tsx'
 import { Toaster } from './components/ui/sonner.tsx'
 import AdminInvitationsPage from './pages/AdminInvitationsPage.tsx'
 import FramePage from './pages/FramePage.tsx'
@@ -40,6 +41,19 @@ function AccountBarLayout(): JSX.Element {
   )
 }
 
+// The app's own pages get the phone's tab bar; the 404 page does not, it is no place to go back to.
+// The pages leave room for the bar (and the home bar under it) so their end stays reachable.
+function TabBarLayout(): JSX.Element {
+  return (
+    <>
+      <div className="max-md:pb-[calc(var(--tab-bar-height)_+_env(safe-area-inset-bottom))]">
+        <Outlet />
+      </div>
+      <MobileTabBar />
+    </>
+  )
+}
+
 function AppRoutes(): JSX.Element {
   return (
     <Routes>
@@ -48,17 +62,19 @@ function AppRoutes(): JSX.Element {
       <Route element={<LoggedInLayout />}>
         <Route path="/frame" element={<FramePage />} />
         <Route element={<AccountBarLayout />}>
-          <Route path="/" element={<LibraryPage />} />
-          <Route path="/friends" element={<FriendsPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route
-            path="/admin/invitations"
-            element={
-              <RequireAdmin>
-                <AdminInvitationsPage />
-              </RequireAdmin>
-            }
-          />
+          <Route element={<TabBarLayout />}>
+            <Route path="/" element={<LibraryPage />} />
+            <Route path="/friends" element={<FriendsPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route
+              path="/admin/invitations"
+              element={
+                <RequireAdmin>
+                  <AdminInvitationsPage />
+                </RequireAdmin>
+              }
+            />
+          </Route>
           {/* Behind RequireAuth: a logged-out visitor goes to /login, as for any other page. */}
           <Route path="*" element={<NotFoundPage />} />
         </Route>

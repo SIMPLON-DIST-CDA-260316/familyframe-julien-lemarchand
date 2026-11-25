@@ -6,7 +6,7 @@ Personne ne s'inscrit seul dans FamilyFrame : l'administrateur crée un lien d'i
 
 **Ce que l'on peut faire**
 
-- Ouvrir la page « Invitations » depuis la barre du haut (entrée « Invitations ») ou depuis la bibliothèque (bouton « Inviter un proche sur FamilyFrame »). Ces deux accès n'apparaissent que pour l'administrateur.
+- Ouvrir la page « Invitations » depuis la barre du haut (entrée « Invitations » ; sur un téléphone, dans le menu du compte) ou depuis la bibliothèque (bouton « Inviter un proche sur FamilyFrame »). Ces deux accès n'apparaissent que pour l'administrateur.
 - Saisir l'adresse e-mail de la personne à inviter et créer le lien.
 - Copier le lien d'un clic avec « Copier le lien », ou le sélectionner pour le copier à la main.
 - Transmettre le lien soi-même, par le moyen de son choix (SMS, message, e-mail personnel).

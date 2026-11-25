@@ -17,6 +17,9 @@ const THEME_TOKENS: React.CSSProperties & Record<`--${string}`, string> = {
   '--border-radius': 'var(--radius)',
 }
 
+// On a phone, toasts rise above the tab bar and the home bar instead of covering them.
+const MOBILE_OFFSET = { bottom: 'calc(var(--tab-bar-height) + env(safe-area-inset-bottom) + 16px)' }
+
 function Toaster({ ...props }: ToasterProps) {
   const theme = useAppliedTheme()
 
@@ -32,6 +35,7 @@ function Toaster({ ...props }: ToasterProps) {
         loading: <Loader2Icon className="size-4 animate-spin" />,
       }}
       style={THEME_TOKENS}
+      mobileOffset={MOBILE_OFFSET}
       {...props}
     />
   )

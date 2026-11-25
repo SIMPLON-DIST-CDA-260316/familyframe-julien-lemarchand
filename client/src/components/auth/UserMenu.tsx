@@ -1,4 +1,4 @@
-import { LogOutIcon, SettingsIcon } from 'lucide-react'
+import { LogOutIcon, SettingsIcon, UserPlusIcon } from 'lucide-react'
 import type { JSX } from 'react'
 import { Link } from 'react-router'
 import { useAuth } from '@/auth/AuthContext.ts'
@@ -14,6 +14,18 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu.tsx'
 
+// On a computer the top bar lists « Invitations »; a phone's tab bar has no room for it.
+function PhoneInvitationsItem(): JSX.Element {
+  return (
+    <DropdownMenuItem asChild className="md:hidden">
+      <Link to="/admin/invitations">
+        <UserPlusIcon aria-hidden />
+        Invitations
+      </Link>
+    </DropdownMenuItem>
+  )
+}
+
 export function UserMenu(): JSX.Element | null {
   const { user, logout } = useAuth()
   if (user === null) return null
@@ -21,7 +33,8 @@ export function UserMenu(): JSX.Element | null {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        className="rounded-full focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+        // A finger gets 44 px around the avatar; a mouse keeps the avatar's own size.
+        className="grid place-items-center rounded-full focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none pointer-coarse:size-11"
         aria-label="Menu du compte"
       >
         <UserAvatar name={user.displayName} avatarUrl={user.avatarUrl} />
@@ -37,6 +50,7 @@ export function UserMenu(): JSX.Element | null {
             Préférences
           </Link>
         </DropdownMenuItem>
+        {user.role === 'admin' && <PhoneInvitationsItem />}
         <ThemeToggle />
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={logout}>

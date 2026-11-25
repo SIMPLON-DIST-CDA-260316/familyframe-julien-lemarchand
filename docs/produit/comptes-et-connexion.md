@@ -71,7 +71,7 @@ Comment on entre dans FamilyFrame, combien de temps on y reste connecté et comm
 
 **Ce que l'on peut faire**
 
-- Se déconnecter avec « Se déconnecter », depuis le menu du compte (ordinateur), le menu mobile (téléphone) ou la page d'invitation quand on y arrive déjà connecté.
+- Se déconnecter avec « Se déconnecter », depuis le menu du compte (rond de profil en haut à droite, sur un ordinateur comme sur un téléphone) ou la page d'invitation quand on y arrive déjà connecté.
 
 **Règles**
 

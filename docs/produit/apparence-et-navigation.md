@@ -7,7 +7,7 @@ Comment on se déplace dans l'application, comment on choisit son thème, et les
 **Ce que l'on peut faire**
 
 - Revenir à sa bibliothèque en touchant « FamilyFrame ».
-- Aller sur « Ma bibliothèque », « Cadre » ou « Amis » ; l'administrateur a en plus « Invitations ».
+- Sur un ordinateur, aller sur « Ma bibliothèque », « Cadre » ou « Amis » ; l'administrateur a en plus « Invitations ». Sur un téléphone, ces pages sont dans la barre d'onglets en bas de l'écran (voir [Barre d'onglets](#barre-donglets-téléphone)).
 
 **Règles**
 
@@ -15,7 +15,7 @@ Comment on se déplace dans l'application, comment on choisit son thème, et les
 2. R-APP-02 · Elle reste visible en haut de l'écran quand on fait défiler la page.
 3. R-APP-03 · L'entrée de la page où l'on se trouve est mise en évidence.
 4. R-APP-04 · L'entrée « Invitations » n'apparaît que pour l'administrateur.
-5. R-APP-05 · Sur un écran large (ordinateur), les entrées s'affichent dans la barre et le menu du compte est à droite. Sur un écran étroit (téléphone), elles sont regroupées dans le menu mobile.
+5. R-APP-05 · Sur un écran large (ordinateur), les entrées s'affichent dans la barre et le menu du compte est à droite. Sur un écran étroit (téléphone), la barre ne garde que « FamilyFrame » et le menu du compte, à droite ; les entrées sont dans la barre d'onglets (R-APP-60).
 
 **Messages affichés**
 
@@ -27,60 +27,75 @@ Comment on se déplace dans l'application, comment on choisit son thème, et les
 
 - Personnaliser ou réordonner les entrées.
 
-## Menu du compte (écran large)
+## Menu du compte
 
 **Ce que l'on peut faire**
 
-- Ouvrir le menu en touchant le rond de son profil (sa photo, ou son initiale), à droite de la barre.
+- Ouvrir le menu en touchant le rond de son profil (sa photo, ou son initiale), à droite de la barre du haut, sur un ordinateur comme sur un téléphone.
 - Y voir son nom, son adresse e-mail et, pour l'administrateur, la mention « Admin ».
 - Y ouvrir ses « Préférences », choisir son thème et se déconnecter.
+- Sur un téléphone, pour l'administrateur, y ouvrir aussi « Invitations ».
 
 **Règles**
 
 1. R-APP-10 · Remplacée : le rond affiche la photo de profil quand il y en a une (R-APP-55). Il affichait la première lettre du nom, en majuscule.
-2. R-APP-11 · La mention « Admin » s'affiche à côté du nom de l'administrateur, dans le menu du compte et dans le menu mobile.
+2. R-APP-11 · La mention « Admin » s'affiche à côté du nom de l'administrateur, dans le menu du compte.
 3. R-APP-55 · Le rond de profil, dans le menu du compte, montre la photo de profil de la personne quand elle en a une, et sa première lettre en majuscule sinon. « Préférences » ouvre la page décrite dans [preferences.md](preferences.md).
+4. R-APP-12 · Sur un téléphone, le menu du compte propose aussi « Invitations » à l'administrateur, juste sous « Préférences » : la barre d'onglets n'a pas cette entrée. Sur un ordinateur, « Invitations » reste dans la barre du haut et n'est pas répété dans le menu.
 
 **Messages affichés**
 
-| Situation                       | Message                                                                                     |
-| ------------------------------- | ------------------------------------------------------------------------------------------- |
-| Nom du bouton (lecture d'écran) | « Menu du compte »                                                                          |
-| Contenu                         | [nom], « Admin » (administrateur), [e-mail], « Préférences », « Thème », « Se déconnecter » |
+| Situation                       | Message                                                                                                                                         |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Nom du bouton (lecture d'écran) | « Menu du compte »                                                                                                                              |
+| Contenu                         | [nom], « Admin » (administrateur), [e-mail], « Préférences », « Invitations » (administrateur, sur un téléphone), « Thème », « Se déconnecter » |
 
 **Ce qui n'est pas possible**
 
 - Rien de particulier.
 
-## Menu mobile (écran étroit)
+## Barre d'onglets (téléphone)
 
 **Ce que l'on peut faire**
 
-- Ouvrir le menu avec le bouton à trois traits, à gauche de la barre : il glisse depuis le bord gauche.
-- Y retrouver son nom, son adresse e-mail, les entrées de navigation, « Préférences », le choix du thème et « Se déconnecter ».
+- Sur un téléphone, aller d'un toucher sur « Bibliothèque », « Amis », « Cadre » ou « Compte », avec la barre d'onglets en bas de l'écran, sous le pouce.
 
 **Règles**
 
-1. R-APP-20 · Toucher une entrée de navigation ferme le menu et ouvre la page.
-2. R-APP-21 · Le menu se ferme aussi en touchant à côté ou avec sa croix.
+1. R-APP-60 · Sur un écran étroit (téléphone), une barre d'onglets en bas de l'écran remplace l'ancien menu à trois traits : « Bibliothèque », « Amis », « Cadre », « Compte ». Sur un écran large (ordinateur), il n'y a pas de barre d'onglets : rien ne change.
+2. R-APP-61 · La barre d'onglets est présente sur la bibliothèque, la page « Amis », les préférences et la page des invitations. Elle n'apparaît ni sur le cadre, ni sur la page de connexion, ni sur la page d'invitation, ni sur la page introuvable.
+3. R-APP-62 · L'onglet de la page où l'on se trouve est mis en évidence. Sur la page des invitations, qui s'ouvre depuis le menu du compte (R-APP-12), aucun onglet ne l'est.
+4. R-APP-63 · « Compte » ouvre la page « Préférences » (voir [preferences.md](preferences.md)). Le thème et « Se déconnecter » restent dans le menu du compte (rond de profil, en haut à droite).
+5. R-APP-64 · « Cadre » ouvre le cadre en plein écran, comme « Mode cadre » (R-CAD-58). Ouvert depuis la bibliothèque, quitter le cadre ramène à cette bibliothèque.
+6. R-APP-65 · La barre d'onglets reste en bas de l'écran quand on fait défiler la page, et la fin de chaque page reste visible au-dessus d'elle.
+7. R-APP-66 · Sur un téléphone, les courtes notifications (R-APP-53) s'affichent au-dessus de la barre d'onglets, sans la cacher.
 
 **Messages affichés**
 
-| Situation                       | Message            |
-| ------------------------------- | ------------------ |
-| Nom du bouton (lecture d'écran) | « Ouvrir le menu » |
-| Titre du menu                   | « FamilyFrame »    |
-| Entrée du compte                | « Préférences »    |
+| Situation                         | Message                                           |
+| --------------------------------- | ------------------------------------------------- |
+| Onglets                           | « Bibliothèque », « Amis », « Cadre », « Compte » |
+| Nom de la barre (lecture d'écran) | « Navigation principale »                         |
 
 **Ce qui n'est pas possible**
 
-- Rien de plus que dans le menu du compte et la barre du haut.
+- Personnaliser ou réordonner les onglets.
+- Ouvrir « Invitations » depuis la barre d'onglets : l'entrée est dans le menu du compte (R-APP-12).
+
+## Menu mobile (retiré)
+
+Le menu à trois traits a laissé sa place à la barre d'onglets (R-APP-60) et au menu du compte, désormais affiché aussi sur un téléphone. Les règles ci-dessous gardent leur numéro.
+
+**Règles**
+
+1. R-APP-20 · Remplacée : le menu mobile n'existe plus ; un onglet ouvre directement sa page (R-APP-60).
+2. R-APP-21 · Remplacée : le menu mobile n'existe plus ; le menu du compte se ferme en touchant à côté, comme sur un ordinateur.
 
 ## Thème clair, sombre ou système
 
 **Ce que l'on peut faire**
 
-- Choisir, dans le menu du compte ou le menu mobile, sur la ligne « Thème » : « Clair », « Sombre » ou « Système ».
+- Choisir, dans le menu du compte, sur la ligne « Thème » : « Clair », « Sombre » ou « Système ».
 
 **Règles**
 
@@ -128,7 +143,7 @@ Aucun message.
 
 **Règles**
 
-1. R-APP-40 · Toute adresse inconnue de l'application, ouverte en étant connecté, affiche la page introuvable, avec la barre du haut.
+1. R-APP-40 · Toute adresse inconnue de l'application, ouverte en étant connecté, affiche la page introuvable, avec la barre du haut mais sans la barre d'onglets du téléphone.
 2. R-APP-41 · Sans être connecté, une adresse inconnue mène d'abord à la page de connexion (R-CNX-31).
 
 **Messages affichés**

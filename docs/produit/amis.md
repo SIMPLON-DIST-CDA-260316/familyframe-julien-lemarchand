@@ -6,7 +6,7 @@ Deux membres deviennent amis quand l'un envoie une demande et que l'autre l'acce
 
 **Ce que l'on peut faire**
 
-- Ouvrir la page « Amis » depuis la barre du haut, ou le menu ☰ sur un téléphone ; c'est le seul endroit où gérer ses amis. Le panneau d'envoi d'une photo, sans ami, propose « Ajouter un ami », qui mène ici.
+- Ouvrir la page « Amis » depuis la barre du haut, ou l'onglet « Amis » sur un téléphone ; c'est le seul endroit où gérer ses amis. Le panneau d'envoi d'une photo, sans ami, propose « Ajouter un ami », qui mène ici.
 - Basculer entre deux vues : « Mes amis » et « En attente », chacune avec son nombre.
 - Dans « En attente », voir séparément les « Demandes reçues » et les « Demandes envoyées », chacune avec son nombre.
 
