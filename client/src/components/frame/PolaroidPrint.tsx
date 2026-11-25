@@ -22,7 +22,7 @@ export function PolaroidPrint({ photo, children }: PolaroidPrintProps): JSX.Elem
     // w-min: the print is as wide as its photo, and a long sender name wraps instead of widening it.
     <figure
       className={cn(
-        'w-min bg-frame-print p-[3vmin] pb-0 text-black/75 shadow-2xl shadow-black/60',
+        'w-min bg-frame-print p-[3vmin] pb-0 text-frame-print-foreground shadow-2xl shadow-frame-shadow',
         isTiltedLeft(photo.id) ? '-rotate-[1.5deg]' : 'rotate-[1.5deg]',
       )}
     >

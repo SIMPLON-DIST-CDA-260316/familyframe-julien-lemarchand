@@ -19,7 +19,7 @@ function RevealedPhoto({ photo }: { photo: Photo }): JSX.Element {
       <img
         src={photo.url}
         alt={photoLabel(photo)}
-        className="min-h-0 flex-1 rounded-sm object-contain shadow-2xl shadow-black/60"
+        className="min-h-0 flex-1 rounded-sm object-contain shadow-2xl shadow-frame-shadow"
       />
       <div className="flex max-w-xl flex-col items-center gap-1 text-center">
         {photo.senderName !== null && (

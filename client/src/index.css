@@ -34,9 +34,15 @@
   /* .dark is app-wide (theme.ts): the frame's warm palette gets its own tokens instead. */
   --frame-background: oklch(0.14 0.008 60);
   --frame-accent: oklch(0.82 0.12 75);
+  --frame-accent-foreground: oklch(0 0 0);
   /* Warm off-whites: a cardboard mat, and the glossier white of a print. */
   --frame-mat: oklch(0.94 0.014 85);
   --frame-print: oklch(0.98 0.006 85);
+  --frame-print-foreground: oklch(0.33 0.01 60);
+  /* The wall's soft light, the bevel cut into the mat, the shadow a mat or a print casts on the wall. */
+  --frame-wall-glow: oklch(1 0 0 / 6%);
+  --frame-bevel: oklch(1 0 0 / 90%);
+  --frame-shadow: oklch(0 0 0 / 60%);
   /* The chrome drawn over a photo: dark and neutral whatever the theme, since it sits on the photo, not on the page. */
   --overlay: oklch(0 0 0 / 55%);
   --overlay-strong: oklch(0 0 0 / 75%);
@@ -54,8 +60,13 @@
   --font-sans: "Geist Variable", sans-serif;
   --color-frame-background: var(--frame-background);
   --color-frame-accent: var(--frame-accent);
+  --color-frame-accent-foreground: var(--frame-accent-foreground);
   --color-frame-mat: var(--frame-mat);
   --color-frame-print: var(--frame-print);
+  --color-frame-print-foreground: var(--frame-print-foreground);
+  --color-frame-wall-glow: var(--frame-wall-glow);
+  --color-frame-bevel: var(--frame-bevel);
+  --color-frame-shadow: var(--frame-shadow);
   --color-overlay: var(--overlay);
   --color-overlay-strong: var(--overlay-strong);
   --color-overlay-hover: var(--overlay-hover);

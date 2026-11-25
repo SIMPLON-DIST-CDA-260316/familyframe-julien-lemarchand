@@ -44,7 +44,7 @@ function FrameModeButton(): JSX.Element {
       asChild
       size="lg"
       // A phone opens the frame from the tab bar instead.
-      className="hidden rounded-full bg-frame-accent px-4 text-black hover:bg-frame-accent/85 md:inline-flex"
+      className="hidden rounded-full bg-frame-accent px-4 text-frame-accent-foreground hover:bg-frame-accent/85 md:inline-flex"
     >
       {/* The state: leaving the frame comes back to this library entry. Full screen is asked on
           the click itself: browsers grant it only during a user gesture. */}
