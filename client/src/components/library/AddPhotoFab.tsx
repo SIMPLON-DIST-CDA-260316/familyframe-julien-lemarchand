@@ -1,5 +1,5 @@
 import { PlusIcon } from 'lucide-react'
-import type { JSX } from 'react'
+import { type JSX, useEffect } from 'react'
 import { Button } from '@/components/ui/button.tsx'
 import { useHideOnScrollDown } from '@/hooks/useHideOnScrollDown.ts'
 import { cn } from '@/lib/utils.ts'
@@ -13,6 +13,18 @@ const FAB_CLASSES =
 // keyboard reaching it brings it back.
 const HIDDEN_CLASSES = 'pointer-events-none translate-y-24 opacity-0 motion-reduce:translate-y-0'
 
+// Toasts sit just above the tab bar, where this button floats: while it shows, the page says so
+// on <html> and index.css lifts the toasts above it (below md only, where it exists).
+function useLiftToasts(isShown: boolean): void {
+  useEffect(() => {
+    if (!isShown) return
+    document.documentElement.dataset.fabShown = ''
+    return () => {
+      delete document.documentElement.dataset.fabShown
+    }
+  }, [isShown])
+}
+
 type AddPhotoFabProps = {
   onAdd: () => void
 }
@@ -21,6 +33,7 @@ type AddPhotoFabProps = {
 // A computer keeps the button in the header.
 export function AddPhotoFab({ onAdd }: AddPhotoFabProps): JSX.Element {
   const { isHidden, ref, onFocus } = useHideOnScrollDown()
+  useLiftToasts(!isHidden)
   return (
     <Button
       ref={ref}

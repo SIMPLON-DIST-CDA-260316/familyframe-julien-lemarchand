@@ -120,6 +120,19 @@
   }
 }
 
+/* While the floating « Ajouter » shows (AddPhotoFab), toasts also clear it: its 3.5rem and a gap. */
+@media (width < 48rem) {
+  :root[data-fab-shown] {
+    --toast-bottom: calc(
+      var(--tab-bar-height) +
+      env(safe-area-inset-bottom) +
+      16px +
+      3.5rem +
+      12px
+    );
+  }
+}
+
 .dark {
   color-scheme: dark;
   --background: oklch(0.145 0 0);
