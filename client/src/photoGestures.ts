@@ -13,7 +13,8 @@ import {
 const DOUBLE_TAP_MS = 300
 const DOUBLE_TAP_DISTANCE_PX = 30
 const DOUBLE_TAP_SCALE = 2.5
-// A finger travels this far before we tell a drag down from the carousel's sideways swipe.
+// A finger travels this far before we tell a drag down from the carousel's sideways swipe, or a
+// pan from a tap: a finger always trembles a little.
 const DIRECTION_SLOP_PX = 10
 
 // Client coordinates (clientX, clientY), as the pointer events give them.
@@ -23,7 +24,7 @@ type ClientPoint = Point
 type Gesture =
   | { kind: 'idle' }
   | { kind: 'pending' | 'drag'; start: ClientPoint }
-  | { kind: 'pan'; last: ClientPoint }
+  | { kind: 'pan'; start: ClientPoint; last: ClientPoint }
   | { kind: 'pinch'; startZoom: Zoom; startDistance: number; startMidpoint: ClientPoint }
 
 // The photo's box: its slide, which the zoom does not transform.
@@ -92,7 +93,7 @@ function gestureFor(state: GestureState, zoom: Zoom): Gesture {
     const startMidpoint = midpoint(first, second)
     return { kind: 'pinch', startZoom: zoom, startDistance: distance(first, second), startMidpoint }
   }
-  if (isZoomed(zoom)) return { kind: 'pan', last: first }
+  if (isZoomed(zoom)) return { kind: 'pan', start: first, last: first }
   // The mouse swipes with the carousel and closes with ✕: only a finger drags the photo down.
   if (state.pointerType !== 'touch') return { kind: 'idle' }
   return { kind: 'pending', start: first }
@@ -104,6 +105,8 @@ export function pressPointer(
   event: PointerEvent<HTMLElement>,
 ): void {
   if (state.pointers.size === 0) state.didMove = false
+  // A second finger landing mid-drag starts a pinch: the photo goes back to its place.
+  if (state.gesture.kind === 'drag') callbacks.setDragOffset(0)
   state.frame = frameOf(event.currentTarget)
   state.pointerType = event.pointerType
   // Captured: the gesture goes on when a finger slides off the photo.
@@ -151,6 +154,13 @@ function pan(state: GestureState, callbacks: GestureCallbacks, point: ClientPoin
   callbacks.setZoom(pannedBy(callbacks.readZoom(), delta, state.frame.box))
 }
 
+// Within the slop a pan is still a tap: it may toggle the controls or be half a double tap.
+function hasMoved({ gesture }: GestureState, point: ClientPoint): boolean {
+  if (gesture.kind === 'pending' || gesture.kind === 'idle') return false
+  if (gesture.kind === 'pan') return distance(gesture.start, point) >= DIRECTION_SLOP_PX
+  return true
+}
+
 export function movePointer(
   state: GestureState,
   callbacks: GestureCallbacks,
@@ -163,7 +173,7 @@ export function movePointer(
   if (kind === 'pinch') pinch(state, callbacks)
   if (kind === 'pan') pan(state, callbacks, point)
   if (kind === 'pending' || kind === 'drag') dragDown(state, callbacks, point)
-  if (state.gesture.kind === 'pending' || state.gesture.kind === 'idle') return
+  if (!hasMoved(state, point)) return
   state.didMove = true
   callbacks.setIsActive(true)
 }
@@ -221,7 +231,11 @@ export function releasePointer(
   const { gesture } = state
   if (!state.pointers.delete(event.pointerId)) return
   const point = clientPoint(event)
-  if (gesture.kind === 'pending') noteTap(state, callbacks, point, event.timeStamp)
+  // The last finger of a pinch is no tap: only a press that never moved counts. The mouse has
+  // its own double-click (doubleClickPhoto).
+  const isPress = gesture.kind === 'pending' || gesture.kind === 'pan'
+  const isTap = isPress && !state.didMove && state.pointerType !== 'mouse'
+  if (isTap) noteTap(state, callbacks, point, event.timeStamp)
   if (gesture.kind === 'drag') {
     // Closing keeps the offset: the photo leaves from where the finger let go.
     if (point.y - gesture.start.y > CLOSE_DRAG_DISTANCE_PX) callbacks.onClose()

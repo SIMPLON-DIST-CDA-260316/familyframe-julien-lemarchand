@@ -73,7 +73,8 @@ function PhotoArea({ library, viewer, photo, index, chrome, info }: PhotoAreaPro
 function ViewerPhoto(props: ViewerPhotoProps): JSX.Element {
   const chrome = useViewerChrome()
   const info = usePhotoInfoPanel()
-  useViewerKeys({ i: info.toggle })
+  // I with Shift or Caps Lock too.
+  useViewerKeys({ i: info.toggle, I: info.toggle })
   return (
     <div className="flex h-svh">
       <PhotoArea {...props} chrome={chrome} info={info} />

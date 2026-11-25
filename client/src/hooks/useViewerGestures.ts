@@ -28,7 +28,7 @@ export type ViewerGestures = {
   isActive: boolean
   handlers: PhotoGestureHandlers
   isZoomed: boolean
-  // The keys and buttons zoom around the centre: × factor, below 1 to zoom out.
+  // The keys zoom around the centre: × factor, below 1 to zoom out.
   zoomByStep: (factor: number) => void
   // true when the click ends a pan, a drag or a pinch: it is not a tap on the photo.
   consumeClick: () => boolean

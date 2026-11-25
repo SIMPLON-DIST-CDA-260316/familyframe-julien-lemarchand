@@ -78,9 +78,10 @@ export function ViewerCarousel({
 
   return (
     <Carousel setApi={setApi} opts={options}>
-      <CarouselContent>
+      {/* No gap between slides: the zoom measures the slide as the photo's box. */}
+      <CarouselContent className="ml-0">
         {photos.map((photo) => (
-          <CarouselItem key={photo.id} className="overflow-hidden">
+          <CarouselItem key={photo.id} className="overflow-hidden pl-0">
             <ViewerImage
               photo={photo}
               isCurrent={photo.id === currentId}
