@@ -7,9 +7,11 @@ import { libraryPath } from '@/viewerHistory.ts'
 export const CARD_CLASSES =
   'group flex w-[150px] flex-col gap-1.5 text-left outline-none sm:w-[180px]'
 
-// The cover carries the focus and selection rings; the text under it stays plain.
+// The cover carries the selection ring and, outside it, the focus outline: a focused selected
+// card shows both. The outline uses the text colour, well above 3:1 on the page in either
+// theme (--ring is about 2:1); the row's py-2.5 leaves it room.
 export const COVER_CLASSES =
-  'grid aspect-square w-full place-items-center overflow-hidden rounded-xl bg-muted text-muted-foreground ring-offset-2 ring-offset-background transition-opacity group-hover:opacity-90 group-focus-visible:ring-3 group-focus-visible:ring-ring'
+  'grid aspect-square w-full place-items-center overflow-hidden rounded-xl bg-muted text-muted-foreground ring-offset-2 ring-offset-background transition-opacity group-hover:opacity-90 group-focus-visible:outline-2 group-focus-visible:outline-offset-[7px] group-focus-visible:outline-foreground'
 
 type CardTextProps = { label: string; detail: string | null }
 

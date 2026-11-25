@@ -92,7 +92,7 @@ export function CollectionsRow({ selectedId, allCardRef }: CollectionsRowProps):
   return (
     <nav
       aria-label="Collections"
-      className="-mx-4 snap-x snap-mandatory scroll-px-4 overflow-x-auto px-4 py-1.5"
+      className="-mx-4 snap-x snap-mandatory scroll-px-4 overflow-x-auto px-4 py-2.5"
     >
       <ul className="flex w-max items-start gap-3">
         <li className="snap-start">
