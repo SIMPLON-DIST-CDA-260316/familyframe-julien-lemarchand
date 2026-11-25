@@ -117,8 +117,9 @@ export default function LibraryPage(): JSX.Element {
   const allChipRef = useRef<HTMLAnchorElement>(null)
 
   return (
-    // max-md:pb-24: the floating « Ajouter » never covers the last photos or « Charger plus ».
-    <main className="mx-auto flex max-w-5xl flex-col gap-4 px-4 py-6 max-md:pb-24 sm:gap-6 sm:py-10">
+    // pb-24 below md: the floating « Ajouter » never covers the last photos or « Charger plus ».
+    // Written per side so sm:pt-10 cannot undo it between sm and md.
+    <main className="mx-auto flex max-w-5xl flex-col gap-4 px-4 pt-6 pb-24 sm:gap-6 sm:pt-10 md:pb-10">
       <LibraryContent
         selected={selected}
         library={library}
