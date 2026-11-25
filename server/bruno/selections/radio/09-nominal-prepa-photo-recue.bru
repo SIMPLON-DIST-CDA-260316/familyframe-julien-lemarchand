@@ -21,8 +21,6 @@ script:pre-request {
     throw new Error('inviteeCookie ou inviteEmail absent : lancer toute la collection, invitations/accept/05 doit passer')
   }
   const baseUrl = bru.getEnvVar('baseUrl')
-  // The member's history line: sends/delete removes it, so the image can go with the photo.
-  bru.setVar('radioSendId', res.body.send.id)
   const inviteeHeaders = { Cookie: bru.getVar('inviteeCookie') }
   const { data: me } = await axios.get(`${baseUrl}/api/auth/me`, { headers: inviteeHeaders })
   bru.setVar('inviteeId', me.user.id)
