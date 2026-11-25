@@ -1,0 +1,41 @@
+meta {
+  name: Nominal - suppression de la seconde collection
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/api/collections/{{secondCollectionId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('inviteeCookie')) {
+    throw new Error('inviteeCookie absent : lancer toute la collection, invitations/accept/05 doit passer')
+  }
+  // The throwaway account of invitations/accept/05, never the member (see collections/folder.bru).
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 204
+}
+
+script:post-response {
+  const axios = require('axios')
+  // A script request does not get the collection headers: send the cookie itself.
+  const namesOf = async (cookie) => {
+    const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/collections`, {
+      headers: { Cookie: cookie },
+    })
+    return list.data.collections.map(({ name }) => name)
+  }
+  test('le compte n\'a plus aucune collection', async () => {
+    expect(await namesOf(bru.getVar('inviteeCookie'))).to.eql([])
+  })
+}
+
+docs {
+  NOMINAL → 204 : le dossier se termine sans collection.
+}

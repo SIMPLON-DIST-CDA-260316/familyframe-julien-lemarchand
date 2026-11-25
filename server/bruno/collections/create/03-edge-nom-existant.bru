@@ -1,0 +1,35 @@
+meta {
+  name: Edge - nom déjà utilisé
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/collections
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Noël"
+  }
+}
+
+script:pre-request {
+  if (!bru.getVar('inviteeCookie')) {
+    throw new Error('inviteeCookie absent : lancer toute la collection, invitations/accept/05 doit passer')
+  }
+  // The throwaway account of invitations/accept/05, never the member (see collections/folder.bru).
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 409
+  res.body.error: eq COLLECTION_EXISTS
+}
+
+docs {
+  EDGE → 409 COLLECTION_EXISTS : le compte a déjà une collection « Noël »
+  (`01`). Deux collections du même nom se confondraient dans les menus.
+}

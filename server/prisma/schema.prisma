@@ -30,6 +30,7 @@ model User {
   photos                 Photo[]      @relation("PhotoOwner")
   // Photos this account sent to friends: they live in the friends' libraries.
   sentPhotos             Photo[]      @relation("PhotoSender")
+  collections            Collection[]
   invitations            Invitation[]
   sentFriendRequests     Friendship[] @relation("FriendshipRequester")
   receivedFriendRequests Friendship[] @relation("FriendshipAddressee")
@@ -94,4 +95,19 @@ model Friendship {
 
   @@index([requesterId])
   @@index([addresseeId])
+}
+
+model Collection {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  ownerId   String   @db.ObjectId
+  owner     User     @relation(fields: [ownerId], references: [id])
+  name      String
+  // The owner's photos, in the order they were added. Prisma has no $pull: a deleted photo's id
+  // stays here, and reads keep only the photos still in the library. Written as [] at creation:
+  // MongoDB matches « does not have » only on a field that exists.
+  photoIds  String[] @db.ObjectId
+  createdAt DateTime @default(now())
+
+  // Two collections with the same name would look alike in every menu.
+  @@unique([ownerId, name])
 }

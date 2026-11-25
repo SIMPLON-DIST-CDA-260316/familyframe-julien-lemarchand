@@ -67,6 +67,27 @@ describe('toErrorResponse', () => {
     })
   })
 
+  it('answers a collection name that is blank, too long or not text with 400', () => {
+    expect(toErrorResponse(new AppError('COLLECTION_NAME_INVALID'))).toEqual({
+      status: 400,
+      body: { error: 'COLLECTION_NAME_INVALID' },
+    })
+  })
+
+  it('answers an unknown, malformed or foreign collection id with 404', () => {
+    expect(toErrorResponse(new AppError('COLLECTION_NOT_FOUND'))).toEqual({
+      status: 404,
+      body: { error: 'COLLECTION_NOT_FOUND' },
+    })
+  })
+
+  it('answers a collection name the account already uses with 409', () => {
+    expect(toErrorResponse(new AppError('COLLECTION_EXISTS'))).toEqual({
+      status: 409,
+      body: { error: 'COLLECTION_EXISTS' },
+    })
+  })
+
   it('answers an invitation past its 7 days with 410', () => {
     expect(toErrorResponse(new AppError('INVITATION_EXPIRED'))).toEqual({
       status: 410,

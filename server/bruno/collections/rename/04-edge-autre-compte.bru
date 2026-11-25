@@ -1,0 +1,42 @@
+meta {
+  name: Edge - collection d'un autre compte
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/collections/{{collectionId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Piratée"
+  }
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq COLLECTION_NOT_FOUND
+}
+
+script:post-response {
+  const axios = require('axios')
+  // A script request does not get the collection headers: send the cookie itself.
+  const namesOf = async (cookie) => {
+    const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/collections`, {
+      headers: { Cookie: cookie },
+    })
+    return list.data.collections.map(({ name }) => name)
+  }
+  test('la collection garde son nom', async () => {
+    expect(await namesOf(bru.getVar('inviteeCookie'))).to.include('Noël 2026')
+  })
+}
+
+docs {
+  EDGE → 404 COLLECTION_NOT_FOUND : le membre (cookie par défaut) essaie de
+  renommer la collection du compte jetable. La réponse est celle d'une
+  collection inconnue (pas de 403, qui dirait qu'elle existe).
+}

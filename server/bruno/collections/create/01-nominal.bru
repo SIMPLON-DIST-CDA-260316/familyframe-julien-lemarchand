@@ -1,0 +1,54 @@
+meta {
+  name: Nominal - nouvelle collection
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/collections
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "  Noël  "
+  }
+}
+
+script:pre-request {
+  if (!bru.getVar('inviteeCookie')) {
+    throw new Error('inviteeCookie absent : lancer toute la collection, invitations/accept/05 doit passer')
+  }
+  // The throwaway account of invitations/accept/05, never the member (see collections/folder.bru).
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 201
+  res.body.id: isString
+  res.body.name: eq Noël
+  res.body.photoIds: isArray
+  res.body.photoIds.length: eq 0
+  res.body.ownerId: isUndefined
+}
+
+script:post-response {
+  bru.setVar('collectionId', res.body.id)
+  const axios = require('axios')
+  // A script request does not get the collection headers: send the cookie itself.
+  const namesOf = async (cookie) => {
+    const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/collections`, {
+      headers: { Cookie: cookie },
+    })
+    return list.data.collections.map(({ name }) => name)
+  }
+  test('la collection est dans la liste du compte', async () => {
+    expect(await namesOf(bru.getVar('inviteeCookie'))).to.include('Noël')
+  })
+}
+
+docs {
+  NOMINAL → 201 `{ id, name, photoIds }`, sans photo. Le nom part entouré d'espaces : le serveur
+  le rogne. Le script relit la liste : la collection est bien enregistrée.
+}

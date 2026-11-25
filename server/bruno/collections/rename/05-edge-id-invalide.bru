@@ -1,0 +1,35 @@
+meta {
+  name: Edge - id mal formé
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{baseUrl}}/api/collections/pas-un-id
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Noël"
+  }
+}
+
+script:pre-request {
+  if (!bru.getVar('inviteeCookie')) {
+    throw new Error('inviteeCookie absent : lancer toute la collection, invitations/accept/05 doit passer')
+  }
+  // The throwaway account of invitations/accept/05, never the member (see collections/folder.bru).
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq COLLECTION_NOT_FOUND
+}
+
+docs {
+  EDGE → 404 COLLECTION_NOT_FOUND : un id qui n'est pas un ObjectId ne va
+  pas jusqu'à la base.
+}

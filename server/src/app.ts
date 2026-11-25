@@ -13,6 +13,10 @@ import { createRequireAuth } from './features/auth/auth.middleware.js'
 import { createAuthRepository } from './features/auth/auth.repository.js'
 import { createAuthRouter } from './features/auth/auth.routes.js'
 import { type AuthService, createAuthService } from './features/auth/auth.service.js'
+import { createCollectionsController } from './features/collections/collections.controller.js'
+import { createCollectionsRepository } from './features/collections/collections.repository.js'
+import { createCollectionsRouter } from './features/collections/collections.routes.js'
+import { createCollectionsService } from './features/collections/collections.service.js'
 import { createFriendshipsController } from './features/friendships/friendships.controller.js'
 import { createFriendshipsRepository } from './features/friendships/friendships.repository.js'
 import { createFriendshipsRouter } from './features/friendships/friendships.routes.js'
@@ -63,6 +67,14 @@ function assemblePhotosRouter(
     logger,
   })
   return createPhotosRouter(createPhotosController(service, io))
+}
+
+function assembleCollectionsRouter(io: SocketServer): Router {
+  const service = createCollectionsService({
+    repository: createCollectionsRepository(prisma),
+    logger,
+  })
+  return createCollectionsRouter(createCollectionsController(service, io))
 }
 
 function assembleFriendshipsService(): FriendshipsService {
@@ -130,6 +142,7 @@ export function createApp(io: SocketServer, authService: AuthService): Express {
   app.use('/api/invitations', assembleInvitationsRouter(authService, requireAuth, requireAdmin))
   app.use('/api/friendships', requireAuth, assembleFriendshipsRouter(friendships))
   app.use('/api/account', requireAuth, assembleAccountRouter())
+  app.use('/api/collections', requireAuth, assembleCollectionsRouter(io))
 
   app.use(notFound)
   app.use(errorHandler)

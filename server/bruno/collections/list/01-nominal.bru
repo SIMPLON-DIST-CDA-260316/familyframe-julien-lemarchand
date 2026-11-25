@@ -1,0 +1,48 @@
+meta {
+  name: Nominal - collections triées par nom
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/collections
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('inviteeCookie')) {
+    throw new Error('inviteeCookie absent : lancer toute la collection, invitations/accept/05 doit passer')
+  }
+  // The throwaway account of invitations/accept/05, never the member (see collections/folder.bru).
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 200
+  res.body.collections: isArray
+  res.body.collections.length: eq 2
+}
+
+script:post-response {
+  const axios = require('axios')
+  // A script request does not get the collection headers: send the cookie itself.
+  const namesOf = async (cookie) => {
+    const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/collections`, {
+      headers: { Cookie: cookie },
+    })
+    return list.data.collections.map(({ name }) => name)
+  }
+  test('triées à la française : « Été 2026 » avant « Noël »', () => {
+    expect(res.body.collections.map(({ name }) => name)).to.eql(['Été 2026', 'Noël'])
+  })
+  test('le membre ne voit pas les collections du compte jetable', async () => {
+    expect(await namesOf(bru.getVar('sessionCookie'))).to.not.include('Été 2026')
+  })
+}
+
+docs {
+  NOMINAL → 200 avec les deux collections de `create/`. Un tri par octets
+  placerait « Été » après « Noël » : le serveur trie comme en français. Le
+  script vérifie aussi que le membre ne les voit pas.
+}

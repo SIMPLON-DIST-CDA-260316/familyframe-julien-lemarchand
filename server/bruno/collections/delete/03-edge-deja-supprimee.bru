@@ -1,0 +1,28 @@
+meta {
+  name: Edge - collection déjà supprimée
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{baseUrl}}/api/collections/{{collectionId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('collectionId') || !bru.getVar('inviteeCookie')) {
+    throw new Error('collectionId ou inviteeCookie absent : lancer toute la collection, collections/create/01 doit passer')
+  }
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq COLLECTION_NOT_FOUND
+}
+
+docs {
+  EDGE → 404 COLLECTION_NOT_FOUND : `02` vient de la supprimer, depuis un
+  autre appareil par exemple.
+}

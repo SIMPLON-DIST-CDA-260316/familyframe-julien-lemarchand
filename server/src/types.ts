@@ -12,6 +12,7 @@ export type ApiErrorCode =
   | 'PASSWORD_INCORRECT'
   | 'MESSAGE_INVALID'
   | 'SELF_FRIEND'
+  | 'COLLECTION_NAME_INVALID'
   | 'UNAUTHENTICATED'
   | 'INVALID_CREDENTIALS'
   | 'FORBIDDEN'
@@ -21,10 +22,12 @@ export type ApiErrorCode =
   | 'INVITATION_NOT_FOUND'
   | 'USER_NOT_FOUND'
   | 'FRIENDSHIP_NOT_FOUND'
+  | 'COLLECTION_NOT_FOUND'
   | 'PHOTO_DUPLICATE'
   | 'ACCOUNT_EXISTS'
   | 'ALREADY_FRIENDS'
   | 'FRIEND_REQUEST_EXISTS'
+  | 'COLLECTION_EXISTS'
   | 'INVITATION_EXPIRED'
   | 'INVITATION_USED'
   | 'PHOTO_TOO_LARGE'
@@ -105,6 +108,16 @@ export type PhotoPage = {
 // Newest first, all at once: a handful of photos waiting, not a library to page through.
 export type UnopenedPhotos = { photos: Photo[] }
 
+// photoIds: the owner's photos, in the order they were added; a deleted photo is not listed.
+export type Collection = {
+  id: string
+  name: string
+  photoIds: string[]
+}
+
+// Sorted by name: the order of every menu that lists them.
+export type CollectionList = { collections: Collection[] }
+
 // photo:new is a photo one added oneself, photo:received one a friend sent, still unopened;
 // photo:opened is a received photo that just joined the library.
 export type ServerToClientEvents = {
@@ -112,6 +125,8 @@ export type ServerToClientEvents = {
   'photo:received': (photo: Photo) => void
   'photo:opened': (photo: Photo) => void
   'photo:deleted': (id: string) => void
+  // No payload: each page reloads the list, the server stays the only source.
+  'collections:changed': () => void
 }
 
 export type ClientToServerEvents = Record<string, never>
