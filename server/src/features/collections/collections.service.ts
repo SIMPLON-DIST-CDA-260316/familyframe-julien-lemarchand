@@ -102,13 +102,15 @@ function toCollectionDto(
   return { id, name, photoIds: photos.map((photo) => photo.id), ...photoSpan(photos, thumbnailUrl) }
 }
 
-// One query for every collection, however many there are.
+// One query for every collection, however many there are, and none when they hold no photo,
+// such as a collection just created.
 async function findLivePhotos(
   { repository }: CollectionsServiceDeps,
   ownerId: string,
   records: CollectionRecord[],
 ): Promise<LivePhotos> {
   const allIds = records.flatMap((record) => record.photoIds)
+  if (allIds.length === 0) return new Map()
   const photos = await repository.findLivePhotos(ownerId, allIds)
   return new Map(photos.map((photo) => [photo.id, photo]))
 }

@@ -114,6 +114,14 @@ describe('createCollection', () => {
     })
   })
 
+  it('reads no photos for a collection that is empty by construction', async () => {
+    const deps = makeDeps()
+
+    await createCollectionsService(deps).createCollection({ ownerId: OWNER_ID, name: 'Été' })
+
+    expect(deps.repository.findLivePhotos).not.toHaveBeenCalled()
+  })
+
   it('refuses a name the account already uses', async () => {
     const deps = makeDeps()
     deps.repository.create.mockResolvedValue('name_taken')
