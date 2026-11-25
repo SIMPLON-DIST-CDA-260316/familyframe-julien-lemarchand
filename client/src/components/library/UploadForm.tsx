@@ -1,12 +1,10 @@
 import { CameraIcon, ImageIcon, SendIcon } from 'lucide-react'
-import { type ChangeEvent, type JSX, type SubmitEvent, useId, useRef, useState } from 'react'
+import { type ChangeEvent, type JSX, type SubmitEvent, useId, useState } from 'react'
+import { PickButton, type PickButtonProps } from '@/components/form/PickButton.tsx'
 import { UploadPreview } from '@/components/library/UploadPreview.tsx'
 import { Alert, AlertDescription } from '@/components/ui/alert.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import { tooManyPhotosMessage } from '@/upload/uploadTexts.ts'
-
-// The server's accepted types: a HEIC or GIF picked here would only be refused after the upload.
-const ACCEPTED_IMAGE_TYPES = 'image/jpeg,image/png,image/webp'
 
 // Enough for an outing's best shots; past it the queue would run for many minutes on a phone
 // network, and the preview would push the buttons out of the panel.
@@ -18,15 +16,6 @@ type UploadFormProps = {
   onShare: (file: File) => void
 }
 
-type PickButtonProps = {
-  label: string
-  icon: JSX.Element
-  capture?: 'environment'
-  // The gallery only: the camera takes one photo at a time.
-  multiple?: boolean
-  onChange: (event: ChangeEvent<HTMLInputElement>) => void
-}
-
 type FileChoice = {
   files: File[]
   tooManyMessage: string
@@ -36,35 +25,6 @@ type FileChoice = {
 type UploadButtonsProps = {
   fileCount: number
   onShare: () => void
-}
-
-// A button rather than the raw file input: the browser's « Choose file » cannot be styled or
-// translated. The hidden input does the picking.
-function PickButton({ label, icon, capture, multiple, onChange }: PickButtonProps): JSX.Element {
-  const inputRef = useRef<HTMLInputElement>(null)
-  return (
-    <>
-      <Button
-        type="button"
-        variant="outline"
-        // pointer-coarse:h-20 beats the Button's coarse h-11: the big tile stays big under a finger.
-        className="h-20 flex-col gap-2 whitespace-normal pointer-coarse:h-20"
-        onClick={() => inputRef.current?.click()}
-      >
-        {icon}
-        {label}
-      </Button>
-      <input
-        ref={inputRef}
-        type="file"
-        accept={ACCEPTED_IMAGE_TYPES}
-        capture={capture}
-        multiple={multiple}
-        className="hidden"
-        onChange={onChange}
-      />
-    </>
-  )
 }
 
 function PickButtons({ onChange }: Pick<PickButtonProps, 'onChange'>): JSX.Element {

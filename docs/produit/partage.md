@@ -6,7 +6,7 @@ Envoyer une photo à un ou plusieurs amis la leur fait parvenir comme du courrie
 
 **Ce que l'on peut faire**
 
-- Ouvrir « Envoyer à des proches » depuis une photo de sa bibliothèque ou depuis le panneau « Ajouter une photo » (voir les deux sections suivantes).
+- Ouvrir « Envoyer à des proches » depuis la page « Envoyer », depuis une photo de sa bibliothèque ou depuis le panneau « Ajouter une photo » (voir les sections suivantes).
 - Voir un aperçu de la photo, puis ses amis sous forme de ronds portant leur photo de profil ou, sans photo, leur initiale.
 - Envoyer une photo à plusieurs proches en une fois, en touchant leur visage puis un seul bouton.
 - Rechercher un ami par son nom ou son adresse e-mail quand on en a beaucoup.
@@ -53,6 +53,40 @@ Envoyer une photo à un ou plusieurs amis la leur fait parvenir comme du courrie
 - Fermer le panneau en le faisant glisser vers le bas : il se ferme avec la croix, la touche Échap ou en touchant à côté.
 - Modifier ou retirer le message une fois la photo envoyée.
 - Écrire un message différent à chaque proche dans le même envoi : il faut faire un envoi par personne.
+
+## Envoyer une photo depuis la page « Envoyer »
+
+**Ce que l'on peut faire**
+
+- Sur la page « Envoyer », toucher « Envoyer une photo », puis choisir d'où vient la photo : « Prendre une photo » avec l'appareil photo, « Choisir sur l'appareil » parmi ses images, ou « Depuis ma bibliothèque ».
+- Depuis sa bibliothèque, toucher la photo voulue dans la grille ; « Charger plus » montre les photos plus anciennes, et la flèche « Retour » ramène au choix d'origine.
+- Choisir ensuite les proches et écrire un message, comme depuis le menu « … » d'une photo.
+
+**Règles**
+
+1. R-PAR-67 · La page s'ouvre sur ce que l'on vient faire : le bouton « Envoyer une photo » est en tête, l'historique des envois en dessous.
+2. R-PAR-68 · Une photo prise ou choisie sur l'appareil part uniquement chez les proches : elle n'est pas ajoutée à la bibliothèque de l'expéditeur (R-PAR-20). Une photo choisie dans sa bibliothèque y reste, inchangée (R-PAR-11).
+3. R-PAR-69 · On envoie une photo à la fois, avec son message : « Choisir sur l'appareil » ne prend qu'une image.
+4. R-PAR-70 · La grille de sa bibliothèque montre les photos ouvertes, de la plus récente à la plus ancienne, comme la bibliothèque elle-même ; les photos reçues qui attendent d'être découvertes n'y sont pas.
+5. R-PAR-71 · Choisir la photo ferme le choix d'origine et ouvre le panneau d'envoi avec cette photo (voir [Choisir à qui envoyer](#choisir-à-qui-envoyer)). Le fermer sans envoyer abandonne la photo.
+6. R-PAR-72 · Après un envoi réussi, la ligne de l'envoi apparaît en tête de l'historique, sans recharger la page.
+
+**Messages affichés**
+
+| Situation                 | Message                                                                            |
+| ------------------------- | ---------------------------------------------------------------------------------- |
+| Bouton de la page         | « Envoyer une photo »                                                              |
+| Choix d'origine           | « Envoyer une photo » — « Choisissez la photo, puis les proches à qui l'envoyer. » |
+| Les trois origines        | « Prendre une photo », « Choisir sur l'appareil », « Depuis ma bibliothèque »      |
+| Grille de sa bibliothèque | « Depuis ma bibliothèque » — « Touchez la photo à envoyer. »                       |
+| Bouton pour revenir       | « Retour » (pour les lecteurs d'écran)                                             |
+| Bibliothèque vide         | « Votre bibliothèque est vide. »                                                   |
+| Suite de la grille        | « Charger plus »                                                                   |
+
+**Ce qui n'est pas possible**
+
+- Envoyer plusieurs photos en une fois.
+- Envoyer une photo reçue qui attend encore d'être découverte : il faut d'abord la découvrir.
 
 ## Envoyer une photo de sa bibliothèque
 
@@ -167,17 +201,17 @@ La page « Envoyer » garde la trace de ce que l'on a envoyé, comme le dossier 
 
 **Messages affichés**
 
-| Situation                          | Message                                                                                          |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------ |
-| En-tête                            | « Envoyer » — « Les photos que vous avez envoyées à vos proches, la plus récente en premier. »   |
-| Titre de la liste                  | « Envois »                                                                                       |
-| Chargement                         | « Chargement… »                                                                                  |
-| Aucun envoi                        | « Aucun envoi pour l'instant » — « Les photos que vous envoyez à vos proches apparaîtront ici. » |
-| Bouton pour la suite               | « Afficher plus »                                                                                |
-| Bouton de la corbeille             | « Retirer de l'historique » (au survol et pour les lecteurs d'écran)                             |
-| Confirmation                       | « Retirer cet envoi de l'historique ? » — « Vos proches gardent la photo. »                      |
-| Boutons de la confirmation         | « Annuler », « Retirer »                                                                         |
-| L'envoi a déjà été retiré ailleurs | « Cet envoi a déjà été retiré de l'historique. »                                                 |
+| Situation                          | Message                                                                                              |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| En-tête                            | « Envoyer » — « Faites parvenir une photo à vos proches, sur leur cadre et dans leur bibliothèque. » |
+| Titre de la liste                  | « Envois »                                                                                           |
+| Chargement                         | « Chargement… »                                                                                      |
+| Aucun envoi                        | « Aucun envoi pour l'instant » — « Les photos que vous envoyez à vos proches apparaîtront ici. »     |
+| Bouton pour la suite               | « Afficher plus »                                                                                    |
+| Bouton de la corbeille             | « Retirer de l'historique » (au survol et pour les lecteurs d'écran)                                 |
+| Confirmation                       | « Retirer cet envoi de l'historique ? » — « Vos proches gardent la photo. »                          |
+| Boutons de la confirmation         | « Annuler », « Retirer »                                                                             |
+| L'envoi a déjà été retiré ailleurs | « Cet envoi a déjà été retiré de l'historique. »                                                     |
 
 **Ce qui n'est pas possible**
 
