@@ -1,4 +1,4 @@
-import { PlusIcon } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { type JSX, type RefObject, useEffect } from 'react'
 import { Button } from '@/components/ui/button.tsx'
 import { useHideOnScrollDown } from '@/hooks/useHideOnScrollDown.ts'
@@ -25,27 +25,30 @@ function useLiftToasts(isShown: boolean): void {
   }, [isShown])
 }
 
-type AddPhotoFabProps = {
-  onAdd: () => void
-  // The library page focuses it when the add panels close.
+type PageFabProps = {
+  icon: LucideIcon
+  // Read by screen readers and shown on hover: the icon alone names nothing.
+  label: string
+  onClick: () => void
+  // The page focuses it when the panel it opened closes.
   buttonRef: RefObject<HTMLButtonElement | null>
 }
 
-// A phone's « Ajouter », where the thumb rests: bottom right, above the tab bar and the home bar.
-// A computer keeps the button in the header.
-export function AddPhotoFab({ onAdd, buttonRef }: AddPhotoFabProps): JSX.Element {
+// A phone's main action of the page, where the thumb rests: bottom right, above the tab bar and
+// the home bar. A computer keeps the button in the header. One per page at most.
+export function PageFab({ icon: Icon, label, onClick, buttonRef }: PageFabProps): JSX.Element {
   const { isHidden, onFocus } = useHideOnScrollDown(buttonRef)
   useLiftToasts(!isHidden)
   return (
     <Button
       ref={buttonRef}
-      onClick={onAdd}
+      onClick={onClick}
       onFocus={onFocus}
-      aria-label="Ajouter une photo"
-      title="Ajouter une photo"
+      aria-label={label}
+      title={label}
       className={cn(FAB_CLASSES, isHidden && HIDDEN_CLASSES)}
     >
-      <PlusIcon aria-hidden className="size-6" />
+      <Icon aria-hidden className="size-6" />
     </Button>
   )
 }

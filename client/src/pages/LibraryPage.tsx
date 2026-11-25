@@ -1,7 +1,7 @@
+import { PlusIcon } from 'lucide-react'
 import { type JSX, type RefObject, useRef, useState } from 'react'
 import { CollectionsRow } from '@/components/collections/CollectionsRow.tsx'
 import { CollectionTitle } from '@/components/collections/CollectionTitle.tsx'
-import { AddPhotoFab } from '@/components/library/AddPhotoFab.tsx'
 import { AddPhotoPanel } from '@/components/library/AddPhotoPanel.tsx'
 import { LibraryHeader, LibraryTitle } from '@/components/library/LibraryHeader.tsx'
 import {
@@ -11,6 +11,7 @@ import {
 } from '@/components/library/LibraryNotices.tsx'
 import { LibrarySection } from '@/components/library/LibrarySection.tsx'
 import { LibraryMail } from '@/components/mail/LibraryMail.tsx'
+import { PageFab } from '@/components/nav/PageFab.tsx'
 import { PhotoViewer } from '@/components/viewer/PhotoViewer.tsx'
 import { type LibraryLayout, useLibraryLayout } from '@/hooks/useLibraryLayout.ts'
 import { type PhotoLibrary, usePhotoLibrary } from '@/hooks/usePhotoLibrary.ts'
@@ -143,7 +144,12 @@ function LibraryOverlays({
         onUpload={onUpload}
         returnFocusRefs={[addPanel.headerButtonRef, addPanel.fabRef]}
       />
-      <AddPhotoFab onAdd={addPanel.open} buttonRef={addPanel.fabRef} />
+      <PageFab
+        icon={PlusIcon}
+        label="Ajouter une photo"
+        onClick={addPanel.open}
+        buttonRef={addPanel.fabRef}
+      />
       {viewer.openId !== null && isShowingPhotos && (
         <PhotoViewer library={library} openId={viewer.openId} viewer={viewer} />
       )}
