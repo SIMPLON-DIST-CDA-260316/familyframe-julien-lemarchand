@@ -1,14 +1,14 @@
 ---
 plan: design-tokens
-status: in-progress
+status: done
 spec: docs/superpowers/specs/2026-11-25-design-tokens-design.md
 branch: feat/design-tokens
 worktree: false
-tasks_total: 7
-tasks_done: 0
-current_task: 1
+tasks_total: 8
+tasks_done: 8
+current_task: null
 last_commit: null
-last_updated: 2026-11-25
+last_updated: 2026-11-26
 ---
 
 # Design tokens and the « Encre » palette Implementation Plan
@@ -38,9 +38,12 @@ last_updated: 2026-11-25
 5. **feat(client): one modal backdrop and a destructive foreground token** (D6, D9 with today's values). `index.css`, `ui/dialog.tsx`, `ui/alert-dialog.tsx`, `ui/sheet.tsx`, `friends/FriendsViewToggle.tsx`.
 6. **feat(client): the « Encre » palette by default, « Actuelle » kept** (D1–D3, D7, D8, D9, D11, D12). `index.css`, `index.html`, `palette.ts`, `themeColor.ts`, `theme.ts`, `main.tsx`, `mail/MailAnnouncementCard.tsx`, `docs/produit/apparence-et-navigation.md`, `ARCHITECTURE.md`.
 7. **feat(client): choose the palette in the account menu** (D13). `theme/PaletteToggle.tsx`, `auth/UserMenu.tsx`, `docs/produit/apparence-et-navigation.md`.
+8. **fix(client): give the theme-color metas an RGB colour** (drift 1). `themeColor.ts`.
 
 Each task: `pnpm check`, `pnpm typecheck`; tasks 6 and 7 also `pnpm build`. Then a re-grep for `black|white|#hex|rgb(` in `client/src`.
 
 ## Drift Log
 
-(none yet)
+1. **D11, how the colour reaches the meta.** A fresh-context review flagged that `syncThemeColor` wrote the computed `--background` as is, an `oklch()` string, and a browser may not accept it in a `theme-color` meta. `themeColor.ts` now paints the colour on a one-pixel canvas and writes the `rgb(…)` it reads back (task 8). The decision (the meta follows the token) is unchanged.
+2. **Product rules.** R-APP-78 (Encre by default, Actuelle kept, accent follows the palette), R-APP-79 (browser bar follows the chosen theme and palette, replaces R-APP-57 for the bar), R-APP-80 (palette independent of the theme, applied at once), R-APP-81 (remembered per device and browser). Other branches may claim numbers in the same range: renumber on merge if they collide.
+3. **The frame gradient's `via` stop** was kept dropped after review: recorded in spec D5.
