@@ -17,18 +17,20 @@ type DeletePhotoDialogProps = {
   photo: Photo | null
   onClose: () => void
   onCloseAutoFocus: (event: Event) => void
+  // The dialog portals to body: the photo menu passes its theme (`dark` on the frame).
+  className?: string
 }
 
 export function DeletePhotoDialog({
   photo,
   onClose,
   onCloseAutoFocus,
+  className,
 }: DeletePhotoDialogProps): JSX.Element | null {
   if (!photo) return null
   return (
     <AlertDialog open onOpenChange={onClose}>
-      {/* `dark`: the dialog portals to body, outside the frame's dark <main>. */}
-      <AlertDialogContent className="dark" onCloseAutoFocus={onCloseAutoFocus}>
+      <AlertDialogContent className={className} onCloseAutoFocus={onCloseAutoFocus}>
         <AlertDialogHeader>
           <AlertDialogTitle>Supprimer cette photo ?</AlertDialogTitle>
           <AlertDialogDescription>

@@ -80,6 +80,7 @@ function MenuDialogs({ dialog, themeClass, onClose, triggerRef }: MenuDialogsPro
         photo={photoFor('delete')}
         onClose={onClose}
         onCloseAutoFocus={focusTrigger}
+        className={themeClass}
       />
       <CollectionNameDialog
         target={photoFor('createCollection') ? { kind: 'create' } : null}
@@ -135,6 +136,7 @@ function MenuItems({ photo, themeClass, onOpen, children }: MenuItemsProps): JSX
       <CollectionsSubmenu
         photoId={photo.id}
         onCreate={() => onOpen({ kind: 'createCollection', photo })}
+        className={themeClass}
       />
       <DropdownMenuItem variant="destructive" onSelect={() => onOpen({ kind: 'delete', photo })}>
         <Trash2Icon />

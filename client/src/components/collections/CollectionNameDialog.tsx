@@ -21,7 +21,7 @@ type CollectionNameDialogProps = {
   // After a success: the photo menu adds its photo to the collection it just created.
   onSaved?: (collection: Collection) => void
   onCloseAutoFocus?: (event: Event) => void
-  // `dark` from the frame: the dialog portals to body, outside the frame's dark <main>.
+  // The dialog portals to body: the caller passes its theme (`dark` on the frame).
   className?: string
 }
 

@@ -11,16 +11,18 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
 } from '@/components/ui/dropdown-menu.tsx'
+import { cn } from '@/lib/utils.ts'
 
-// `dark`: the submenu portals to body, outside the frame's dark <main>. A long list scrolls
-// inside the screen instead of being cut.
+// A long list scrolls inside the screen instead of being cut.
 const SUB_CONTENT_CLASS =
-  'dark max-h-(--radix-dropdown-menu-content-available-height) max-w-64 overflow-y-auto'
+  'max-h-(--radix-dropdown-menu-content-available-height) max-w-64 overflow-y-auto'
 
 type CollectionsSubmenuProps = {
   photoId: string
   // Opens the naming dialog: the photo menu adds its photo to the new collection.
   onCreate: () => void
+  // The submenu portals to body: the photo menu passes its theme (`dark` on the frame).
+  className?: string
 }
 
 // A failure shows in a toast; the box follows the list, so it stays as it was.
@@ -55,7 +57,11 @@ function CollectionCheckboxes({ photoId }: { photoId: string }): JSX.Element {
   )
 }
 
-export function CollectionsSubmenu({ photoId, onCreate }: CollectionsSubmenuProps): JSX.Element {
+export function CollectionsSubmenu({
+  photoId,
+  onCreate,
+  className,
+}: CollectionsSubmenuProps): JSX.Element {
   return (
     <DropdownMenuSub>
       <DropdownMenuSubTrigger>
@@ -63,7 +69,7 @@ export function CollectionsSubmenu({ photoId, onCreate }: CollectionsSubmenuProp
         Collections
       </DropdownMenuSubTrigger>
       <DropdownMenuPortal>
-        <DropdownMenuSubContent className={SUB_CONTENT_CLASS}>
+        <DropdownMenuSubContent className={cn(SUB_CONTENT_CLASS, className)}>
           <CollectionCheckboxes photoId={photoId} />
           <DropdownMenuItem onSelect={onCreate}>
             <PlusIcon />
