@@ -30,6 +30,8 @@ model User {
   photos                 Photo[]      @relation("PhotoOwner")
   // Photos this account sent to friends: they live in the friends' libraries.
   sentPhotos             Photo[]      @relation("PhotoSender")
+  // One per send action: the sender's history.
+  sends                  Send[]
   collections            Collection[]
   invitations            Invitation[]
   sentFriendRequests     Friendship[] @relation("FriendshipRequester")
@@ -69,6 +71,25 @@ model Photo {
 
   @@unique([ownerId, sha256])
   @@index([ownerId, id])
+  @@index([cloudinaryId])
+}
+
+// One send action: a photo given to one or more friends at once. Each friend got their own Photo
+// pointing to the same Cloudinary image; this record is the sender's history line, and it keeps
+// the image alive after the friends delete their photos.
+model Send {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  senderId     String   @db.ObjectId
+  sender       User     @relation(fields: [senderId], references: [id])
+  // Only the friends who received it: a refused friend is not listed.
+  recipientIds String[] @db.ObjectId
+  url          String
+  cloudinaryId String
+  // The note sent with it, 200 characters at most; absent when there is none.
+  message      String?
+  createdAt    DateTime @default(now())
+
+  @@index([senderId, id])
   @@index([cloudinaryId])
 }
 

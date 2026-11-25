@@ -22,10 +22,11 @@ const SEED_USERS: SeedUser[] = [
 ]
 
 async function seed(): Promise<void> {
-  // Sessions, photos, invitations, friendships and collections first: Prisma emulates the
+  // Sessions, photos, sends, invitations, friendships and collections first: Prisma emulates the
   // relations on MongoDB and refuses to delete a user that still has any of them.
   await prisma.session.deleteMany()
   await prisma.photo.deleteMany()
+  await prisma.send.deleteMany()
   await prisma.invitation.deleteMany()
   await prisma.friendship.deleteMany()
   await prisma.collection.deleteMany()

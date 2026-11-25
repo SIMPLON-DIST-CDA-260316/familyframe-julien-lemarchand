@@ -37,7 +37,7 @@ function makeDeps() {
       deleteOwned: vi.fn<PhotosRepository['deleteOwned']>().mockResolvedValue(RECORD),
       openOwned: vi.fn<PhotosRepository['openOwned']>(),
       findUnopened: vi.fn<PhotosRepository['findUnopened']>(),
-      countByCloudinaryId: vi.fn<PhotosRepository['countByCloudinaryId']>().mockResolvedValue(0),
+      countImageUses: vi.fn<PhotosRepository['countImageUses']>().mockResolvedValue(0),
       findCollectionPhotoIds: vi.fn<PhotosRepository['findCollectionPhotoIds']>(),
     },
     toFrameJpeg: vi.fn<PhotosServiceDeps['toFrameJpeg']>().mockResolvedValue(FRAME_JPEG),

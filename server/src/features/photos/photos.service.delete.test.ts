@@ -30,7 +30,7 @@ function makeDeps() {
       deleteOwned: vi.fn<PhotosRepository['deleteOwned']>().mockResolvedValue(RECORD),
       openOwned: vi.fn<PhotosRepository['openOwned']>(),
       findUnopened: vi.fn<PhotosRepository['findUnopened']>(),
-      countByCloudinaryId: vi.fn<PhotosRepository['countByCloudinaryId']>().mockResolvedValue(0),
+      countImageUses: vi.fn<PhotosRepository['countImageUses']>().mockResolvedValue(0),
       findCollectionPhotoIds: vi.fn<PhotosRepository['findCollectionPhotoIds']>(),
     },
     toFrameJpeg: vi.fn<PhotosServiceDeps['toFrameJpeg']>(),
@@ -46,7 +46,7 @@ function makeDeps() {
 }
 
 describe('deletePhoto', () => {
-  it("deletes the owner's record, then its image once no photo uses it, and returns the id", async () => {
+  it("deletes the owner's record, then its image once no photo or send uses it, and returns the id", async () => {
     const deps = makeDeps()
 
     const deletedId = await createPhotosService(deps).deletePhoto({
@@ -56,17 +56,17 @@ describe('deletePhoto', () => {
 
     expect(deletedId).toBe(RECORD.id)
     expect(deps.repository.deleteOwned).toHaveBeenCalledWith(RECORD.id, OWNER_ID)
-    expect(deps.repository.countByCloudinaryId).toHaveBeenCalledWith(IMAGE.cloudinaryId)
+    expect(deps.repository.countImageUses).toHaveBeenCalledWith(IMAGE.cloudinaryId)
     // Counted after the deletion: the deleted photo must not count itself.
     expect(deps.repository.deleteOwned.mock.invocationCallOrder[0]).toBeLessThan(
-      deps.repository.countByCloudinaryId.mock.invocationCallOrder[0],
+      deps.repository.countImageUses.mock.invocationCallOrder[0],
     )
     expect(deps.deleteImage).toHaveBeenCalledWith(IMAGE.cloudinaryId)
   })
 
-  it('keeps the image while another photo still uses it', async () => {
+  it('keeps the image while another photo or a send still uses it', async () => {
     const deps = makeDeps()
-    deps.repository.countByCloudinaryId.mockResolvedValue(1)
+    deps.repository.countImageUses.mockResolvedValue(1)
 
     await expect(
       createPhotosService(deps).deletePhoto({ ownerId: OWNER_ID, id: RECORD.id }),
@@ -83,7 +83,7 @@ describe('deletePhoto', () => {
 
   it('keeps the deletion and the image when the reference count fails', async () => {
     const deps = makeDeps()
-    deps.repository.countByCloudinaryId.mockRejectedValue(new Error('database down'))
+    deps.repository.countImageUses.mockRejectedValue(new Error('database down'))
 
     await expect(
       createPhotosService(deps).deletePhoto({ ownerId: OWNER_ID, id: RECORD.id }),

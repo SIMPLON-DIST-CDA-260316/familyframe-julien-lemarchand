@@ -1,5 +1,6 @@
 import { AppError } from '../../errors/app-error.js'
 import type { UploadedImage } from '../../lib/cloudinary.js'
+import { destroyUnusedImage } from '../../lib/image-uses.js'
 import type { Logger } from '../../lib/logger.js'
 import {
   parseCollectionFilter,
@@ -16,7 +17,7 @@ import {
   shareFromDevice,
   shareFromLibrary,
 } from './photos.share.js'
-import { deleteStoredImage, storeNewPhoto } from './photos.store.js'
+import { storeNewPhoto } from './photos.store.js'
 
 // ownerId is the logged-in account: a photo belongs to whoever uploaded it.
 export type NewPhotoInput = { ownerId: string; file: UploadedFile | undefined }
@@ -60,22 +61,13 @@ export type PhotosService = {
   shareFromDevice: (share: DeviceShare) => Promise<PhotoRecord>
 }
 
-// A shared photo points to the same image: it goes with the last photo using it.
-// Counted after the deletion, so the deleted photo does not count itself.
-async function destroyUnusedImage(deps: PhotosServiceDeps, cloudinaryId: string): Promise<boolean> {
-  let remainingCount: number
-  try {
-    remainingCount = await deps.repository.countByCloudinaryId(cloudinaryId)
-  } catch (error: unknown) {
-    // The record is gone and without the count we cannot tell whether another photo
-    // still uses the image, so we keep it and log it.
-    deps.logger.error('photo.orphaned', { cloudinaryId, error })
-    return false
-  }
-  if (remainingCount > 0) {
-    return false
-  }
-  return deleteStoredImage(deps, cloudinaryId)
+// The image stays while another photo or a send uses it.
+function destroyImageIfUnused(deps: PhotosServiceDeps, cloudinaryId: string): Promise<boolean> {
+  const { repository, deleteImage, logger } = deps
+  return destroyUnusedImage(
+    { countImageUses: repository.countImageUses, deleteImage, logger },
+    cloudinaryId,
+  )
 }
 
 async function createPhoto(
@@ -103,7 +95,7 @@ async function deletePhoto(
   if (!record) {
     throw new AppError('PHOTO_NOT_FOUND')
   }
-  const isImageDestroyed = await destroyUnusedImage(deps, record.cloudinaryId)
+  const isImageDestroyed = await destroyImageIfUnused(deps, record.cloudinaryId)
   deps.logger.info('photo.deleted', {
     photoId: record.id,
     cloudinaryId: record.cloudinaryId,

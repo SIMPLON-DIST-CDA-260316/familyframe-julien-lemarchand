@@ -1,4 +1,5 @@
 import { type Photo, Prisma, type PrismaClient } from '@prisma/client'
+import { countImageUses } from '../../lib/image-uses.js'
 
 // The sender's display name only: « Envoyée par X » needs nothing else of their account.
 const SENDER_NAME = {
@@ -44,7 +45,8 @@ export type PhotosRepository = {
   deleteOwned: (id: string, ownerId: string) => Promise<StoredPhoto | null>
   // null unless this owner has a photo with this id, like findOwned.
   openOwned: (id: string, ownerId: string) => Promise<PhotoRecord | null>
-  countByCloudinaryId: (cloudinaryId: string) => Promise<number>
+  // Photos and history lines: the image stays while one of them uses it.
+  countImageUses: (cloudinaryId: string) => Promise<number>
   // null unless id is one of ownerId's collections: someone else's answers like a missing one.
   findCollectionPhotoIds: (id: string, ownerId: string) => Promise<string[] | null>
 }
@@ -147,7 +149,7 @@ export function createPhotosRepository(prisma: PrismaClient): PhotosRepository {
     create: (photo) => createRecord(prisma, photo),
     deleteOwned: (id, ownerId) => deleteOwned(prisma, id, ownerId),
     openOwned: (id, ownerId) => openOwned(prisma, id, ownerId),
-    countByCloudinaryId: (cloudinaryId) => prisma.photo.count({ where: { cloudinaryId } }),
+    countImageUses: (cloudinaryId) => countImageUses(prisma, cloudinaryId),
     findCollectionPhotoIds: (id, ownerId) => findCollectionPhotoIds(prisma, id, ownerId),
   }
 }
