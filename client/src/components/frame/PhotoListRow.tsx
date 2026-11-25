@@ -36,7 +36,10 @@ export function PhotoListRow({ photo, isCurrent, onSelect }: PhotoListRowProps):
           decoding="async"
         />
         <span className="flex min-w-0 flex-1 flex-col">
-          <time dateTime={photo.createdAt} className="truncate text-base tabular-nums sm:text-lg">
+          <time
+            dateTime={photo.createdAt}
+            className="truncate text-sm font-medium tabular-nums sm:text-base"
+          >
             {ROW_DATE_FORMAT.format(new Date(photo.createdAt))}
           </time>
           {photo.senderName !== null && (

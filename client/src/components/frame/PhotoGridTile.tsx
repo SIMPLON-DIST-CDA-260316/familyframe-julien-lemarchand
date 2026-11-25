@@ -3,6 +3,16 @@ import { PhotoActionsMenu } from '@/components/frame/PhotoActionsMenu.tsx'
 import type { Photo } from '@/photo.ts'
 import { photoLabel } from '@/photoLabel.ts'
 
+// focus-visible:z-10: with 4 px gaps on a phone, the next tiles would paint over the focus ring.
+const TILE_CLASSES =
+  'group relative block w-full overflow-hidden rounded-sm outline-none ring-offset-2 ring-offset-background focus-visible:z-10 focus-visible:ring-3 focus-visible:ring-ring sm:rounded-xl sm:ring-offset-4 aria-[current=true]:ring-2 aria-[current=true]:ring-frame-accent'
+
+// White on the photo whatever the theme. On a phone tile (~120 px) a 44 px pill would hide too
+// much of it: the icon alone, shadowed, keeps the 44 px target in the corner. From sm, a dark pill.
+// z-10: stays above its own tile when that tile is focused.
+const ELLIPSIS_CLASSES =
+  'absolute top-0 right-0 z-10 rounded-full text-white drop-shadow-[0_1px_2px_rgb(0_0_0/0.8)] hover:bg-black/75 hover:text-white aria-expanded:bg-black/75 aria-expanded:text-white dark:hover:bg-black/75 sm:top-2 sm:right-2 sm:bg-black/55 sm:text-white/80 sm:drop-shadow-none sm:backdrop-blur-sm'
+
 type PhotoGridTileProps = {
   photo: Photo
   isCurrent: boolean
@@ -19,7 +29,7 @@ export function PhotoGridTile({ photo, isCurrent, onSelect }: PhotoGridTileProps
         aria-current={isCurrent}
         // The viewer focuses this tile when it closes on this photo.
         data-photo-id={photo.id}
-        className="group relative block w-full overflow-hidden rounded-xl outline-none ring-offset-4 ring-offset-background focus-visible:ring-3 focus-visible:ring-ring aria-[current=true]:ring-2 aria-[current=true]:ring-frame-accent"
+        className={TILE_CLASSES}
       >
         <img
           className="aspect-square w-full object-cover motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover/tile:scale-105"
@@ -29,12 +39,11 @@ export function PhotoGridTile({ photo, isCurrent, onSelect }: PhotoGridTileProps
           decoding="async"
         />
       </button>
-      {/* A dark pill whatever the theme: it sits on the photo, not on the page. */}
       <PhotoActionsMenu
         photo={photo}
         label={`Actions : ${photoLabel(photo)}`}
         theme="app"
-        className="absolute top-2 right-2 rounded-full bg-black/55 text-white/80 backdrop-blur-sm hover:bg-black/75 hover:text-white aria-expanded:bg-black/75 aria-expanded:text-white dark:hover:bg-black/75"
+        className={ELLIPSIS_CLASSES}
       />
     </li>
   )
