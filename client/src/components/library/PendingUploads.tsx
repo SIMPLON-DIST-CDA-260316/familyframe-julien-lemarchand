@@ -1,12 +1,13 @@
 import type { JSX } from 'react'
+import { usePreviewUrl } from '@/hooks/usePreviewUrl.ts'
+import { cn } from '@/lib/utils.ts'
+import { FULL_PERCENT } from '@/upload/postWithProgress.ts'
+import type { PendingUpload } from '@/upload/uploadQueue.ts'
 import {
   pendingAnnouncement,
   pendingProgressLabel,
   pendingShortLabel,
-} from '@/components/library/uploadTexts.ts'
-import { usePreviewUrl } from '@/hooks/usePreviewUrl.ts'
-import { cn } from '@/lib/utils.ts'
-import type { PendingUpload } from '@/upload/uploadQueue.ts'
+} from '@/upload/uploadTexts.ts'
 
 type PendingProps = { upload: PendingUpload }
 
@@ -29,8 +30,6 @@ const GRID_TILE_CLASSES = 'relative aspect-square overflow-hidden rounded-sm bg-
 const GRID_PILL_CLASSES =
   'absolute inset-x-1 bottom-1 flex flex-col gap-1 rounded-md bg-black/55 px-1.5 py-1 text-xs font-medium text-white backdrop-blur-sm sm:inset-x-2 sm:bottom-2 sm:gap-1.5 sm:rounded-lg sm:px-2.5 sm:py-2 sm:text-sm'
 
-const PROGRESS_MAX = 100
-
 // Not a live region itself: one announcement per photo is enough, not one per percent. No value
 // while waiting: an indeterminate bar, not « 0 % » under « En attente ».
 function ProgressBar({ progress, tone }: { progress: number | null; tone: BarTone }): JSX.Element {
@@ -40,7 +39,7 @@ function ProgressBar({ progress, tone }: { progress: number | null; tone: BarTon
       role="progressbar"
       aria-label="Progression de l'envoi"
       aria-valuemin={0}
-      aria-valuemax={PROGRESS_MAX}
+      aria-valuemax={FULL_PERCENT}
       aria-valuenow={progress ?? undefined}
       className={cn('h-1.5 w-full overflow-hidden rounded-full', track)}
     >

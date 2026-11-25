@@ -2,7 +2,8 @@
 // page for a stopped API.
 export type ProgressResponse = { isOk: boolean; status: number; body: unknown }
 
-const FULL_PERCENT = 100
+// Progress is a percentage: the bar's maximum and the « Finalisation… » step too.
+export const FULL_PERCENT = 100
 const SUCCESS_STATUS_MIN = 200
 const SUCCESS_STATUS_MAX = 299
 // A 10 MB photo on a slow mobile link takes well under a minute; past two, the link is dead and

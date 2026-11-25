@@ -1,10 +1,10 @@
 import type { Dispatch, SetStateAction } from 'react'
 import { toast } from 'sonner'
 import { errorMessage } from '@/api.ts'
-import { type UploadTally, uploadSummary } from '@/components/library/uploadTexts.ts'
 import type { Photo } from '@/photo.ts'
 import { postPhoto } from '@/photosApi.ts'
 import { preparePhoto } from '@/upload/preparePhoto.ts'
+import { type UploadTally, uploadSummary } from '@/upload/uploadTexts.ts'
 
 // collectionId: the view the photo was chosen from, where its tile shows. progress null: still
 // waiting its turn.

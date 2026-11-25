@@ -1,9 +1,9 @@
 import { CameraIcon, ImageIcon, SendIcon } from 'lucide-react'
 import { type ChangeEvent, type JSX, type SubmitEvent, useId, useRef, useState } from 'react'
 import { UploadPreview } from '@/components/library/UploadPreview.tsx'
-import { tooManyPhotosMessage } from '@/components/library/uploadTexts.ts'
 import { Alert, AlertDescription } from '@/components/ui/alert.tsx'
 import { Button } from '@/components/ui/button.tsx'
+import { tooManyPhotosMessage } from '@/upload/uploadTexts.ts'
 
 // The server's accepted types: a HEIC or GIF picked here would only be refused after the upload.
 const ACCEPTED_IMAGE_TYPES = 'image/jpeg,image/png,image/webp'

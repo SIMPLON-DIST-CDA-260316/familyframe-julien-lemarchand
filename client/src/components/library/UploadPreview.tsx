@@ -1,6 +1,6 @@
 import type { JSX } from 'react'
-import { chosenPhotosLabel } from '@/components/library/uploadTexts.ts'
 import { usePreviewUrl } from '@/hooks/usePreviewUrl.ts'
+import { chosenPhotosLabel } from '@/upload/uploadTexts.ts'
 
 function SinglePreview({ file }: { file: File }): JSX.Element | null {
   const previewUrl = usePreviewUrl(file)

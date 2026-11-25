@@ -1,4 +1,4 @@
-const FULL_PERCENT = 100
+import { FULL_PERCENT } from '@/upload/postWithProgress.ts'
 
 // collectionName: where the photos were filed, null when they only went to the library.
 export type UploadTally = {
