@@ -1,9 +1,18 @@
 import { SendIcon } from 'lucide-react'
-import type { JSX } from 'react'
+import { type JSX, useRef } from 'react'
 import { SendHistoryRow } from '@/components/send/SendHistoryRow.tsx'
 import { Alert, AlertDescription } from '@/components/ui/alert.tsx'
 import { Button } from '@/components/ui/button.tsx'
+import { useNow } from '@/hooks/useNow.ts'
 import type { SendHistory as History } from '@/hooks/useSendHistory.ts'
+
+// The coarsest unit the relative dates show.
+const DATE_REFRESH_MS = 60_000
+
+type HistoryProps = {
+  history: History
+  onRemove: (id: string) => void
+}
 
 function NoSendYet(): JSX.Element {
   return (
@@ -17,13 +26,13 @@ function NoSendYet(): JSX.Element {
   )
 }
 
-function HistoryList({ history }: { history: History }): JSX.Element {
-  const now = new Date()
+function HistoryList({ history, onRemove }: HistoryProps): JSX.Element {
+  const now = useNow(DATE_REFRESH_MS)
   return (
     <>
       <ul className="divide-y rounded-xl border">
         {history.sends.map((send) => (
-          <SendHistoryRow key={send.id} send={send} now={now} onRemove={history.remove} />
+          <SendHistoryRow key={send.id} send={send} now={now} onRemove={onRemove} />
         ))}
       </ul>
       {history.hasMore && (
@@ -40,7 +49,7 @@ function HistoryList({ history }: { history: History }): JSX.Element {
   )
 }
 
-function HistoryContent({ history }: { history: History }): JSX.Element {
+function HistoryContent({ history, onRemove }: HistoryProps): JSX.Element {
   if (history.isLoading) return <p className="text-sm text-muted-foreground">Chargement…</p>
   if (history.error) {
     return (
@@ -50,17 +59,27 @@ function HistoryContent({ history }: { history: History }): JSX.Element {
     )
   }
   if (history.sends.length === 0) return <NoSendYet />
-  return <HistoryList history={history} />
+  return <HistoryList history={history} onRemove={onRemove} />
 }
 
-// Private, as a mail box's sent folder: only the sender sees it.
+// Private, as a mail box's sent folder: only the sender sees it. A removed row takes its bin
+// button with it: the keyboard goes on from the list's title instead of the page's top.
 export function SendHistory({ history }: { history: History }): JSX.Element {
+  const titleRef = useRef<HTMLHeadingElement>(null)
+  async function handleRemove(id: string): Promise<void> {
+    if (await history.remove(id)) titleRef.current?.focus()
+  }
   return (
     <section aria-labelledby="send-history-title" className="flex flex-col gap-3">
-      <h2 id="send-history-title" className="text-sm font-medium text-muted-foreground">
+      <h2
+        ref={titleRef}
+        id="send-history-title"
+        tabIndex={-1}
+        className="text-sm font-medium text-muted-foreground outline-none"
+      >
         Envois
       </h2>
-      <HistoryContent history={history} />
+      <HistoryContent history={history} onRemove={handleRemove} />
     </section>
   )
 }

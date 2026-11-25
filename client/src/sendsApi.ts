@@ -6,10 +6,12 @@ export type SendPageResult =
   | { isSuccess: false; message: string }
 
 // gone: another tab or device removed it first; the page reloads its history then.
+// unauthenticated: the provider already sends the user to the login page, nothing to show.
 export type SendRemovalResult =
   | { status: 'removed' }
   | { status: 'gone'; message: string }
   | { status: 'failed'; message: string }
+  | { status: 'unauthenticated' }
 
 const NOT_FOUND_STATUS = 404
 
@@ -42,7 +44,10 @@ export async function removeSend(
   try {
     const res = await fetch(`/api/sends/${encodeURIComponent(id)}`, { method: 'DELETE' })
     if (res.ok) return { status: 'removed' }
-    if (res.status === UNAUTHORIZED_STATUS) onUnauthenticated()
+    if (res.status === UNAUTHORIZED_STATUS) {
+      onUnauthenticated()
+      return { status: 'unauthenticated' }
+    }
     const data: unknown = await res.json().catch(() => null)
     const message = errorMessage(data)
     return res.status === NOT_FOUND_STATUS

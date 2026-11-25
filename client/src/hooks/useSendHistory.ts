@@ -21,7 +21,8 @@ export type SendHistory = {
   error: string
   reload: () => Promise<void>
   loadMore: () => Promise<void>
-  remove: (id: string) => Promise<void>
+  // true once the line left the list: the page moves the focus off its vanished row.
+  remove: (id: string) => Promise<boolean>
 }
 
 type HistoryPages = { sends: SentPhoto[]; nextCursor: string | null }
@@ -77,19 +78,22 @@ function useRemove(
   setPages: Dispatch<SetStateAction<HistoryPages>>,
   reload: () => Promise<void>,
   dropUser: () => void,
-): (id: string) => Promise<void> {
+): (id: string) => Promise<boolean> {
   return useCallback(
     async (id: string) => {
       const result = await removeSend(id, dropUser)
+      if (result.status === 'unauthenticated') return false
       if (result.status === 'removed') {
         setPages((current) => ({
           ...current,
           sends: current.sends.filter((send) => send.id !== id),
         }))
-        return
+        return true
       }
       toast.error(result.message)
-      if (result.status === 'gone') await reload()
+      if (result.status === 'failed') return false
+      await reload()
+      return true
     },
     [setPages, reload, dropUser],
   )
