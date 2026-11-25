@@ -11,6 +11,7 @@ import {
 import type { FriendUser } from '@/friendship.ts'
 import type { Photo } from '@/photo.ts'
 import { postDeviceShare, postLibraryShare, type ShareResult } from '@/photosApi.ts'
+import { preparePhoto } from '@/upload/preparePhoto.ts'
 
 export type ShareTarget = { kind: 'library'; photo: Photo } | { kind: 'device'; file: File }
 
@@ -24,6 +25,12 @@ function postShare(target: ShareTarget, friendId: string, message: string): Prom
   return target.kind === 'library'
     ? postLibraryShare(target.photo.id, friendId, message)
     : postDeviceShare(target.file, friendId, message)
+}
+
+// Prepared once, before the first friend: each one then gets the same file.
+async function preparedTarget(target: ShareTarget): Promise<ShareTarget> {
+  if (target.kind === 'library') return target
+  return { kind: 'device', file: await preparePhoto(target.file) }
 }
 
 // One friend after the other: a device share uploads the whole file each time. null: the
@@ -59,7 +66,7 @@ export function useShareSending(target: ShareTarget, onSent: () => void): ShareS
   async function sendTo(friends: FriendUser[], message: string): Promise<void> {
     setIsSending(true)
     setError('')
-    const outcomes = await shareWithEach(target, friends, message)
+    const outcomes = await shareWithEach(await preparedTarget(target), friends, message)
     setIsSending(false)
     // The session ended on the server: RequireAuth sends the user to /login.
     if (outcomes === null) {

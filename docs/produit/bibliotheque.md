@@ -17,7 +17,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 1. R-BIB-01 · Les deux boutons restent désactivés tant qu'aucune photo n'est choisie.
 2. R-BIB-02 · Remplacée : plusieurs photos peuvent être ajoutées d'un coup (R-BIB-60).
 3. R-BIB-03 · Formats acceptés : JPEG, PNG et WebP. Seuls ces formats peuvent être choisis ; le téléphone convertit lui-même une photo prise avec l'appareil photo. Tout autre format (GIF, HEIC, vidéo…) est refusé.
-4. R-BIB-04 · Une photo pèse au plus 10 Mo.
+4. R-BIB-04 · Une photo envoyée pèse au plus 10 Mo. Une photo plus lourde est d'abord réduite sur l'appareil (R-BIB-63) ; si l'appareil ne sait pas la lire, elle part telle quelle et elle est refusée.
 5. R-BIB-05 · Le fichier doit être une image lisible ; un fichier abîmé ou déguisé en image est refusé.
 6. R-BIB-06 · Remplacée : une photo reçue en attente d'être découverte compte aussi (R-BIB-43).
 7. R-BIB-43 · Une photo identique, octet pour octet, à une photo déjà présente dans la bibliothèque, ou reçue d'un ami et en attente d'être découverte, est refusée, qu'elle ait été ajoutée par soi ou reçue d'un ami. Une version retouchée, recadrée ou réenregistrée de la même photo est un autre fichier : elle est acceptée.
@@ -40,6 +40,8 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 24. R-BIB-60 · « Choisir des images » permet de choisir jusqu'à 20 photos d'un coup ; « Prendre une photo » en prend une à la fois. Choisir de nouveau remplace les photos choisies dans le panneau. Refermer le sélecteur sans rien choisir garde les photos déjà choisies ; choisir de nouveau la même photo fonctionne.
 25. R-BIB-61 · Au-delà de 20 photos choisies d'un coup, aucune n'est gardée et un message demande d'en choisir moins.
 26. R-BIB-62 · Chaque photo choisie a sa propre vignette grisée. Une photo refusée n'arrête pas les suivantes : sa vignette disparaît, sa raison s'affiche, et le message de fin compte les photos ajoutées et refusées.
+27. R-BIB-63 · Une très grande photo, de plus de 4096 pixels sur son plus grand côté ou de plus de 10 Mo, est légèrement réduite sur l'appareil avant l'envoi, à 4096 pixels au plus, pour pouvoir être envoyée. Cette réduction garde toujours assez de détail pour un tirage 20×30 cm. Les autres photos partent telles quelles, sans aucune retouche. Il n'y a rien à régler. La photo gardée dans la bibliothèque reste ensuite celle préparée pour l'affichage (R-BIB-08).
+28. R-BIB-64 · Une image que l'appareil ne sait pas lire part telle quelle : l'application l'accepte ou la refuse avec sa raison, comme toute photo.
 
 **Messages affichés**
 

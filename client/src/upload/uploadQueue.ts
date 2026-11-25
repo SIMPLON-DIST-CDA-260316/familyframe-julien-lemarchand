@@ -4,6 +4,7 @@ import { errorMessage } from '@/api.ts'
 import { type UploadTally, uploadSummary } from '@/components/library/uploadTexts.ts'
 import type { Photo } from '@/photo.ts'
 import { postPhoto } from '@/photosApi.ts'
+import { preparePhoto } from '@/upload/preparePhoto.ts'
 
 // collectionId: the view the photo was chosen from, where its tile shows. progress null: still
 // waiting its turn.
@@ -68,9 +69,8 @@ async function uploadOne(
   onUploaded: UploadedHandler,
 ): Promise<UploadOutcome> {
   updateProgress(setPending, upload.id, 0)
-  const result = await postPhoto(upload.file, (percent) =>
-    updateProgress(setPending, upload.id, percent),
-  )
+  const file = await preparePhoto(upload.file)
+  const result = await postPhoto(file, (percent) => updateProgress(setPending, upload.id, percent))
   if (result.status === 'unauthenticated') return result
   if (result.status === 'failed') {
     toast.error(result.message, { description: upload.file.name })
