@@ -3,10 +3,12 @@
 // createdAt is an ISO 8601 string: JSON has no dates. senderName is the display name of the
 // friend who sent the photo, null for a photo its owner uploaded. message is the note the
 // friend wrote with it, null without one. width and height (px) and bytes describe the stored
-// image; all three null on a photo stored before step 15.
+// image; all three null on a photo stored before step 15. url is at most 1920 px, mediumUrl
+// at most 1280 px (phone screens), thumbnailUrl a 640 px square.
 export type Photo = {
   id: string
   url: string
+  mediumUrl: string
   thumbnailUrl: string
   createdAt: string
   senderName: string | null
@@ -48,6 +50,8 @@ export function isPhoto(value: unknown): value is Photo {
     typeof value.id === 'string' &&
     'url' in value &&
     typeof value.url === 'string' &&
+    'mediumUrl' in value &&
+    typeof value.mediumUrl === 'string' &&
     'thumbnailUrl' in value &&
     typeof value.thumbnailUrl === 'string' &&
     'createdAt' in value &&

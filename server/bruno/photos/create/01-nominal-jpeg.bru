@@ -28,7 +28,7 @@ assert {
 
 script:post-response {
   const axios = require('axios')
-  const { url, thumbnailUrl } = res.body
+  const { url, mediumUrl, thumbnailUrl } = res.body
   // photos/delete deletes this photo: the JPEG one does not pile up run after run.
   bru.setVar('createdPhotoId', res.body.id)
   test('format et compression choisis par Cloudinary', () => {
@@ -38,11 +38,15 @@ script:post-response {
   test('photo entière limitée à 1920 px pour les écrans, jamais agrandie', () => {
     expect(url).to.contain('c_limit,h_1920,w_1920')
   })
+  test('photo moyenne limitée à 1280 px pour les téléphones', () => {
+    expect(mediumUrl).to.contain('c_limit,h_1280,w_1280')
+    expect(mediumUrl).to.contain('f_auto,q_auto')
+  })
   test('miniature carrée de 640 px, recadrée sur le sujet', () => {
     expect(thumbnailUrl).to.contain('c_fill,g_auto,h_640,w_640')
   })
-  test('les deux URL livrent une image, en WebP pour un navigateur qui l\'accepte', async () => {
-    for (const imageUrl of [url, thumbnailUrl]) {
+  test('les trois URL livrent une image, en WebP pour un navigateur qui l\'accepte', async () => {
+    for (const imageUrl of [url, mediumUrl, thumbnailUrl]) {
       const image = await axios.get(imageUrl, { headers: { Accept: 'image/webp,*/*' } })
       expect(image.status).to.equal(200)
       expect(image.headers['content-type']).to.match(/^image\//)
@@ -51,6 +55,7 @@ script:post-response {
   test('URL signées : une transformation modifiée est refusée', async () => {
     expect(url).to.match(/\/s--[\w-]+--\//)
     expect(thumbnailUrl).to.match(/\/s--[\w-]+--\//)
+    expect(mediumUrl).to.match(/\/s--[\w-]+--\//)
     // Bruno's axios throws on 4xx even with validateStatus: read the status from the error.
     for (const tampered of [thumbnailUrl.replace('w_640', 'w_641'), url.replace('w_1920', 'w_4096')]) {
       const status = await axios.get(tampered).then(
@@ -70,8 +75,9 @@ docs {
   stockée, mesurée par Cloudinary à l'envoi : les infos de la photo les montrent.
   `cloudinaryId` n'est pas exposé : le serveur envoie des URL prêtes, `url`
   (photo entière, limitée à 1920 px par `c_limit` : l'image stockée va
-  jusqu'à 4096 px pour l'impression) et `thumbnailUrl` (miniature), toutes
-  deux en `f_auto,q_auto`. Le test télécharge les deux URL : une transformation
+  jusqu'à 4096 px pour l'impression), `mediumUrl` (limitée à 1280 px, que la
+  visionneuse d'un téléphone choisit par `srcset`) et `thumbnailUrl`
+  (miniature), toutes en `f_auto,q_auto`. Le test télécharge les trois URL : une transformation
   refusée par Cloudinary ferait échouer le test.
 
   Les URL sont signées (`s--…--`). Les tests des URL modifiées (miniature

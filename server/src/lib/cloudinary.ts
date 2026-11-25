@@ -15,6 +15,9 @@ const THUMBNAIL_SIZE = 640
 // The frame and the viewer: a full HD screen. The stored photo is larger, kept for printing.
 const DISPLAY_SIZE = 1920
 
+// A phone's screen: the viewer picks it there (srcset) and saves the bigger download.
+const MEDIUM_SIZE = 1280
+
 // Decided per request: WebP when the browser takes it and it is lighter, else JPEG.
 // Compression is picked from the image content.
 const OPTIMIZED_DELIVERY: ImageTransformationOptions = { fetch_format: 'auto', quality: 'auto' }
@@ -24,7 +27,7 @@ export type UploadedImage = { url: string; cloudinaryId: string }
 // Shown in a photo's info: an avatar does not keep them.
 export type UploadedPhoto = UploadedImage & { width: number; height: number; bytes: number }
 
-export type DeliveryUrls = { url: string; thumbnailUrl: string }
+export type DeliveryUrls = { url: string; mediumUrl: string; thumbnailUrl: string }
 
 // Data URI rather than a stream: simpler, and fine up to 10 MB.
 async function uploadToFolder(jpeg: Buffer, folder: string): Promise<UploadedPhoto> {
@@ -80,14 +83,15 @@ export function thumbnailUrl(cloudinaryId: string): string {
 
 // limit: shrinks a larger photo, never enlarges one; photos stored before the 4096 px cap stay
 // at 1920 px and go through unchanged.
+function limitedUrl(cloudinaryId: string, size: number): string {
+  const limit: ImageTransformationOptions = { crop: 'limit', width: size, height: size }
+  return deliveryUrl(cloudinaryId, [limit, OPTIMIZED_DELIVERY])
+}
+
 export function deliveryUrls(cloudinaryId: string): DeliveryUrls {
-  const display: ImageTransformationOptions = {
-    crop: 'limit',
-    width: DISPLAY_SIZE,
-    height: DISPLAY_SIZE,
-  }
   return {
-    url: deliveryUrl(cloudinaryId, [display, OPTIMIZED_DELIVERY]),
+    url: limitedUrl(cloudinaryId, DISPLAY_SIZE),
+    mediumUrl: limitedUrl(cloudinaryId, MEDIUM_SIZE),
     thumbnailUrl: thumbnailUrl(cloudinaryId),
   }
 }
