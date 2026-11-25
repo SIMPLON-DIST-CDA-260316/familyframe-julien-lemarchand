@@ -39,6 +39,8 @@ export async function fetchPhotoPage(
       onUnauthenticated()
       return null
     }
+    // A refused load, such as a collection deleted elsewhere (404): the page says so already.
+    if (!res.ok) return null
     const data: unknown = await res.json()
     if (isPhotoPage(data)) return data
     // Client and API images out of sync: say so instead of waiting forever.
