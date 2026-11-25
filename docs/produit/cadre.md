@@ -122,7 +122,7 @@ Le cadre n'a plus de vue bibliothèque : voir R-CAD-53. Les règles ci-dessous g
 
 **Ce que l'on peut faire**
 
-- Voir une photo ajoutée depuis un téléphone ou envoyée par un ami arriver sur le cadre en quelques instants, sans recharger.
+- Voir une photo ajoutée depuis un téléphone, ou découverte sur un autre appareil, arriver sur le cadre en quelques instants, sans recharger.
 - Quand quelqu'un regarde le cadre, aller à la nouvelle photo en touchant la pastille « 1 nouvelle photo ».
 
 **Règles**
@@ -133,6 +133,7 @@ Le cadre n'a plus de vue bibliothèque : voir R-CAD-53. Les règles ci-dessous g
 4. R-CAD-43 · Remplacée : le cadre n'a plus de vue bibliothèque (R-CAD-53).
 5. R-CAD-44 · La pastille additionne les photos arrivées tant qu'elle n'a pas été touchée.
 6. R-CAD-45 · Une photo supprimée depuis un autre appareil disparaît du cadre en quelques instants, sans recharger.
+7. R-CAD-76 · Une photo envoyée par un ami ne s'affiche pas à son arrivée : elle attend d'être découverte (voir [Photos reçues en attente](#photos-reçues-en-attente)). Découverte sur un autre appareil, elle entre dans le diaporama à sa date de réception ; si c'est la plus récente, les règles d'arrivée ci-dessus s'appliquent.
 
 **Messages affichés**
 
@@ -144,7 +145,33 @@ Le cadre n'a plus de vue bibliothèque : voir R-CAD-53. Les règles ci-dessous g
 **Ce qui n'est pas possible**
 
 - Être averti par un son ou une vibration.
-- Voir la liste des photos reçues mais pas encore regardées : prévu, voir [a-venir.md](a-venir.md).
+
+## Photos reçues en attente
+
+**Ce que l'on peut faire**
+
+- Voir en haut du cadre la pastille « Vous avez N nouvelles photos » quand des proches ont envoyé des photos.
+- Toucher la pastille pour découvrir les photos une à une, en grand, avec leur expéditeur, leur date et leur message.
+
+**Règles**
+
+1. R-CAD-72 · Tant qu'au moins une photo reçue attend, une pastille blanche, marquée d'une enveloppe, s'affiche en haut au centre du cadre, même quand personne ne l'utilise. Elle se place au-dessus de la pastille des nouvelles photos, sans la cacher, et se met à jour seule.
+2. R-CAD-73 · Toucher la pastille lance la découverte, comme dans la bibliothèque (voir [partage.md](partage.md#recevoir-une-photo), R-PAR-53 et R-PAR-54). Le diaporama s'arrête pendant ce temps.
+3. R-CAD-74 · Après « Terminer » ou la fermeture, le diaporama repart de la photo la plus récente. Les photos découvertes y sont déjà, à leur date de réception : la pastille des nouvelles photos ne les annonce pas.
+4. R-CAD-75 · Sans aucune photo dans la bibliothèque mais avec des photos en attente, le cadre affiche « Des photos vous attendent. » sous la pastille.
+
+**Messages affichés**
+
+| Situation                            | Message                          |
+| ------------------------------------ | -------------------------------- |
+| Une photo en attente                 | « Vous avez 1 nouvelle photo »   |
+| Plusieurs photos en attente          | « Vous avez N nouvelles photos » |
+| Bibliothèque vide, photos en attente | « Des photos vous attendent. »   |
+
+**Ce qui n'est pas possible**
+
+- Voir la liste des photos en attente sans les découvrir.
+- Découvrir les photos sans que le diaporama s'arrête.
 
 ## Coupure de réseau
 

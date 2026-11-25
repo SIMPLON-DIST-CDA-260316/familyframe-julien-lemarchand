@@ -13,7 +13,7 @@ function newPhotosLabel(count: number): string {
 export function NewPhotosBadge({ count, onSelect }: NewPhotosBadgeProps): JSX.Element {
   return (
     // The live region stays mounted: screen readers only announce changes to one that exists.
-    <div aria-live="polite" className="fixed top-6 left-1/2 z-20 -translate-x-1/2">
+    <div aria-live="polite">
       {count > 0 && (
         <Badge
           asChild

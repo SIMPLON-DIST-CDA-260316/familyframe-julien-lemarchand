@@ -32,20 +32,20 @@ Envoyer une photo à un ou plusieurs amis la leur fait parvenir comme du courrie
 
 **Messages affichés**
 
-| Situation                            | Message                                                                            |
-| ------------------------------------ | ---------------------------------------------------------------------------------- |
-| En-tête                              | « Envoyer à des proches » — « La photo s'affichera aussitôt sur leur cadre. »      |
-| Chargement des amis                  | « Chargement… »                                                                    |
-| Aucun ami                            | « Vous n'avez pas encore d'amis. » et le lien « Ajouter un ami » vers la page Amis |
-| Recherche sans résultat              | « Aucun ami ne correspond à « [texte saisi] ». »                                   |
-| Champ du message                     | « Message (facultatif) », avec le compteur « N / 200 »                             |
-| Message trop long                    | « Le message doit faire 200 caractères au plus. »                                  |
-| Bouton                               | « Envoyer », « Envoyer à 1 personne », « Envoyer à N personnes »                   |
-| Envoi en cours                       | « Envoi… »                                                                         |
-| Envoi réussi                         | « Envoyée à Mamie et Tata » (exemple)                                              |
-| Le destinataire a déjà cette photo   | « Tata a déjà cette photo. »                                                       |
-| La personne n'est plus un ami        | « Cette personne ne fait pas partie de vos amis. »                                 |
-| La photo a été supprimée entre-temps | « Cette photo a déjà été supprimée. »                                              |
+| Situation                            | Message                                                                                     |
+| ------------------------------------ | ------------------------------------------------------------------------------------------- |
+| En-tête                              | « Envoyer à des proches » — « Elle les attendra sur leur cadre et dans leur bibliothèque. » |
+| Chargement des amis                  | « Chargement… »                                                                             |
+| Aucun ami                            | « Vous n'avez pas encore d'amis. » et le lien « Ajouter un ami » vers la page Amis          |
+| Recherche sans résultat              | « Aucun ami ne correspond à « [texte saisi] ». »                                            |
+| Champ du message                     | « Message (facultatif) », avec le compteur « N / 200 »                                      |
+| Message trop long                    | « Le message doit faire 200 caractères au plus. »                                           |
+| Bouton                               | « Envoyer », « Envoyer à 1 personne », « Envoyer à N personnes »                            |
+| Envoi en cours                       | « Envoi… »                                                                                  |
+| Envoi réussi                         | « Envoyée à Mamie et Tata » (exemple)                                                       |
+| Le destinataire a déjà cette photo   | « Tata a déjà cette photo. »                                                                |
+| La personne n'est plus un ami        | « Cette personne ne fait pas partie de vos amis. »                                          |
+| La photo a été supprimée entre-temps | « Cette photo a déjà été supprimée. »                                                       |
 
 **Ce qui n'est pas possible**
 
@@ -111,7 +111,7 @@ Ceux du panneau d'envoi (voir [Choisir à qui envoyer](#choisir-à-qui-envoyer))
 4. R-PAR-33 · Une photo transférée de nouveau nomme la dernière personne qui l'a envoyée, pas l'auteur d'origine.
 5. R-PAR-34 · Remplacée : la photo découverte se range à sa date de réception, pas forcément en tête (R-PAR-55).
 6. R-PAR-35 · Remplacée : l'annonce et la photo découverte apparaissent sur tous les appareils du destinataire (R-PAR-52, R-PAR-55) ; l'expéditeur ne voit rien changer (R-PAR-56).
-7. R-PAR-36 · Sur un cadre en diaporama, la photo reçue s'affiche selon les règles d'arrivée d'une nouvelle photo (voir [cadre.md](cadre.md#arrivée-dune-nouvelle-photo)).
+7. R-PAR-36 · Remplacée : sur le cadre aussi, la photo reçue attend d'être découverte (R-PAR-57).
 8. R-PAR-49 · Le message de l'expéditeur s'affiche entre guillemets sous la mention « Envoyée par » : sur la photo ouverte en grand, dans la légende du diaporama et sur la bande blanche du polaroid. Sur le cadre, il tient sur trois lignes au plus ; la photo ouverte en grand le montre en entier.
 9. R-PAR-50 · Une photo transférée de nouveau porte le message de la dernière personne qui l'a envoyée, ou aucun message si elle n'en a pas écrit : le message reçu avec la photo ne la suit pas.
 10. R-PAR-51 · Une photo reçue arrive non ouverte : elle n'entre ni dans la bibliothèque ni dans le diaporama tant que le destinataire ne l'a pas découverte. Les photos reçues avant l'arrivée de cette fonctionnalité comptent comme déjà découvertes.
@@ -120,6 +120,7 @@ Ceux du panneau d'envoi (voir [Choisir à qui envoyer](#choisir-à-qui-envoyer))
 13. R-PAR-54 · Une photo compte comme découverte dès qu'elle s'affiche, pour tous les appareils du destinataire. Fermer avant la fin, avec la croix ou la touche Échap, laisse les photos suivantes en attente.
 14. R-PAR-55 · Une fois découverte, la photo entre dans la bibliothèque à sa date de réception, sur tous les appareils connectés, sans recharger : elle n'est en tête que si rien n'a été ajouté depuis.
 15. R-PAR-56 · L'expéditeur ne voit aucun changement sur ses propres écrans et ne sait pas si la photo a été découverte.
+16. R-PAR-57 · Sur le cadre, une pastille annonce aussi les photos en attente et lance la même découverte ; une fois découvertes, elles entrent dans le diaporama (voir [cadre.md](cadre.md#photos-reçues-en-attente)).
 
 **Messages affichés**
 

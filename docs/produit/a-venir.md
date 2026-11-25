@@ -4,12 +4,6 @@ Fonctionnalités prévues mais pas encore livrées, regroupées par étape. Rien
 
 Les règles ci-dessous décrivent l'intention ; elles recevront leur identifiant définitif à la livraison.
 
-## Étape 9 · Courrier photo
-
-**Prévu**
-
-- Une annonce « Vous avez N nouvelles photos » sur le cadre, et la découverte des photos reçues depuis le cadre.
-
 ## Étape 10 · Collections
 
 **Prévu**

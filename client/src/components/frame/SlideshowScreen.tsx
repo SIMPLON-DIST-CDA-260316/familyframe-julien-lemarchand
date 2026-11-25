@@ -1,5 +1,4 @@
 import type { JSX } from 'react'
-import { NewPhotosBadge } from '@/components/frame/NewPhotosBadge.tsx'
 import { PhotoStrip } from '@/components/frame/PhotoStrip.tsx'
 import { PhotoView } from '@/components/frame/PhotoView.tsx'
 import { SlideshowBottomBar } from '@/components/frame/SlideshowBottomBar.tsx'
@@ -54,7 +53,6 @@ export function SlideshowScreen({
           onSelect={selection.selectPhoto}
         />
       </PhotoView>
-      <NewPhotosBadge count={selection.newPhotoCount} onSelect={selection.showNewest} />
     </>
   )
 }

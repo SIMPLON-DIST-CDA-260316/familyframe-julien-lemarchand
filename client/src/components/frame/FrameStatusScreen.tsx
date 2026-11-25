@@ -1,11 +1,19 @@
-import { ImagesIcon, TriangleAlertIcon } from 'lucide-react'
+import { ImagesIcon, MailIcon, TriangleAlertIcon } from 'lucide-react'
 import type { JSX, ReactNode } from 'react'
 import { FullscreenButton } from '@/components/frame/FullscreenButton.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import { cn } from '@/lib/utils.ts'
 
 // Why the frame shows no photo: each case needs its own words.
-export type FrameStatus = 'loading' | 'empty' | 'failed'
+// unopened: nothing in the library yet, but friends' photos wait to be discovered.
+export type FrameStatus = 'loading' | 'empty' | 'unopened' | 'failed'
+
+const STATUS_ICONS = {
+  loading: ImagesIcon,
+  empty: ImagesIcon,
+  unopened: MailIcon,
+  failed: TriangleAlertIcon,
+} satisfies Record<FrameStatus, typeof ImagesIcon>
 
 type FrameStatusScreenProps = {
   status: FrameStatus
@@ -15,6 +23,8 @@ type FrameStatusScreenProps = {
 
 function StatusMessage({ status }: { status: FrameStatus }): ReactNode {
   if (status === 'loading') return <p className="text-3xl font-medium">Chargement des photos…</p>
+  if (status === 'unopened')
+    return <p className="text-3xl font-medium">Des photos vous attendent.</p>
   if (status === 'failed') {
     return (
       <>
@@ -41,7 +51,7 @@ export function FrameStatusScreen({
   className,
   onLeave,
 }: FrameStatusScreenProps): JSX.Element {
-  const Icon = status === 'failed' ? TriangleAlertIcon : ImagesIcon
+  const Icon = STATUS_ICONS[status]
   return (
     <main
       className={cn(
