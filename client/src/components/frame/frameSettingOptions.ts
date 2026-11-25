@@ -1,6 +1,6 @@
 import type { Collection } from '@/collections/collection.ts'
 import { type FrameTemplate, type PlaybackOrder, SLIDESHOW_INTERVALS_MS } from '@/frameSettings.ts'
-import { DAILY_SOURCE, LIBRARY_SOURCE, sourceKey } from '@/photoSource.ts'
+import { DAILY_SOURCE, LIBRARY_SOURCE, type PlayedSource, sourceKey } from '@/photoSource.ts'
 
 export type SettingOption<Value> = { value: Value; label: string }
 
@@ -44,4 +44,14 @@ export function sourceOptions(collections: Collection[]): SettingOption<string>[
       label: name,
     })),
   ]
+}
+
+// The frame's menu adds the radio first while one plays: it is checked, and never stored.
+export function playedSourceOptions(
+  source: PlayedSource,
+  collections: Collection[],
+): SettingOption<string>[] {
+  const options = sourceOptions(collections)
+  if (source.kind !== 'radio') return options
+  return [{ value: sourceKey(source), label: 'Radio' }, ...options]
 }

@@ -4,8 +4,4 @@ Fonctionnalités prévues mais pas encore livrées, regroupées par étape. Rien
 
 Les règles ci-dessous décrivent l'intention ; elles recevront leur identifiant définitif à la livraison.
 
-## Étape 11 · Sélections automatiques
-
-**Prévu**
-
-- Une « radio » lancée à partir d'une photo, qui enchaîne des photos liées par leur contexte : dates proches, même expéditeur, mêmes collections.
+Aucune fonctionnalité n'est prévue pour l'instant : les sélections automatiques de l'étape 11 sont livrées (voir [cadre.md](cadre.md#sélection-du-jour)).

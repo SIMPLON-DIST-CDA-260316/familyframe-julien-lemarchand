@@ -9,7 +9,7 @@ import { usePlaybackPhotos } from '@/hooks/usePlaybackPhotos.ts'
 import { type SlideshowSettings, useSlideshowSettings } from '@/hooks/useSlideshowSettings.ts'
 import { type SourcePhotos, useSourcePhotos } from '@/hooks/useSourcePhotos.ts'
 import type { Photo } from '@/photo.ts'
-import { type PhotoSource, sourceKey } from '@/photoSource.ts'
+import { type PlayedSource, sourceKey } from '@/photoSource.ts'
 import { PHOTO_PARAM } from '@/viewerHistory.ts'
 
 // The controls step aside quickly: the photo is what the wall is for.
@@ -20,7 +20,7 @@ export type FrameMode = {
   photos: Photo[]
   status: FeedStatus
   // The source played: the library when the chosen one is unavailable.
-  source: PhotoSource
+  source: PlayedSource
   // undefined while there is no photo to show.
   currentPhoto: Photo | undefined
   isActive: boolean

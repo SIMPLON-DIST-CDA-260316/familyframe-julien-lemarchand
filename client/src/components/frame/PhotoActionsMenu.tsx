@@ -1,4 +1,4 @@
-import { EllipsisIcon, SendIcon, Trash2Icon } from 'lucide-react'
+import { EllipsisIcon, RadioIcon, SendIcon, Trash2Icon } from 'lucide-react'
 import { type JSX, type ReactNode, type RefObject, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { useCollections } from '@/collections/CollectionsContext.ts'
@@ -15,6 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu.tsx'
+import { useStartRadio } from '@/hooks/useStartRadio.ts'
 import { cn } from '@/lib/utils.ts'
 import type { Photo } from '@/photo.ts'
 
@@ -113,10 +114,15 @@ type MenuItemsProps = {
 }
 
 function MenuItems({ photo, onOpen, children }: MenuItemsProps): JSX.Element {
+  const startRadio = useStartRadio()
   return (
     // `dark`: the menu portals to body, outside the frame's dark <main>.
     <DropdownMenuContent align="end" className="dark">
       {children}
+      <DropdownMenuItem onSelect={() => startRadio(photo.id)}>
+        <RadioIcon />
+        Lancer la radio
+      </DropdownMenuItem>
       <DropdownMenuItem onSelect={() => onOpen({ kind: 'share', photo })}>
         <SendIcon />
         Envoyer à un ami

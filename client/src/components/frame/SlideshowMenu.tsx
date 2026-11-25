@@ -5,31 +5,35 @@ import { GLASS_BUTTON_CLASSES } from '@/components/frame/controlClasses.ts'
 import {
   INTERVAL_OPTIONS,
   ORDER_OPTIONS,
-  sourceOptions,
+  playedSourceOptions,
   TEMPLATE_OPTIONS,
 } from '@/components/frame/frameSettingOptions.ts'
 import { PhotoActionsMenu } from '@/components/frame/PhotoActionsMenu.tsx'
 import { RadioSubmenu } from '@/components/frame/RadioSubmenu.tsx'
 import { DropdownMenuSeparator } from '@/components/ui/dropdown-menu.tsx'
-import type { FrameSettingsControls } from '@/hooks/useFrameSettings.ts'
+import type { SlideshowSettings } from '@/hooks/useSlideshowSettings.ts'
 import type { Photo } from '@/photo.ts'
-import { playedSourceKey, sourceFromKey } from '@/photoSource.ts'
+import { playedSourceKey, sourceFromKey, sourceKey } from '@/photoSource.ts'
 
 type SlideshowMenuProps = {
   photo: Photo
-  settings: FrameSettingsControls
+  settings: SlideshowSettings
 }
 
-// What the frame plays: the library or one collection.
-function SourceSubmenu({ settings }: { settings: FrameSettingsControls }): JSX.Element {
+// What the frame plays: the library, the day's selection, one collection, or the radio playing.
+// Choosing the radio again does nothing: it is not a stored choice. The library, checked while a
+// deleted collection is stored, is stored when chosen.
+function SourceSubmenu({ settings }: { settings: SlideshowSettings }): JSX.Element {
   const { collections } = useCollections()
   return (
     <RadioSubmenu
       icon={ImagesIcon}
       label="Photos"
-      options={sourceOptions(collections)}
+      options={playedSourceOptions(settings.source, collections)}
       value={playedSourceKey(settings.source, collections)}
-      onValueChange={(key) => settings.onSourceChange(sourceFromKey(key))}
+      onValueChange={(key) => {
+        if (key !== sourceKey(settings.source)) settings.onSourceChange(sourceFromKey(key))
+      }}
     />
   )
 }

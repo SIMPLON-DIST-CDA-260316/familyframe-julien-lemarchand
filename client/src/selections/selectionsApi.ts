@@ -21,3 +21,11 @@ async function fetchSelection(
 export function fetchDailySelection(onUnauthenticated: () => void): Promise<Selection | null> {
   return fetchSelection('/api/selections/daily', onUnauthenticated)
 }
+
+// null too for a photo the server does not know (404): the frame plays the library instead.
+export function fetchRadioSelection(
+  photoId: string,
+  onUnauthenticated: () => void,
+): Promise<Selection | null> {
+  return fetchSelection(`/api/selections/radio/${encodeURIComponent(photoId)}`, onUnauthenticated)
+}
