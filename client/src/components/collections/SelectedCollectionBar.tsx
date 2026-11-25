@@ -37,6 +37,12 @@ type BarDialogsProps = {
   dialog: BarDialog
   onClose: () => void
   triggerRef: RefObject<HTMLButtonElement | null>
+  fallbackRef: RefObject<HTMLElement | null>
+}
+
+type SelectedCollectionBarProps = {
+  collection: Collection
+  fallbackRef: RefObject<HTMLElement | null>
 }
 
 // The frame reads its settings as it opens: the choice is stored first. A device that cannot store
@@ -102,9 +108,11 @@ function CollectionMenu({ name, onSelect, onPlay, triggerRef }: CollectionMenuPr
 // Outside the menu: closing the menu must not unmount the dialogs.
 function BarDialogs({ collection, dialog, onClose, ...props }: BarDialogsProps): JSX.Element {
   // Radix would focus the menu item that opened the dialog, gone by now: focus would fall to body.
+  // After a deletion the bar is gone too, the trigger with it: the fallback outlives it. Here, not in
+  // onDeleted: the dialog's focus trap still holds then and would pull focus back.
   function focusTrigger(event: Event): void {
     event.preventDefault()
-    props.triggerRef.current?.focus()
+    ;(props.triggerRef.current ?? props.fallbackRef.current)?.focus()
   }
   return (
     <>
@@ -124,7 +132,10 @@ function BarDialogs({ collection, dialog, onClose, ...props }: BarDialogsProps):
 }
 
 // Replace on deletion: back must not return to a collection that no longer exists.
-export function SelectedCollectionBar({ collection }: { collection: Collection }): JSX.Element {
+export function SelectedCollectionBar({
+  collection,
+  fallbackRef,
+}: SelectedCollectionBarProps): JSX.Element {
   const [dialog, setDialog] = useState<BarDialog>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const playOnFrame = usePlayOnFrame(collection.id)
@@ -145,6 +156,7 @@ export function SelectedCollectionBar({ collection }: { collection: Collection }
         dialog={dialog}
         onClose={() => setDialog(null)}
         triggerRef={triggerRef}
+        fallbackRef={fallbackRef}
       />
     </div>
   )

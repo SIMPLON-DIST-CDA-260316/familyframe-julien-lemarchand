@@ -1,5 +1,5 @@
 import { PlusIcon } from 'lucide-react'
-import { type JSX, useEffect, useRef, useState } from 'react'
+import { type JSX, type RefObject, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { useCollections } from '@/collections/CollectionsContext.ts'
 import { CollectionNameDialog } from '@/components/collections/CollectionNameDialog.tsx'
@@ -10,17 +10,26 @@ import { libraryPath } from '@/viewerHistory.ts'
 const CHIP_CLASSES =
   'inline-flex h-9 max-w-64 items-center gap-1.5 rounded-full border px-4 text-sm font-medium whitespace-nowrap outline-none transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 pointer-coarse:h-11'
 
-type CollectionChipsProps = { selectedId: string | null }
+type CollectionChipsProps = {
+  selectedId: string | null
+  allChipRef: RefObject<HTMLAnchorElement | null>
+}
 
-type ChipLinkProps = { collectionId: string | null; isSelected: boolean; label: string }
+type ChipLinkProps = {
+  collectionId: string | null
+  isSelected: boolean
+  label: string
+  linkRef?: RefObject<HTMLAnchorElement | null>
+}
 
 // A link, not a button: each collection has its own address, so back and reload keep it.
-function ChipLink({ collectionId, isSelected, label }: ChipLinkProps): JSX.Element {
-  const linkRef = useRef<HTMLAnchorElement>(null)
+function ChipLink({ collectionId, isSelected, label, ...props }: ChipLinkProps): JSX.Element {
+  const ownRef = useRef<HTMLAnchorElement>(null)
+  const linkRef = props.linkRef ?? ownRef
   // After a reload on a collection far along the row, its chip scrolls into sight.
   useEffect(() => {
     if (isSelected) linkRef.current?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
-  }, [isSelected])
+  }, [isSelected, linkRef])
   return (
     <Link
       ref={linkRef}
@@ -57,13 +66,19 @@ function NewCollectionChip(): JSX.Element {
 }
 
 // Only this row scrolls sideways; it reaches the screen edges so a cut chip says « more ».
-export function CollectionChips({ selectedId }: CollectionChipsProps): JSX.Element {
+// allChipRef: the page focuses « Toutes » once the shown collection is deleted.
+export function CollectionChips({ selectedId, allChipRef }: CollectionChipsProps): JSX.Element {
   const { collections, status } = useCollections()
   return (
     <nav aria-label="Collections" className="-mx-4 overflow-x-auto px-4 py-1">
       <ul className="flex w-max items-center gap-2">
         <li>
-          <ChipLink collectionId={null} isSelected={selectedId === null} label="Toutes" />
+          <ChipLink
+            collectionId={null}
+            isSelected={selectedId === null}
+            label="Toutes"
+            linkRef={allChipRef}
+          />
         </li>
         {collections.map(({ id, name }) => (
           <li key={id}>

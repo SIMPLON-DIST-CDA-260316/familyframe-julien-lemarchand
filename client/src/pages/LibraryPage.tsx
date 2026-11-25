@@ -1,4 +1,4 @@
-import { type JSX, useState } from 'react'
+import { type JSX, type RefObject, useRef, useState } from 'react'
 import { CollectionChips } from '@/components/collections/CollectionChips.tsx'
 import { SelectedCollectionBar } from '@/components/collections/SelectedCollectionBar.tsx'
 import { AddPhotoPanel } from '@/components/library/AddPhotoPanel.tsx'
@@ -27,6 +27,7 @@ type LibraryContentProps = {
   library: PhotoLibrary
   viewer: ViewerParam
   onAdd: () => void
+  allChipRef: RefObject<HTMLAnchorElement | null>
 }
 
 type LibraryBodyProps = LibraryContentProps & { layout: LibraryLayout }
@@ -61,14 +62,16 @@ function LibraryBody({ selected, library, layout, viewer, onAdd }: LibraryBodyPr
 
 function LibraryContent(props: LibraryContentProps): JSX.Element {
   const [layout, setLayout] = useLibraryLayout()
-  const { selected, library, onAdd } = props
+  const { selected, library, onAdd, allChipRef } = props
   return (
     <>
       <LibraryHeader library={library} layout={layout} onLayoutChange={setLayout} onAdd={onAdd} />
       {/* Above the photos: news from the family comes first. */}
       <LibraryMail />
-      <CollectionChips selectedId={selectedCollectionId(selected)} />
-      {selected.status === 'found' && <SelectedCollectionBar collection={selected.collection} />}
+      <CollectionChips selectedId={selectedCollectionId(selected)} allChipRef={allChipRef} />
+      {selected.status === 'found' && (
+        <SelectedCollectionBar collection={selected.collection} fallbackRef={allChipRef} />
+      )}
       <LibraryBody {...props} layout={layout} />
     </>
   )
@@ -104,6 +107,7 @@ export default function LibraryPage(): JSX.Element {
   const viewer = useViewerParam()
   const handleUploaded = useLibraryUpload(selected, library)
   const [isAdding, setIsAdding] = useState(false)
+  const allChipRef = useRef<HTMLAnchorElement>(null)
 
   return (
     <main className="mx-auto flex max-w-5xl flex-col gap-4 px-4 py-6 sm:gap-6 sm:py-10">
@@ -112,6 +116,7 @@ export default function LibraryPage(): JSX.Element {
         library={library}
         viewer={viewer}
         onAdd={() => setIsAdding(true)}
+        allChipRef={allChipRef}
       />
       <LibraryOverlays
         library={library}
