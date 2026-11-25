@@ -12,11 +12,15 @@ export type ViewerChrome = {
 }
 
 // Someone pointing at a button, tabbing through them or reading a menu is still using the
-// controls: they must not vanish under them.
+// controls: they must not vanish under them. The arrows carry the marker on the button itself,
+// so the element's own focus counts as well as a focused child.
 function isUsingControls(): boolean {
   if (isOverlayOpen()) return true
   return Array.from(document.querySelectorAll(CONTROLS_SELECTOR)).some(
-    (controls) => controls.matches(':hover') || controls.querySelector(':focus-visible') !== null,
+    (controls) =>
+      controls.matches(':hover') ||
+      controls.matches(':focus-visible') ||
+      controls.querySelector(':focus-visible') !== null,
   )
 }
 
