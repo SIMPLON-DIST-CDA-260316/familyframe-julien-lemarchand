@@ -15,6 +15,7 @@ export type PhotoSocketHandlers = {
   onReceivedPhoto?: (photo: Photo) => void
   onOpenedPhoto?: (photo: Photo) => void
   onDeletedPhoto?: (id: string) => void
+  onCollectionsChanged?: () => void
 }
 
 type PhotoEvent = 'photo:new' | 'photo:received' | 'photo:opened'
@@ -42,6 +43,7 @@ export function connectPhotoSocket({
   onReceivedPhoto,
   onOpenedPhoto,
   onDeletedPhoto,
+  onCollectionsChanged,
 }: PhotoSocketHandlers): PhotoSocket {
   // Same origin: Vite proxies /socket.io to the API, the session cookie goes with it.
   const socket: PhotoSocket = io()
@@ -55,5 +57,6 @@ export function connectPhotoSocket({
   listenForPhoto(socket, 'photo:received', onReceivedPhoto)
   listenForPhoto(socket, 'photo:opened', onOpenedPhoto)
   if (onDeletedPhoto) socket.on('photo:deleted', onDeletedPhoto)
+  if (onCollectionsChanged) socket.on('collections:changed', onCollectionsChanged)
   return socket
 }

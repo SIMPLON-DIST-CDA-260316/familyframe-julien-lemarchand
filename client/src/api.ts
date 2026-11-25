@@ -10,6 +10,7 @@ export type ApiErrorCode =
   | 'PASSWORD_INCORRECT'
   | 'MESSAGE_INVALID'
   | 'SELF_FRIEND'
+  | 'COLLECTION_NAME_INVALID'
   | 'UNAUTHENTICATED'
   | 'INVALID_CREDENTIALS'
   | 'FORBIDDEN'
@@ -19,10 +20,12 @@ export type ApiErrorCode =
   | 'INVITATION_NOT_FOUND'
   | 'USER_NOT_FOUND'
   | 'FRIENDSHIP_NOT_FOUND'
+  | 'COLLECTION_NOT_FOUND'
   | 'PHOTO_DUPLICATE'
   | 'ACCOUNT_EXISTS'
   | 'ALREADY_FRIENDS'
   | 'FRIEND_REQUEST_EXISTS'
+  | 'COLLECTION_EXISTS'
   | 'INVITATION_EXPIRED'
   | 'INVITATION_USED'
   | 'PHOTO_TOO_LARGE'
@@ -41,6 +44,7 @@ const ERROR_MESSAGES: Record<ApiErrorCode, string> = {
   PASSWORD_INCORRECT: 'Mot de passe actuel incorrect.',
   MESSAGE_INVALID: 'Le message doit faire 200 caractères au plus.',
   SELF_FRIEND: 'Vous ne pouvez pas vous ajouter vous-même.',
+  COLLECTION_NAME_INVALID: 'Choisissez un nom de 1 à 50 caractères.',
   UNAUTHENTICATED: 'Votre session a expiré. Reconnectez-vous.',
   INVALID_CREDENTIALS: 'E-mail ou mot de passe incorrect.',
   FORBIDDEN: "Cette action est réservée à l'administrateur.",
@@ -51,9 +55,11 @@ const ERROR_MESSAGES: Record<ApiErrorCode, string> = {
   USER_NOT_FOUND:
     "Aucun compte n'utilise cette adresse e-mail. Demandez à l'administrateur d'inviter cette personne.",
   FRIENDSHIP_NOT_FOUND: "Cette demande ou cette amitié n'existe plus.",
+  COLLECTION_NOT_FOUND: "Cette collection n'existe plus.",
   PHOTO_DUPLICATE: "Cette photo est déjà dans votre bibliothèque, ou attend d'être découverte.",
   ACCOUNT_EXISTS: 'Un compte existe déjà pour cette adresse e-mail.',
   ALREADY_FRIENDS: 'Vous êtes déjà amis.',
+  COLLECTION_EXISTS: 'Vous avez déjà une collection de ce nom.',
   FRIEND_REQUEST_EXISTS:
     'Vous avez déjà envoyé une demande à cette personne : elle attend sa réponse.',
   INVITATION_EXPIRED: "Ce lien d'invitation a expiré. Demandez-en un nouveau.",

@@ -28,6 +28,8 @@ export type ServerToClientEvents = {
   'photo:received': (photo: Photo) => void
   'photo:opened': (photo: Photo) => void
   'photo:deleted': (id: string) => void
+  // No payload: each page reloads the list, the server stays the only source.
+  'collections:changed': () => void
 }
 
 export function isPhoto(value: unknown): value is Photo {

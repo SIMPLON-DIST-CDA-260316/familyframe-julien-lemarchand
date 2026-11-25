@@ -3,6 +3,7 @@ import { BrowserRouter, Outlet, Route, Routes } from 'react-router'
 import { AuthProvider } from './auth/AuthProvider.tsx'
 import { RequireAdmin } from './auth/RequireAdmin.tsx'
 import { RequireAuth } from './auth/RequireAuth.tsx'
+import { CollectionsProvider } from './collections/CollectionsProvider.tsx'
 import { AccountBar } from './components/auth/AccountBar.tsx'
 import { Toaster } from './components/ui/sonner.tsx'
 import AdminInvitationsPage from './pages/AdminInvitationsPage.tsx'
@@ -14,29 +15,36 @@ import LoginPage from './pages/LoginPage.tsx'
 import NotFoundPage from './pages/NotFoundPage.tsx'
 import SettingsPage from './pages/SettingsPage.tsx'
 
-// One layout route guards every logged-in page, instead of wrapping each one.
+// One layout route guards every logged-in page, instead of wrapping each one. The collections
+// load once for all of them: the library, the menus and the frame show the same list.
+function LoggedInLayout(): JSX.Element {
+  return (
+    <RequireAuth>
+      <CollectionsProvider>
+        <Outlet />
+      </CollectionsProvider>
+    </RequireAuth>
+  )
+}
+
+// The frame is full screen: only the other pages get the account bar.
+function AccountBarLayout(): JSX.Element {
+  return (
+    <>
+      <AccountBar />
+      <Outlet />
+    </>
+  )
+}
+
 function AppRoutes(): JSX.Element {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/invite/:token" element={<InvitePage />} />
-      <Route
-        element={
-          <RequireAuth>
-            <Outlet />
-          </RequireAuth>
-        }
-      >
+      <Route element={<LoggedInLayout />}>
         <Route path="/frame" element={<FramePage />} />
-        {/* The frame is full screen: only the other pages get the account bar. */}
-        <Route
-          element={
-            <>
-              <AccountBar />
-              <Outlet />
-            </>
-          }
-        >
+        <Route element={<AccountBarLayout />}>
           <Route path="/" element={<LibraryPage />} />
           <Route path="/friends" element={<FriendsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
