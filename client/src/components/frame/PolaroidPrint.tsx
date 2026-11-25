@@ -34,9 +34,10 @@ export function PolaroidPrint({ photo, children }: PolaroidPrintProps): JSX.Elem
         {photo.senderName !== null && (
           <p className="text-[clamp(0.875rem,2.2vmin,1.5rem)]">Envoyée par {photo.senderName}</p>
         )}
-        {/* Written on the band like a note under a print: three lines, as on the other captions. */}
+        {/* Written on the band like a note under a print: three lines, as on the other captions.
+            wrap-anywhere, not break-words: a long word must not widen the w-min print. */}
         {photo.message !== null && (
-          <p className="mt-[1vmin] line-clamp-3 text-[clamp(0.875rem,2.2vmin,1.5rem)] whitespace-pre-line italic">
+          <p className="mt-[1vmin] line-clamp-3 text-[clamp(0.875rem,2.2vmin,1.5rem)] wrap-anywhere whitespace-pre-line italic">
             {quotedMessage(photo.message)}
           </p>
         )}

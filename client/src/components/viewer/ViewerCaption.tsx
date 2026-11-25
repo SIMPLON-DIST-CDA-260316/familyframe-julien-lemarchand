@@ -17,7 +17,7 @@ export function ViewerCaption({ photo }: ViewerCaptionProps): JSX.Element {
         <p className="text-sm text-white/80 drop-shadow-md">Envoyée par {photo.senderName}</p>
       )}
       {photo.message !== null && (
-        <p className="mt-2 text-base whitespace-pre-line drop-shadow-md">
+        <p className="mt-2 text-base break-words whitespace-pre-line drop-shadow-md">
           {quotedMessage(photo.message)}
         </p>
       )}
