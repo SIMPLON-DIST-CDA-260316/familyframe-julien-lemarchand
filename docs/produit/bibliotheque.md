@@ -61,6 +61,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 - Ouvrir le menu « … » d'une photo pour l'envoyer à un ami ou la supprimer.
 - Lancer le mode cadre, en plein écran, depuis la bibliothèque, ou depuis une photo ouverte pour que le diaporama commence par elle (voir [cadre.md](cadre.md)).
 - Découvrir les photos envoyées par ses proches depuis l'annonce en haut de la page (voir [partage.md](partage.md#recevoir-une-photo)).
+- Gérer ses collections dans la carte « Mes collections » (voir [collections.md](collections.md)).
 
 **Règles**
 

@@ -1,6 +1,6 @@
 # FamilyFrame : description du produit
 
-FamilyFrame est un cadre photo connecté pour les familles éloignées. Chaque membre de la famille a un compte, une bibliothèque de photos et un cadre : un écran (tablette, vieil ordinateur, télévision) qui fait défiler ses photos. Les membres deviennent amis entre eux et s'envoient des photos : une photo envoyée est annoncée sur le cadre et dans la bibliothèque de l'ami, qui la découvre quand bon lui semble, sans que personne ait à recharger la page.
+FamilyFrame est un cadre photo connecté pour les familles éloignées. Chaque membre de la famille a un compte, une bibliothèque de photos qu'il peut ranger en collections, et un cadre : un écran (tablette, vieil ordinateur, télévision) qui fait défiler ses photos. Les membres deviennent amis entre eux et s'envoient des photos : une photo envoyée est annoncée sur le cadre et dans la bibliothèque de l'ami, qui la découvre quand bon lui semble, sans que personne ait à recharger la page.
 
 Cette documentation décrit ce que l'application permet de faire et selon quelles règles. Elle ne parle pas de la manière dont c'est construit.
 
@@ -8,7 +8,7 @@ Cette documentation décrit ce que l'application permet de faire et selon quelle
 
 | Rôle               | Ce qu'il peut faire                                                                                                                                                                             |
 | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Membre**         | Se connecter, gérer sa bibliothèque, afficher son cadre, ajouter des amis, envoyer des photos à ses amis, choisir son thème.                                                                    |
+| **Membre**         | Se connecter, gérer sa bibliothèque et ses collections, afficher son cadre, ajouter des amis, envoyer des photos à ses amis, choisir son thème.                                                 |
 | **Administrateur** | Tout ce que fait un membre, plus inviter de nouvelles personnes dans FamilyFrame. Il n'y a qu'un administrateur, créé à l'installation de l'application. Personne ne s'inscrit sans invitation. |
 
 ## Glossaire
@@ -24,6 +24,7 @@ Cette documentation décrit ce que l'application permet de faire et selon quelle
 | **Bibliothèque**       | L'ensemble des photos d'un compte : celles qu'il a ajoutées et celles que ses amis lui ont envoyées. Elle est privée : personne d'autre ne la voit.                    |
 | **Photo reçue**        | Une photo qu'un ami a envoyée. Elle fait partie de la bibliothèque du destinataire comme les autres et porte la mention « Envoyée par » suivie du nom de l'expéditeur. |
 | **Expéditeur**         | Le membre qui a envoyé une photo reçue.                                                                                                                                |
+| **Collection**         | Une liste de photos de sa bibliothèque, rangées sous un nom (« Noël », « Les vacances »). Elle est privée.                                                             |
 | **Cadre**              | L'affichage plein écran de sa bibliothèque, pensé pour un écran posé chez soi. Il montre toutes les photos du compte connecté.                                         |
 | **Diaporama**          | Le mode du cadre qui affiche une photo à la fois, en grand, et passe seul à la suivante.                                                                               |
 | **Modèle d'affichage** | La façon dont le cadre présente chaque photo : ajustée sur un fond flouté, en plein format, dans un passe-partout ou en polaroïd. Chaque appareil garde le sien.       |
@@ -39,6 +40,7 @@ Cette documentation décrit ce que l'application permet de faire et selon quelle
 | [amis.md](amis.md)                                       | Demandes d'ami, acceptation, refus, annulation, retrait d'un ami.                                                     |
 | [bibliotheque.md](bibliotheque.md)                       | Ajout de photos, formats acceptés, doublons, affichage, chargement, suppression.                                      |
 | [partage.md](partage.md)                                 | Envoi d'une photo à un ami, depuis sa bibliothèque ou depuis son appareil.                                            |
+| [collections.md](collections.md)                         | Création, renommage et suppression des collections.                                                                   |
 | [cadre.md](cadre.md)                                     | Vue cadre, diaporama, arrivée des photos en direct, comportement sans activité ou sans connexion.                     |
 | [apparence-et-navigation.md](apparence-et-navigation.md) | Barre du haut, menus, thème, page introuvable, messages d'erreur communs.                                             |
 | [preferences.md](preferences.md)                         | Page « Préférences » : photo de profil, nom affiché, mot de passe, adresse e-mail, réglages du cadre de cet appareil. |

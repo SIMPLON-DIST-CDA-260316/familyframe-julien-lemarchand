@@ -1,4 +1,5 @@
 import type { JSX } from 'react'
+import { CollectionsCard } from '@/components/collections/CollectionsCard.tsx'
 import { FriendsCallToAction } from '@/components/library/FriendsCallToAction.tsx'
 import { LibrarySection } from '@/components/library/LibrarySection.tsx'
 import { UploadForm } from '@/components/library/UploadForm.tsx'
@@ -30,6 +31,7 @@ export default function LibraryPage(): JSX.Element {
         </Card>
         <FriendsCallToAction />
       </div>
+      <CollectionsCard />
       <LibrarySection library={library} onOpenPhoto={viewer.open} />
       {viewer.openId !== null && (
         <PhotoViewer library={library} openId={viewer.openId} viewer={viewer} />

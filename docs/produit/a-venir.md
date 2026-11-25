@@ -8,8 +8,8 @@ Les règles ci-dessous décrivent l'intention ; elles recevront leur identifiant
 
 **Prévu**
 
-- Des collections : des listes de lecture de photos à faire passer sur le cadre.
-- Chaque collection se lit en boucle ou en ordre aléatoire.
+- Ranger ses photos dans ses collections, depuis leur menu « … ».
+- Faire passer une collection sur le cadre, en boucle ou en ordre aléatoire.
 
 ## Étape 11 · Sélections automatiques
 
