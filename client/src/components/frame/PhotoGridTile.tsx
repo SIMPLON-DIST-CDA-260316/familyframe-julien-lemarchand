@@ -19,7 +19,7 @@ export function PhotoGridTile({ photo, isCurrent, onSelect }: PhotoGridTileProps
         aria-current={isCurrent}
         // The viewer focuses this tile when it closes on this photo.
         data-photo-id={photo.id}
-        className="group relative block w-full overflow-hidden rounded-xl outline-none ring-offset-4 ring-offset-frame-background focus-visible:ring-3 focus-visible:ring-ring aria-[current=true]:ring-2 aria-[current=true]:ring-frame-accent"
+        className="group relative block w-full overflow-hidden rounded-xl outline-none ring-offset-4 ring-offset-background focus-visible:ring-3 focus-visible:ring-ring aria-[current=true]:ring-2 aria-[current=true]:ring-frame-accent"
       >
         <img
           className="aspect-square w-full object-cover motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover/tile:scale-105"
@@ -29,10 +29,12 @@ export function PhotoGridTile({ photo, isCurrent, onSelect }: PhotoGridTileProps
           decoding="async"
         />
       </button>
+      {/* A dark pill whatever the theme: it sits on the photo, not on the page. */}
       <PhotoActionsMenu
         photo={photo}
         label={`Actions : ${photoLabel(photo)}`}
-        className="absolute top-2 right-2 rounded-full bg-black/55 text-white/80 backdrop-blur-sm hover:bg-black/75 hover:text-white dark:hover:bg-black/75"
+        theme="app"
+        className="absolute top-2 right-2 rounded-full bg-black/55 text-white/80 backdrop-blur-sm hover:bg-black/75 hover:text-white aria-expanded:bg-black/75 aria-expanded:text-white dark:hover:bg-black/75"
       />
     </li>
   )

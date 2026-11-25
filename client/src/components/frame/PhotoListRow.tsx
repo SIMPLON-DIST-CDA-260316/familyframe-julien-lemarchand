@@ -25,7 +25,7 @@ export function PhotoListRow({ photo, isCurrent, onSelect }: PhotoListRowProps):
         aria-current={isCurrent}
         // The viewer focuses this row when it closes on this photo.
         data-photo-id={photo.id}
-        className="flex w-full items-center gap-4 rounded-xl p-2 pr-14 text-left outline-none hover:bg-white/5 focus-visible:ring-3 focus-visible:ring-ring aria-[current=true]:ring-2 aria-[current=true]:ring-frame-accent"
+        className="flex w-full items-center gap-4 rounded-xl p-2 pr-14 text-left outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring aria-[current=true]:ring-2 aria-[current=true]:ring-frame-accent"
       >
         <img
           className="size-14 shrink-0 rounded-lg object-cover"
@@ -39,14 +39,17 @@ export function PhotoListRow({ photo, isCurrent, onSelect }: PhotoListRowProps):
             {ROW_DATE_FORMAT.format(new Date(photo.createdAt))}
           </time>
           {photo.senderName !== null && (
-            <span className="truncate text-sm text-white/70">Envoyée par {photo.senderName}</span>
+            <span className="truncate text-sm text-muted-foreground">
+              Envoyée par {photo.senderName}
+            </span>
           )}
         </span>
       </button>
       <PhotoActionsMenu
         photo={photo}
         label={`Actions : ${photoLabel(photo)}`}
-        className="absolute top-1/2 right-3 -translate-y-1/2 rounded-full text-white/80"
+        theme="app"
+        className="absolute top-1/2 right-3 -translate-y-1/2 rounded-full text-muted-foreground"
       />
     </li>
   )

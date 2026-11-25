@@ -47,8 +47,8 @@ export function LibrarySection(props: LibrarySectionProps): JSX.Element {
   const { hasMore, isLoadingMore, loadMore } = props.library
 
   return (
-    // `dark` and the frame background: the frame's components look as designed.
-    <section aria-label="Photos" className="dark rounded-2xl bg-frame-background text-foreground">
+    // The page's own surface: the library follows the app's theme; only the frame is always dark.
+    <section aria-label="Photos">
       <LibraryPhotos {...props} />
       {hasMore && <LoadMoreButton isLoadingMore={isLoadingMore} loadMore={loadMore} />}
     </section>
