@@ -96,12 +96,15 @@ function connectLibrary(
   dropUser: () => void,
 ): () => void {
   const { setPhotos } = setters
+  function addPhoto(photo: Photo): void {
+    liveLoads.rememberAdded(photo)
+    setPhotos((current) => withNewPhoto(current, photo))
+  }
+  // A received photo joins the library once opened, here or on another device.
   const socket = connectPhotoSocket({
     onConnect: createFirstPageLoader(liveLoads, setters, readLoadCount, dropUser),
-    onNewPhoto: (photo) => {
-      liveLoads.rememberAdded(photo)
-      setPhotos((current) => withNewPhoto(current, photo))
-    },
+    onNewPhoto: addPhoto,
+    onOpenedPhoto: addPhoto,
     // The delete dialog relies on this event, as on the frame.
     onDeletedPhoto: (id) => {
       liveLoads.rememberDeleted(id)

@@ -18,8 +18,15 @@ export type PhotoPage = {
   nextCursor: string | null
 }
 
+// Newest first, all at once: a handful of photos waiting, not a library to page through.
+export type UnopenedPhotos = { photos: Photo[] }
+
+// photo:new is a photo one added oneself, photo:received one a friend sent, still unopened;
+// photo:opened is a received photo that just joined the library.
 export type ServerToClientEvents = {
   'photo:new': (photo: Photo) => void
+  'photo:received': (photo: Photo) => void
+  'photo:opened': (photo: Photo) => void
   'photo:deleted': (id: string) => void
 }
 
@@ -39,6 +46,16 @@ export function isPhoto(value: unknown): value is Photo {
     (value.senderName === null || typeof value.senderName === 'string') &&
     'message' in value &&
     (value.message === null || typeof value.message === 'string')
+  )
+}
+
+export function isUnopenedPhotos(value: unknown): value is UnopenedPhotos {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'photos' in value &&
+    Array.isArray(value.photos) &&
+    value.photos.every(isPhoto)
   )
 }
 

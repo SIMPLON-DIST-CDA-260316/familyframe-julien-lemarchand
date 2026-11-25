@@ -42,18 +42,28 @@ function createFeedLoader(
   }
 }
 
+function createPhotoAdder(
+  liveLoads: LiveLoads,
+  setPhotos: FeedSetters['setPhotos'],
+): (photo: Photo) => void {
+  return (photo) => {
+    liveLoads.rememberAdded(photo)
+    setPhotos((current) => withNewPhoto(current, photo))
+  }
+}
+
 // Returns the cleanup that stops the socket, the timer and any load still running.
 function connectPhotoFeed(setters: FeedSetters, dropUser: () => void): () => void {
   const { setPhotos } = setters
   const liveLoads = createLiveLoads()
   const load = createFeedLoader(liveLoads, setters, dropUser)
+  const addPhoto = createPhotoAdder(liveLoads, setPhotos)
 
+  // A received photo plays once opened, here or on another device: not on arrival.
   const socket = connectPhotoSocket({
     onConnect: load,
-    onNewPhoto: (photo) => {
-      liveLoads.rememberAdded(photo)
-      setPhotos((current) => withNewPhoto(current, photo))
-    },
+    onNewPhoto: addPhoto,
+    onOpenedPhoto: addPhoto,
     // The whole library is loaded: no gap to fill, the photo just leaves the list.
     onDeletedPhoto: (id) => {
       liveLoads.rememberDeleted(id)
