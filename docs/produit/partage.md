@@ -1,6 +1,6 @@
 # Partage
 
-Envoyer une photo à un ou plusieurs amis la fait entrer dans sa bibliothèque et l'affiche aussitôt sur son cadre. On ne peut envoyer qu'à un ami, c'est-à-dire après une demande acceptée (voir [amis.md](amis.md)).
+Envoyer une photo à un ou plusieurs amis la leur fait parvenir comme du courrier : elle les attend, non ouverte, jusqu'à ce qu'ils la découvrent, puis entre dans leur bibliothèque. On ne peut envoyer qu'à un ami, c'est-à-dire après une demande acceptée (voir [amis.md](amis.md)).
 
 ## Choisir à qui envoyer
 
@@ -99,32 +99,44 @@ Ceux du panneau d'envoi (voir [Choisir à qui envoyer](#choisir-à-qui-envoyer))
 
 **Ce que l'on peut faire**
 
-- Voir la photo reçue apparaître seule, sans recharger, en tête de sa bibliothèque et sur son cadre.
-- La garder, la supprimer ou l'envoyer à son tour à ses propres amis, comme n'importe quelle photo de sa bibliothèque.
+- Voir l'annonce « Vous avez N nouvelles photos » en haut de sa bibliothèque dès qu'une photo arrive, sans recharger.
+- Toucher « Découvrir » pour voir les photos reçues une à une, en grand, avec leur expéditeur, leur date et leur message.
+- Une fois découverte, la garder, la supprimer ou l'envoyer à son tour à ses propres amis, comme n'importe quelle photo de sa bibliothèque.
 
 **Règles**
 
-1. R-PAR-30 · Une photo reçue devient une photo de la bibliothèque du destinataire, à part entière.
+1. R-PAR-30 · Remplacée : une photo reçue entre dans la bibliothèque une fois découverte (R-PAR-51, R-PAR-55).
 2. R-PAR-31 · Elle porte la mention « Envoyée par » suivie du nom de l'expéditeur : dans la légende du cadre, dans la vue liste et dans la description de la photo.
 3. R-PAR-32 · Le nom affiché est le nom actuel de l'expéditeur.
 4. R-PAR-33 · Une photo transférée de nouveau nomme la dernière personne qui l'a envoyée, pas l'auteur d'origine.
-5. R-PAR-34 · Sa date est celle de sa réception, pas celle de son ajout chez l'expéditeur : elle se range donc en tête de la bibliothèque.
-6. R-PAR-35 · La photo s'affiche sur tous les appareils du destinataire connectés à ce moment-là ; l'expéditeur ne voit aucun changement sur ses propres écrans.
+5. R-PAR-34 · Remplacée : la photo découverte se range à sa date de réception, pas forcément en tête (R-PAR-55).
+6. R-PAR-35 · Remplacée : l'annonce et la photo découverte apparaissent sur tous les appareils du destinataire (R-PAR-52, R-PAR-55) ; l'expéditeur ne voit rien changer (R-PAR-56).
 7. R-PAR-36 · Sur un cadre en diaporama, la photo reçue s'affiche selon les règles d'arrivée d'une nouvelle photo (voir [cadre.md](cadre.md#arrivée-dune-nouvelle-photo)).
 8. R-PAR-49 · Le message de l'expéditeur s'affiche entre guillemets sous la mention « Envoyée par » : sur la photo ouverte en grand, dans la légende du diaporama et sur la bande blanche du polaroid. Sur le cadre, il tient sur trois lignes au plus ; la photo ouverte en grand le montre en entier.
 9. R-PAR-50 · Une photo transférée de nouveau porte le message de la dernière personne qui l'a envoyée, ou aucun message si elle n'en a pas écrit : le message reçu avec la photo ne la suit pas.
+10. R-PAR-51 · Une photo reçue arrive non ouverte : elle n'entre ni dans la bibliothèque ni dans le diaporama tant que le destinataire ne l'a pas découverte. Les photos reçues avant l'arrivée de cette fonctionnalité comptent comme déjà découvertes.
+11. R-PAR-52 · L'annonce « Vous avez N nouvelles photos » s'affiche en tête de la bibliothèque tant qu'au moins une photo attend, avec le prénom de chaque expéditeur, une seule fois chacun. Elle se met à jour seule, sur tous les appareils connectés, quand une photo arrive ou est découverte ailleurs.
+12. R-PAR-53 · « Découvrir » montre les photos en attente une à une, de la plus ancienne à la plus récente : la photo en grand, « Envoyée par » suivi du nom, la date de réception et le message. « Photo suivante » passe à la suivante ; sur la dernière, « Terminer » referme. Une photo arrivée pendant la découverte attend la suivante.
+13. R-PAR-54 · Une photo compte comme découverte dès qu'elle s'affiche, pour tous les appareils du destinataire. Fermer avant la fin, avec la croix ou la touche Échap, laisse les photos suivantes en attente.
+14. R-PAR-55 · Une fois découverte, la photo entre dans la bibliothèque à sa date de réception, sur tous les appareils connectés, sans recharger : elle n'est en tête que si rien n'a été ajouté depuis.
+15. R-PAR-56 · L'expéditeur ne voit aucun changement sur ses propres écrans et ne sait pas si la photo a été découverte.
 
 **Messages affichés**
 
-| Situation                    | Message               |
-| ---------------------------- | --------------------- |
-| Photo reçue (légende, liste) | « Envoyée par [nom] » |
-| Photo reçue avec un message  | « « [message] » »     |
+| Situation                     | Message                                                                             |
+| ----------------------------- | ----------------------------------------------------------------------------------- |
+| Photo reçue (légende, liste)  | « Envoyée par [nom] »                                                               |
+| Photo reçue avec un message   | « « [message] » »                                                                   |
+| Annonce, une photo en attente | « Vous avez 1 nouvelle photo » — « De Mamie » (exemple) et le bouton « Découvrir »  |
+| Annonce, plusieurs photos     | « Vous avez N nouvelles photos » — « De Mamie et Tata » (exemple)                   |
+| Découverte                    | « Nouvelle photo 1 / 3 », puis « Photo suivante » ou, sur la dernière, « Terminer » |
 
 **Ce qui n'est pas possible**
 
-- Refuser une photo avant qu'elle arrive : elle entre directement dans la bibliothèque.
-- Être prévenu autrement que par son apparition sur le cadre et dans la bibliothèque : prévu, voir [a-venir.md](a-venir.md).
+- Refuser une photo : une fois découverte, on peut la supprimer.
+- Découvrir une photo sans qu'elle compte comme ouverte, ou la remettre en attente.
+- Savoir si un proche a découvert la photo qu'on lui a envoyée.
+- Être prévenu en dehors de FamilyFrame, par e-mail ou par une notification du téléphone.
 
 ## Ce que deviennent les photos envoyées
 

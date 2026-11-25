@@ -60,6 +60,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 - Ouvrir une photo en grand dans l'application, puis passer à la suivante ou à la précédente d'un geste du doigt, avec les flèches à l'écran ou celles du clavier.
 - Ouvrir le menu « … » d'une photo pour l'envoyer à un ami ou la supprimer.
 - Lancer le mode cadre, en plein écran, depuis la bibliothèque, ou depuis une photo ouverte pour que le diaporama commence par elle (voir [cadre.md](cadre.md)).
+- Découvrir les photos envoyées par ses proches depuis l'annonce en haut de la page (voir [partage.md](partage.md#recevoir-une-photo)).
 
 **Règles**
 
@@ -69,7 +70,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 4. R-BIB-23 · En miniatures, chaque vignette est seule. En liste, chaque ligne montre la vignette, la date et l'heure d'ajout (par exemple « 24 nov. 2026, 14:05 ») et, pour une photo reçue, « Envoyée par » suivi du nom de l'expéditeur.
 5. R-BIB-24 · L'affichage choisi (miniatures ou liste) est retenu sur l'appareil Par défaut : miniatures.
 6. R-BIB-25 · Cliquer sur une photo l'ouvre en grand dans l'application.
-7. R-BIB-26 · La bibliothèque se met à jour seule : une photo ajoutée depuis un autre appareil ou reçue d'un ami apparaît en tête, une photo supprimée disparaît, sans recharger la page.
+7. R-BIB-26 · Remplacée : une photo reçue n'apparaît plus dès son arrivée, mais une fois découverte (R-BIB-42).
 8. R-BIB-27 · Après une coupure de réseau, la bibliothèque se recharge seule depuis le début dès que la connexion revient, pour rattraper ce qui a changé entre-temps, sans revenir aux 30 premières photos.
 9. R-BIB-28 · La section « Ma bibliothèque » est toujours sombre, quel que soit le thème choisi, pour présenter les photos comme sur le cadre.
 10. R-BIB-29 · Pour l'administrateur, la carte « Vos proches » propose en plus « Inviter un proche sur FamilyFrame ».
@@ -79,6 +80,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 14. R-BIB-39 · Supprimer la photo affichée montre la suivante ; s'il n'en reste aucune, la photo se ferme.
 15. R-BIB-40 · Le bouton retour du téléphone ferme la photo.
 16. R-BIB-41 · Un lien vers une photo qui n'existe plus ramène simplement à la bibliothèque.
+17. R-BIB-42 · La bibliothèque se met à jour seule, sans recharger la page : une photo ajoutée depuis un autre appareil apparaît en tête, une photo reçue y entre à sa date de réception dès qu'elle est découverte (sur cet appareil ou un autre), une photo supprimée disparaît.
 
 **Messages affichés**
 
@@ -88,6 +90,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 | Photo en cours d'arrivée                  | « Chargement… »                                                                                                 |
 | Chargement des photos suivantes           | « Chargement… » (sur le bouton « Charger plus »)                                                                |
 | Carte d'accès aux amis                    | « Vos proches » — « Ajoutez vos proches en amis pour leur envoyer des photos. » et le bouton « Gérer mes amis » |
+| Photos reçues en attente                  | « Vous avez N nouvelles photos » et le bouton « Découvrir » (voir [partage.md](partage.md#recevoir-une-photo))  |
 | Description d'une photo (lecture d'écran) | « Photo du 24 novembre 2026 » ou « Photo envoyée par [nom], du 24 novembre 2026 »                               |
 
 **Ce qui n'est pas possible**

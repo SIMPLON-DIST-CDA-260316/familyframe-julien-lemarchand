@@ -8,9 +8,7 @@ Les règles ci-dessous décrivent l'intention ; elles recevront leur identifiant
 
 **Prévu**
 
-- Les photos reçues restent « non ouvertes » tant que le destinataire ne les a pas regardées.
-- Une annonce « Vous avez N nouvelles photos ».
-- La découverte des photos reçues une à une.
+- Une annonce « Vous avez N nouvelles photos » sur le cadre, et la découverte des photos reçues depuis le cadre.
 
 ## Étape 10 · Collections
 
