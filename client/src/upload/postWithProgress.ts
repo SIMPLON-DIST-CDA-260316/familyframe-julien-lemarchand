@@ -13,13 +13,19 @@ function toResponse(request: XMLHttpRequest): ProgressResponse {
 }
 
 // XMLHttpRequest rather than fetch: only it reports how much of the body has left. A same-origin
-// request sends the session cookie, as fetch does. null: the network failed, nothing came back.
+// request sends the session cookie, as fetch does. null: the network failed, nothing came back,
+// or the signal stopped it (the user logged out).
 export function postWithProgress(
   url: string,
   body: FormData,
   onProgress: (percent: number) => void,
+  signal: AbortSignal,
 ): Promise<ProgressResponse | null> {
   return new Promise((resolve) => {
+    if (signal.aborted) {
+      resolve(null)
+      return
+    }
     const request = new XMLHttpRequest()
     request.open('POST', url)
     request.responseType = 'json'
@@ -31,6 +37,7 @@ export function postWithProgress(
     request.onload = () => resolve(toResponse(request))
     request.onerror = () => resolve(null)
     request.onabort = () => resolve(null)
+    signal.addEventListener('abort', () => request.abort(), { once: true })
     request.send(body)
   })
 }

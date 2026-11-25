@@ -96,10 +96,11 @@ export async function fetchNewestPhotos(
 export async function postPhoto(
   file: File,
   onProgress: (percent: number) => void,
+  signal: AbortSignal,
 ): Promise<UploadResult> {
   const body = new FormData()
   body.append('photo', file)
-  const response = await postWithProgress('/api/photos', body, onProgress)
+  const response = await postWithProgress('/api/photos', body, onProgress, signal)
   if (response === null) return { status: 'failed', message: errorMessage(null) }
   if (response.status === UNAUTHORIZED_STATUS) return { status: 'unauthenticated' }
   if (response.isOk && isPhoto(response.body)) {

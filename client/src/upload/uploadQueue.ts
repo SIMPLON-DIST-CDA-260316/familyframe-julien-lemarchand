@@ -21,12 +21,14 @@ export type UploadedHandler = (photo: Photo, collectionId: string | null) => Pro
 export type SetPending = Dispatch<SetStateAction<PendingUpload[]>>
 
 // Mutable on purpose, like liveLoads: the queue's steps read and change it between renders.
+// controller: aborts the upload in flight when the queue stops.
 export type QueueState = {
   chain: Promise<void>
   nextId: number
   waitingCount: number
   tally: UploadTally
   isStopped: boolean
+  controller: AbortController
 }
 
 export type QueueContext = {
@@ -40,6 +42,7 @@ type UploadOutcome =
   | { status: 'added'; collectionName: string | null }
   | { status: 'refused' }
   | { status: 'unauthenticated' }
+  | { status: 'stopped' }
 
 const EMPTY_TALLY: UploadTally = { addedCount: 0, refusedCount: 0, collectionName: null }
 
@@ -50,7 +53,21 @@ export function createQueueState(): QueueState {
     waitingCount: 0,
     tally: EMPTY_TALLY,
     isStopped: false,
+    controller: new AbortController(),
   }
+}
+
+// StrictMode mounts the provider, unmounts it and mounts it again: each mount gets a live queue.
+export function startQueue(state: QueueState): void {
+  state.isStopped = false
+  state.controller = new AbortController()
+}
+
+// The provider leaves with the session (logout, or a session ended elsewhere): the upload in
+// flight is aborted and the rest of the chain is dropped, so no photo reaches the next account.
+export function stopQueue(state: QueueState): void {
+  state.isStopped = true
+  state.controller.abort()
 }
 
 function updateProgress(setPending: SetPending, id: number, progress: number): void {
@@ -63,14 +80,15 @@ function removePending(setPending: SetPending, id: number): void {
   setPending((current) => current.filter((upload) => upload.id !== id))
 }
 
-async function uploadOne(
-  upload: PendingUpload,
-  setPending: SetPending,
-  onUploaded: UploadedHandler,
-): Promise<UploadOutcome> {
+async function uploadOne(context: QueueContext, upload: PendingUpload): Promise<UploadOutcome> {
+  const { state, setPending, onUploaded } = context
   updateProgress(setPending, upload.id, 0)
   const file = await preparePhoto(upload.file)
-  const result = await postPhoto(file, (percent) => updateProgress(setPending, upload.id, percent))
+  const { signal } = state.controller
+  const onProgress = (percent: number): void => updateProgress(setPending, upload.id, percent)
+  const result = await postPhoto(file, onProgress, signal)
+  // Logged out meanwhile: no message for an account that left, no filing without its session.
+  if (signal.aborted) return { status: 'stopped' }
   if (result.status === 'unauthenticated') return result
   if (result.status === 'failed') {
     toast.error(result.message, { description: upload.file.name })
@@ -84,15 +102,15 @@ async function uploadOne(
 // « Toutes » the socket's photo:new often brings the photo just before the answer: both may show
 // for a moment, never two photos. A step that throws counts as refused: the queue goes on.
 async function settleUpload(context: QueueContext, upload: PendingUpload): Promise<UploadOutcome> {
-  const { setPending, onUploaded } = context
   try {
-    return await uploadOne(upload, setPending, onUploaded)
+    return await uploadOne(context, upload)
   } catch (error: unknown) {
     console.error('Photo upload failed unexpectedly', error)
+    if (context.state.isStopped) return { status: 'stopped' }
     toast.error(errorMessage(null), { description: upload.file.name })
     return { status: 'refused' }
   } finally {
-    removePending(setPending, upload.id)
+    removePending(context.setPending, upload.id)
   }
 }
 
@@ -100,7 +118,7 @@ async function settleUpload(context: QueueContext, upload: PendingUpload): Promi
 // unique per account, so comparing them compares the collections.
 function withOutcome(tally: UploadTally, outcome: UploadOutcome): UploadTally {
   if (outcome.status === 'refused') return { ...tally, refusedCount: tally.refusedCount + 1 }
-  if (outcome.status === 'unauthenticated') return tally
+  if (outcome.status !== 'added') return tally
   const isSamePlace = tally.addedCount === 0 || tally.collectionName === outcome.collectionName
   const collectionName = isSamePlace ? outcome.collectionName : null
   return { ...tally, addedCount: tally.addedCount + 1, collectionName }
@@ -118,6 +136,7 @@ async function runUpload(context: QueueContext, upload: PendingUpload): Promise<
   const { state, setPending, dropUser } = context
   if (state.isStopped) return
   const outcome = await settleUpload(context, upload)
+  if (outcome.status === 'stopped') return
   // The session ended on the server: RequireAuth sends the user to /login, the rest is dropped.
   if (outcome.status === 'unauthenticated') {
     state.isStopped = true
