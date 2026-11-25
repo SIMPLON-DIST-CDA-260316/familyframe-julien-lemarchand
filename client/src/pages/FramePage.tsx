@@ -6,6 +6,7 @@ import { MailRevealDialog } from '@/components/mail/MailRevealDialog.tsx'
 import { type FrameMode, useFrameMode } from '@/hooks/useFrameMode.ts'
 import { useMailReveal } from '@/hooks/useMailReveal.ts'
 import { usePhotoMail } from '@/hooks/usePhotoMail.ts'
+import { useScreenWakeLock } from '@/hooks/useScreenWakeLock.ts'
 import { cn } from '@/lib/utils.ts'
 
 // The frame is a screen on a wall: dark keeps the photos in front.
@@ -60,6 +61,7 @@ export default function FramePage(): JSX.Element {
   const frame = useFrameMode()
   const mail = usePhotoMail()
   const reveal = useMailReveal()
+  useScreenWakeLock()
 
   // The photos just opened joined the slideshow while the reveal was open: they were seen,
   // no pill should announce them again.

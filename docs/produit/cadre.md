@@ -7,7 +7,7 @@ Le cadre est la page à laisser affichée en plein écran sur l'appareil posé c
 **Ce que l'on peut faire**
 
 - Se connecter sur l'appareil du cadre avec le compte dont on veut afficher les photos, puis ouvrir « Cadre ».
-- Laisser l'appareil allumé : le cadre reste connecté et à jour sans intervention.
+- Laisser l'appareil allumé : le cadre reste connecté et à jour sans intervention, et l'écran ne se met pas en veille tant que le cadre est affiché.
 - Ouvrir le cadre en plein écran d'un seul toucher, depuis la barre du haut (ou la barre d'onglets d'un téléphone), la bibliothèque ou une photo ouverte.
 - Passer en plein écran avec le bouton « Plein écran » quand le cadre a été ouvert directement (au démarrage de l'appareil, par exemple).
 - Quitter le cadre (✕, Échap ou sortie du plein écran) pour revenir à la bibliothèque, sur la photo qui était affichée.
@@ -31,6 +31,7 @@ Le cadre est la page à laisser affichée en plein écran sur l'appareil posé c
 15. R-CAD-59 · Sortir du plein écran, de n'importe quelle façon (✕, touche Échap, touche F11, geste de l'appareil), quitte le cadre : on revient à la bibliothèque, sur la photo qui était affichée, ou à la bibliothèque seule s'il n'y avait pas de photo. Exception : si un menu ou une fenêtre est ouvert (menu « … », « Envoyer à des proches », « Supprimer cette photo ? »), sortir du plein écran ne quitte pas le cadre, car la touche Échap visait ce menu : le cadre reste affiché, hors plein écran, et le bouton « Plein écran » revient.
 16. R-CAD-60 · Quitter le cadre autrement (bouton retour du navigateur, « Retour à la bibliothèque ») sort aussi du plein écran : la bibliothèque ne reste jamais en plein écran.
 17. R-CAD-61 · Tant que le cadre n'est pas en plein écran, un bouton « Plein écran » s'affiche en haut à droite, sur le diaporama comme sur les écrans sans photo. Sur le diaporama, il s'efface avec les autres boutons (R-CAD-24). Il n'apparaît pas sur un appareil qui ne permet pas le plein écran.
+18. R-CAD-98 · Tant que le cadre est affiché, l'écran de l'appareil reste allumé : il ne s'assombrit pas et ne se verrouille pas, même sans toucher l'appareil. Quitter le cadre rend à l'appareil son réglage de mise en veille. Si l'on passe à une autre application puis revient au cadre, l'écran reste de nouveau allumé. Sur un appareil ou un navigateur qui ne le permet pas, ou en mode économie d'énergie, l'écran suit son propre réglage, sans message.
 
 **Messages affichés**
 
