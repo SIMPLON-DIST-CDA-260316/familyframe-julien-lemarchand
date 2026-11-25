@@ -7,9 +7,18 @@ export type ResizeDecision =
   | { shouldResize: false }
   | { shouldResize: true; width: number; height: number }
 
+// The decoded photo, and whether the browser turned it the right way up (imageOrientation).
+export type DecodedSize = { width: number; height: number; isUpright: boolean }
+
 // Pure, so the rule reads on its own: only too large or too heavy photos are redrawn, never
 // enlarged. Too heavy but small enough keeps its size: the JPEG encoding alone makes it lighter.
-export function resizeDecision(width: number, height: number, byteSize: number): ResizeDecision {
+// Not upright, a redrawn photo could lie on its side: the original goes whenever the server takes
+// it, since the server turns it from its EXIF.
+export function resizeDecision(
+  { width, height, isUpright }: DecodedSize,
+  byteSize: number,
+): ResizeDecision {
+  if (!isUpright && byteSize <= MAX_UPLOAD_BYTES) return { shouldResize: false }
   const longSide = Math.max(width, height)
   if (longSide <= MAX_LONG_SIDE && byteSize <= MAX_UPLOAD_BYTES) return { shouldResize: false }
   const scale = Math.min(1, MAX_LONG_SIDE / longSide)

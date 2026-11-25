@@ -5,19 +5,22 @@ const JPEG_QUALITY = 0.92
 
 type TargetSize = Extract<ResizeDecision, { shouldResize: true }>
 
+type Decoded = { bitmap: ImageBitmap; isUpright: boolean }
+
 // from-image: the photo is drawn the right way up, as the phone's sensor saw it turned. Older
-// browsers reject the option itself with a TypeError: they decode without it.
-async function decodeUpright(file: File): Promise<ImageBitmap> {
+// browsers reject the option itself with a TypeError: they decode without it, not upright.
+async function decodeUpright(file: File): Promise<Decoded> {
   try {
-    return await createImageBitmap(file, { imageOrientation: 'from-image' })
+    const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' })
+    return { bitmap, isUpright: true }
   } catch (error: unknown) {
     if (!(error instanceof TypeError)) throw error
-    return createImageBitmap(file)
+    return { bitmap: await createImageBitmap(file), isUpright: false }
   }
 }
 
 // null: the browser cannot read this file (a HEIC on a computer, a damaged file).
-async function decode(file: File): Promise<ImageBitmap | null> {
+async function decode(file: File): Promise<Decoded | null> {
   try {
     return await decodeUpright(file)
   } catch {
@@ -61,9 +64,13 @@ function jpegName(fileName: string): string {
 // The original file whenever it fits the server, so nothing is lost; otherwise a lighter JPEG.
 // A file the browser cannot read goes as it is: the server decides and explains a refusal.
 export async function preparePhoto(file: File): Promise<File> {
-  const bitmap = await decode(file)
-  if (bitmap === null) return file
-  const decision = resizeDecision(bitmap.width, bitmap.height, file.size)
+  const decoded = await decode(file)
+  if (decoded === null) return file
+  const { bitmap, isUpright } = decoded
+  const decision = resizeDecision(
+    { width: bitmap.width, height: bitmap.height, isUpright },
+    file.size,
+  )
   const blob = decision.shouldResize ? await drawAsJpeg(bitmap, decision) : null
   bitmap.close()
   if (blob === null) return file
