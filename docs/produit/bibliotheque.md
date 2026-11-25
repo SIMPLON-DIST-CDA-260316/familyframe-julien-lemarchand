@@ -17,14 +17,15 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 3. R-BIB-03 · Formats acceptés : JPEG, PNG et WebP. Seuls ces formats peuvent être choisis ; le téléphone convertit lui-même une photo prise avec l'appareil photo. Tout autre format (GIF, HEIC, vidéo…) est refusé.
 4. R-BIB-04 · Une photo pèse au plus 10 Mo.
 5. R-BIB-05 · Le fichier doit être une image lisible ; un fichier abîmé ou déguisé en image est refusé.
-6. R-BIB-06 · Une photo identique, octet pour octet, à une photo déjà présente dans la bibliothèque est refusée, qu'elle ait été ajoutée par soi ou reçue d'un ami. Une version retouchée, recadrée ou réenregistrée de la même photo est un autre fichier : elle est acceptée.
-7. R-BIB-07 · Supprimer une photo permet de l'ajouter de nouveau ensuite.
-8. R-BIB-08 · La photo ajoutée est préparée pour l'affichage : elle est remise dans le bon sens (photo prise téléphone tourné), réduite à 1920 pixels au plus sur son plus grand côté (jamais agrandie), et les zones transparentes deviennent blanches.
-9. R-BIB-09 · Les informations cachées de la photo, dont le lieu de prise de vue, sont retirées à l'ajout : elles ne sont jamais conservées ni montrées.
-10. R-BIB-10 · Une photo ajoutée porte la date et l'heure de son ajout. La date de prise de vue n'est pas utilisée.
-11. R-BIB-11 · Pendant l'envoi, les deux boutons sont désactivés et le premier affiche « Envoi… ».
-12. R-BIB-12 · Après un ajout réussi, le formulaire se vide, un message de réussite s'affiche, et la photo apparaît en tête de la bibliothèque et sur le cadre, sur tous les appareils connectés au compte, sans recharger la page.
-13. R-BIB-13 · Après un échec, la photo reste choisie dans le formulaire et un message explique la raison.
+6. R-BIB-06 · Remplacée : une photo reçue en attente d'être découverte compte aussi (R-BIB-43).
+7. R-BIB-43 · Une photo identique, octet pour octet, à une photo déjà présente dans la bibliothèque, ou reçue d'un ami et en attente d'être découverte, est refusée, qu'elle ait été ajoutée par soi ou reçue d'un ami. Une version retouchée, recadrée ou réenregistrée de la même photo est un autre fichier : elle est acceptée.
+8. R-BIB-07 · Supprimer une photo permet de l'ajouter de nouveau ensuite.
+9. R-BIB-08 · La photo ajoutée est préparée pour l'affichage : elle est remise dans le bon sens (photo prise téléphone tourné), réduite à 1920 pixels au plus sur son plus grand côté (jamais agrandie), et les zones transparentes deviennent blanches.
+10. R-BIB-09 · Les informations cachées de la photo, dont le lieu de prise de vue, sont retirées à l'ajout : elles ne sont jamais conservées ni montrées.
+11. R-BIB-10 · Une photo ajoutée porte la date et l'heure de son ajout. La date de prise de vue n'est pas utilisée.
+12. R-BIB-11 · Pendant l'envoi, les deux boutons sont désactivés et le premier affiche « Envoi… ».
+13. R-BIB-12 · Après un ajout réussi, le formulaire se vide, un message de réussite s'affiche, et la photo apparaît en tête de la bibliothèque et sur le cadre, sur tous les appareils connectés au compte, sans recharger la page.
+14. R-BIB-13 · Après un échec, la photo reste choisie dans le formulaire et un message explique la raison.
 
 **Messages affichés**
 
@@ -39,7 +40,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 | Format refusé                   | « Format non pris en charge : JPEG, PNG ou WebP uniquement. »                                                     |
 | Fichier trop lourd              | « La photo est trop lourde (10 Mo maximum). »                                                                     |
 | Fichier illisible               | « Ce fichier n'est pas une image lisible. »                                                                       |
-| Photo déjà dans la bibliothèque | « Cette photo est déjà dans votre bibliothèque. »                                                                 |
+| Photo déjà dans la bibliothèque | « Cette photo est déjà dans votre bibliothèque, ou attend d'être découverte. »                                    |
 
 **Ce qui n'est pas possible**
 

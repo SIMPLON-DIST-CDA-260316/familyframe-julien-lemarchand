@@ -51,7 +51,7 @@ const ERROR_MESSAGES: Record<ApiErrorCode, string> = {
   USER_NOT_FOUND:
     "Aucun compte n'utilise cette adresse e-mail. Demandez à l'administrateur d'inviter cette personne.",
   FRIENDSHIP_NOT_FOUND: "Cette demande ou cette amitié n'existe plus.",
-  PHOTO_DUPLICATE: 'Cette photo est déjà dans votre bibliothèque.',
+  PHOTO_DUPLICATE: "Cette photo est déjà dans votre bibliothèque, ou attend d'être découverte.",
   ACCOUNT_EXISTS: 'Un compte existe déjà pour cette adresse e-mail.',
   ALREADY_FRIENDS: 'Vous êtes déjà amis.',
   FRIEND_REQUEST_EXISTS:
