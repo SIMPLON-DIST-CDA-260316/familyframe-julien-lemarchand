@@ -1,5 +1,5 @@
 import { type JSX, type RefObject, useRef, useState } from 'react'
-import { CollectionChips } from '@/components/collections/CollectionChips.tsx'
+import { CollectionsRow } from '@/components/collections/CollectionsRow.tsx'
 import { SelectedCollectionBar } from '@/components/collections/SelectedCollectionBar.tsx'
 import { AddPhotoFab } from '@/components/library/AddPhotoFab.tsx'
 import { AddPhotoPanel } from '@/components/library/AddPhotoPanel.tsx'
@@ -90,7 +90,7 @@ function LibraryContent(props: LibraryContentProps): JSX.Element {
   const [layout, setLayout] = useLibraryLayout()
   const { selected, library, onAdd, addButtonRef } = props
   // « Toutes »: where focus lands once the shown collection is deleted.
-  const allChipRef = useRef<HTMLAnchorElement>(null)
+  const allCardRef = useRef<HTMLAnchorElement>(null)
   return (
     <>
       <LibraryHeader
@@ -103,9 +103,9 @@ function LibraryContent(props: LibraryContentProps): JSX.Element {
       />
       {/* Above the photos: news from the family comes first. */}
       <LibraryMail />
-      <CollectionChips selectedId={selectedCollectionId(selected)} allChipRef={allChipRef} />
+      <CollectionsRow selectedId={selectedCollectionId(selected)} allCardRef={allCardRef} />
       {selected.status === 'found' && (
-        <SelectedCollectionBar collection={selected.collection} fallbackRef={allChipRef} />
+        <SelectedCollectionBar collection={selected.collection} fallbackRef={allCardRef} />
       )}
       <LibraryBody {...props} layout={layout} />
     </>
