@@ -6,13 +6,13 @@ La page où chacun règle son compte : sa photo de profil, son nom affiché et s
 
 **Ce que l'on peut faire**
 
-- Ouvrir la page « Préférences » depuis le menu du compte, ou avec l'onglet « Compte » de la barre d'onglets sur un téléphone.
+- Ouvrir la page « Préférences » depuis le menu du compte, sur un ordinateur comme sur un téléphone.
 
 **Règles**
 
-1. R-PRF-01 · L'entrée « Préférences » est dans le menu du compte, au-dessus du choix du thème, sur un ordinateur comme sur un téléphone ; sur un téléphone, l'administrateur a « Invitations » entre les deux (R-APP-12). Sur un téléphone, l'onglet « Compte » ouvre aussi la page (R-APP-63).
-2. R-PRF-02 · Remplacée : le menu mobile n'existe plus ; l'onglet « Compte » ouvre la page d'un toucher (R-APP-63).
-3. R-PRF-03 · La page est réservée aux personnes connectées, comme les autres pages (R-CNX-30). Elle a la barre du haut et, sur un téléphone, la barre d'onglets, « Compte » mis en évidence.
+1. R-PRF-01 · L'entrée « Préférences » est dans le menu du compte, au-dessus du choix du thème, sur un ordinateur comme sur un téléphone ; sur un téléphone, l'administrateur a « Invitations » entre les deux (R-APP-12). Il n'y a pas d'onglet pour cette page (R-APP-68).
+2. R-PRF-02 · Remplacée : le menu mobile n'existe plus ; la page s'ouvre depuis le menu du compte (R-APP-68).
+3. R-PRF-03 · La page est réservée aux personnes connectées, comme les autres pages (R-CNX-30). Elle a la barre du haut et, sur un téléphone, la barre d'onglets, sans onglet mis en évidence (R-APP-62).
 4. R-PRF-04 · Chaque encart s'enregistre seul : « Enregistrer » n'envoie que les changements de son encart, ce qui est saisi dans les autres reste en place. L'encart « Cadre de cet appareil » n'a pas de bouton : un choix s'applique aussitôt (R-PRF-50).
 
 **Messages affichés**
@@ -20,7 +20,7 @@ La page où chacun règle son compte : sa photo de profil, son nom affiché et s
 | Situation           | Message                                                                                      |
 | ------------------- | -------------------------------------------------------------------------------------------- |
 | En-tête de la page  | « Préférences » — « Votre profil, la sécurité de votre compte et le cadre de cet appareil. » |
-| Entrée des menus    | « Préférences » (menu du compte), « Compte » (barre d'onglets)                               |
+| Entrée des menus    | « Préférences » (menu du compte)                                                             |
 | Pendant l'envoi     | « Enregistrement… » (sur le bouton « Enregistrer »)                                          |
 | Enregistrement fait | « Enregistré. »                                                                              |
 

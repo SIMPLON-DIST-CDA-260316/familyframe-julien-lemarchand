@@ -7,7 +7,7 @@ Comment on se déplace dans l'application, comment on choisit son thème, et les
 **Ce que l'on peut faire**
 
 - Revenir à sa bibliothèque en touchant « FamilyFrame ».
-- Sur un ordinateur, aller sur « Ma bibliothèque », « Cadre » ou « Amis » ; l'administrateur a en plus « Invitations ». Sur un téléphone, ces pages sont dans la barre d'onglets en bas de l'écran (voir [Barre d'onglets](#barre-donglets-téléphone)).
+- Sur un ordinateur, aller sur « Ma bibliothèque », « Envoyer », « Cadre » ou « Amis » ; l'administrateur a en plus « Invitations ». Sur un téléphone, ces pages sont dans la barre d'onglets en bas de l'écran (voir [Barre d'onglets](#barre-donglets-téléphone)).
 
 **Règles**
 
@@ -159,24 +159,27 @@ Aucun message.
 
 **Ce que l'on peut faire**
 
-- Sur un téléphone, aller d'un toucher sur « Bibliothèque », « Amis », « Cadre » ou « Compte », avec la barre d'onglets en bas de l'écran, sous le pouce.
+- Sur un téléphone, aller d'un toucher sur « Bibliothèque », « Envoyer », « Cadre » ou « Amis », avec la barre d'onglets en bas de l'écran, sous le pouce.
+- Ouvrir ses préférences depuis le menu du compte (rond de profil, en haut à droite).
 
 **Règles**
 
-1. R-APP-60 · Sur un écran étroit (téléphone), une barre d'onglets en bas de l'écran remplace l'ancien menu à trois traits : « Bibliothèque », « Amis », « Cadre », « Compte ». Sur un écran large (ordinateur), il n'y a pas de barre d'onglets : rien ne change.
-2. R-APP-61 · La barre d'onglets est présente sur la bibliothèque, la page « Amis », les préférences et la page des invitations. Elle n'apparaît ni sur le cadre, ni sur la page de connexion, ni sur la page d'invitation, ni sur la page introuvable.
-3. R-APP-62 · L'onglet de la page où l'on se trouve est mis en évidence. Sur la page des invitations, qui s'ouvre depuis le menu du compte (R-APP-12), aucun onglet ne l'est.
-4. R-APP-63 · « Compte » ouvre la page « Préférences » (voir [preferences.md](preferences.md)). Le thème et « Se déconnecter » restent dans le menu du compte (rond de profil, en haut à droite).
+1. R-APP-60 · Remplacée : les onglets sont désormais « Bibliothèque », « Envoyer », « Cadre », « Amis » (R-APP-67).
+2. R-APP-61 · La barre d'onglets est présente sur la bibliothèque, la page « Envoyer », la page « Amis », les préférences et la page des invitations. Elle n'apparaît ni sur le cadre, ni sur la page de connexion, ni sur la page d'invitation, ni sur la page introuvable.
+3. R-APP-62 · L'onglet de la page où l'on se trouve est mis en évidence. Sur la page des invitations et sur les préférences, qui s'ouvrent depuis le menu du compte (R-APP-12, R-APP-68), aucun onglet ne l'est.
+4. R-APP-63 · Remplacée : « Compte » n'est plus un onglet ; les préférences s'ouvrent depuis le menu du compte (R-APP-68).
 5. R-APP-64 · « Cadre » ouvre le cadre en plein écran, comme « Mode cadre » (R-CAD-58). Ouvert depuis la bibliothèque, quitter le cadre ramène à cette bibliothèque.
 6. R-APP-65 · La barre d'onglets reste en bas de l'écran quand on fait défiler la page, et la fin de chaque page reste visible au-dessus d'elle.
 7. R-APP-66 · Tant que la barre d'onglets est affichée (écran étroit), les courtes notifications (R-APP-53) s'affichent au-dessus d'elle, sans la cacher. Dans la bibliothèque, tant que le bouton rond « Ajouter » est visible, elles s'affichent aussi au-dessus de lui ; quand il s'efface au défilement, elles redescendent juste au-dessus de la barre.
+8. R-APP-67 · Sur un écran étroit (téléphone), une barre d'onglets en bas de l'écran remplace l'ancien menu à trois traits : « Bibliothèque », « Envoyer », « Cadre », « Amis », dans cet ordre. Sur un écran large (ordinateur), il n'y a pas de barre d'onglets : « Envoyer » s'affiche dans la barre du haut, juste après « Ma bibliothèque ».
+9. R-APP-68 · Les préférences (voir [preferences.md](preferences.md)) s'ouvrent depuis le menu du compte (rond de profil, en haut à droite), avec le thème et « Se déconnecter » : on les règle rarement, elles n'ont pas d'onglet.
 
 **Messages affichés**
 
-| Situation                         | Message                                           |
-| --------------------------------- | ------------------------------------------------- |
-| Onglets                           | « Bibliothèque », « Amis », « Cadre », « Compte » |
-| Nom de la barre (lecture d'écran) | « Navigation principale »                         |
+| Situation                         | Message                                            |
+| --------------------------------- | -------------------------------------------------- |
+| Onglets                           | « Bibliothèque », « Envoyer », « Cadre », « Amis » |
+| Nom de la barre (lecture d'écran) | « Navigation principale »                          |
 
 **Ce qui n'est pas possible**
 

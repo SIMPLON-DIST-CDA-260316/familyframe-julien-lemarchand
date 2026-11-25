@@ -1,4 +1,11 @@
-import { ImagesIcon, type LucideIcon, MonitorIcon, UserPlusIcon, UsersIcon } from 'lucide-react'
+import {
+  ImagesIcon,
+  type LucideIcon,
+  MonitorIcon,
+  SendIcon,
+  UserPlusIcon,
+  UsersIcon,
+} from 'lucide-react'
 import { useAuth } from '@/auth/AuthContext.ts'
 import { enterFullscreen } from '@/fullscreen.ts'
 
@@ -7,6 +14,7 @@ export type NavItem = { to: string; label: string; icon: LucideIcon; onClick?: (
 
 const MEMBER_ITEMS: NavItem[] = [
   { to: '/', label: 'Ma bibliothèque', icon: ImagesIcon },
+  { to: '/send', label: 'Envoyer', icon: SendIcon },
   { to: '/frame', label: 'Cadre', icon: MonitorIcon, onClick: enterFullscreen },
   { to: '/friends', label: 'Amis', icon: UsersIcon },
 ]

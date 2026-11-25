@@ -1,10 +1,4 @@
-import {
-  CircleUserRoundIcon,
-  ImagesIcon,
-  type LucideIcon,
-  MonitorIcon,
-  UsersIcon,
-} from 'lucide-react'
+import { ImagesIcon, type LucideIcon, MonitorIcon, SendIcon, UsersIcon } from 'lucide-react'
 import type { JSX } from 'react'
 import { NavLink, useLocation } from 'react-router'
 import { enterFullscreen } from '@/fullscreen.ts'
@@ -13,8 +7,8 @@ import { LIBRARY_BELOW_STATE } from '@/viewerHistory.ts'
 type Tab = { to: string; label: string; icon: LucideIcon }
 
 const LIBRARY_TAB: Tab = { to: '/', label: 'Bibliothèque', icon: ImagesIcon }
+const SEND_TAB: Tab = { to: '/send', label: 'Envoyer', icon: SendIcon }
 const FRIENDS_TAB: Tab = { to: '/friends', label: 'Amis', icon: UsersIcon }
-const ACCOUNT_TAB: Tab = { to: '/settings', label: 'Compte', icon: CircleUserRoundIcon }
 
 // NavLink sets aria-current="page" on the active tab: the styles read it.
 const TAB_CLASSES =
@@ -53,7 +47,8 @@ function FrameTabLink(): JSX.Element {
   )
 }
 
-// Below md only: a phone's thumb reaches the bottom edge, not a menu in the top corner.
+// Below md only: a phone's thumb reaches the bottom edge, not a menu in the top corner. The
+// account is not a tab: it is set once, from the avatar menu at the top.
 export function MobileTabBar(): JSX.Element {
   return (
     <nav
@@ -65,13 +60,13 @@ export function MobileTabBar(): JSX.Element {
           <TabLink {...LIBRARY_TAB} />
         </li>
         <li>
-          <TabLink {...FRIENDS_TAB} />
+          <TabLink {...SEND_TAB} />
         </li>
         <li>
           <FrameTabLink />
         </li>
         <li>
-          <TabLink {...ACCOUNT_TAB} />
+          <TabLink {...FRIENDS_TAB} />
         </li>
       </ul>
     </nav>

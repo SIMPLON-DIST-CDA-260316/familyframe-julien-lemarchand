@@ -142,6 +142,50 @@ Ceux du panneau d'envoi (voir [Choisir à qui envoyer](#choisir-à-qui-envoyer))
 - Savoir si un proche a découvert la photo qu'on lui a envoyée.
 - Être prévenu en dehors de FamilyFrame, par e-mail ou par une notification du téléphone.
 
+## Historique des envois
+
+La page « Envoyer » garde la trace de ce que l'on a envoyé, comme le dossier des messages envoyés d'une boîte mail.
+
+**Ce que l'on peut faire**
+
+- Ouvrir la page « Envoyer » par l'onglet du même nom sur un téléphone, ou par « Envoyer » dans la barre du haut sur un ordinateur.
+- Revoir ses envois, du plus récent au plus ancien : la photo en petit, à qui elle est partie, quand, et le message s'il y en avait un.
+- Afficher les envois plus anciens.
+- Retirer un envoi de son historique.
+
+**Règles**
+
+1. R-PAR-58 · Un envoi fait une seule ligne dans l'historique, même envoyé à plusieurs proches en une fois. La ligne ne nomme que les proches qui ont reçu la photo : ceux qui l'avaient déjà, ou qui ne sont plus des amis, n'y figurent pas. Un envoi que personne n'a reçu ne crée pas de ligne.
+2. R-PAR-59 · Chaque ligne montre la photo en petit, « À » suivi des prénoms des proches (« À Mamie et Tata »), la date de l'envoi et, s'il y en avait un, le message entre guillemets, sur deux lignes au plus.
+3. R-PAR-60 · La date se lit comme dans une boîte mail : « à l'instant » pendant la première minute, puis « il y a 5 min », « il y a 2 h » le jour même, « hier » la veille, « il y a 3 jours » jusqu'à six jours, puis le jour (« 12 novembre 2026 »). Le jour et l'heure exacts s'affichent au survol.
+4. R-PAR-61 · Les prénoms sont ceux d'aujourd'hui : si un proche change de nom, ses anciens envois portent son nouveau nom. Si plus aucun des proches n'a de compte, la ligne affiche « À un compte supprimé ».
+5. R-PAR-62 · L'historique est privé : seul l'expéditeur le voit. Il ne dit pas si la photo a été découverte ou gardée, et un proche qui a reçu la photo ne voit pas cet envoi dans son propre historique.
+6. R-PAR-63 · Les 30 envois les plus récents s'affichent d'abord ; « Afficher plus » montre les 30 suivants, tant qu'il en reste.
+7. R-PAR-64 · Retirer un envoi demande une confirmation. Il quitte alors l'historique, et seulement lui : les proches gardent la photo qu'ils ont reçue, et la photo reste dans la bibliothèque de l'expéditeur si elle y était.
+8. R-PAR-65 · Une ligne de l'historique ne s'ouvre pas : pour regarder la photo, on passe par sa bibliothèque.
+9. R-PAR-66 · L'historique n'a pas de limite de durée. Il commence avec cette version : les photos envoyées avant n'y figurent pas.
+
+**Messages affichés**
+
+| Situation                          | Message                                                                                          |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------ |
+| En-tête                            | « Envoyer » — « Les photos que vous avez envoyées à vos proches, la plus récente en premier. »   |
+| Titre de la liste                  | « Envois »                                                                                       |
+| Chargement                         | « Chargement… »                                                                                  |
+| Aucun envoi                        | « Aucun envoi pour l'instant » — « Les photos que vous envoyez à vos proches apparaîtront ici. » |
+| Bouton pour la suite               | « Afficher plus »                                                                                |
+| Bouton de la corbeille             | « Retirer de l'historique » (au survol et pour les lecteurs d'écran)                             |
+| Confirmation                       | « Retirer cet envoi de l'historique ? » — « Vos proches gardent la photo. »                      |
+| Boutons de la confirmation         | « Annuler », « Retirer »                                                                         |
+| L'envoi a déjà été retiré ailleurs | « Cet envoi a déjà été retiré de l'historique. »                                                 |
+
+**Ce qui n'est pas possible**
+
+- Voir si un proche a découvert ou gardé la photo.
+- Retirer la photo de chez ses proches depuis l'historique.
+- Vider tout l'historique d'un coup : les envois se retirent un par un.
+- Rechercher ou filtrer dans l'historique.
+
 ## Ce que deviennent les photos envoyées
 
 **Ce que l'on peut faire**

@@ -14,6 +14,7 @@ import InvitePage from './pages/InvitePage.tsx'
 import LibraryPage from './pages/LibraryPage.tsx'
 import LoginPage from './pages/LoginPage.tsx'
 import NotFoundPage from './pages/NotFoundPage.tsx'
+import SendPage from './pages/SendPage.tsx'
 import SettingsPage from './pages/SettingsPage.tsx'
 import { UploadsProvider } from './upload/UploadsProvider.tsx'
 
@@ -68,6 +69,7 @@ function AppRoutes(): JSX.Element {
         <Route element={<AccountBarLayout />}>
           <Route element={<TabBarLayout />}>
             <Route path="/" element={<LibraryPage />} />
+            <Route path="/send" element={<SendPage />} />
             <Route path="/friends" element={<FriendsPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route
