@@ -8,5 +8,4 @@ Les règles ci-dessous décrivent l'intention ; elles recevront leur identifiant
 
 **Prévu**
 
-- Une sélection du jour : N photos choisies automatiquement chaque jour.
 - Une « radio » lancée à partir d'une photo, qui enchaîne des photos liées par leur contexte : dates proches, même expéditeur, mêmes collections.

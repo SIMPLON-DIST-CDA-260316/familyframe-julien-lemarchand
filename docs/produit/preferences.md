@@ -153,7 +153,7 @@ La page où chacun règle son compte : sa photo de profil, son nom affiché et s
 
 **Ce que l'on peut faire**
 
-- Choisir, pour le cadre de l'appareil utilisé, les photos lues (toute la bibliothèque ou une collection), le modèle d'affichage, l'ordre de lecture et la vitesse, dans l'encart « Cadre de cet appareil ».
+- Choisir, pour le cadre de l'appareil utilisé, les photos lues (toute la bibliothèque, la sélection du jour ou une collection), le modèle d'affichage, l'ordre de lecture et la vitesse, dans l'encart « Cadre de cet appareil ».
 
 **Règles**
 
@@ -163,13 +163,13 @@ La page où chacun règle son compte : sa photo de profil, son nom affiché et s
 
 **Messages affichés**
 
-| Situation         | Message                                                                       |
-| ----------------- | ----------------------------------------------------------------------------- |
-| Titre de l'encart | « Cadre de cet appareil » — « Ces réglages ne concernent que cet appareil. »  |
-| Choix des photos  | « Photos » : « Toute la bibliothèque », puis le nom de chaque collection      |
-| Choix du modèle   | « Affichage » : « Ajusté », « Plein format », « Passe-partout », « Polaroïd » |
-| Choix de l'ordre  | « Lecture » : « Dans l'ordre », « Aléatoire »                                 |
-| Choix de vitesse  | « Vitesse » : « 5 s », « 10 s », « 20 s »                                     |
+| Situation         | Message                                                                                         |
+| ----------------- | ----------------------------------------------------------------------------------------------- |
+| Titre de l'encart | « Cadre de cet appareil » — « Ces réglages ne concernent que cet appareil. »                    |
+| Choix des photos  | « Photos » : « Toute la bibliothèque », « Sélection du jour », puis le nom de chaque collection |
+| Choix du modèle   | « Affichage » : « Ajusté », « Plein format », « Passe-partout », « Polaroïd »                   |
+| Choix de l'ordre  | « Lecture » : « Dans l'ordre », « Aléatoire »                                                   |
+| Choix de vitesse  | « Vitesse » : « 5 s », « 10 s », « 20 s »                                                       |
 
 **Ce qui n'est pas possible**
 

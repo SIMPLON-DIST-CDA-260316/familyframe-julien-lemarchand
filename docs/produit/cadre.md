@@ -17,7 +17,7 @@ Le cadre est la page à laisser affichée en plein écran sur l'appareil posé c
 1. R-CAD-01 · Un cadre affiche les photos d'un seul compte : celui qui y est connecté.
 2. R-CAD-02 · Le cadre est toujours sombre, quel que soit le thème choisi, pour mettre les photos en valeur.
 3. R-CAD-03 · Le cadre occupe toute la page : la barre du haut et les menus de l'application n'y sont pas affichés.
-4. R-CAD-04 · Le cadre affiche toutes les photos de la bibliothèque, ou de la collection choisie (R-CAD-77), des plus récentes aux plus anciennes, sans limite de nombre : les anciennes photos ne disparaissent jamais du cadre.
+4. R-CAD-04 · Le cadre affiche toutes les photos de la bibliothèque, ou de la sélection du jour ou de la collection choisie (R-CAD-77), des plus récentes aux plus anciennes, sans limite de nombre : les anciennes photos ne disparaissent jamais du cadre.
 5. R-CAD-05 · Le cadre recharge toutes ses photos une fois par jour. Cela garde sa connexion active (voir [comptes-et-connexion.md](comptes-et-connexion.md#rester-connecté)) : un cadre allumé en continu ne se déconnecte jamais.
 6. R-CAD-06 · Un cadre rallumé alors que le réseau n'est pas encore prêt attend et réessaie seul toutes les 5 secondes, sans afficher la page de connexion (R-CNX-16).
 7. R-CAD-07 · Si sa connexion au compte a expiré ou a été fermée, le cadre revient à la page de connexion : il faut se reconnecter sur l'appareil.
@@ -75,7 +75,7 @@ Le cadre n'a plus de vue bibliothèque : voir R-CAD-53. Les règles ci-dessous g
 - Choisir la vitesse : 5 s, 10 s ou 20 s par photo (menu « … », « Vitesse ») ; l'appareil la retient.
 - Choisir l'ordre de lecture : « Dans l'ordre » (des plus récentes aux plus anciennes) ou « Aléatoire » (menu « … », « Lecture ») ; l'appareil le retient.
 - Faire ces mêmes réglages depuis la page « Préférences », encart « Cadre de cet appareil » (voir [preferences.md](preferences.md#cadre-de-cet-appareil)).
-- Choisir les photos lues : toute la bibliothèque ou une collection (menu « … », « Photos ») ; l'appareil le retient (voir [Choisir les photos du cadre](#choisir-les-photos-du-cadre)).
+- Choisir les photos lues : toute la bibliothèque, la sélection du jour ou une collection (menu « … », « Photos ») ; l'appareil le retient (voir [Choisir les photos du cadre](#choisir-les-photos-du-cadre)).
 - Afficher ou masquer un bandeau de vignettes (« Vignettes ») et toucher une vignette pour aller à cette photo.
 - Envoyer la photo affichée à un ami, la ranger dans ses collections ou la supprimer (menu « … »).
 - Quitter le mode cadre (bouton ✕, touche Échap ou sortie du plein écran) pour revenir à la bibliothèque, sur la photo affichée.
@@ -124,13 +124,13 @@ Le cadre n'a plus de vue bibliothèque : voir R-CAD-53. Les règles ci-dessous g
 
 **Ce que l'on peut faire**
 
-- Dans le menu « … » du diaporama, « Photos », choisir « Toute la bibliothèque » ou l'une de ses collections.
+- Dans le menu « … » du diaporama, « Photos », choisir « Toute la bibliothèque », « Sélection du jour » (voir [Sélection du jour](#sélection-du-jour)) ou l'une de ses collections.
 - Faire ce choix depuis la page « Préférences », encart « Cadre de cet appareil » (voir [preferences.md](preferences.md#cadre-de-cet-appareil)).
 - Depuis la carte « Mes collections » de la bibliothèque, choisir « Lire sur le cadre » dans le menu « … » d'une collection : le cadre s'ouvre en plein écran sur elle (voir [collections.md](collections.md)).
 
 **Règles**
 
-1. R-CAD-77 · Le cadre lit toute la bibliothèque (par défaut) ou une seule collection. Le choix est retenu sur l'appareil, comme la vitesse (R-CAD-62, R-CAD-63).
+1. R-CAD-77 · Le cadre lit toute la bibliothèque (par défaut), la sélection du jour (R-CAD-84) ou une seule collection. Le choix est retenu sur l'appareil, comme la vitesse (R-CAD-62, R-CAD-63).
 2. R-CAD-78 · Une collection se lit comme la bibliothèque : des plus récentes aux plus anciennes et en boucle, ou en ordre aléatoire, selon « Lecture » ; avec la même vitesse et le même modèle d'affichage.
 3. R-CAD-79 · Changer de photos fait repartir le diaporama de la photo la plus récente du nouveau choix ; en « Aléatoire », un nouveau mélange commence.
 4. R-CAD-80 · Une photo rangée dans la collection lue, ou retirée, depuis cet appareil ou un autre, entre dans le diaporama ou en sort en quelques instants, sans recharger. Une photo ajoutée à la bibliothèque n'arrive sur le cadre que si elle est rangée dans la collection lue.
@@ -148,6 +148,27 @@ Le cadre n'a plus de vue bibliothèque : voir R-CAD-53. Les règles ci-dessous g
 
 - Lire plusieurs collections à la fois.
 - Garder le choix d'une collection sur un autre appareil : chaque appareil garde le sien.
+
+## Sélection du jour
+
+**Ce que l'on peut faire**
+
+- Dans le menu « … » du diaporama, « Photos », choisir « Sélection du jour » : le cadre lit 20 photos de la bibliothèque tirées au hasard, un lot différent chaque jour.
+- Faire ce choix depuis la page « Préférences », encart « Cadre de cet appareil » (voir [preferences.md](preferences.md#cadre-de-cet-appareil)).
+
+**Règles**
+
+1. R-CAD-84 · La sélection du jour compte 20 photos de la bibliothèque, tirées au hasard. Une photo reçue n'y entre qu'une fois découverte. Avec 20 photos ou moins, la sélection les contient toutes. Le choix est retenu sur l'appareil, comme les autres choix de « Photos » (R-CAD-77).
+2. R-CAD-85 · Le lot reste le même toute la journée, à chaque ouverture et sur tous les appareils du compte. Un nouveau lot est tiré chaque jour à minuit, heure de Paris ; un cadre allumé y passe dans le quart d'heure qui suit, sans recharger.
+3. R-CAD-86 · Une photo ajoutée ou reçue dans la journée ne remplace pas une photo du lot : elle n'y entre que s'il reste de la place, sinon elle peut être tirée les jours suivants. Exception : une photo reçue avant aujourd'hui mais découverte aujourd'hui compte à sa date de réception, et peut prendre la place d'une photo du lot.
+4. R-CAD-87 · Une photo supprimée quitte la sélection en quelques instants ; une autre photo de la bibliothèque prend sa place s'il y en a.
+5. R-CAD-88 · La sélection se lit comme une collection : des plus récentes aux plus anciennes ou en ordre aléatoire, selon « Lecture », avec la même vitesse et le même modèle d'affichage (R-CAD-78, R-CAD-79).
+6. R-CAD-89 · Si la sélection ne peut pas être chargée, le cadre lit toute la bibliothèque en attendant, sans message ; il réessaie au plus tard un quart d'heure après, et passe à la sélection dès qu'elle arrive. Le menu garde « Sélection du jour » coché.
+
+**Ce qui n'est pas possible**
+
+- Choisir le nombre de photos de la sélection.
+- Tirer un nouveau lot avant le lendemain, ou garder une photo d'un jour sur l'autre.
 
 ## Arrivée d'une nouvelle photo
 

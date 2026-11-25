@@ -19,7 +19,7 @@ export type FrameMode = {
   // In the order they play.
   photos: Photo[]
   status: FeedStatus
-  // The source played: the library when the chosen collection is gone.
+  // The source played: the library when the chosen one is unavailable.
   source: PhotoSource
   // undefined while there is no photo to show.
   currentPhoto: Photo | undefined
