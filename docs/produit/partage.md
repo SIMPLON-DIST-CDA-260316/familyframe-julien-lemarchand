@@ -58,13 +58,13 @@ Envoyer une photo à un ou plusieurs amis la leur fait parvenir comme du courrie
 
 **Ce que l'on peut faire**
 
-- Sur la page « Envoyer », toucher « Envoyer une photo », puis choisir d'où vient la photo : « Prendre une photo » avec l'appareil photo, « Choisir sur l'appareil » parmi ses images, ou « Depuis ma bibliothèque ».
+- Sur la page « Envoyer », toucher « Envoyer une photo » (en haut de la page sur un ordinateur, le bouton rond à l'avion en papier en bas à droite sur un téléphone), puis choisir d'où vient la photo : « Prendre une photo » avec l'appareil photo, « Choisir sur l'appareil » parmi ses images, ou « Depuis ma bibliothèque ».
 - Depuis sa bibliothèque, toucher la photo voulue dans la grille ; « Charger plus » montre les photos plus anciennes, et la flèche « Retour » ramène au choix d'origine.
 - Choisir ensuite les proches et écrire un message, comme depuis le menu « … » d'une photo.
 
 **Règles**
 
-1. R-PAR-67 · La page s'ouvre sur ce que l'on vient faire : le bouton « Envoyer une photo » est en tête, l'historique des envois en dessous.
+1. R-PAR-67 · La page s'ouvre sur ce que l'on vient faire : sur un ordinateur, le bouton « Envoyer une photo » est en tête, l'historique des envois en dessous. Sur un téléphone, « Envoyer une photo » est un bouton rond à l'avion en papier, en bas à droite de l'écran, comme le « + » de la bibliothèque (R-APP-76) ; le titre est directement suivi de l'historique. Quand le choix d'origine ou le panneau d'envoi se ferme, la navigation au clavier reprend sur le bouton « Envoyer une photo » affiché.
 2. R-PAR-68 · Une photo prise ou choisie sur l'appareil part uniquement chez les proches : elle n'est pas ajoutée à la bibliothèque de l'expéditeur (R-PAR-20). Une photo choisie dans sa bibliothèque y reste, inchangée (R-PAR-11).
 3. R-PAR-69 · On envoie une photo à la fois, avec son message : « Choisir sur l'appareil » ne prend qu'une image.
 4. R-PAR-70 · La grille de sa bibliothèque montre les photos ouvertes, de la plus récente à la plus ancienne, comme la bibliothèque elle-même ; les photos reçues qui attendent d'être découvertes n'y sont pas.

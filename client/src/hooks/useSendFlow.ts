@@ -1,5 +1,6 @@
 import { type RefObject, useRef, useState } from 'react'
 import type { ShareTarget } from '@/hooks/useShareSending.ts'
+import { shownButton } from '@/lib/shownButton.ts'
 
 export type SendFlow = {
   isChoosingSource: boolean
@@ -12,11 +13,12 @@ export type SendFlow = {
   returnFocus: (event: Event) => void
 }
 
-// Two panels in a row: the source choice, then the send panel. Focus goes back to « Envoyer une
-// photo » only at the very end, not while the send panel takes over from the source choice.
-// onShareClosed: the page reloads its history, the send may have added a line.
+// Two panels in a row: the source choice, then the send panel. Focus goes back to the shown
+// « Envoyer une photo » only at the very end, not while the send panel takes over from the
+// source choice. triggerRefs: the header's and the floating one. onShareClosed: the page reloads
+// its history, the send may have added a line.
 export function useSendFlow(
-  triggerRef: RefObject<HTMLButtonElement | null>,
+  triggerRefs: RefObject<HTMLButtonElement | null>[],
   onShareClosed: () => void,
 ): SendFlow {
   const [isChoosingSource, setIsChoosingSource] = useState(false)
@@ -39,7 +41,7 @@ export function useSendFlow(
     },
     returnFocus: (event) => {
       event.preventDefault()
-      if (!isHandingOver.current) triggerRef.current?.focus()
+      if (!isHandingOver.current) shownButton(triggerRefs)?.focus()
     },
   }
 }

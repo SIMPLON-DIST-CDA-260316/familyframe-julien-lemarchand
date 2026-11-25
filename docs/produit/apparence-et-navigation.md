@@ -209,6 +209,7 @@ Aucun message : les mots « Installer » ou « Ajouter à l'écran d'accueil » 
 
 - Sur un téléphone, aller d'un toucher sur « Bibliothèque », « Envoyer », « Cadre » ou « Amis », avec la barre d'onglets en bas de l'écran, sous le pouce.
 - Ouvrir ses préférences depuis le menu du compte (rond de profil, en haut à droite).
+- Sur un téléphone, toucher le bouton rond en bas à droite pour l'action principale de la page : ajouter une photo dans la bibliothèque, envoyer une photo sur la page « Envoyer ».
 
 **Règles**
 
@@ -221,6 +222,8 @@ Aucun message : les mots « Installer » ou « Ajouter à l'écran d'accueil » 
 7. R-APP-66 · Tant que la barre d'onglets est affichée (écran étroit), les courtes notifications (R-APP-53) s'affichent au-dessus d'elle, sans la cacher. Dans la bibliothèque, tant que le bouton rond « Ajouter » est visible, elles s'affichent aussi au-dessus de lui ; quand il s'efface au défilement, elles redescendent juste au-dessus de la barre.
 8. R-APP-67 · Sur un écran étroit (téléphone), une barre d'onglets en bas de l'écran remplace l'ancien menu à trois traits : « Bibliothèque », « Envoyer », « Cadre », « Amis », dans cet ordre. Sur un écran large (ordinateur), il n'y a pas de barre d'onglets : « Envoyer » s'affiche dans la barre du haut, juste après « Ma bibliothèque ».
 9. R-APP-68 · Les préférences (voir [preferences.md](preferences.md)) s'ouvrent depuis le menu du compte (rond de profil, en haut à droite), avec le thème et « Se déconnecter » : on les règle rarement, elles n'ont pas d'onglet.
+10. R-APP-76 · Sur un téléphone, l'action principale d'une page est un bouton rond en bas à droite de l'écran, au-dessus de la barre d'onglets, qui se comporte partout comme le « + » de la bibliothèque (R-BIB-48) : il s'efface pendant que l'on fait défiler la page vers le bas et revient quand on remonte, en haut ou à la fin de la page, et la fin de la page reste visible au-dessus de lui. Une page en a un au plus, et seulement si elle a une action principale : « Ajouter une photo » (« + ») sur la bibliothèque, « Envoyer une photo » (avion en papier) sur la page « Envoyer ». Le cadre, qui occupe tout l'écran, n'en a pas, ni les préférences, faites de réglages indépendants, ni la page des invitations, dont le formulaire est déjà sur la page. Sur ces pages, le bouton de l'en-tête n'apparaît que sur un ordinateur, qui n'a pas de bouton rond.
+11. R-APP-77 · Les courtes notifications passent au-dessus du bouton rond (R-APP-76) tant qu'il est visible, sur chaque page qui en a un, et pas seulement dans la bibliothèque (R-APP-66) ; quand il s'efface au défilement, elles redescendent juste au-dessus de la barre d'onglets.
 
 **Messages affichés**
 

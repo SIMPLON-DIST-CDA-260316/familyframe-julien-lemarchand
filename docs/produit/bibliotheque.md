@@ -42,6 +42,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 27. R-BIB-64 · Une image que l'appareil ne sait pas lire part telle quelle : l'application l'accepte ou la refuse avec sa raison, comme toute photo.
 28. R-BIB-65 · Quand le panneau « Ajouter une photo » se ferme, la navigation au clavier reprend sur le bouton « Ajouter » affiché : celui de l'en-tête sur un ordinateur, le bouton rond « + » sur un téléphone (qui réapparaît s'il s'était effacé), même si le panneau avait été ouvert depuis une bibliothèque vide.
 29. R-BIB-67 · Le panneau « Ajouter une photo » ne sert qu'à ajouter : prendre ou choisir des photos les ajoute aussitôt à sa bibliothèque et ferme le panneau, sans aperçu ni bouton à confirmer. L'envoi à un ami a quitté ce panneau pour la page « Envoyer » (voir [partage.md](partage.md#envoyer-une-photo-depuis-la-page-envoyer)).
+30. R-BIB-74 · Le bouton rond « + » n'est plus le seul de l'application (R-BIB-48 disait qu'il n'apparaissait que sur la bibliothèque) : les autres pages qui ont une action principale ont aussi le leur, au même endroit et avec le même comportement (R-APP-76). Une page n'en montre jamais deux.
 
 **Messages affichés**
 

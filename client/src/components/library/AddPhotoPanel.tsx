@@ -2,6 +2,7 @@ import type { JSX, RefObject } from 'react'
 import { UploadForm } from '@/components/library/UploadForm.tsx'
 import { ResponsivePanel } from '@/components/panel/ResponsivePanel.tsx'
 import { DialogDescription, DialogTitle } from '@/components/ui/dialog.tsx'
+import { shownButton } from '@/lib/shownButton.ts'
 
 type AddPhotoPanelProps = {
   isOpen: boolean
@@ -19,17 +20,6 @@ function AddPhotoHeading(): JSX.Element {
       <DialogDescription>Ajoutez-en une ou plusieurs à votre bibliothèque.</DialogDescription>
     </div>
   )
-}
-
-// display: none (hidden md:inline-flex, md:hidden) leaves no box. Not offsetParent: it is always
-// null for the fixed floating button.
-function shownButton(refs: RefObject<HTMLButtonElement | null>[]): HTMLButtonElement | undefined {
-  return refs
-    .map((ref) => ref.current)
-    .find(
-      (button): button is HTMLButtonElement =>
-        button !== null && button.getClientRects().length > 0,
-    )
 }
 
 // Sending to a friend lives on the Envoyer page now: this panel only adds. A choice closes it at
