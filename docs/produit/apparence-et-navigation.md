@@ -88,7 +88,7 @@ Comment on se déplace dans l'application, comment on choisit son thème, et les
 2. R-APP-31 · En « Système », un changement de réglage de l'appareil (passage automatique en sombre le soir, par exemple) s'applique aussitôt, sans recharger.
 3. R-APP-32 · Le choix s'applique immédiatement à toute l'application.
 4. R-APP-33 · Le choix est retenu sur cet appareil et dans ce navigateur seulement : il ne suit pas le compte sur ses autres appareils. Si l'appareil ne permet pas de le retenir (navigation privée, par exemple), le choix vaut jusqu'à la fermeture de la page, puis l'application revient à « Système ».
-5. R-APP-34 · Le cadre et la section « Ma bibliothèque » restent toujours sombres, quel que soit le thème (R-CAD-02, R-BIB-28).
+5. R-APP-34 · Le cadre et les photos de la bibliothèque restent toujours sur fond sombre, quel que soit le thème (R-CAD-02, R-BIB-28).
 
 **Messages affichés**
 

@@ -6,7 +6,7 @@ Envoyer une photo à un ou plusieurs amis la leur fait parvenir comme du courrie
 
 **Ce que l'on peut faire**
 
-- Ouvrir « Envoyer à des proches » depuis une photo de sa bibliothèque ou depuis le formulaire d'ajout (voir les deux sections suivantes).
+- Ouvrir « Envoyer à des proches » depuis une photo de sa bibliothèque ou depuis le panneau « Ajouter une photo » (voir les deux sections suivantes).
 - Voir un aperçu de la photo, puis ses amis sous forme de ronds portant leur photo de profil ou, sans photo, leur initiale.
 - Envoyer une photo à plusieurs proches en une fois, en touchant leur visage puis un seul bouton.
 - Rechercher un ami par son nom ou son adresse e-mail quand on en a beaucoup.
@@ -78,14 +78,14 @@ Ceux du panneau d'envoi (voir [Choisir à qui envoyer](#choisir-à-qui-envoyer))
 
 **Ce que l'on peut faire**
 
-- Dans la carte « Ajouter une photo » de la bibliothèque, prendre ou choisir une photo, puis cliquer sur « Envoyer à un ami » au lieu de « Ajouter à ma bibliothèque ».
+- Dans le panneau « Ajouter une photo » (bouton « Ajouter » de la bibliothèque), prendre ou choisir une photo, puis cliquer sur « Envoyer à un ami » au lieu de « Ajouter à ma bibliothèque ».
 
 **Règles**
 
 1. R-PAR-20 · La photo entre uniquement dans la bibliothèque de l'ami : elle n'est pas ajoutée à celle de l'expéditeur.
 2. R-PAR-21 · Les règles d'ajout s'appliquent comme pour sa propre bibliothèque : formats JPEG, PNG ou WebP, 10 Mo au plus, image lisible, photo préparée pour l'affichage et informations cachées retirées (voir [bibliotheque.md](bibliotheque.md#ajouter-une-photo), R-BIB-03 à R-BIB-09). Les messages d'erreur sont les mêmes.
-3. R-PAR-22 · Après un envoi réussi, le formulaire d'ajout se vide et le panneau se ferme.
-4. R-PAR-23 · La notification « Photo ajoutée à votre bibliothèque. » du formulaire ne concerne que l'ajout à sa bibliothèque ; l'envoi à des amis se confirme par sa propre notification (« Envoyée à … »).
+3. R-PAR-22 · « Envoyer à un ami » ferme le panneau « Ajouter une photo » et ouvre le panneau d'envoi avec la photo choisie. Après un envoi réussi, il se ferme ; le fermer sans envoyer abandonne la photo.
+4. R-PAR-23 · La notification « Photo ajoutée à votre bibliothèque. » du panneau d'ajout ne concerne que l'ajout à sa bibliothèque ; l'envoi à des amis se confirme par sa propre notification (« Envoyée à … »).
 
 **Messages affichés**
 

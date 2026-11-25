@@ -1,19 +1,20 @@
 # Bibliothèque
 
-La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajoutées et celles que ses amis lui ont envoyées. Elle est privée. C'est la page d'accueil de l'application une fois connecté (« Ma bibliothèque »). Le cadre affiche ces mêmes photos (voir [cadre.md](cadre.md)) ; l'envoi à un ami est décrit dans [partage.md](partage.md).
+La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajoutées et celles que ses amis lui ont envoyées. Elle est privée. C'est la page d'accueil de l'application une fois connecté (« Ma bibliothèque » dans le menu, « Bibliothèque » en titre de la page). La page est consacrée aux photos : les amis se gèrent sur la page « Amis » (voir [amis.md](amis.md)). Le cadre affiche ces mêmes photos (voir [cadre.md](cadre.md)) ; l'envoi à un ami est décrit dans [partage.md](partage.md).
 
 ## Ajouter une photo
 
 **Ce que l'on peut faire**
 
-- Dans la carte « Ajouter une photo », prendre une photo avec l'appareil photo du téléphone (« Prendre une photo ») ou choisir une image déjà enregistrée (« Choisir une image »).
+- Toucher « Ajouter », en haut de la bibliothèque : le panneau « Ajouter une photo » s'ouvre, par le bas de l'écran sur un téléphone, au centre sur un ordinateur.
+- Dans ce panneau, prendre une photo avec l'appareil photo du téléphone (« Prendre une photo ») ou choisir une image déjà enregistrée (« Choisir une image »).
 - Voir un aperçu de la photo choisie avant de l'envoyer.
 - L'ajouter à sa bibliothèque avec « Ajouter à ma bibliothèque », ou l'envoyer directement à un ami avec « Envoyer à un ami » (voir [partage.md](partage.md#envoyer-une-photo-depuis-son-appareil)).
 
 **Règles**
 
 1. R-BIB-01 · Les deux boutons restent désactivés tant qu'aucune photo n'est choisie.
-2. R-BIB-02 · Une seule photo est ajoutée à la fois. Choisir une nouvelle photo remplace la précédente dans le formulaire et efface le dernier message.
+2. R-BIB-02 · Une seule photo est ajoutée à la fois. Choisir une nouvelle photo remplace la précédente dans le panneau et efface le dernier message.
 3. R-BIB-03 · Formats acceptés : JPEG, PNG et WebP. Seuls ces formats peuvent être choisis ; le téléphone convertit lui-même une photo prise avec l'appareil photo. Tout autre format (GIF, HEIC, vidéo…) est refusé.
 4. R-BIB-04 · Une photo pèse au plus 10 Mo.
 5. R-BIB-05 · Le fichier doit être une image lisible ; un fichier abîmé ou déguisé en image est refusé.
@@ -24,14 +25,15 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 10. R-BIB-09 · Les informations cachées de la photo, dont le lieu de prise de vue, sont retirées à l'ajout : elles ne sont jamais conservées ni montrées.
 11. R-BIB-10 · Une photo ajoutée porte la date et l'heure de son ajout. La date de prise de vue n'est pas utilisée.
 12. R-BIB-11 · Pendant l'envoi, les deux boutons sont désactivés et le premier affiche « Envoi… ».
-13. R-BIB-12 · Après un ajout réussi, le formulaire se vide, un message de réussite s'affiche, et la photo apparaît en tête de la bibliothèque et sur le cadre qui lit toute la bibliothèque, sur tous les appareils connectés au compte, sans recharger la page.
-14. R-BIB-13 · Après un échec, la photo reste choisie dans le formulaire et un message explique la raison.
+13. R-BIB-12 · Après un ajout réussi, le panneau se ferme, un message de réussite s'affiche, et la photo apparaît en tête de la bibliothèque et sur le cadre qui lit toute la bibliothèque, sur tous les appareils connectés au compte, sans recharger la page.
+14. R-BIB-13 · Après un échec, la photo reste choisie dans le panneau et un message explique la raison.
+15. R-BIB-44 · Fermer le panneau sans rien envoyer abandonne la photo choisie : il s'ouvre vide la fois suivante.
 
 **Messages affichés**
 
 | Situation                       | Message                                                                                                           |
 | ------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| En-tête de la carte             | « Ajouter une photo » — « Ajoutez-la à votre bibliothèque ou envoyez-la directement à un ami. »                   |
+| En-tête du panneau              | « Ajouter une photo » — « Ajoutez-la à votre bibliothèque ou envoyez-la directement à un ami. »                   |
 | Aperçu                          | Image décrite comme « Aperçu avant envoi »                                                                        |
 | Envoi en cours                  | « Envoi… »                                                                                                        |
 | Photo ajoutée                   | « Photo ajoutée à votre bibliothèque. », dans une courte notification en bas de l'écran qui disparaît d'elle-même |
@@ -54,13 +56,13 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 
 **Ce que l'on peut faire**
 
-- Voir ses photos dans la section « Ma bibliothèque », en miniatures (grille de vignettes carrées) ou en liste.
+- Voir ses photos sous l'en-tête « Bibliothèque », qui indique leur nombre, en miniatures (grille de vignettes carrées) ou en liste.
 - Passer de l'un à l'autre avec les boutons « Miniatures » et « Liste ».
 - Charger les photos plus anciennes avec « Charger plus ».
 - Ouvrir une photo en grand dans l'application, puis passer à la suivante ou à la précédente d'un geste du doigt, avec les flèches à l'écran ou celles du clavier.
 - Ouvrir le menu « … » d'une photo pour lancer sa radio sur le cadre (voir [cadre.md](cadre.md#radio)), l'envoyer à un ami, la ranger dans ses collections (voir [collections.md](collections.md#ranger-ses-photos-dans-une-collection)) ou la supprimer.
 - Lancer le mode cadre, en plein écran, depuis la bibliothèque, ou depuis une photo ouverte pour que le diaporama commence par elle (voir [cadre.md](cadre.md)).
-- Découvrir les photos envoyées par ses proches depuis l'annonce en haut de la page (voir [partage.md](partage.md#recevoir-une-photo)).
+- Découvrir les photos envoyées par ses proches depuis l'annonce placée sous l'en-tête (voir [partage.md](partage.md#recevoir-une-photo)).
 - Gérer ses collections dans la carte « Mes collections » (voir [collections.md](collections.md)).
 
 **Règles**
@@ -73,26 +75,30 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 6. R-BIB-25 · Cliquer sur une photo l'ouvre en grand dans l'application.
 7. R-BIB-26 · Remplacée : une photo reçue n'apparaît plus dès son arrivée, mais une fois découverte (R-BIB-42).
 8. R-BIB-27 · Après une coupure de réseau, la bibliothèque se recharge seule depuis le début dès que la connexion revient, pour rattraper ce qui a changé entre-temps, sans revenir aux 30 premières photos.
-9. R-BIB-28 · La section « Ma bibliothèque » est toujours sombre, quel que soit le thème choisi, pour présenter les photos comme sur le cadre.
-10. R-BIB-29 · Pour l'administrateur, la carte « Vos proches » propose en plus « Inviter un proche sur FamilyFrame ».
+9. R-BIB-28 · Les photos de la bibliothèque sont toujours sur fond sombre, quel que soit le thème choisi, pour présenter les photos comme sur le cadre.
+10. R-BIB-29 · Remplacée : la carte « Vos proches » a quitté la bibliothèque (R-BIB-45).
 11. R-BIB-36 · La photo affiche sa date, et « Envoyée par » suivi du nom quand elle a été reçue.
 12. R-BIB-37 · Un compteur indique la position de la photo (« 3 / 42 ») ; « 30+ » signifie que d'autres photos plus anciennes ne sont pas encore chargées.
 13. R-BIB-38 · Fermer la photo ramène à l'endroit de la bibliothèque où se trouve la dernière photo regardée.
 14. R-BIB-39 · Supprimer la photo affichée montre la suivante ; s'il n'en reste aucune, la photo se ferme.
 15. R-BIB-40 · Le bouton retour du téléphone ferme la photo.
 16. R-BIB-41 · Un lien vers une photo qui n'existe plus ramène simplement à la bibliothèque.
-17. R-BIB-42 · La bibliothèque se met à jour seule, sans recharger la page : une photo ajoutée depuis un autre appareil apparaît en tête, une photo reçue y entre à sa date de réception dès qu'elle est découverte (sur cet appareil ou un autre), une photo supprimée disparaît.
+17. R-BIB-45 · La bibliothèque ne propose ni la gestion des amis ni les invitations : « Amis » et, pour l'administrateur, « Invitations » sont dans le menu (barre du haut, ou ☰ sur un téléphone).
+18. R-BIB-46 · Le nombre de photos s'affiche sous le titre (« 12 photos ») ; « Plus de 30 photos » tant que des photos plus anciennes ne sont pas encore chargées.
+19. R-BIB-47 · Une bibliothèque vide propose « Ajouter une photo », qui ouvre le même panneau que « Ajouter ».
+20. R-BIB-42 · La bibliothèque se met à jour seule, sans recharger la page : une photo ajoutée depuis un autre appareil apparaît en tête, une photo reçue y entre à sa date de réception dès qu'elle est découverte (sur cet appareil ou un autre), une photo supprimée disparaît.
 
 **Messages affichés**
 
-| Situation                                 | Message                                                                                                         |
-| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Bibliothèque vide                         | « Aucune photo pour l'instant. »                                                                                |
-| Photo en cours d'arrivée                  | « Chargement… »                                                                                                 |
-| Chargement des photos suivantes           | « Chargement… » (sur le bouton « Charger plus »)                                                                |
-| Carte d'accès aux amis                    | « Vos proches » — « Ajoutez vos proches en amis pour leur envoyer des photos. » et le bouton « Gérer mes amis » |
-| Photos reçues en attente                  | « Vous avez N nouvelles photos » et le bouton « Découvrir » (voir [partage.md](partage.md#recevoir-une-photo))  |
-| Description d'une photo (lecture d'écran) | « Photo du 24 novembre 2026 » ou « Photo envoyée par [nom], du 24 novembre 2026 »                               |
+| Situation                                 | Message                                                                                                        |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| En-tête                                   | « Bibliothèque », le nombre de photos, et les boutons « Ajouter » et « Mode cadre »                            |
+| Chargement de la bibliothèque             | « Chargement… »                                                                                                |
+| Bibliothèque vide                         | « Aucune photo pour l'instant. » et le bouton « Ajouter une photo »                                            |
+| Photo en cours d'arrivée                  | « Chargement… »                                                                                                |
+| Chargement des photos suivantes           | « Chargement… » (sur le bouton « Charger plus »)                                                               |
+| Photos reçues en attente                  | « Vous avez N nouvelles photos » et le bouton « Découvrir » (voir [partage.md](partage.md#recevoir-une-photo)) |
+| Description d'une photo (lecture d'écran) | « Photo du 24 novembre 2026 » ou « Photo envoyée par [nom], du 24 novembre 2026 »                              |
 
 **Ce qui n'est pas possible**
 
