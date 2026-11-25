@@ -76,4 +76,33 @@ Une collection est une liste de photos de sa bibliothèque, rangées sous un nom
 
 - Ranger plusieurs photos d'un coup.
 - Changer l'ordre des photos dans une collection.
-- Voir les photos d'une collection ailleurs que sur le cadre.
+
+## Parcourir une collection
+
+**Ce que l'on peut faire**
+
+- Dans la bibliothèque, choisir une collection dans la rangée placée sous l'annonce des photos reçues : seules ses photos s'affichent, sous son nom.
+- Revenir à toutes les photos avec « Toutes », au début de la rangée.
+- Ouvrir une photo de la collection en grand et passer d'une photo à l'autre sans sortir de la collection.
+
+**Règles**
+
+1. R-COL-15 · La rangée propose « Toutes » puis chaque collection, par ordre alphabétique (R-COL-03). Le choix en cours est mis en avant. Quand elle dépasse la largeur de l'écran, elle défile de côté ; le reste de la page ne bouge pas.
+2. R-COL-16 · Une collection affiche ses photos dans le même ordre que la bibliothèque (R-BIB-20), 30 à la fois avec « Charger plus ».
+3. R-COL-17 · La collection choisie fait partie de l'adresse de la page : recharger la page, revenir en arrière ou ouvrir un lien enregistré montre la même collection.
+4. R-COL-18 · Une photo ouverte en grand depuis une collection fait défiler les seules photos de cette collection ; la fermer ramène dans la collection.
+5. R-COL-19 · Une collection vide le dit et explique comment y ranger des photos.
+6. R-COL-20 · Une collection supprimée, sur cet appareil ou un autre, ou un lien vers une collection qui n'existe pas affiche « Cette collection n'existe plus. » et propose « Voir toutes les photos ».
+7. R-COL-21 · La collection affichée suit les changements sans recharger la page : une photo rangée ou retirée, sur cet appareil ou un autre, y apparaît ou en disparaît. Une photo ajoutée pendant qu'une collection est affichée n'y entre pas : elle rejoint « Toutes ».
+
+**Messages affichés**
+
+| Situation                | Message                                                                                           |
+| ------------------------ | ------------------------------------------------------------------------------------------------- |
+| Collection vide          | « Cette collection est vide. » — « Rangez-y des photos depuis leur menu « … », dans « Toutes ». » |
+| Collection introuvable   | « Cette collection n'existe plus. » et le bouton « Voir toutes les photos »                       |
+| Collections non chargées | « Cette collection n'a pas pu être chargée. » et le bouton « Voir toutes les photos »             |
+
+**Ce qui n'est pas possible**
+
+- Afficher plusieurs collections à la fois, ou les photos qui ne sont dans aucune collection.

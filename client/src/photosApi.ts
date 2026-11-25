@@ -4,7 +4,8 @@ import { isPhoto, isPhotoPage, type Photo, type PhotoPage } from '@/photo.ts'
 // The server's MAX_PAGE_SIZE: the fewest requests for many photos.
 const MAX_PAGE_SIZE = 100
 
-export type PageRequest = { cursor?: string; limit?: number }
+// collectionId: only that collection's photos; left out for the whole library.
+export type PageRequest = { cursor?: string; limit?: number; collectionId?: string }
 
 export type UploadResult =
   | { status: 'uploaded'; photo: Photo }
@@ -18,10 +19,11 @@ export type ShareResult =
   | { status: 'failed'; message: string }
   | { status: 'unauthenticated' }
 
-function photosUrl({ cursor, limit }: PageRequest): string {
+function photosUrl({ cursor, limit, collectionId }: PageRequest): string {
   const params = new URLSearchParams()
   if (cursor !== undefined) params.set('cursor', cursor)
   if (limit !== undefined) params.set('limit', String(limit))
+  if (collectionId !== undefined) params.set('collectionId', collectionId)
   const query = params.toString()
   return query === '' ? '/api/photos' : `/api/photos?${query}`
 }
@@ -70,13 +72,14 @@ export async function fetchAllPhotos(onUnauthenticated: () => void): Promise<Pho
 // soon as one page fails.
 export async function fetchNewestPhotos(
   count: number,
+  collectionId: string | undefined,
   onUnauthenticated: () => void,
 ): Promise<PhotoPage | null> {
   const photos: Photo[] = []
   let cursor: string | undefined
   while (photos.length < count) {
     const limit = Math.min(count - photos.length, MAX_PAGE_SIZE)
-    const page = await fetchPhotoPage({ cursor, limit }, onUnauthenticated)
+    const page = await fetchPhotoPage({ cursor, limit, collectionId }, onUnauthenticated)
     if (page === null) return null
     photos.push(...page.photos)
     // An empty page with a cursor would ask for the same page forever.

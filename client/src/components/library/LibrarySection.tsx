@@ -1,4 +1,3 @@
-import { ImagePlusIcon } from 'lucide-react'
 import type { JSX } from 'react'
 import { PhotoGrid } from '@/components/frame/PhotoGrid.tsx'
 import { PhotoList } from '@/components/frame/PhotoList.tsx'
@@ -10,22 +9,11 @@ type LibrarySectionProps = {
   library: PhotoLibrary
   layout: LibraryLayout
   onOpenPhoto: (id: string) => void
-  onAdd: () => void
+  // The library and a collection say different things when they have no photo.
+  emptyState: JSX.Element
 }
 
 type LoadMoreButtonProps = Pick<PhotoLibrary, 'isLoadingMore' | 'loadMore'>
-
-function EmptyLibrary({ onAdd }: { onAdd: () => void }): JSX.Element {
-  return (
-    <div className="flex flex-col items-center gap-4 px-6 py-16 text-center">
-      <p className="text-muted-foreground">Aucune photo pour l'instant.</p>
-      <Button size="lg" className="pointer-coarse:h-11" onClick={onAdd}>
-        <ImagePlusIcon aria-hidden data-icon="inline-start" />
-        Ajouter une photo
-      </Button>
-    </div>
-  )
-}
 
 function LoadMoreButton({ isLoadingMore, loadMore }: LoadMoreButtonProps): JSX.Element {
   return (
@@ -42,11 +30,16 @@ function LoadMoreButton({ isLoadingMore, loadMore }: LoadMoreButtonProps): JSX.E
   )
 }
 
-function LibraryPhotos({ library, layout, onOpenPhoto, onAdd }: LibrarySectionProps): JSX.Element {
+function LibraryPhotos({
+  library,
+  layout,
+  onOpenPhoto,
+  emptyState,
+}: LibrarySectionProps): JSX.Element {
   if (!library.isFirstPageLoaded) {
     return <p className="px-6 py-16 text-center text-muted-foreground">Chargement…</p>
   }
-  if (library.photos.length === 0) return <EmptyLibrary onAdd={onAdd} />
+  if (library.photos.length === 0) return emptyState
   // currentId null: no photo is on screen here, so no tile gets the frame's ring.
   return layout === 'grid' ? (
     <PhotoGrid photos={library.photos} currentId={null} onSelect={onOpenPhoto} />

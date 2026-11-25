@@ -63,6 +63,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 - Ouvrir le menu « … » d'une photo pour lancer sa radio sur le cadre (voir [cadre.md](cadre.md#radio)), l'envoyer à un ami, la ranger dans ses collections (voir [collections.md](collections.md#ranger-ses-photos-dans-une-collection)) ou la supprimer.
 - Lancer le mode cadre, en plein écran, depuis la bibliothèque, ou depuis une photo ouverte pour que le diaporama commence par elle (voir [cadre.md](cadre.md)).
 - Découvrir les photos envoyées par ses proches depuis l'annonce placée sous l'en-tête (voir [partage.md](partage.md#recevoir-une-photo)).
+- N'afficher que les photos d'une collection, depuis la rangée « Toutes », « Noël », « Les vacances »… placée sous l'annonce (voir [collections.md](collections.md#parcourir-une-collection)).
 - Gérer ses collections dans la carte « Mes collections » (voir [collections.md](collections.md)).
 
 **Règles**
@@ -84,7 +85,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 15. R-BIB-40 · Le bouton retour du téléphone ferme la photo.
 16. R-BIB-41 · Un lien vers une photo qui n'existe plus ramène simplement à la bibliothèque.
 17. R-BIB-45 · La bibliothèque ne propose ni la gestion des amis ni les invitations : « Amis » et, pour l'administrateur, « Invitations » sont dans le menu (barre du haut, ou ☰ sur un téléphone).
-18. R-BIB-46 · Le nombre de photos s'affiche sous le titre (« 12 photos ») ; « Plus de 30 photos » tant que des photos plus anciennes ne sont pas encore chargées.
+18. R-BIB-46 · Le nombre de photos s'affiche sous le titre (« 12 photos ») ; « Plus de 30 photos » tant que des photos plus anciennes ne sont pas encore chargées. Dans une collection, il compte les photos de cette collection.
 19. R-BIB-47 · Une bibliothèque vide propose « Ajouter une photo », qui ouvre le même panneau que « Ajouter ».
 20. R-BIB-42 · La bibliothèque se met à jour seule, sans recharger la page : une photo ajoutée depuis un autre appareil apparaît en tête, une photo reçue y entre à sa date de réception dès qu'elle est découverte (sur cet appareil ou un autre), une photo supprimée disparaît.
 
@@ -102,7 +103,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 
 **Ce qui n'est pas possible**
 
-- Trier ou filtrer les photos (par date, par expéditeur…), ou les rechercher.
+- Trier les photos, les filtrer autrement que par collection (par date, par expéditeur…), ou les rechercher.
 - Ranger les photos dans des albums : les collections en tiennent lieu (voir [collections.md](collections.md)).
 - Voir la bibliothèque d'un autre membre.
 
