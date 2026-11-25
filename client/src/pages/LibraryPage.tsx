@@ -1,6 +1,7 @@
 import { type JSX, type RefObject, useRef, useState } from 'react'
 import { CollectionChips } from '@/components/collections/CollectionChips.tsx'
 import { SelectedCollectionBar } from '@/components/collections/SelectedCollectionBar.tsx'
+import { AddPhotoFab } from '@/components/library/AddPhotoFab.tsx'
 import { AddPhotoPanel } from '@/components/library/AddPhotoPanel.tsx'
 import { LibraryHeader } from '@/components/library/LibraryHeader.tsx'
 import {
@@ -116,7 +117,8 @@ export default function LibraryPage(): JSX.Element {
   const allChipRef = useRef<HTMLAnchorElement>(null)
 
   return (
-    <main className="mx-auto flex max-w-5xl flex-col gap-4 px-4 py-6 sm:gap-6 sm:py-10">
+    // max-md:pb-24: the floating « Ajouter » never covers the last photos or « Charger plus ».
+    <main className="mx-auto flex max-w-5xl flex-col gap-4 px-4 py-6 max-md:pb-24 sm:gap-6 sm:py-10">
       <LibraryContent
         selected={selected}
         library={library}
@@ -132,6 +134,7 @@ export default function LibraryPage(): JSX.Element {
         onUploaded={handleUploaded}
         isShowingPhotos={isShowingPhotos(selected)}
       />
+      <AddPhotoFab onAdd={() => setIsAdding(true)} />
     </main>
   )
 }

@@ -1,6 +1,6 @@
 # Cadre
 
-Le cadre est la page à laisser affichée en plein écran sur l'appareil posé chez soi (tablette, vieil ordinateur, télévision). Il montre toutes les photos de la bibliothèque du compte connecté (voir [bibliotheque.md](bibliotheque.md)), ou celles d'une de ses collections (voir [collections.md](collections.md)), et reçoit les nouvelles en direct. On l'ouvre avec l'entrée « Cadre » de la barre du haut (l'onglet « Cadre » sur un téléphone), ou avec « Mode cadre » depuis la bibliothèque ou une photo ouverte : il passe alors en plein écran. Il n'affiche que le diaporama (une photo à la fois) ; les vignettes et la liste sont dans la bibliothèque.
+Le cadre est la page à laisser affichée en plein écran sur l'appareil posé chez soi (tablette, vieil ordinateur, télévision). Il montre toutes les photos de la bibliothèque du compte connecté (voir [bibliotheque.md](bibliotheque.md)), ou celles d'une de ses collections (voir [collections.md](collections.md)), et reçoit les nouvelles en direct. On l'ouvre avec l'entrée « Cadre » de la barre du haut (l'onglet « Cadre » sur un téléphone), ou avec « Mode cadre » depuis la bibliothèque (sur un ordinateur) ou une photo ouverte : il passe alors en plein écran. Il n'affiche que le diaporama (une photo à la fois) ; les vignettes et la liste sont dans la bibliothèque.
 
 ## Mettre en place un cadre
 

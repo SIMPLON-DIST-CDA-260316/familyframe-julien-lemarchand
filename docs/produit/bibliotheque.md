@@ -6,7 +6,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 
 **Ce que l'on peut faire**
 
-- Toucher « Ajouter », en haut de la bibliothèque : le panneau « Ajouter une photo » s'ouvre, par le bas de l'écran sur un téléphone, au centre sur un ordinateur.
+- Toucher « Ajouter », en haut de la bibliothèque sur un ordinateur, ou le bouton rond « + » en bas à droite de l'écran sur un téléphone : le panneau « Ajouter une photo » s'ouvre, par le bas de l'écran sur un téléphone, au centre sur un ordinateur.
 - Dans ce panneau, prendre une photo avec l'appareil photo du téléphone (« Prendre une photo ») ou choisir une image déjà enregistrée (« Choisir une image »).
 - Voir un aperçu de la photo choisie avant de l'envoyer.
 - L'ajouter à sa bibliothèque avec « Ajouter à ma bibliothèque », ou l'envoyer directement à un ami avec « Envoyer à un ami » (voir [partage.md](partage.md#envoyer-une-photo-depuis-son-appareil)).
@@ -28,6 +28,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 13. R-BIB-12 · Après un ajout réussi, le panneau se ferme, un message de réussite s'affiche, et la photo apparaît en tête de la bibliothèque et sur le cadre qui lit toute la bibliothèque, sur tous les appareils connectés au compte, sans recharger la page. Ajoutée pendant qu'une collection est affichée, elle est aussi rangée dans cette collection (R-COL-21).
 14. R-BIB-13 · Après un échec, la photo reste choisie dans le panneau et un message explique la raison.
 15. R-BIB-44 · Fermer le panneau sans rien envoyer abandonne la photo choisie : il s'ouvre vide la fois suivante.
+16. R-BIB-48 · Sur un téléphone, « Ajouter » est un bouton rond « + » qui reste en bas à droite de l'écran, au-dessus de la barre d'onglets, pendant que l'on fait défiler les photos ; il n'apparaît que sur la bibliothèque. L'en-tête n'y montre plus « Ajouter » ni « Mode cadre » : le cadre s'ouvre avec l'onglet « Cadre » (R-APP-64). La fin de la page reste visible au-dessus du bouton.
 
 **Messages affichés**
 
@@ -61,7 +62,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 - Charger les photos plus anciennes avec « Charger plus ».
 - Ouvrir une photo en grand dans l'application, puis passer à la suivante ou à la précédente d'un geste du doigt, avec les flèches à l'écran ou celles du clavier.
 - Ouvrir le menu « … » d'une photo pour lancer sa radio sur le cadre (voir [cadre.md](cadre.md#radio)), l'envoyer à un ami, la ranger dans ses collections (voir [collections.md](collections.md#ranger-ses-photos-dans-une-collection)) ou la supprimer.
-- Lancer le mode cadre, en plein écran, depuis la bibliothèque, ou depuis une photo ouverte pour que le diaporama commence par elle (voir [cadre.md](cadre.md)).
+- Lancer le mode cadre, en plein écran, depuis la bibliothèque (« Mode cadre » sur un ordinateur, l'onglet « Cadre » sur un téléphone), ou depuis une photo ouverte pour que le diaporama commence par elle (voir [cadre.md](cadre.md)).
 - Découvrir les photos envoyées par ses proches depuis l'annonce placée sous l'en-tête (voir [partage.md](partage.md#recevoir-une-photo)).
 - N'afficher que les photos d'une collection, depuis la rangée « Toutes », « Noël », « Les vacances »… placée sous l'annonce (voir [collections.md](collections.md#parcourir-une-collection)).
 - Créer une collection au bout de cette rangée, et renommer, supprimer ou lire sur le cadre la collection affichée (voir [collections.md](collections.md)).
@@ -91,15 +92,16 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 
 **Messages affichés**
 
-| Situation                                 | Message                                                                                                        |
-| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| En-tête                                   | « Bibliothèque », le nombre de photos, et les boutons « Ajouter » et « Mode cadre »                            |
-| Chargement de la bibliothèque             | « Chargement… »                                                                                                |
-| Bibliothèque vide                         | « Aucune photo pour l'instant. » et le bouton « Ajouter une photo »                                            |
-| Photo en cours d'arrivée                  | « Chargement… »                                                                                                |
-| Chargement des photos suivantes           | « Chargement… » (sur le bouton « Charger plus »)                                                               |
-| Photos reçues en attente                  | « Vous avez N nouvelles photos » et le bouton « Découvrir » (voir [partage.md](partage.md#recevoir-une-photo)) |
-| Description d'une photo (lecture d'écran) | « Photo du 24 novembre 2026 » ou « Photo envoyée par [nom], du 24 novembre 2026 »                              |
+| Situation                                                 | Message                                                                                                        |
+| --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| En-tête                                                   | « Bibliothèque », le nombre de photos, et les boutons « Ajouter » et « Mode cadre » (ordinateur)               |
+| Bouton d'ajout sur un téléphone (survol, lecture d'écran) | « Ajouter une photo »                                                                                          |
+| Chargement de la bibliothèque                             | « Chargement… »                                                                                                |
+| Bibliothèque vide                                         | « Aucune photo pour l'instant. » et le bouton « Ajouter une photo »                                            |
+| Photo en cours d'arrivée                                  | « Chargement… »                                                                                                |
+| Chargement des photos suivantes                           | « Chargement… » (sur le bouton « Charger plus »)                                                               |
+| Photos reçues en attente                                  | « Vous avez N nouvelles photos » et le bouton « Découvrir » (voir [partage.md](partage.md#recevoir-une-photo)) |
+| Description d'une photo (lecture d'écran)                 | « Photo du 24 novembre 2026 » ou « Photo envoyée par [nom], du 24 novembre 2026 »                              |
 
 **Ce qui n'est pas possible**
 
