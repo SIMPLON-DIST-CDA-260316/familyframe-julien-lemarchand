@@ -29,7 +29,9 @@ function RevealedPhoto({ photo }: { photo: Photo }): JSX.Element {
           <time dateTime={photo.createdAt}>{formatPhotoDay(photo.createdAt)}</time>
         </p>
         {photo.message !== null && (
-          <p className="mt-2 text-lg whitespace-pre-line">{quotedMessage(photo.message)}</p>
+          <p className="mt-2 text-lg whitespace-pre-line wrap-anywhere">
+            {quotedMessage(photo.message)}
+          </p>
         )}
       </div>
     </div>
