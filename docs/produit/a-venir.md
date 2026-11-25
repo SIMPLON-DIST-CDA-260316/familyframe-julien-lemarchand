@@ -9,7 +9,6 @@ Les règles ci-dessous décrivent l'intention ; elles recevront leur identifiant
 **Prévu**
 
 - Trois modèles d'affichage : plein format, passe-partout, polaroïd.
-- Lecture en boucle ou aléatoire.
 
 ## Étape 9 · Courrier photo
 

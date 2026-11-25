@@ -29,11 +29,7 @@ export function SlideshowTopBar({
       <CloseButton onClose={onClose} />
       <div className="flex items-center gap-2">
         <FullscreenButton />
-        <SlideshowMenu
-          photo={photo}
-          intervalMs={settings.intervalMs}
-          onIntervalChange={settings.onIntervalChange}
-        />
+        <SlideshowMenu photo={photo} settings={settings} />
       </div>
     </ControlsBar>
   )

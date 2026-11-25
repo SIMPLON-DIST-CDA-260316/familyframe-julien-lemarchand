@@ -4,6 +4,7 @@ import { type FrameSelection, useFrameSelection } from '@/hooks/useFrameSelectio
 import { useIdle } from '@/hooks/useIdle.ts'
 import { useLeaveFrame } from '@/hooks/useLeaveFrame.ts'
 import { type FeedStatus, usePhotoFeed } from '@/hooks/usePhotoFeed.ts'
+import { usePlaybackPhotos } from '@/hooks/usePlaybackPhotos.ts'
 import { type SlideshowSettings, useSlideshowSettings } from '@/hooks/useSlideshowSettings.ts'
 import type { Photo } from '@/photo.ts'
 import { PHOTO_PARAM } from '@/viewerHistory.ts'
@@ -12,6 +13,7 @@ import { PHOTO_PARAM } from '@/viewerHistory.ts'
 const CONTROLS_HIDE_DELAY_MS = 4000
 
 export type FrameMode = {
+  // In the order they play.
   photos: Photo[]
   status: FeedStatus
   // undefined while there is no photo to show.
@@ -37,6 +39,7 @@ export function useFrameMode(): FrameMode {
   const currentPhoto = photos.find(({ id }) => id === selection.currentId)
   const leave = (): void => leaveFrame(currentPhoto?.id ?? null)
   useFrameFullscreen(leave)
+  const playbackPhotos = usePlaybackPhotos(photos, settings.order, selection.currentId)
 
-  return { photos, status, currentPhoto, isActive, settings, selection, leave }
+  return { photos: playbackPhotos, status, currentPhoto, isActive, settings, selection, leave }
 }

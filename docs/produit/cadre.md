@@ -72,6 +72,7 @@ Le cadre n'a plus de vue bibliothèque : voir R-CAD-53. Les règles ci-dessous g
 - Passer à la photo précédente ou suivante avec les flèches à l'écran, les flèches gauche et droite du clavier, ou en faisant glisser la photo du doigt.
 - Mettre en pause ou relancer la lecture automatique.
 - Choisir la vitesse : 5 s, 10 s ou 20 s par photo (menu « … », « Vitesse ») ; l'appareil la retient.
+- Choisir l'ordre de lecture : « Dans l'ordre » (des plus récentes aux plus anciennes) ou « Aléatoire » (menu « … », « Lecture ») ; l'appareil le retient.
 - Afficher ou masquer un bandeau de vignettes (« Vignettes ») et toucher une vignette pour aller à cette photo.
 - Envoyer la photo affichée à un ami ou la supprimer (menu « … »).
 - Quitter le mode cadre (bouton ✕, touche Échap ou sortie du plein écran) pour revenir à la bibliothèque, sur la photo affichée.
@@ -80,7 +81,7 @@ Le cadre n'a plus de vue bibliothèque : voir R-CAD-53. Les règles ci-dessous g
 
 1. R-CAD-20 · Réglages au premier affichage : lecture automatique, 10 secondes par photo, bandeau de vignettes masqué.
 2. R-CAD-21 · Remplacée : la vitesse est désormais retenue sur l'appareil ; seules la pause et l'affichage du bandeau reviennent aux réglages par défaut (R-CAD-62).
-3. R-CAD-22 · La lecture automatique passe à la photo suivante, plus ancienne, à chaque intervalle. Après la plus ancienne, elle repart de la plus récente, en boucle et sans retour en arrière visible.
+3. R-CAD-22 · Remplacée : la lecture suit désormais l'ordre choisi, dans l'ordre ou aléatoire (R-CAD-64).
 4. R-CAD-23 · La lecture automatique attend pendant que quelqu'un utilise le cadre : elle ne change pas de photo tant qu'il y a eu une activité dans les 4 dernières secondes, ni tant qu'un menu ou une fenêtre est ouvert.
 5. R-CAD-24 · Les boutons (✕, « … », flèches, lecture, vignettes) et le bandeau s'affichent dès qu'il y a une activité et s'effacent après 4 secondes sans activité ; le pointeur de la souris se cache aussi. Ils restent affichés tant qu'un menu ou une fenêtre est ouvert.
 6. R-CAD-25 · Pendant qu'un menu est ouvert, les flèches du clavier et la touche Échap servent au menu : elles ne changent pas de photo et ne ferment pas le diaporama.
@@ -90,20 +91,23 @@ Le cadre n'a plus de vue bibliothèque : voir R-CAD-53. Les règles ci-dessous g
 10. R-CAD-29 · Si la photo affichée est supprimée (ici ou depuis un autre appareil), le diaporama passe à la photo la plus récente.
 11. R-CAD-62 · La vitesse choisie est retenue sur l'appareil, dans ce navigateur : elle reste la même quand la page du cadre est rechargée ou rouverte, le lendemain comme après un redémarrage. La lecture ou la pause et l'affichage du bandeau reviennent aux réglages par défaut (lecture automatique, bandeau masqué). Le rechargement quotidien des photos (R-CAD-05) ne change rien.
 12. R-CAD-63 · En navigation privée, ou si le navigateur bloque l'enregistrement, le réglage vaut jusqu'à la fermeture de la page. Un réglage devenu illisible revient à sa valeur par défaut sans effacer les autres.
-13. R-CAD-30 · La légende montre la date d'ajout ou de réception (« 24 novembre 2026 »), sans l'heure.
+13. R-CAD-64 · Deux ordres de lecture. « Dans l'ordre » (par défaut) : la lecture passe à la photo suivante, plus ancienne, à chaque intervalle ; après la plus ancienne, elle repart de la plus récente, en boucle et sans retour en arrière visible. « Aléatoire » : les photos sont mélangées une fois, et chacune passe une fois avant qu'un nouveau mélange commence ; le nouveau tour ne remontre pas tout de suite la photo qui vient de passer.
+14. R-CAD-65 · En « Aléatoire », une nouvelle photo se place juste après celle qui est affichée : les règles d'arrivée (R-CAD-40 à R-CAD-42) s'appliquent comme dans l'ordre. Une photo supprimée sort du mélange ; si c'était la photo affichée, le diaporama passe à la plus récente (R-CAD-29).
+15. R-CAD-66 · L'ordre choisi est retenu sur l'appareil, comme la vitesse (R-CAD-62, R-CAD-63). Le bandeau de vignettes suit l'ordre de lecture.
+16. R-CAD-30 · La légende montre la date d'ajout ou de réception (« 24 novembre 2026 »), sans l'heure.
 
 **Messages affichés**
 
 | Situation                                  | Message                                                                                                                      |
 | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
 | Légende d'une photo                        | « [date] » et, pour une photo reçue, « Envoyée par [nom] »                                                                   |
+| Choix de l'ordre                           | « Lecture » : « Dans l'ordre », « Aléatoire »                                                                                |
 | Choix de vitesse                           | « Vitesse » : « 5 s », « 10 s », « 20 s »                                                                                    |
 | Noms des boutons (survol, lecture d'écran) | « Quitter le mode cadre », « Plein écran », « Photo précédente », « Lecture automatique », « Photo suivante », « Vignettes » |
 
 **Ce qui n'est pas possible**
 
 - Choisir une autre vitesse que 5, 10 ou 20 secondes.
-- Lire les photos dans un ordre aléatoire : prévu, voir [a-venir.md](a-venir.md).
 - Choisir un modèle d'affichage (passe-partout, polaroïd…) : prévu, voir [a-venir.md](a-venir.md).
 - Retrouver ses réglages sur un autre appareil ou dans un autre navigateur : chaque appareil garde les siens.
 
