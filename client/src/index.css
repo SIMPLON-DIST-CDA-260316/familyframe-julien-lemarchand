@@ -27,6 +27,7 @@
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(1 0 0);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
@@ -53,6 +54,8 @@
   --on-overlay-muted: oklch(1 0 0 / 80%);
   /* Where a caption's gradient starts, at the photo's edge. */
   --scrim: oklch(0 0 0 / 70%);
+  /* Behind every dialog and sheet: enough to set the window apart, with or without a blur. */
+  --backdrop: oklch(0 0 0 / 30%);
 }
 
 @theme inline {
@@ -75,10 +78,12 @@
   --color-on-overlay: var(--on-overlay);
   --color-on-overlay-muted: var(--on-overlay-muted);
   --color-scrim: var(--scrim);
+  --color-backdrop: var(--backdrop);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -153,6 +158,7 @@
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(1 0 0);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);

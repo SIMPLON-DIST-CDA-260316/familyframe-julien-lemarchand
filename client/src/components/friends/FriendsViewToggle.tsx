@@ -52,7 +52,7 @@ export function FriendsViewToggle({
         En attente{' '}
         <Count
           value={pendingCount}
-          className={cn(incomingCount > 0 && 'bg-destructive text-white')}
+          className={cn(incomingCount > 0 && 'bg-destructive text-destructive-foreground')}
         />
       </ToggleGroupItem>
     </ToggleGroup>
