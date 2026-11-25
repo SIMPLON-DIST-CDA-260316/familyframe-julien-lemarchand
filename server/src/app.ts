@@ -32,6 +32,10 @@ import { createPhotosController } from './features/photos/photos.controller.js'
 import { createPhotosRepository } from './features/photos/photos.repository.js'
 import { createPhotosRouter } from './features/photos/photos.routes.js'
 import { createPhotosService, type PhotosServiceDeps } from './features/photos/photos.service.js'
+import { createSelectionsController } from './features/selections/selections.controller.js'
+import { createSelectionsRepository } from './features/selections/selections.repository.js'
+import { createSelectionsRouter } from './features/selections/selections.routes.js'
+import { createSelectionsService } from './features/selections/selections.service.js'
 import { avatarUrl, deleteImage, uploadAvatar, uploadImage } from './lib/cloudinary.js'
 import { prisma } from './lib/db.js'
 import { toAvatarJpeg, toFrameJpeg } from './lib/image.js'
@@ -75,6 +79,14 @@ function assembleCollectionsRouter(io: SocketServer): Router {
     logger,
   })
   return createCollectionsRouter(createCollectionsController(service, io))
+}
+
+function assembleSelectionsRouter(): Router {
+  const service = createSelectionsService({
+    repository: createSelectionsRepository(prisma),
+    now: () => new Date(),
+  })
+  return createSelectionsRouter(createSelectionsController(service))
 }
 
 function assembleFriendshipsService(): FriendshipsService {
@@ -143,6 +155,7 @@ export function createApp(io: SocketServer, authService: AuthService): Express {
   app.use('/api/friendships', requireAuth, assembleFriendshipsRouter(friendships))
   app.use('/api/account', requireAuth, assembleAccountRouter())
   app.use('/api/collections', requireAuth, assembleCollectionsRouter(io))
+  app.use('/api/selections', requireAuth, assembleSelectionsRouter())
 
   app.use(notFound)
   app.use(errorHandler)

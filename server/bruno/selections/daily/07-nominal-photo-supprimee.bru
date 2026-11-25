@@ -1,0 +1,40 @@
+meta {
+  name: Nominal - une photo supprimée quitte le lot
+  type: http
+  seq: 7
+}
+
+delete {
+  url: {{baseUrl}}/api/photos/{{dailyPhotoId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('dailyPhotoId') || !bru.getVar('dailySecondPhotoId')) {
+    throw new Error('dailyPhotoId ou dailySecondPhotoId absent : lancer tout le dossier, daily/02 et 03 doivent passer')
+  }
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 204
+}
+
+script:post-response {
+  const axios = require('axios')
+  const baseUrl = bru.getEnvVar('baseUrl')
+  const headers = { Cookie: bru.getVar('inviteeCookie') }
+  test('le lot ne garde que la photo restante', async () => {
+    const lot = await axios.get(`${baseUrl}/api/selections/daily`, { headers })
+    expect(lot.data.photoIds).to.eql([bru.getVar('dailySecondPhotoId')])
+  })
+  // The second photo was only for this folder: deleted, its image leaves Cloudinary.
+  await axios.delete(`${baseUrl}/api/photos/${bru.getVar('dailySecondPhotoId')}`, { headers })
+}
+
+docs {
+  NOMINAL → 204 : le compte jetable supprime la photo de `02`. Le script
+  relit le lot : seule la photo de `03` y reste. Il supprime ensuite cette
+  seconde photo : le dossier ne laisse rien.
+}

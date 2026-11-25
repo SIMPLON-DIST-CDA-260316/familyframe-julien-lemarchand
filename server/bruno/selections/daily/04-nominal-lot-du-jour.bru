@@ -1,0 +1,45 @@
+meta {
+  name: Nominal - les photos du jour complètent le lot
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/selections/daily
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('dailyPhotoId') || !bru.getVar('dailySecondPhotoId')) {
+    throw new Error('dailyPhotoId ou dailySecondPhotoId absent : lancer tout le dossier, daily/02 et 03 doivent passer')
+  }
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 200
+  res.body.photoIds.length: eq 2
+}
+
+script:post-response {
+  const axios = require('axios')
+  test('le lot contient les deux photos du compte', () => {
+    expect(res.body.photoIds).to.have.members([
+      bru.getVar('dailyPhotoId'),
+      bru.getVar('dailySecondPhotoId'),
+    ])
+  })
+  test('une seconde demande donne le même lot', async () => {
+    const again = await axios.get(`${bru.getEnvVar('baseUrl')}/api/selections/daily`, {
+      headers: { Cookie: bru.getVar('inviteeCookie') },
+    })
+    expect(again.data.photoIds).to.eql(res.body.photoIds)
+  })
+}
+
+docs {
+  NOMINAL → 200 avec les deux photos : arrivées aujourd'hui, elles
+  complètent un lot qui a de la place (moins de 20 photos plus anciennes).
+  Le script redemande le lot : le même, dans le même ordre.
+}

@@ -118,6 +118,9 @@ export type Collection = {
 // Sorted by name: the order of every menu that lists them.
 export type CollectionList = { collections: Collection[] }
 
+// A selection names its photos by id: the frame finds them in the library it already holds.
+export type Selection = { photoIds: string[] }
+
 // photo:new is a photo one added oneself, photo:received one a friend sent, still unopened;
 // photo:opened is a received photo that just joined the library.
 export type ServerToClientEvents = {
