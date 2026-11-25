@@ -1,6 +1,6 @@
 import type { JSX, ReactNode } from 'react'
+import { BottomDrawer } from '@/components/panel/BottomDrawer.tsx'
 import { Dialog, DialogContent } from '@/components/ui/dialog.tsx'
-import { Sheet, SheetContent } from '@/components/ui/sheet.tsx'
 import { useMediaQuery } from '@/hooks/useMediaQuery.ts'
 import { cn } from '@/lib/utils.ts'
 
@@ -38,21 +38,17 @@ function PhoneSheet({
   children,
 }: ResponsivePanelProps): JSX.Element {
   return (
-    <Sheet open onOpenChange={onClose}>
-      <SheetContent
-        side="bottom"
-        // bg-popover matches the ring offset of the friend avatars, as in the dialog.
-        className={cn(
-          'max-h-[90svh] rounded-t-2xl bg-popover px-4 pt-4 pb-[calc(1.5rem_+_env(safe-area-inset-bottom))] text-popover-foreground',
-          className,
-        )}
-        onCloseAutoFocus={onCloseAutoFocus}
-        // Focusing a text field would raise the keyboard over the panel.
-        onOpenAutoFocus={(event) => event.preventDefault()}
-      >
-        {children}
-      </SheetContent>
-    </Sheet>
+    <BottomDrawer
+      onClose={onClose}
+      onCloseAutoFocus={onCloseAutoFocus}
+      // bg-popover matches the ring offset of the friend avatars, as in the dialog.
+      className={cn(
+        'max-h-[90svh] bg-popover pb-[calc(1.5rem_+_env(safe-area-inset-bottom))] text-popover-foreground',
+        className,
+      )}
+    >
+      {children}
+    </BottomDrawer>
   )
 }
 
