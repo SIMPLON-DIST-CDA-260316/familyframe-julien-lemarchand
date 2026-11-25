@@ -161,17 +161,20 @@ Aucun message.
 
 - Voir, dès l'ouverture d'une page, la forme de ce qui va s'afficher.
 - Savoir que l'appareil n'a plus de réseau.
+- Relancer un chargement qui a échoué, avec « Réessayer ».
 
 **Règles**
 
 1. R-APP-69 · Pendant qu'une page charge son contenu (la bibliothèque, une photo ouverte en grand, la page « Amis », la liste des invitations), des formes grises qui pulsent doucement tiennent la place des vignettes, des lignes ou de la photo attendues, dans la disposition choisie (miniatures ou liste). Le contenu les remplace sans que la page saute. Si l'appareil demande de réduire les animations, elles ne pulsent pas. Les lecteurs d'écran annoncent « Chargement… ». Le cadre garde son propre écran (« Chargement des photos… », voir [cadre.md](cadre.md)).
 2. R-APP-70 · Quand l'appareil perd le réseau, un bandeau s'affiche sous la barre du haut, et y reste pendant le défilement, jusqu'au retour du réseau. Il n'apparaît pas sur le cadre, qui gère lui-même la coupure (voir [cadre.md](cadre.md#coupure-de-réseau)), ni sur une photo ouverte en grand.
+3. R-APP-71 · Quand le premier chargement de la bibliothèque (ou d'une collection), de la page « Amis » ou de la liste des invitations échoue, la page le dit et propose « Réessayer », qui relance ce chargement. Les photos plus anciennes qui ne se chargent pas se redemandent avec « Charger plus », toujours affiché.
 
 **Messages affichés**
 
 | Situation                    | Message                                                                  |
 | ---------------------------- | ------------------------------------------------------------------------ |
 | Chargement (lecture d'écran) | « Chargement… »                                                          |
+| Chargement impossible        | Le message propre à la page, et le bouton « Réessayer »                  |
 | Plus de réseau               | « Pas de connexion. Les photos se mettront à jour au retour du réseau. » |
 
 **Ce qui n'est pas possible**

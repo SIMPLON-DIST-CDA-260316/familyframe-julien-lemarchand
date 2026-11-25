@@ -51,7 +51,12 @@ export default function AdminInvitationsPage(): JSX.Element {
           <CardTitle>Invitations envoyées</CardTitle>
         </CardHeader>
         <CardContent>
-          <InvitationList invitations={invitations} isLoading={isLoading} error={error} />
+          <InvitationList
+            invitations={invitations}
+            isLoading={isLoading}
+            error={error}
+            onRetry={reload}
+          />
         </CardContent>
       </Card>
     </main>

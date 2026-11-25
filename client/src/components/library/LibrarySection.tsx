@@ -1,6 +1,7 @@
 import type { JSX } from 'react'
 import { PhotoGrid } from '@/components/frame/PhotoGrid.tsx'
 import { PhotoList } from '@/components/frame/PhotoList.tsx'
+import { LoadFailed } from '@/components/library/LibraryNotices.tsx'
 import { LibrarySkeleton } from '@/components/library/LibrarySkeleton.tsx'
 import {
   PendingAnnouncement,
@@ -46,6 +47,13 @@ function libraryDays(library: PhotoLibrary, pending: PendingUpload[]): LibraryDa
   return { days: pending.length > 0 ? withToday(days, now) : days, today: dayKey(now) }
 }
 
+type FirstPageWaitProps = Pick<LibrarySectionProps, 'library' | 'layout'>
+
+function FirstPageWait({ library, layout }: FirstPageWaitProps): JSX.Element {
+  if (library.hasLoadFailed) return <LoadFailed onRetry={library.retry} />
+  return <LibrarySkeleton layout={layout} />
+}
+
 function LibraryPhotos({
   library,
   layout,
@@ -53,7 +61,7 @@ function LibraryPhotos({
   onOpenPhoto,
   emptyState,
 }: LibrarySectionProps): JSX.Element {
-  if (!library.isFirstPageLoaded) return <LibrarySkeleton layout={layout} />
+  if (!library.isFirstPageLoaded) return <FirstPageWait library={library} layout={layout} />
   if (library.photos.length === 0 && pending.length === 0) return emptyState
   const { days, today } = libraryDays(library, pending)
   // Newest first, like the photos: the upload in progress sits right above the photos, where

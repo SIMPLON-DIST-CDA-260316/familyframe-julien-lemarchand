@@ -1,5 +1,6 @@
 import { UserPlusIcon } from 'lucide-react'
 import type { JSX } from 'react'
+import { RetryButton } from '@/components/feedback/RetryButton.tsx'
 import { AddFriendDialog } from '@/components/friends/AddFriendDialog.tsx'
 import { FriendshipSection } from '@/components/friends/FriendshipSection.tsx'
 import { FriendsSkeleton } from '@/components/friends/FriendsSkeleton.tsx'
@@ -162,6 +163,8 @@ export default function FriendsPage(): JSX.Element {
     <main className="mx-auto flex max-w-2xl flex-col gap-8 px-4 py-10">
       <PageHeader onAddFriend={openDialog} />
       <Notices error={error || page.actions.error} notice={page.notice} />
+      {/* Only for the list's own load: a failed action keeps its message and the list. */}
+      {error && <RetryButton onRetry={reload} />}
       {isLoading && <FriendsSkeleton />}
       {!isLoading && !error && (
         <FriendshipViews

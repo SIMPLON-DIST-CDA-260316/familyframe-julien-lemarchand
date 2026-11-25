@@ -1,6 +1,7 @@
 import { ImagePlusIcon } from 'lucide-react'
 import type { JSX } from 'react'
 import { Link } from 'react-router'
+import { RetryButton } from '@/components/feedback/RetryButton.tsx'
 import { Button } from '@/components/ui/button.tsx'
 
 const NOTICE_CLASSES = 'flex flex-col items-center gap-4 px-6 py-16 text-center'
@@ -33,6 +34,17 @@ export function EmptyCollection({ onAdd }: AddProps): JSX.Element {
         Ajoutez-y une photo, ou rangez-y celles de « Toutes » depuis leur menu « … ».
       </p>
       <AddPhotoButton onAdd={onAdd} />
+    </div>
+  )
+}
+
+// The first load failed (a server error, a network that looked online): the page has nothing
+// to show but this way to try again.
+export function LoadFailed({ onRetry }: { onRetry: () => void }): JSX.Element {
+  return (
+    <div className={NOTICE_CLASSES}>
+      <p className="text-muted-foreground">Les photos n'ont pas pu être chargées.</p>
+      <RetryButton onRetry={onRetry} />
     </div>
   )
 }

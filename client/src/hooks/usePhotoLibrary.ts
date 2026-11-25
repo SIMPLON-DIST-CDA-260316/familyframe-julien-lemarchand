@@ -23,6 +23,9 @@ export type PhotoLibrary = {
   isLoadingMore: boolean
   // false until the first page arrives: an empty list then means an empty library.
   isFirstPageLoaded: boolean
+  // true once the first load failed: the page offers « Réessayer », which calls retry.
+  hasLoadFailed: boolean
+  retry: () => void
   loadMore: () => Promise<void>
   addPhoto: (photo: Photo) => void
 }
@@ -41,6 +44,7 @@ type LibrarySetters = {
 
 type FirstPageSetters = LibrarySetters & {
   setIsFirstPageLoaded: Dispatch<SetStateAction<boolean>>
+  setHasLoadFailed: Dispatch<SetStateAction<boolean>>
 }
 
 type MoreSetters = LibrarySetters & {
@@ -53,6 +57,7 @@ type LibraryStore = FirstPageSetters &
     nextPage: NextPage | null
     isLoadingMore: boolean
     isFirstPageLoaded: boolean
+    hasLoadFailed: boolean
   }
 
 function toNextPage(
@@ -67,7 +72,7 @@ function toNextPage(
 // for as many photos as were loaded: the viewer's photo, pages deep, stays in the list.
 function createFirstPageLoader(
   liveLoads: LiveLoads,
-  { setPhotos, setNextPage, setIsFirstPageLoaded }: FirstPageSetters,
+  { setPhotos, setNextPage, setIsFirstPageLoaded, setHasLoadFailed }: FirstPageSetters,
   readLoadCount: () => number,
   collectionId: CollectionFilter,
   dropUser: () => void,
@@ -77,7 +82,10 @@ function createFirstPageLoader(
     const page = await fetchNewestPhotos(readLoadCount(), collectionId ?? undefined, () => {
       if (liveLoads.isCurrent(loadId)) dropUser()
     })
-    if (page === null || !liveLoads.isCurrent(loadId)) return
+    if (!liveLoads.isCurrent(loadId)) return
+    // A failed reload keeps the photos shown: only a first load that fails has nothing to show.
+    setHasLoadFailed(page === null)
+    if (page === null) return
     setPhotos(liveLoads.withLiveChanges(page.photos))
     setNextPage(toNextPage(page.nextCursor, loadId, collectionId))
     setIsFirstPageLoaded(true)
@@ -205,16 +213,20 @@ function useLoadCountReader(photos: Photo[]): () => number {
   return useCallback(() => Math.max(loadedCount.current, FIRST_LOAD_COUNT), [])
 }
 
-// Another collection reconnects: its first load asks for its own photos.
+// Another collection reconnects: its first load asks for its own photos. So does a retry: each
+// one bumps retryCount, and the new connection loads again, as a reconnection would.
 function useLibraryConnection(
   liveLoads: LiveLoads,
-  { photos, setPhotos, setNextPage, setIsFirstPageLoaded }: LibraryStore,
+  store: LibraryStore,
   collectionId: CollectionFilter,
   dropUser: () => void,
+  retryCount: number,
 ): void {
+  const { photos, setPhotos, setNextPage, setIsFirstPageLoaded, setHasLoadFailed } = store
   const readLoadCount = useLoadCountReader(photos)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: retryCount is only there to reconnect.
   useEffect(() => {
-    const setters = { setPhotos, setNextPage, setIsFirstPageLoaded }
+    const setters = { setPhotos, setNextPage, setIsFirstPageLoaded, setHasLoadFailed }
     return connectLibrary(liveLoads, setters, readLoadCount, collectionId, dropUser)
   }, [
     liveLoads,
@@ -222,8 +234,10 @@ function useLibraryConnection(
     setPhotos,
     setNextPage,
     setIsFirstPageLoaded,
+    setHasLoadFailed,
     collectionId,
     dropUser,
+    retryCount,
   ])
 }
 
@@ -234,6 +248,7 @@ function useLibraryStore(collectionId: CollectionFilter): LibraryStore {
   const [nextPage, setNextPage] = useState<NextPage | null>(null)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [isFirstPageLoaded, setIsFirstPageLoaded] = useState(false)
+  const [hasLoadFailed, setHasLoadFailed] = useState(false)
   const [shownCollectionId, setShownCollectionId] = useState(collectionId)
   if (shownCollectionId !== collectionId) {
     setShownCollectionId(collectionId)
@@ -241,9 +256,11 @@ function useLibraryStore(collectionId: CollectionFilter): LibraryStore {
     setNextPage(null)
     setIsLoadingMore(false)
     setIsFirstPageLoaded(false)
+    setHasLoadFailed(false)
   }
-  const state = { photos, nextPage, isLoadingMore, isFirstPageLoaded }
-  return { ...state, setPhotos, setNextPage, setIsLoadingMore, setIsFirstPageLoaded }
+  const state = { photos, nextPage, isLoadingMore, isFirstPageLoaded, hasLoadFailed }
+  const setters = { setPhotos, setNextPage, setIsLoadingMore, setIsFirstPageLoaded }
+  return { ...state, ...setters, setHasLoadFailed }
 }
 
 export function usePhotoLibrary(collectionId: CollectionFilter): PhotoLibrary {
@@ -251,7 +268,8 @@ export function usePhotoLibrary(collectionId: CollectionFilter): PhotoLibrary {
   // useState keeps one instance across renders: its load bookkeeping must survive them.
   const [liveLoads] = useState(createLiveLoads)
   const store = useLibraryStore(collectionId)
-  useLibraryConnection(liveLoads, store, collectionId, dropUser)
+  const [retryCount, setRetryCount] = useState(0)
+  useLibraryConnection(liveLoads, store, collectionId, dropUser, retryCount)
   const loadMore = useMoreLoader(liveLoads, store.nextPage, store, dropUser)
   const addPhoto = usePhotoAdder(liveLoads, store.setPhotos, collectionId)
   return {
@@ -259,6 +277,11 @@ export function usePhotoLibrary(collectionId: CollectionFilter): PhotoLibrary {
     hasMore: store.nextPage !== null,
     isLoadingMore: store.isLoadingMore,
     isFirstPageLoaded: store.isFirstPageLoaded,
+    hasLoadFailed: store.hasLoadFailed,
+    retry: () => {
+      store.setHasLoadFailed(false)
+      setRetryCount((count) => count + 1)
+    },
     loadMore,
     addPhoto,
   }
