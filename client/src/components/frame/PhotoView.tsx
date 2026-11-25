@@ -39,7 +39,7 @@ function BottomOverlay({ captionPhoto, children }: BottomOverlayProps): JSX.Elem
       {/* The shade is there for the controls: at rest it fades out with them (FramePage sets data-idle). */}
       <div
         aria-hidden
-        className="absolute inset-0 -z-10 bg-linear-to-t from-black/75 via-black/30 to-transparent transition-opacity duration-500 motion-reduce:transition-none group-data-[idle=true]/frame:opacity-0"
+        className="absolute inset-0 -z-10 bg-linear-to-t from-scrim to-transparent transition-opacity duration-500 motion-reduce:transition-none group-data-[idle=true]/frame:opacity-0"
       />
       {captionPhoto && <PhotoCaption key={captionPhoto.id} photo={captionPhoto} />}
       {/* The bottom bar sits on top of this box: just above the strip when it is open. */}

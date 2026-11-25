@@ -83,14 +83,14 @@ export function ViewerTopBar({
       data-viewer-controls
       inert={!isVisible}
       className={cn(
-        'pointer-events-none absolute inset-x-0 top-0 flex items-center gap-2 bg-linear-to-b from-black/60 to-transparent pt-[max(0.75rem,env(safe-area-inset-top))] pr-[max(1rem,env(safe-area-inset-right))] pb-3 pl-[max(1rem,env(safe-area-inset-left))]',
+        'pointer-events-none absolute inset-x-0 top-0 flex items-center gap-2 bg-linear-to-b from-scrim to-transparent pt-[max(0.75rem,env(safe-area-inset-top))] pr-[max(1rem,env(safe-area-inset-right))] pb-3 pl-[max(1rem,env(safe-area-inset-left))]',
         isVisible && '*:pointer-events-auto',
         chromeClasses(isVisible),
       )}
     >
       <CloseViewerButton onClose={onClose} />
       {/* Announced by PhotoViewer instead: the hidden bar is inert, out of screen readers' reach. */}
-      <p aria-hidden className="mx-auto text-sm text-white/80 tabular-nums">
+      <p aria-hidden className="mx-auto text-sm text-on-overlay-muted tabular-nums">
         {counter}
       </p>
       <InfoButton isInfoOpen={isInfoOpen} onToggleInfo={onToggleInfo} />

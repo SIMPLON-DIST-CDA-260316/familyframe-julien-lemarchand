@@ -17,7 +17,7 @@ const IMAGE_CLASSES =
 // invisible `after` 8 px wider on each side gives the finger its 44 px. z-10: stays above its own
 // tile when that tile is focused.
 const ELLIPSIS_CLASSES =
-  'absolute top-2 right-2 z-10 rounded-full bg-black/55 text-white/80 backdrop-blur-sm hover:bg-black/75 hover:text-white aria-expanded:bg-black/75 aria-expanded:text-white dark:hover:bg-black/75 pointer-coarse:top-1 pointer-coarse:right-1 pointer-coarse:size-7 pointer-coarse:after:absolute pointer-coarse:after:-inset-2'
+  'absolute top-2 right-2 z-10 rounded-full bg-overlay text-on-overlay-muted backdrop-blur-sm hover:bg-overlay-strong hover:text-on-overlay aria-expanded:bg-overlay-strong aria-expanded:text-on-overlay dark:hover:bg-overlay-strong pointer-coarse:top-1 pointer-coarse:right-1 pointer-coarse:size-7 pointer-coarse:after:absolute pointer-coarse:after:-inset-2'
 
 type PhotoGridTileProps = {
   photo: Photo

@@ -16,7 +16,7 @@ type PendingProps = { upload: PendingUpload }
 type BarTone = 'onPhoto' | 'onPage'
 
 const BAR_CLASSES: Record<BarTone, { track: string; fill: string }> = {
-  onPhoto: { track: 'bg-white/25', fill: 'bg-frame-accent' },
+  onPhoto: { track: 'bg-overlay-selected', fill: 'bg-frame-accent' },
   onPage: { track: 'bg-foreground/15', fill: 'bg-primary' },
 }
 
@@ -28,7 +28,7 @@ const GRID_TILE_CLASSES = 'relative aspect-square overflow-hidden rounded-sm bg-
 // The same dark pill as the tiles' « … »: readable over any photo, in either theme. Tighter on a
 // phone, where three columns leave each tile about 100 px.
 const GRID_PILL_CLASSES =
-  'absolute inset-x-1 bottom-1 flex flex-col gap-1 rounded-md bg-black/55 px-1.5 py-1 text-xs font-medium text-white backdrop-blur-sm sm:inset-x-2 sm:bottom-2 sm:gap-1.5 sm:rounded-lg sm:px-2.5 sm:py-2 sm:text-sm'
+  'absolute inset-x-1 bottom-1 flex flex-col gap-1 rounded-md bg-overlay px-1.5 py-1 text-xs font-medium text-on-overlay backdrop-blur-sm sm:inset-x-2 sm:bottom-2 sm:gap-1.5 sm:rounded-lg sm:px-2.5 sm:py-2 sm:text-sm'
 
 // Not a live region itself: one announcement per photo is enough, not one per percent. No value
 // while waiting: an indeterminate bar, not « 0 % » under « En attente ».

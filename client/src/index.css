@@ -37,6 +37,16 @@
   /* Warm off-whites: a cardboard mat, and the glossier white of a print. */
   --frame-mat: oklch(0.94 0.014 85);
   --frame-print: oklch(0.98 0.006 85);
+  /* The chrome drawn over a photo: dark and neutral whatever the theme, since it sits on the photo, not on the page. */
+  --overlay: oklch(0 0 0 / 55%);
+  --overlay-strong: oklch(0 0 0 / 75%);
+  --overlay-hover: oklch(1 0 0 / 10%);
+  --overlay-selected: oklch(1 0 0 / 20%);
+  --overlay-border: oklch(1 0 0 / 15%);
+  --on-overlay: oklch(1 0 0);
+  --on-overlay-muted: oklch(1 0 0 / 80%);
+  /* Where a caption's gradient starts, at the photo's edge. */
+  --scrim: oklch(0 0 0 / 70%);
 }
 
 @theme inline {
@@ -46,6 +56,14 @@
   --color-frame-accent: var(--frame-accent);
   --color-frame-mat: var(--frame-mat);
   --color-frame-print: var(--frame-print);
+  --color-overlay: var(--overlay);
+  --color-overlay-strong: var(--overlay-strong);
+  --color-overlay-hover: var(--overlay-hover);
+  --color-overlay-selected: var(--overlay-selected);
+  --color-overlay-border: var(--overlay-border);
+  --color-on-overlay: var(--on-overlay);
+  --color-on-overlay-muted: var(--on-overlay-muted);
+  --color-scrim: var(--scrim);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);

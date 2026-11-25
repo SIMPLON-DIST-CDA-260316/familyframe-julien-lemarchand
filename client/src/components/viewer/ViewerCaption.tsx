@@ -16,7 +16,7 @@ export function ViewerCaption({ photo, isVisible }: ViewerCaptionProps): JSX.Ele
     // nothing to focus.
     <div
       className={cn(
-        'pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-black/70 to-transparent pt-16 pr-[max(1.5rem,env(safe-area-inset-right))] pb-[calc(1.5rem_+_env(safe-area-inset-bottom))] pl-[max(1.5rem,env(safe-area-inset-left))] text-white',
+        'pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-scrim to-transparent pt-16 pr-[max(1.5rem,env(safe-area-inset-right))] pb-[calc(1.5rem_+_env(safe-area-inset-bottom))] pl-[max(1.5rem,env(safe-area-inset-left))] text-on-overlay',
         chromeClasses(isVisible),
       )}
     >
@@ -24,7 +24,9 @@ export function ViewerCaption({ photo, isVisible }: ViewerCaptionProps): JSX.Ele
         <time dateTime={photo.createdAt}>{formatPhotoDay(photo.createdAt)}</time>
       </p>
       {photo.senderName !== null && (
-        <p className="text-sm text-white/80 drop-shadow-md">Envoyée par {photo.senderName}</p>
+        <p className="text-sm text-on-overlay-muted drop-shadow-md">
+          Envoyée par {photo.senderName}
+        </p>
       )}
       {photo.message !== null && (
         <p className="mt-2 text-base break-words whitespace-pre-line drop-shadow-md">
