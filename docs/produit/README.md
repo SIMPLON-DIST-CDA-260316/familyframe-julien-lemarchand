@@ -1,6 +1,6 @@
 # FamilyFrame : description du produit
 
-FamilyFrame est un cadre photo connecté pour les familles éloignées. Chaque membre de la famille a un compte, une bibliothèque de photos et un cadre : un écran (tablette, vieil ordinateur, télévision) qui fait défiler ses photos. Les membres deviennent amis entre eux et s'envoient des photos : une photo envoyée apparaît aussitôt sur le cadre de l'ami, sans que personne ait à recharger la page.
+FamilyFrame est un cadre photo connecté pour les familles éloignées. Chaque membre de la famille a un compte, une bibliothèque de photos et un cadre : un écran (tablette, vieil ordinateur, télévision) qui fait défiler ses photos. Les membres deviennent amis entre eux et s'envoient des photos : une photo envoyée est annoncée sur le cadre et dans la bibliothèque de l'ami, qui la découvre quand bon lui semble, sans que personne ait à recharger la page.
 
 Cette documentation décrit ce que l'application permet de faire et selon quelles règles. Elle ne parle pas de la manière dont c'est construit.
 

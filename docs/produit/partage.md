@@ -101,6 +101,7 @@ Ceux du panneau d'envoi (voir [Choisir à qui envoyer](#choisir-à-qui-envoyer))
 
 - Voir l'annonce « Vous avez N nouvelles photos » en haut de sa bibliothèque dès qu'une photo arrive, sans recharger.
 - Toucher « Découvrir » pour voir les photos reçues une à une, en grand, avec leur expéditeur, leur date et leur message.
+- Voir la même annonce en haut de son cadre et lancer de là la même découverte.
 - Une fois découverte, la garder, la supprimer ou l'envoyer à son tour à ses propres amis, comme n'importe quelle photo de sa bibliothèque.
 
 **Règles**
