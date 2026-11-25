@@ -15,7 +15,7 @@ Une collection est une liste de photos de sa bibliothèque, rangées sous un nom
 1. R-COL-01 · Un nom fait de 1 à 50 caractères ; les espaces au début et à la fin ne comptent pas.
 2. R-COL-02 · Deux collections d'un même compte ne portent pas le même nom. Les majuscules et les accents comptent : « noël » et « Noël » sont deux noms différents. Renommer une collection sous le nom qu'elle porte déjà est permis.
 3. R-COL-03 · Les collections sont classées par ordre alphabétique (« Été » avant « Noël »).
-4. R-COL-04 · Une collection créée depuis « Nouvelle collection », au bout de la rangée des collections, est vide et s'affiche aussitôt ; créée depuis le menu « … » d'une photo, elle contient cette photo.
+4. R-COL-04 · Une collection créée depuis « Nouvelle collection », au bout de la rangée des collections, est vide et s'affiche aussitôt ; créée depuis le menu « … » d'une photo, elle contient aussitôt cette photo, sauf si la photo a été supprimée entre-temps : la collection reste alors vide, et un message dit pourquoi.
 5. R-COL-05 · Supprimer une collection demande une confirmation ; « Annuler » ferme la fenêtre sans rien changer. Ses photos restent dans la bibliothèque ; un cadre qui la lisait repasse à toute la bibliothèque (R-CAD-81). Supprimer la collection affichée ramène à « Toutes ».
 6. R-COL-06 · Une collection créée, renommée ou supprimée l'est aussitôt sur tous les appareils connectés au compte, sans recharger la page.
 7. R-COL-07 · Les collections sont privées : personne d'autre ne les voit, pas même les amis.
