@@ -4,8 +4,8 @@ status: done
 spec: docs/superpowers/specs/2026-11-25-library-timeline-design.md
 branch: feat/library-timeline
 worktree: false
-tasks_total: 5
-tasks_done: 5
+tasks_total: 6
+tasks_done: 6
 current_task: null
 last_commit: null
 last_updated: 2026-11-25
@@ -39,8 +39,8 @@ last_updated: 2026-11-25
 - `collections.repository.ts`: `LivePhoto = { id, cloudinaryId, createdAt }`, `findLivePhotos(ownerId, ids)`.
 - `collections.service.ts`: `photoSpan(photos, thumbnailUrl)`; deps gain `thumbnailUrl`.
 - `lib/cloudinary.ts`: `thumbnailUrl(cloudinaryId)`.
-- `client/src/photoDays.ts`: `PhotoDay = { key, label, photos }`, `groupByDay(photos, now)`, `withToday(days, now)`.
-- Components: `DateGroup({ day, children })`, `PhotoGrid({ days, currentId, onSelect, children })`, `PhotoList({ days, currentId, onSelect, children })`, `CollectionsRow({ selectedId, allCardRef })`, `CollectionCard`, `CardText`, `CollectionTitle({ collection, fallbackRef })`, `LibraryTitle({ library, showsCount })`, `LibraryHeader({ title, layout, onLayoutChange, onAdd })`; `collectionSummary(collection)`, `photoCountLabel(count)`.
+- `client/src/photoDays.ts`: `PhotoDay = { key, label, photos }`, `dayKey(date)`, `groupByDay(photos, now)`, `withToday(days, now)`.
+- Components: `DateGroup({ day, children })`, `PhotoGrid({ days, currentId, onSelect, children, childrenDayKey })`, `PhotoList({ days, currentId, onSelect, children, childrenDayKey })`, `CollectionsRow({ selectedId, allCardRef })`, `CollectionCard`, `CardText`, `CollectionTitle({ collection, fallbackRef })`, `LibraryTitle({ library, showsCount })`, `LibraryHeader({ title, layout, onLayoutChange, onAdd })`; `collectionSummary(collection)`, `photoCountLabel(count)`.
 
 ---
 
@@ -1798,6 +1798,418 @@ index 62801d5..4c8b409 100644
          photo={photo}
 ~~~~
 
+### Task 6: Final review fixes
+
+**Commit:** `seven commits, one per Minor finding (M1 to M7)`
+
+**Scope:** M2 days sorted by key; M1 pending tiles in today's day (`childrenDayKey`, `withToday` searching every day); M3 no library count while a collection loads (R-COL-23); M4 focus outline beside the selection ring; M5 ARCHITECTURE.md's collections paragraph; M6 Bruno `list/01` and `photos/14` assert the cover fields; M7 the mobile-first plan's Task 18 branch and Task 17 gate. Spec T13 to T16.
+
+**Gate:** `pnpm check` and `pnpm typecheck` green on each commit; at the tip `pnpm build` green and `pnpm test` → `Test Files  27 passed (27)`, `Tests  312 passed (312)`. Bruno written, not run in the clone.
+
+- [x] **Final diff**
+
+~~~~diff
+diff --git a/client/src/photoDays.ts b/client/src/photoDays.ts
+index 6686824..40a8dcd 100644
+--- a/client/src/photoDays.ts
++++ b/client/src/photoDays.ts
+@@ -17,9 +17,17 @@ const DAY_WITH_YEAR_FORMAT = new Intl.DateTimeFormat('fr-FR', {
+ })
+ 
+ // The device's own calendar day: a photo added at 23:30 belongs to that evening, not to the
+-// next day in UTC.
++// next day in UTC. Zero-padded (2026-01-05), so comparing two keys compares their days.
+ function dayKey(date: Date): string {
+-  return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
++  const month = String(date.getMonth() + 1).padStart(2, '0')
++  const day = String(date.getDate()).padStart(2, '0')
++  return `${date.getFullYear()}-${month}-${day}`
++}
++
++// Newest day first, whatever the photos' order: an old photo opened while older pages are not
++// loaded yet arrives at the end of the list, and its day must still sit in its place.
++function newestDayFirst(days: PhotoDay[]): PhotoDay[] {
++  return days.toSorted((a, b) => (a.key < b.key ? 1 : -1))
+ }
+ 
+ // « Aujourd'hui », « Hier », then « dim. 22 nov. »; the year only when it is not this one.
+@@ -31,8 +39,8 @@ function dayLabel(date: Date, now: Date): string {
+   return format.format(date)
+ }
+ 
+-// One group per day, in the photos' own order (newest first). Keyed by day rather than by
+-// neighbours: a day continued on the next « Charger plus » page still has one header.
++// One group per day, newest day first. Keyed by day rather than by neighbours: a day continued
++// on the next « Charger plus » page still has one header.
+ export function groupByDay(photos: Photo[], now: Date): PhotoDay[] {
+   const days = new Map<string, PhotoDay>()
+   for (const photo of photos) {
+@@ -42,7 +50,7 @@ export function groupByDay(photos: Photo[], now: Date): PhotoDay[] {
+     day.photos.push(photo)
+     days.set(key, day)
+   }
+-  return [...days.values()]
++  return newestDayFirst([...days.values()])
+ }
+ 
+ // Puts an empty « Aujourd'hui » first when today has no photo yet: the uploads on their way
+~~~~
+
+~~~~diff
+diff --git a/client/src/components/frame/PhotoGrid.tsx b/client/src/components/frame/PhotoGrid.tsx
+index 18520cf..eba1aa6 100644
+--- a/client/src/components/frame/PhotoGrid.tsx
++++ b/client/src/components/frame/PhotoGrid.tsx
+@@ -8,8 +8,10 @@ type PhotoGridProps = {
+   // null on the library page: no photo is on screen there.
+   currentId: string | null
+   onSelect: (id: string) => void
+-  // Items placed before the photos: the library's uploads still on their way.
++  // Items placed before the photos of the day keyed childrenDayKey: the library's uploads still
++  // on their way, under today.
+   children?: ReactNode
++  childrenDayKey?: string
+ }
+ 
+ // Edge to edge with the page's header. Three tight columns on a phone, as photo apps do, so a
+@@ -18,14 +20,20 @@ const GRID_CLASSES =
+   'grid grid-cols-3 gap-1 sm:grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] sm:gap-4'
+ 
+ // One grid per day, under its date: a day with two photos leaves the rest of its row empty.
+-// children go first in the first day, « Aujourd'hui », where their photos appear once sent.
+-export function PhotoGrid({ days, currentId, onSelect, children }: PhotoGridProps): JSX.Element {
++// children go first in their day, « Aujourd'hui », where their photos appear once sent.
++export function PhotoGrid({
++  days,
++  currentId,
++  onSelect,
++  children,
++  childrenDayKey,
++}: PhotoGridProps): JSX.Element {
+   return (
+     <div className="flex flex-col gap-6">
+-      {days.map((day, index) => (
++      {days.map((day) => (
+         <DateGroup key={day.key} day={day}>
+           <ul className={GRID_CLASSES}>
+-            {index === 0 && children}
++            {day.key === childrenDayKey && children}
+             {day.photos.map((photo) => (
+               <PhotoGridTile
+                 key={photo.id}
+diff --git a/client/src/components/frame/PhotoList.tsx b/client/src/components/frame/PhotoList.tsx
+index 69e794f..f0333d9 100644
+--- a/client/src/components/frame/PhotoList.tsx
++++ b/client/src/components/frame/PhotoList.tsx
+@@ -8,19 +8,27 @@ type PhotoListProps = {
+   // null on the library page: no photo is on screen there.
+   currentId: string | null
+   onSelect: (id: string) => void
+-  // Items placed before the photos: the library's uploads still on their way.
++  // Items placed before the photos of the day keyed childrenDayKey: the library's uploads still
++  // on their way, under today.
+   children?: ReactNode
++  childrenDayKey?: string
+ }
+ 
+-// The same days as the grid, children first in the first day. The page's full width:
++// The same days as the grid, children first in their day. The page's full width:
+ // thumbnails and « … » line up with the header's edges.
+-export function PhotoList({ days, currentId, onSelect, children }: PhotoListProps): JSX.Element {
++export function PhotoList({
++  days,
++  currentId,
++  onSelect,
++  children,
++  childrenDayKey,
++}: PhotoListProps): JSX.Element {
+   return (
+     <div className="flex flex-col gap-6">
+-      {days.map((day, index) => (
++      {days.map((day) => (
+         <DateGroup key={day.key} day={day}>
+           <ul className="flex flex-col gap-1">
+-            {index === 0 && children}
++            {day.key === childrenDayKey && children}
+             {day.photos.map((photo) => (
+               <PhotoListRow
+                 key={photo.id}
+diff --git a/client/src/components/library/LibrarySection.tsx b/client/src/components/library/LibrarySection.tsx
+index 718f598..169c720 100644
+--- a/client/src/components/library/LibrarySection.tsx
++++ b/client/src/components/library/LibrarySection.tsx
+@@ -9,7 +9,7 @@ import {
+ import { Button } from '@/components/ui/button.tsx'
+ import type { LibraryLayout } from '@/hooks/useLibraryLayout.ts'
+ import type { PhotoLibrary } from '@/hooks/usePhotoLibrary.ts'
+-import { groupByDay, type PhotoDay, withToday } from '@/photoDays.ts'
++import { dayKey, groupByDay, type PhotoDay, withToday } from '@/photoDays.ts'
+ import type { PendingUpload } from '@/upload/uploadQueue.ts'
+ 
+ type LibrarySectionProps = {
+@@ -34,12 +34,15 @@ function LoadMoreButton({ isLoadingMore, loadMore }: LoadMoreButtonProps): JSX.E
+   )
+ }
+ 
++// today: the day the uploads on their way sit in.
++type LibraryDays = { days: PhotoDay[]; today: string }
++
+ // Every loaded page at once: « Charger plus » extends the last day instead of repeating it.
+ // An upload on its way belongs to today, even before today has a photo.
+-function libraryDays(library: PhotoLibrary, pending: PendingUpload[]): PhotoDay[] {
++function libraryDays(library: PhotoLibrary, pending: PendingUpload[]): LibraryDays {
+   const now = new Date()
+   const days = groupByDay(library.photos, now)
+-  return pending.length > 0 ? withToday(days, now) : days
++  return { days: pending.length > 0 ? withToday(days, now) : days, today: dayKey(now) }
+ }
+ 
+ function LibraryPhotos({
+@@ -53,19 +56,19 @@ function LibraryPhotos({
+     return <p className="px-6 py-16 text-center text-muted-foreground">Chargement…</p>
+   }
+   if (library.photos.length === 0 && pending.length === 0) return emptyState
+-  const days = libraryDays(library, pending)
++  const { days, today } = libraryDays(library, pending)
+   // Newest first, like the photos: the upload in progress sits right above the photos, where
+   // its photo appears once sent.
+   const newestFirst = pending.toReversed()
+   // currentId null: no photo is on screen here, so no tile gets the frame's ring.
+   return layout === 'grid' ? (
+-    <PhotoGrid days={days} currentId={null} onSelect={onOpenPhoto}>
++    <PhotoGrid days={days} currentId={null} onSelect={onOpenPhoto} childrenDayKey={today}>
+       {newestFirst.map((upload) => (
+         <PendingGridTile key={upload.id} upload={upload} />
+       ))}
+     </PhotoGrid>
+   ) : (
+-    <PhotoList days={days} currentId={null} onSelect={onOpenPhoto}>
++    <PhotoList days={days} currentId={null} onSelect={onOpenPhoto} childrenDayKey={today}>
+       {newestFirst.map((upload) => (
+         <PendingListRow key={upload.id} upload={upload} />
+       ))}
+diff --git a/client/src/photoDays.ts b/client/src/photoDays.ts
+index 40a8dcd..74bffa2 100644
+--- a/client/src/photoDays.ts
++++ b/client/src/photoDays.ts
+@@ -18,7 +18,7 @@ const DAY_WITH_YEAR_FORMAT = new Intl.DateTimeFormat('fr-FR', {
+ 
+ // The device's own calendar day: a photo added at 23:30 belongs to that evening, not to the
+ // next day in UTC. Zero-padded (2026-01-05), so comparing two keys compares their days.
+-function dayKey(date: Date): string {
++export function dayKey(date: Date): string {
+   const month = String(date.getMonth() + 1).padStart(2, '0')
+   const day = String(date.getDate()).padStart(2, '0')
+   return `${date.getFullYear()}-${month}-${day}`
+@@ -53,10 +53,11 @@ export function groupByDay(photos: Photo[], now: Date): PhotoDay[] {
+   return newestDayFirst([...days.values()])
+ }
+ 
+-// Puts an empty « Aujourd'hui » first when today has no photo yet: the uploads on their way
+-// need a day to sit in.
++// Adds an empty « Aujourd'hui » when today has no photo yet: the uploads on their way need a
++// day to sit in. Searched, not just the first day: with the device's clock behind the server,
++// a photo can be dated tomorrow and come first.
+ export function withToday(days: PhotoDay[], now: Date): PhotoDay[] {
+   const key = dayKey(now)
+-  if (days[0]?.key === key) return days
+-  return [{ key, label: dayLabel(now, now), photos: [] }, ...days]
++  if (days.some((day) => day.key === key)) return days
++  return newestDayFirst([...days, { key, label: dayLabel(now, now), photos: [] }])
+ }
+~~~~
+
+~~~~diff
+diff --git a/client/src/components/library/LibraryHeader.tsx b/client/src/components/library/LibraryHeader.tsx
+index 1a98d5c..505d668 100644
+--- a/client/src/components/library/LibraryHeader.tsx
++++ b/client/src/components/library/LibraryHeader.tsx
+@@ -21,7 +21,7 @@ type LibraryHeaderProps = {
+ 
+ type LibraryTitleProps = {
+   library: PhotoLibrary
+-  // false over a collection that cannot be shown: its photos, if any were loaded, are stale.
++  // Only under « Toutes »: over a collection, the loaded photos are not the library's.
+   showsCount: boolean
+ }
+ 
+diff --git a/client/src/pages/LibraryPage.tsx b/client/src/pages/LibraryPage.tsx
+index 82721be..08c0842 100644
+--- a/client/src/pages/LibraryPage.tsx
++++ b/client/src/pages/LibraryPage.tsx
+@@ -91,11 +91,13 @@ type PageTitleProps = Pick<LibraryContentProps, 'selected' | 'library'> & {
+ }
+ 
+ // A shown collection titles the page with its own name; « Toutes » keeps « Bibliothèque ».
++// The library's count only under « Toutes »: while a collection loads, the photos are its own
++// and « Bibliothèque · 3 photos » would count them as the library's.
+ function PageTitle({ selected, library, allCardRef }: PageTitleProps): JSX.Element {
+   if (selected.status === 'found') {
+     return <CollectionTitle collection={selected.collection} fallbackRef={allCardRef} />
+   }
+-  return <LibraryTitle library={library} showsCount={isShowingPhotos(selected)} />
++  return <LibraryTitle library={library} showsCount={selected.status === 'all'} />
+ }
+ 
+ function LibraryContent(props: LibraryContentProps): JSX.Element {
+diff --git a/docs/produit/collections.md b/docs/produit/collections.md
+index e6786e5..e391973 100644
+--- a/docs/produit/collections.md
++++ b/docs/produit/collections.md
+@@ -93,7 +93,7 @@ Une collection est une liste de photos de sa bibliothèque, rangées sous un nom
+ 6. R-COL-20 · Une collection supprimée sur un autre appareil, ou un lien vers une collection qui n'existe pas affiche « Cette collection n'existe plus. » et propose « Voir toutes les photos ».
+ 7. R-COL-21 · La collection affichée suit les changements sans recharger la page : une photo rangée ou retirée, sur cet appareil ou un autre, y apparaît ou en disparaît. Une photo ajoutée pendant qu'une collection est affichée entre dans la bibliothèque et est rangée dans cette collection ; si le rangement échoue, un message le dit et la photo reste dans la bibliothèque.
+ 8. R-COL-22 · Chaque carte montre une image carrée, puis sous elle le nom et le nombre de photos (« Aucune photo », « 1 photo », « 12 photos »). L'image d'une collection est sa photo la plus récente, quel que soit l'ordre dans lequel les photos y ont été rangées, et change d'elle-même quand une photo plus récente y entre ou que celle-ci en sort ; une collection vide montre un dossier gris. « Toutes » montre une pile de photos, sans nombre, et « Nouvelle collection », au bout, un « + ». Un nom trop long est coupé, mais s'affiche en entier au survol. Sur un téléphone, une carte fait environ 150 px de large, et la troisième est coupée au bord de l'écran ; sur un ordinateur, environ 180 px.
+-9. R-COL-23 · Une collection affichée prend la place de « Bibliothèque » en tête de page : son nom en grand titre, suivi de son menu « … » (« Lire sur le cadre », « Renommer », « Supprimer »), et dessous le nombre de ses photos et les dates de la plus ancienne à la plus récente (« 12 photos · 1 nov. 2022 – 22 nov. 2026 »). Une seule date quand toutes ses photos sont du même jour, aucune quand elle est vide (« Aucune photo »). Avec « Toutes », l'en-tête redevient « Bibliothèque » et le nombre de photos de la bibliothèque.
++9. R-COL-23 · Une collection affichée prend la place de « Bibliothèque » en tête de page : son nom en grand titre, suivi de son menu « … » (« Lire sur le cadre », « Renommer », « Supprimer »), et dessous le nombre de ses photos et les dates de la plus ancienne à la plus récente (« 12 photos · 1 nov. 2022 – 22 nov. 2026 »). Une seule date quand toutes ses photos sont du même jour, aucune quand elle est vide (« Aucune photo »). Avec « Toutes », l'en-tête redevient « Bibliothèque » et le nombre de photos de la bibliothèque. Pendant le court chargement d'une collection, l'en-tête dit « Bibliothèque » sans nombre de photos.
+ 
+ **Messages affichés**
+ 
+~~~~
+
+~~~~diff
+diff --git a/client/src/components/collections/CollectionCard.tsx b/client/src/components/collections/CollectionCard.tsx
+index 2dad2e9..90192df 100644
+--- a/client/src/components/collections/CollectionCard.tsx
++++ b/client/src/components/collections/CollectionCard.tsx
+@@ -7,9 +7,11 @@ import { libraryPath } from '@/viewerHistory.ts'
+ export const CARD_CLASSES =
+   'group flex w-[150px] flex-col gap-1.5 text-left outline-none sm:w-[180px]'
+ 
+-// The cover carries the focus and selection rings; the text under it stays plain.
++// The cover carries the selection ring and, outside it, the focus outline: a focused selected
++// card shows both. The outline uses the text colour, well above 3:1 on the page in either
++// theme (--ring is about 2:1); the row's py-2.5 leaves it room.
+ export const COVER_CLASSES =
+-  'grid aspect-square w-full place-items-center overflow-hidden rounded-xl bg-muted text-muted-foreground ring-offset-2 ring-offset-background transition-opacity group-hover:opacity-90 group-focus-visible:ring-3 group-focus-visible:ring-ring'
++  'grid aspect-square w-full place-items-center overflow-hidden rounded-xl bg-muted text-muted-foreground ring-offset-2 ring-offset-background transition-opacity group-hover:opacity-90 group-focus-visible:outline-2 group-focus-visible:outline-offset-[7px] group-focus-visible:outline-foreground'
+ 
+ type CardTextProps = { label: string; detail: string | null }
+ 
+diff --git a/client/src/components/collections/CollectionsRow.tsx b/client/src/components/collections/CollectionsRow.tsx
+index 107f9b4..d8a6792 100644
+--- a/client/src/components/collections/CollectionsRow.tsx
++++ b/client/src/components/collections/CollectionsRow.tsx
+@@ -92,7 +92,7 @@ export function CollectionsRow({ selectedId, allCardRef }: CollectionsRowProps):
+   return (
+     <nav
+       aria-label="Collections"
+-      className="-mx-4 snap-x snap-mandatory scroll-px-4 overflow-x-auto px-4 py-1.5"
++      className="-mx-4 snap-x snap-mandatory scroll-px-4 overflow-x-auto px-4 py-2.5"
+     >
+       <ul className="flex w-max items-start gap-3">
+         <li className="snap-start">
+~~~~
+
+~~~~diff
+diff --git a/ARCHITECTURE.md b/ARCHITECTURE.md
+index 39e84d9..c06b4b5 100644
+--- a/ARCHITECTURE.md
++++ b/ARCHITECTURE.md
+@@ -220,7 +220,7 @@ Une feature par dossier (`server/src/features/photos/`, `server/src/features/aut
+ - `features/invitations/` suit le même découpage (`invitations.repository.ts`, `invitations.service.ts`, `invitations.controller.ts`, `invitations.routes.ts`). Le service reçoit `repository` (seul endroit qui crée un compte), `generateToken`, `hashToken`, `hashPassword`, `avatarUrl`, `now` et `logger` ; le contrôleur reçoit aussi le service d'auth pour `openSession` ; `app.ts` construit `requireAdmin = requireRole('admin')` une fois et le passe au routeur, derrière `requireAuth`.
+ - `features/friendships/` suit le même découpage (`friendships.repository.ts`, `friendships.service.ts`, `friendships.controller.ts`, `friendships.routes.ts`). Le service reçoit `repository`, `avatarUrl` et `logger` ; le repository calcule `pairKey` et ne lit des comptes que `id`, `email`, `displayName` et `avatarCloudinaryId`. `app.ts` monte le routeur derrière `requireAuth`, comme les photos. Le service expose aussi `areFriends(userId, otherUserId)`, que le service photos reçoit en dépendance : la règle « amis = ligne acceptée » reste ici. `app.ts` construit le service amis une fois (`assembleFriendshipsService`) et le passe aux deux routeurs.
+ - `features/account/` suit le même découpage (`account.repository.ts`, `account.service.ts`, `account.controller.ts`, `account.routes.ts`) : le compte de la personne connectée, jamais un autre (l'id vient de la session, pas de l'URL). Le service reçoit `repository`, `hashPassword`, `verifyPassword`, `toAvatarJpeg`, `uploadAvatar`, `deleteImage`, `avatarUrl` et `logger`. La photo de profil reprend la configuration Multer (`photos.upload.ts`) et `parseFile` (`photos.input.ts`) des photos : mêmes formats, même taille maximale, mêmes codes d'erreur. `app.ts` monte le routeur derrière `requireAuth`.
+-- `features/collections/` suit le même découpage (`collections.repository.ts`, `collections.service.ts`, `collections.controller.ts`, `collections.routes.ts`). Le service reçoit `repository` et `logger`, valide le nom (`parseCollectionName`) et l'id, et trie la liste. Le repository traduit les refus de Prisma en `'not_found'` ou `'name_taken'`, que le service change en code d'erreur ; il lit aussi les photos (`findLivePhotoIds`, les ids encore dans la bibliothèque). Le contrôleur reçoit `io` pour `collections:changed`.
++- `features/collections/` suit le même découpage (`collections.repository.ts`, `collections.service.ts`, `collections.controller.ts`, `collections.routes.ts`). Le service reçoit `repository`, `thumbnailUrl` (`lib/cloudinary.ts`, la vignette carrée qui sert de couverture, reçue en dépendance pour qu'un test unitaire n'ait pas besoin de la configuration Cloudinary) et `logger`, valide le nom (`parseCollectionName`) et l'id, et trie la liste. Le repository traduit les refus de Prisma en `'not_found'` ou `'name_taken'`, que le service change en code d'erreur ; il lit aussi les photos (`findLivePhotos` : celles encore dans la bibliothèque, avec `cloudinaryId` et `createdAt`, d'où `photoSpan` tire la couverture et les dates). Le contrôleur reçoit `io` pour `collections:changed`.
+ - `features/selections/` suit le même découpage (`selections.repository.ts`, `selections.service.ts`, `selections.controller.ts`, `selections.routes.ts`), en lecture seule : ni écriture, ni événement, ni log en plus de `http.request`. Le tirage vit à part, en fonctions pures (`selections.daily.ts`, `selections.radio.ts`). Le service reçoit `repository` et `now`, pour qu'un test choisisse le jour, qui sème les deux tirages. Le repository ne lit des photos que `id`, `createdAt`, `openedAt` et `senderId`, et des collections que `photoIds`.
+ - `features/auth/public-user.ts` construit le `user` renvoyé par l'API (`toPublicUser`, utilisé par les services auth, invitations et compte) : l'URL de la photo de profil vient de `avatarUrl` (`lib/cloudinary.ts`), reçu en dépendance pour qu'un test unitaire n'ait pas besoin de la configuration Cloudinary. Le service amis s'en sert aussi (`toAvatarUrl`) pour l'autre compte d'une amitié.
+ - Les dépendances sont passées par des fonctions-fabriques (`createPhotosService({ repository, toFrameJpeg, uploadImage, deleteImage, areFriends, logger })`), assemblées dans `app.ts` : un test peut fournir de fausses implémentations.
+~~~~
+
+~~~~diff
+diff --git a/server/bruno/collections/list/01-nominal.bru b/server/bruno/collections/list/01-nominal.bru
+index 3f5201a..03b13d3 100644
+--- a/server/bruno/collections/list/01-nominal.bru
++++ b/server/bruno/collections/list/01-nominal.bru
+@@ -36,6 +36,14 @@ script:post-response {
+   test('triées à la française : « Été 2026 » avant « Noël »', () => {
+     expect(res.body.collections.map(({ name }) => name)).to.eql(['Été 2026', 'Noël'])
+   })
++  test('chaque collection a sa couverture et ses dates, texte ou null', () => {
++    for (const collection of res.body.collections) {
++      for (const field of ['coverUrl', 'oldestPhotoAt', 'newestPhotoAt']) {
++        expect(collection).to.have.property(field)
++        expect(collection[field] === null || typeof collection[field] === 'string').to.equal(true)
++      }
++    }
++  })
+   test('le membre ne voit pas les collections du compte jetable', async () => {
+     expect(await namesOf(bru.getVar('sessionCookie'))).to.not.include('Été 2026')
+   })
+@@ -44,5 +52,7 @@ script:post-response {
+ docs {
+   NOMINAL → 200 avec les deux collections de `create/`. Un tri par octets
+   placerait « Été » après « Noël » : le serveur trie comme en français. Le
+-  script vérifie aussi que le membre ne les voit pas.
++  script vérifie aussi que le membre ne les voit pas, et que chaque
++  collection porte `coverUrl`, `oldestPhotoAt` et `newestPhotoAt` (texte,
++  ou null pour une collection vide).
+ }
+diff --git a/server/bruno/collections/photos/14-nominal-photo-supprimee.bru b/server/bruno/collections/photos/14-nominal-photo-supprimee.bru
+index c01452b..1ea0a53 100644
+--- a/server/bruno/collections/photos/14-nominal-photo-supprimee.bru
++++ b/server/bruno/collections/photos/14-nominal-photo-supprimee.bru
+@@ -32,20 +32,27 @@ assert {
+ script:post-response {
+   const axios = require('axios')
+   // A script request does not get the collection headers: send the cookie itself.
+-  const photoIdsOf = async (collectionId) => {
++  const collectionOf = async (collectionId) => {
+     const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/collections`, {
+       headers: { Cookie: bru.getVar('inviteeCookie') },
+     })
+-    return list.data.collections.find(({ id }) => id === collectionId).photoIds
++    return list.data.collections.find(({ id }) => id === collectionId)
+   }
+   test('la collection ne liste plus la photo supprimée', async () => {
+-    expect(await photoIdsOf(bru.getVar('collectionId'))).to.eql([])
++    expect((await collectionOf(bru.getVar('collectionId'))).photoIds).to.eql([])
++  })
++  test('vide, elle perd sa couverture et ses dates', async () => {
++    const collection = await collectionOf(bru.getVar('collectionId'))
++    expect(collection.coverUrl).to.equal(null)
++    expect(collection.oldestPhotoAt).to.equal(null)
++    expect(collection.newestPhotoAt).to.equal(null)
+   })
+ }
+ 
+ docs {
+   NOMINAL → 204 : le compte jetable supprime de sa bibliothèque une photo
+   rangée dans la collection (le script de départ l'y remet). Le script
+-  relit la liste : la collection ne la montre plus. Supprime aussi la
+-  photo de `01`.
++  relit la liste : la collection ne la montre plus et, vide, n'a plus ni
++  couverture ni dates (`coverUrl`, `oldestPhotoAt`, `newestPhotoAt` à
++  null). Supprime aussi la photo de `01`.
+ }
+~~~~
+
+~~~~diff
+diff --git a/docs/superpowers/plans/2026-11-25-mobile-first.md b/docs/superpowers/plans/2026-11-25-mobile-first.md
+index 91024e1..73577c1 100644
+--- a/docs/superpowers/plans/2026-11-25-mobile-first.md
++++ b/docs/superpowers/plans/2026-11-25-mobile-first.md
+@@ -3485,7 +3485,7 @@ index 0ff278f..b8434ac 100644
+ 
+ **Scope:** Tile « … » back on every pointer, 28 px look with a 44 px invisible target; `useTileContextMenu` (native `contextmenu`); `PhotoActionsMenu` `open` / `onOpenChange`; R-BIB-53. Spec D23 amended.
+ 
+-**Gate:** `pnpm check` and `pnpm typecheck` green; `pnpm build` and `pnpm test` green.
++**Gate:** `pnpm check` and `pnpm typecheck` green; `pnpm build` and `pnpm test` green at the tip.
+ 
+ - [x] **Final diff**
+ 
+@@ -3666,7 +3666,7 @@ index b8434ac..f7602a3 100644
+ 
+ **Scope:** `PhotoActionsMenu` content `w-max`: under the 28 px « … » its items wrapped, with a mouse too.
+ 
+-**Gate:** `pnpm check` and `pnpm typecheck` green; `pnpm build` and `pnpm test` green on `feat/library-timeline`, which holds it.
++**Gate:** `pnpm check` and `pnpm typecheck` green; `pnpm build` and `pnpm test` green on `feat/library-surface`, which holds it.
+ 
+ - [x] **Final diff**
+ 
+~~~~
+
 ---
 
 ## Final verification (controller)
@@ -1823,3 +2235,11 @@ index 62801d5..4c8b409 100644
   - **Other conflicts:** `lib/cloudinary.ts` keeps step 14's screen-size `url` and takes the thumbnail out into `thumbnailUrl()`; `LibraryPage` keeps step 14's local « Toutes » ref, renamed `allCardRef`, and `LibraryHeader` keeps its `addButtonRef` beside the new `title`; ARCHITECTURE.md's page row merges both texts.
   - **The spec and this plan are fixed in a docs commit at the tip** rather than in the spec commit, which keeps R-BIB-54 for the day groups until then.
   - **Gates after the rebase:** `pnpm check` and `pnpm typecheck` green on each commit; at the tip `pnpm build` green and `pnpm test` → `Test Files  27 passed (27)`, `Tests  312 passed (312)`.
+- **Task 6, final review (controller, after picking: Bruno 184/184, Chrome fine):** 0 Critical, 0 Important, 7 Minor, each fixed in its own commit.
+  - **M2, out-of-order days:** of the two fixes offered, sorting the days by key rather than dropping an old photo while older pages remain: a dropped photo would vanish from the library for a while after being opened. The keys became zero-padded for that (spec T13).
+  - **M1, clock skew:** `withToday` searches every day and `childrenDayKey` names today's day, so a photo dated tomorrow no longer doubles « Aujourd'hui » (spec T14).
+  - **M3:** no library count in the header while a collection loads; R-COL-23 says so, edited in place since it is new in this stack (spec T15).
+  - **M4:** focus is an outline in the text colour outside the selection ring, the row's padding grows to leave it room (spec T16).
+  - **M5, M6:** ARCHITECTURE.md's collections paragraph names `findLivePhotos` and `thumbnailUrl`; Bruno `list/01` checks the three fields' shape and `photos/14` their null after the collection's last photo is deleted, written and not run in the clone.
+  - **M7:** this branch's spec commit had edited the finished mobile-first plan: Task 18 named this branch for c74b15b, which is on `feat/library-surface`, and its regeneration dropped « at the tip » from Task 17's Gate line. Both corrected in a docs commit.
+  - **No client test runner:** `groupByDay`, `withToday` and their sorting stay without unit tests; the client has no Vitest set up, and adding one is a dependency decision for the author.
