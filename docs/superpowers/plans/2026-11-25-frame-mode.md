@@ -1,13 +1,13 @@
 ---
 plan: frame-mode
-status: draft
+status: done
 spec: docs/superpowers/specs/2026-11-25-frame-mode-design.md
 branch: feat/frame-fullscreen (PR A), feat/frame-playback (PR B), feat/frame-templates (PR C), feat/settings-frame-card (PR D)
 worktree: false
 tasks_total: 7
-tasks_done: 0
+tasks_done: 7
 current_task: none
-last_commit: none
+last_commit: final review fixes
 last_updated: 2026-11-25
 ---
 
@@ -2064,6 +2064,13 @@ Format: `date · task/step · what the plan said · what was done · why`.
 | 2026-11-25 | Plan | Spec: a deleted photo in shuffle gives way to the next in the order | R-CAD-29 kept: the newest | « same as in order » means R-CAD-29 (Choice 4) |
 | 2026-11-25 | Plan | Spec: polaroid tilt from the position | From the photo id | Positions shift on arrivals; the spec also wants a stable tilt (Choice 5) |
 | 2026-11-25 | Plan | Spec: card rules in `preferences.md` | `preferences.md` from step 6, R-PRF-50..52 | The file exists since step 6 (Choice 6) |
+| 2026-11-25 | All | Markdown left to the author's formatting | `biome format --write` on every touched .md, tables re-padded | Biome formats Markdown here: the pre-commit hook rejects unformatted files |
+| 2026-11-25 | 1, final | Chrome check: entries reach `document.fullscreenElement` | Request with user activation checked; leaving logic checked by stubbing `fullscreenElement` and dispatching `fullscreenchange` | Automated Chrome refuses full screen (« not granted »); real full screen goes to the author's UX walkthrough |
+| 2026-11-25 | 7 | Default ToggleGroup look | Chosen item inverted (`data-[state=on]:bg-foreground`); README and R-PRF-04 note the card has no « Enregistrer » | The muted pressed background barely showed on the dark card; review minor on the « every card has Enregistrer » wording |
+| 2026-11-25 | Final review I1 | Leaving full screen by any means leaves the frame | Not while a menu or dialog is open (`isOverlayOpen`): the frame stays, out of full screen; R-CAD-59 amended in place, ARCHITECTURE too | In full screen the browser keeps Escape: closing a menu with Escape left the whole frame, against R-CAD-25 |
+| 2026-11-25 | Final review | — | R-CAD-69 « et non plus en bas », Préférences bullet moved after the order bullet, ARCHITECTURE: the « Cadre » link adds a history entry, bibliotheque.md says « Mode cadre » goes full screen | Doc minors from the final review |
+| 2026-11-25 | Known gaps | — | Left open: Escape does nothing on the status screens (pre-existing); deleting the shown last-in-round photo redraws the shuffle; back to « Aléatoire » resumes the old round; leaving before full screen is granted can leave the library full screen; StrictMode double effect unverified in dev; no test for `shuffleOrder.ts` (`node --test` needs the author's OK) | Minors, triaged in `.superpowers/sdd/step8-final-review.md` |
+| 2026-11-25 | All | Attribution lines | Subagent commits carry the controller's trailer lines | One session, one attribution |
 
 ---
 
