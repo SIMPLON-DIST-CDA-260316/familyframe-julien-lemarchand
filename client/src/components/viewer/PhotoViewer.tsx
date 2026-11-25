@@ -45,6 +45,7 @@ function ViewerPhoto({ library, viewer, photo, index }: ViewerPhotoProps): JSX.E
         photos={library.photos}
         currentId={photo.id}
         onCurrentChange={viewer.show}
+        onClose={viewer.close}
         chrome={chrome}
       />
       <ViewerCaption photo={photo} isVisible={chrome.isVisible} />
