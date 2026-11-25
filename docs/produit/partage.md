@@ -69,7 +69,7 @@ Envoyer une photo à un ou plusieurs amis la leur fait parvenir comme du courrie
 3. R-PAR-69 · On envoie une photo à la fois, avec son message : « Choisir sur l'appareil » ne prend qu'une image.
 4. R-PAR-70 · La grille de sa bibliothèque montre les photos ouvertes, de la plus récente à la plus ancienne, comme la bibliothèque elle-même ; les photos reçues qui attendent d'être découvertes n'y sont pas.
 5. R-PAR-71 · Choisir la photo ferme le choix d'origine et ouvre le panneau d'envoi avec cette photo (voir [Choisir à qui envoyer](#choisir-à-qui-envoyer)). Le fermer sans envoyer abandonne la photo.
-6. R-PAR-72 · Après un envoi réussi, la ligne de l'envoi apparaît en tête de l'historique, sans recharger la page.
+6. R-PAR-72 · Après un envoi réussi, la ligne de l'envoi apparaît en tête de l'historique, sans recharger la page. L'historique revient alors aux 30 envois les plus récents : les envois montrés par « Afficher plus » se remontrent d'un nouvel appui.
 
 **Messages affichés**
 
@@ -198,6 +198,7 @@ La page « Envoyer » garde la trace de ce que l'on a envoyé, comme le dossier 
 7. R-PAR-64 · Retirer un envoi demande une confirmation. Il quitte alors l'historique, et seulement lui : les proches gardent la photo qu'ils ont reçue, et la photo reste dans la bibliothèque de l'expéditeur si elle y était.
 8. R-PAR-65 · Une ligne de l'historique ne s'ouvre pas : pour regarder la photo, on passe par sa bibliothèque.
 9. R-PAR-66 · L'historique n'a pas de limite de durée. Il commence avec cette version : les photos envoyées avant n'y figurent pas.
+10. R-PAR-73 · Les dates se mettent à jour d'elles-mêmes sur une page restée ouverte (« à l'instant » devient « il y a 1 min »). Au clavier, après le retrait d'un envoi, on reprend depuis le titre « Envois » plutôt que depuis le haut de la page.
 
 **Messages affichés**
 
