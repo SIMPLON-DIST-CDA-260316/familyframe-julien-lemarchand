@@ -26,7 +26,7 @@ Deux membres deviennent amis quand l'un envoie une demande et que l'autre l'acce
 | Situation                 | Message                                                                                                             |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | En-tête de la page        | « Amis » — « Les proches à qui vous pouvez envoyer des photos. »                                                    |
-| Chargement                | « Chargement… »                                                                                                     |
+| Chargement                | formes grises (R-APP-69), « Chargement… » pour les lecteurs d'écran                                                 |
 | Aucun ami                 | « Pas encore d'amis » — « Ajoutez un proche pour pouvoir lui envoyer vos photos. » et le bouton « Ajouter un ami »  |
 | Aucune demande en attente | « Aucune demande en attente » — « Les demandes que vous recevez ou envoyez apparaissent ici jusqu'à leur réponse. » |
 

@@ -155,6 +155,26 @@ Aucun message.
 
 - Choisir la couleur de la barre du navigateur.
 
+## Chargements
+
+**Ce que l'on peut faire**
+
+- Voir, dès l'ouverture d'une page, la forme de ce qui va s'afficher.
+
+**Règles**
+
+1. R-APP-69 · Pendant qu'une page charge son contenu (la bibliothèque, une photo ouverte en grand, la page « Amis », la liste des invitations), des formes grises qui pulsent doucement tiennent la place des vignettes, des lignes ou de la photo attendues, dans la disposition choisie (miniatures ou liste). Le contenu les remplace sans que la page saute. Si l'appareil demande de réduire les animations, elles ne pulsent pas. Les lecteurs d'écran annoncent « Chargement… ». Le cadre garde son propre écran (« Chargement des photos… », voir [cadre.md](cadre.md)).
+
+**Messages affichés**
+
+| Situation                    | Message         |
+| ---------------------------- | --------------- |
+| Chargement (lecture d'écran) | « Chargement… » |
+
+**Ce qui n'est pas possible**
+
+- Interrompre un chargement.
+
 ## Installer l'application
 
 **Ce que l'on peut faire**

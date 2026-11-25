@@ -1,4 +1,5 @@
 import type { JSX } from 'react'
+import { InvitationsSkeleton } from '@/components/admin/InvitationsSkeleton.tsx'
 import { Alert, AlertDescription } from '@/components/ui/alert.tsx'
 import { Badge } from '@/components/ui/badge.tsx'
 import type { Invitation, InvitationStatus } from '@/invitation.ts'
@@ -57,7 +58,7 @@ export function InvitationList({
       </Alert>
     )
   }
-  if (isLoading) return <p className="text-sm text-muted-foreground">Chargement…</p>
+  if (isLoading) return <InvitationsSkeleton />
   if (invitations.length === 0) {
     return <p className="text-sm text-muted-foreground">Aucune invitation pour l'instant.</p>
   }

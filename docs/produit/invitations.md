@@ -62,11 +62,11 @@ Personne ne s'inscrit seul dans FamilyFrame : l'administrateur crée un lien d'i
 
 **Messages affichés**
 
-| Situation              | Message                                   |
-| ---------------------- | ----------------------------------------- |
-| Chargement de la liste | « Chargement… »                           |
-| Aucune invitation      | « Aucune invitation pour l'instant. »     |
-| Statuts                | « En attente », « Utilisée », « Expirée » |
+| Situation              | Message                                                             |
+| ---------------------- | ------------------------------------------------------------------- |
+| Chargement de la liste | formes grises (R-APP-69), « Chargement… » pour les lecteurs d'écran |
+| Aucune invitation      | « Aucune invitation pour l'instant. »                               |
+| Statuts                | « En attente », « Utilisée », « Expirée »                           |
 
 **Ce qui n'est pas possible**
 

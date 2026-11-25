@@ -1,6 +1,7 @@
 import type { JSX } from 'react'
 import { PhotoGrid } from '@/components/frame/PhotoGrid.tsx'
 import { PhotoList } from '@/components/frame/PhotoList.tsx'
+import { LibrarySkeleton } from '@/components/library/LibrarySkeleton.tsx'
 import {
   PendingAnnouncement,
   PendingGridTile,
@@ -52,9 +53,7 @@ function LibraryPhotos({
   onOpenPhoto,
   emptyState,
 }: LibrarySectionProps): JSX.Element {
-  if (!library.isFirstPageLoaded) {
-    return <p className="px-6 py-16 text-center text-muted-foreground">Chargement…</p>
-  }
+  if (!library.isFirstPageLoaded) return <LibrarySkeleton layout={layout} />
   if (library.photos.length === 0 && pending.length === 0) return emptyState
   const { days, today } = libraryDays(library, pending)
   // Newest first, like the photos: the upload in progress sits right above the photos, where

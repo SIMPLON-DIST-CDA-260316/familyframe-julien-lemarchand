@@ -1,5 +1,7 @@
 import { Dialog as DialogPrimitive } from 'radix-ui'
 import type { JSX } from 'react'
+import { LoadingStatus } from '@/components/feedback/LoadingStatus.tsx'
+import { Skeleton } from '@/components/ui/skeleton.tsx'
 import { ViewerCaption } from '@/components/viewer/ViewerCaption.tsx'
 import { ViewerCarousel } from '@/components/viewer/ViewerCarousel.tsx'
 import { ViewerTopBar } from '@/components/viewer/ViewerTopBar.tsx'
@@ -75,7 +77,9 @@ export function PhotoViewer({ library, openId, viewer }: PhotoViewerProps): JSX.
         >
           <DialogPrimitive.Title className="sr-only">Photo</DialogPrimitive.Title>
           {photo === undefined ? (
-            <p className="grid h-svh place-items-center text-muted-foreground">Chargement…</p>
+            <LoadingStatus className="grid h-svh place-items-center">
+              <Skeleton className="h-2/3 w-5/6 max-w-4xl bg-white/10" />
+            </LoadingStatus>
           ) : (
             <ViewerPhoto library={library} viewer={viewer} photo={photo} index={index} />
           )}

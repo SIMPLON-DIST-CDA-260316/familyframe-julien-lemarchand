@@ -2,6 +2,7 @@ import { UserPlusIcon } from 'lucide-react'
 import type { JSX } from 'react'
 import { AddFriendDialog } from '@/components/friends/AddFriendDialog.tsx'
 import { FriendshipSection } from '@/components/friends/FriendshipSection.tsx'
+import { FriendsSkeleton } from '@/components/friends/FriendsSkeleton.tsx'
 import { type FriendsView, FriendsViewToggle } from '@/components/friends/FriendsViewToggle.tsx'
 import { NoFriendsYet } from '@/components/friends/NoFriendsYet.tsx'
 import { NoPendingRequests } from '@/components/friends/NoPendingRequests.tsx'
@@ -161,7 +162,7 @@ export default function FriendsPage(): JSX.Element {
     <main className="mx-auto flex max-w-2xl flex-col gap-8 px-4 py-10">
       <PageHeader onAddFriend={openDialog} />
       <Notices error={error || page.actions.error} notice={page.notice} />
-      {isLoading && <p className="text-sm text-muted-foreground">Chargement…</p>}
+      {isLoading && <FriendsSkeleton />}
       {!isLoading && !error && (
         <FriendshipViews
           friendships={friendships}
