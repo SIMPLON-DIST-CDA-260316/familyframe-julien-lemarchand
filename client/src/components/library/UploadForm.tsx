@@ -74,7 +74,8 @@ function PickButton({ label, icon, capture, onChange }: PickButtonProps): JSX.El
       <Button
         type="button"
         variant="outline"
-        className="h-20 flex-col gap-2 whitespace-normal"
+        // pointer-coarse:h-20 beats the Button's coarse h-11: the big tile stays big under a finger.
+        className="h-20 flex-col gap-2 whitespace-normal pointer-coarse:h-20"
         onClick={() => inputRef.current?.click()}
       >
         {icon}

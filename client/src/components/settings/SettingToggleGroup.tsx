@@ -7,7 +7,8 @@ import { cn } from '@/lib/utils.ts'
 // A collection's name can be long: the item grows and wraps instead of leaving the card.
 const ITEM_CLASSES = cn(
   'data-[state=on]:bg-foreground data-[state=on]:text-background data-[state=on]:hover:bg-foreground/90',
-  'h-auto min-h-8 shrink py-1 whitespace-normal wrap-anywhere',
+  // h-auto beats the toggle's coarse h-11: a long label wraps instead of overflowing.
+  'h-auto min-h-8 shrink py-1 whitespace-normal wrap-anywhere pointer-coarse:h-auto pointer-coarse:min-h-11',
 )
 
 type SettingToggleGroupProps<Value extends string | number> = {

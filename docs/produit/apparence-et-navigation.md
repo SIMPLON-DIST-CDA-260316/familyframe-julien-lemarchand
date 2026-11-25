@@ -121,7 +121,7 @@ Le menu à trois traits a laissé sa place à la barre d'onglets (R-APP-60) et a
 2. R-APP-51 · Quand l'application elle-même rencontre un problème, un message invite à réessayer plus tard.
 3. R-APP-52 · Les erreurs propres à une fonctionnalité sont décrites dans le fichier de cette fonctionnalité.
 4. R-APP-53 · Les confirmations et les erreurs d'une action terminée s'affichent dans une courte notification en bas de l'écran, qui disparaît d'elle-même et suit le thème clair ou sombre.
-5. R-APP-54 · Sur un écran tactile, les petits boutons (menu « … » d'une photo, croix qui ferme une fenêtre) sont agrandis à la taille d'un doigt ; à la souris, ils restent compacts.
+5. R-APP-54 · Sur un écran tactile, tous les boutons, champs de saisie, entrées de menu et choix des préférences sont agrandis à la taille d'un doigt, y compris les plus petits (menu « … » d'une photo, croix qui ferme une fenêtre, œil du mot de passe). À la souris, ils restent compacts.
 
 **Messages affichés**
 
