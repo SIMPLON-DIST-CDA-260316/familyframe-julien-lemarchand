@@ -155,6 +155,26 @@ Aucun message.
 
 - Choisir la couleur de la barre du navigateur.
 
+## Installer l'application
+
+**Ce que l'on peut faire**
+
+- Ajouter FamilyFrame à l'écran d'accueil d'un téléphone ou d'une tablette, ou l'installer sur un ordinateur, depuis le menu du navigateur (« Ajouter à l'écran d'accueil », « Installer l'application »).
+
+**Règles**
+
+1. R-APP-67 · Installée, FamilyFrame s'ouvre depuis son icône comme une application : en plein écran, sans barre d'adresse, avec son nom « FamilyFrame » et son icône (un cadre photo avec un paysage). L'onglet du navigateur montre la même icône.
+2. R-APP-68 · Installée ou non, FamilyFrame a besoin du réseau : sans connexion, elle ne s'ouvre pas et le navigateur l'indique. Rien n'est gardé sur l'appareil pour être vu hors ligne.
+
+**Messages affichés**
+
+Aucun message : les mots « Installer » ou « Ajouter à l'écran d'accueil » sont ceux du navigateur.
+
+**Ce qui n'est pas possible**
+
+- Installer FamilyFrame depuis un magasin d'applications.
+- Consulter ses photos sans connexion.
+
 ## Barre d'onglets (téléphone)
 
 **Ce que l'on peut faire**
