@@ -1,0 +1,22 @@
+meta {
+  name: Nominal - utilisateur connecté
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/auth/me
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body.user.email: eq {{memberEmail}}
+  res.body.user.role: eq member
+  res.body.user.passwordHash: isUndefined
+}
+
+docs {
+  NOMINAL → 200 `{ user }`, avec le cookie rangé par `login/01`.
+}

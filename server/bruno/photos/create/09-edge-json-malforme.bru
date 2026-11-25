@@ -15,14 +15,16 @@ headers {
 }
 
 body:text {
-  {"uploaderName": "Mamie"
+  {"photo": "pas un fichier"
 }
 
 assert {
   res.status: eq 400
-  res.body.error: eq UPLOADER_NAME_INVALID
+  res.body.error: eq PHOTO_MISSING
 }
 
 docs {
-  EDGE → 400 UPLOADER_NAME_INVALID, un corps JSON n'est pas lu : la route attend du multipart.
+  EDGE → 400 PHOTO_MISSING : la route photos ne lit pas le JSON (pas de
+  parser, elle attend du multipart), donc aucun fichier n'est reçu. Le cookie
+  de session est envoyé : sans lui, la réponse serait 401.
 }

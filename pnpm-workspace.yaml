@@ -9,3 +9,8 @@ onlyBuiltDependencies:
   - esbuild
   - prisma
   - sharp
+
+# Ships prebuilt binaries (Windows, Linux glibc/musl, x64/arm64) loaded at runtime:
+# its node-gyp build script would only matter on a platform without one.
+ignoredBuiltDependencies:
+  - argon2

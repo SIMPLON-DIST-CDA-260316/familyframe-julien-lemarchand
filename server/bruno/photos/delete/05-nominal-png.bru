@@ -1,0 +1,28 @@
+meta {
+  name: Nominal - suppression du PNG
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/api/photos/{{createdPngId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  // Without it the request hits /api/photos/ and fails with a misleading status.
+  if (!bru.getVar('createdPngId')) {
+    throw new Error('createdPngId absent : lancer le dossier photos en entier, create/02 doit passer')
+  }
+}
+
+assert {
+  res.status: eq 204
+}
+
+docs {
+  NOMINAL → 204 : supprime le PNG de `create/02`. Avec `02-nominal` (le JPEG
+  de `create/01`), chaque lancement laisse la bibliothèque du membre comme il
+  l'a trouvée.
+}

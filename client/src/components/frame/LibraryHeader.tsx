@@ -1,5 +1,6 @@
 import { PlayIcon } from 'lucide-react'
 import type { JSX } from 'react'
+import { UserBadge } from '@/components/auth/UserBadge.tsx'
 import { LayoutToggle } from '@/components/frame/LayoutToggle.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import type { LibraryLayout } from '@/hooks/useLibraryLayout.ts'
@@ -32,6 +33,7 @@ export function LibraryHeader({
         Lancer le diaporama
       </Button>
       <LayoutToggle layout={layout} onLayoutChange={onLayoutChange} />
+      <UserBadge />
     </header>
   )
 }

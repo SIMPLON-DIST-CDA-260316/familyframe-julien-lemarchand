@@ -1,0 +1,34 @@
+meta {
+  name: Edge - e-mail invalide
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/invitations
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "pas-un-email"
+  }
+}
+
+script:pre-request {
+  if (!bru.getVar('adminCookie')) {
+    throw new Error('adminCookie absent : lancer toute la collection, auth/login/05 doit passer')
+  }
+  req.setHeader('Cookie', bru.getVar('adminCookie'))
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq EMAIL_INVALID
+}
+
+docs {
+  EDGE → 400 EMAIL_INVALID : une adresse sans `@`. Le contrôle est souple :
+  il attrape une faute de frappe sans refuser une vraie adresse.
+}

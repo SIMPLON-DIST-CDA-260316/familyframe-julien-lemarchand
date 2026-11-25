@@ -1,0 +1,11 @@
+meta {
+  name: logout
+  seq: 3
+}
+
+docs {
+  `POST /api/auth/logout` → 204 : supprime la session et efface le cookie.
+  Répond 204 aussi sans session. Ordre : déconnexion, `me` avec l'ancien
+  cookie (401), déconnexion sans session, puis reconnexion pour que les
+  dossiers suivants aient une session.
+}

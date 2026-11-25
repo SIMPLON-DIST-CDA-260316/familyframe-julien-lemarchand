@@ -1,0 +1,44 @@
+import type { ChangeEvent, JSX } from 'react'
+import { PasswordInput } from '@/components/form/PasswordInput.tsx'
+import { Input } from '@/components/ui/input.tsx'
+import { Label } from '@/components/ui/label.tsx'
+
+type TextFieldProps = {
+  id: string
+  label: string
+  type: 'email' | 'password' | 'text'
+  autoComplete: string
+  value: string
+  onChange: (value: string) => void
+  minLength?: number
+  maxLength?: number
+}
+
+// Every field of the invitation forms is required: an empty one never reaches the API.
+export function TextField({
+  id,
+  label,
+  value,
+  onChange,
+  type,
+  ...inputProps
+}: TextFieldProps): JSX.Element {
+  const fieldProps = {
+    id,
+    value,
+    onChange: (event: ChangeEvent<HTMLInputElement>) => onChange(event.target.value),
+    required: true,
+    ...inputProps,
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <Label htmlFor={id}>{label}</Label>
+      {type === 'password' ? (
+        <PasswordInput {...fieldProps} />
+      ) : (
+        <Input type={type} {...fieldProps} />
+      )}
+    </div>
+  )
+}

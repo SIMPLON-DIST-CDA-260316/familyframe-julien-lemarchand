@@ -1,0 +1,37 @@
+meta {
+  name: Edge - mot de passe trop court
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/invitations/accept
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "token": "{{inviteToken}}",
+    "displayName": "Invitée",
+    "password": "onze-caract"
+  }
+}
+
+script:pre-request {
+  if (!bru.getVar('inviteToken')) {
+    throw new Error('inviteToken absent : lancer toute la collection, create/02 doit passer')
+  }
+  // The invitee has no session: collection.bru's cookie must not leave.
+  req.deleteHeader('Cookie')
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq PASSWORD_INVALID
+}
+
+docs {
+  EDGE → 400 PASSWORD_INVALID : 11 caractères, il en faut au moins 12. Le
+  lien reste valable.
+}

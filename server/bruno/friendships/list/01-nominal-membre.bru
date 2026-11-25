@@ -1,0 +1,37 @@
+meta {
+  name: Nominal - liste du membre
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/friendships
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('friendshipId')) {
+    throw new Error('friendshipId absent : lancer toute la collection, create/01 doit passer')
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.outgoing: isArray
+}
+
+script:post-response {
+  const friendshipId = bru.getVar('friendshipId')
+  const idsOf = (friendships) => friendships.map(({ id }) => id)
+  test('la demande est dans « envoyées », et seulement là', () => {
+    expect(idsOf(res.body.outgoing)).to.include(friendshipId)
+    expect(idsOf(res.body.incoming)).to.not.include(friendshipId)
+    expect(idsOf(res.body.friends)).to.not.include(friendshipId)
+  })
+}
+
+docs {
+  NOMINAL → 200 : la demande de `create/01` est dans `outgoing` du membre,
+  ni dans `incoming` ni dans `friends`.
+}

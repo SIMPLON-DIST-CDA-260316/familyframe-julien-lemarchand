@@ -1,0 +1,37 @@
+meta {
+  name: Edge - invitation déjà utilisée
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/invitations/accept
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "token": "{{inviteToken}}",
+    "displayName": "Invitée",
+    "password": "invite-bruno-dev"
+  }
+}
+
+script:pre-request {
+  if (!bru.getVar('inviteToken')) {
+    throw new Error('inviteToken absent : lancer toute la collection, create/02 doit passer')
+  }
+  // The invitee has no session: collection.bru's cookie must not leave.
+  req.deleteHeader('Cookie')
+}
+
+assert {
+  res.status: eq 410
+  res.body.error: eq INVITATION_USED
+}
+
+docs {
+  EDGE → 410 INVITATION_USED : le lien a servi à `05`. 410 dit « a existé,
+  ne sert plus » ; le client conseille de se connecter.
+}

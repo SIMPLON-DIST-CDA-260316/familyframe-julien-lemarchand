@@ -1,0 +1,49 @@
+meta {
+  name: Edge - photo d'un autre compte
+  type: http
+  seq: 1
+}
+
+delete {
+  url: {{baseUrl}}/api/photos/{{createdPhotoId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  // Without them the request would test nothing, or the wrong account.
+  if (!bru.getVar('createdPhotoId') || !bru.getVar('adminCookie')) {
+    throw new Error('createdPhotoId ou adminCookie absent : lancer toute la collection, auth/login/05 et photos/create/01 doivent passer')
+  }
+  // The photo belongs to the member: the admin asks to delete it.
+  req.setHeader('Cookie', bru.getVar('adminCookie'))
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq PHOTO_NOT_FOUND
+}
+
+script:post-response {
+  const axios = require('axios')
+  // A script request does not get the collection headers: send the cookie itself.
+  const listIds = async (cookie) => {
+    const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/photos`, {
+      headers: { Cookie: cookie },
+    })
+    return list.data.photos.map(({ id }) => id)
+  }
+  test('la photo est toujours dans la bibliothèque du membre', async () => {
+    expect(await listIds(bru.getVar('sessionCookie'))).to.include(bru.getVar('createdPhotoId'))
+  })
+  test('elle n\'apparaît pas dans celle de l\'admin', async () => {
+    expect(await listIds(bru.getVar('adminCookie'))).to.not.include(bru.getVar('createdPhotoId'))
+  })
+}
+
+docs {
+  EDGE → 404 PHOTO_NOT_FOUND : l'admin demande la suppression de la photo du
+  membre. La réponse est celle d'une photo inconnue (pas de 403, qui dirait
+  qu'elle existe). Le script vérifie ensuite que la photo est toujours dans
+  la liste du membre et absente de celle de l'admin (première page de chaque compte).
+}

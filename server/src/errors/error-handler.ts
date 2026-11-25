@@ -5,15 +5,42 @@ import type { ApiError, ApiErrorCode } from '../types.js'
 import { AppError } from './app-error.js'
 
 const HTTP_STATUS_BY_CODE: Record<ApiErrorCode, number> = {
-  UPLOADER_NAME_INVALID: 400,
   PHOTO_MISSING: 400,
+  EMAIL_INVALID: 400,
   UPLOAD_INVALID: 400,
+  BODY_INVALID: 400,
+  QUERY_INVALID: 400,
+  DISPLAY_NAME_INVALID: 400,
+  PASSWORD_INVALID: 400,
+  SELF_FRIEND: 400,
+  UNAUTHENTICATED: 401,
+  INVALID_CREDENTIALS: 401,
+  FORBIDDEN: 403,
   ROUTE_NOT_FOUND: 404,
   PHOTO_NOT_FOUND: 404,
+  INVITATION_NOT_FOUND: 404,
+  USER_NOT_FOUND: 404,
+  FRIENDSHIP_NOT_FOUND: 404,
+  PHOTO_DUPLICATE: 409,
+  ACCOUNT_EXISTS: 409,
+  ALREADY_FRIENDS: 409,
+  FRIEND_REQUEST_EXISTS: 409,
+  INVITATION_EXPIRED: 410,
+  INVITATION_USED: 410,
   PHOTO_TOO_LARGE: 413,
   FORMAT_UNSUPPORTED: 415,
   IMAGE_UNREADABLE: 422,
   SERVER_ERROR: 500,
+}
+
+// body-parser tags its JSON syntax errors with this type; express.json() runs on the auth routes.
+function isMalformedJson(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'type' in error &&
+    error.type === 'entity.parse.failed'
+  )
 }
 
 function toErrorCode(error: unknown): ApiErrorCode {
@@ -22,6 +49,9 @@ function toErrorCode(error: unknown): ApiErrorCode {
   }
   if (error instanceof multer.MulterError) {
     return error.code === 'LIMIT_FILE_SIZE' ? 'PHOTO_TOO_LARGE' : 'UPLOAD_INVALID'
+  }
+  if (isMalformedJson(error)) {
+    return 'BODY_INVALID'
   }
   return 'SERVER_ERROR'
 }

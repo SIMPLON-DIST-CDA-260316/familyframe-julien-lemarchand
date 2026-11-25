@@ -11,13 +11,17 @@ post {
 }
 
 body:multipart-form {
-  uploaderName: {{uploaderName}}
   photo: @file(fixtures/photo.png) @contentType(image/png)
 }
 
 assert {
   res.status: eq 201
   res.body.url: isString
+}
+
+script:post-response {
+  // photos/delete/05 deletes it: each run leaves the member's library as it found it.
+  bru.setVar('createdPngId', res.body.id)
 }
 
 docs {

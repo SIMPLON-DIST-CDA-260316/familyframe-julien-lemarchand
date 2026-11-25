@@ -1,0 +1,28 @@
+meta {
+  name: Edge - demande déjà acceptée
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/friendships/{{friendshipId}}/accept
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('adminCookie') || !bru.getVar('friendshipId')) {
+    throw new Error('adminCookie ou friendshipId absent : lancer toute la collection, create/01 doit passer')
+  }
+  req.setHeader('Cookie', bru.getVar('adminCookie'))
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq FRIENDSHIP_NOT_FOUND
+}
+
+docs {
+  EDGE → 404 FRIENDSHIP_NOT_FOUND : le filtre `status: 'pending'` ne
+  trouve plus rien, la demande est déjà une amitié.
+}

@@ -1,0 +1,60 @@
+meta {
+  name: Nominal - création d'une invitation
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/invitations
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{inviteEmailTyped}}"
+  }
+}
+
+script:pre-request {
+  if (!bru.getVar('adminCookie')) {
+    throw new Error('adminCookie absent : lancer toute la collection, auth/login/05 doit passer')
+  }
+  req.setHeader('Cookie', bru.getVar('adminCookie'))
+  // A fresh address per run: no reset needed between two runs.
+  const inviteEmail = `invite-${Date.now()}@familyframe.test`
+  bru.setVar('inviteEmail', inviteEmail)
+  // Typed carelessly: the server must trim and lowercase it.
+  bru.setVar('inviteEmailTyped', `  ${inviteEmail.toUpperCase()} `)
+}
+
+assert {
+  res.status: eq 201
+  res.body.invitation.email: eq {{inviteEmail}}
+  res.body.invitation.status: eq pending
+  res.body.invitation.tokenHash: isUndefined
+}
+
+script:post-response {
+  const { invitation, token } = res.body
+  test('un jeton hexadécimal de 64 caractères', () => {
+    expect(token).to.match(/^[0-9a-f]{64}$/)
+  })
+  test('valable 7 jours après sa création', () => {
+    const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000
+    // createdAt comes from the database default, expiresAt from the service clock.
+    const lifetimeMs = new Date(invitation.expiresAt) - new Date(invitation.createdAt)
+    expect(Math.abs(lifetimeMs - SEVEN_DAYS_MS)).to.be.below(60 * 1000)
+  })
+  if (token) {
+    bru.setVar('inviteToken', token)
+  }
+}
+
+docs {
+  NOMINAL → 201 `{ invitation, token }`. L'adresse part en majuscules,
+  entourée d'espaces : elle revient en minuscules, sans espaces. Le jeton va
+  dans `inviteToken` pour `accept/`. `expiresAt` tombe 7 jours après
+  `createdAt`, à une minute près : les deux dates ne viennent pas de la même
+  horloge.
+}

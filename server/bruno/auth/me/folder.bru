@@ -1,0 +1,10 @@
+meta {
+  name: me
+  seq: 2
+}
+
+docs {
+  `GET /api/auth/me` → 200 `{ user }` avec une session valide, sinon 401
+  `UNAUTHENTICATED`. Le client l'appelle au chargement pour savoir qui est
+  connecté (le cookie est illisible en JavaScript).
+}

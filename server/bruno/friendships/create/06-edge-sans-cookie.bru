@@ -1,0 +1,32 @@
+meta {
+  name: Edge - sans cookie de session
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/friendships
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{adminEmail}}"
+  }
+}
+
+script:pre-request {
+  // collection.bru sends the session cookie to every request: remove it here.
+  req.deleteHeader('Cookie')
+}
+
+assert {
+  res.status: eq 401
+  res.body.error: eq UNAUTHENTICATED
+}
+
+docs {
+  EDGE → 401 UNAUTHENTICATED : toutes les routes des amitiés demandent une
+  session.
+}

@@ -1,0 +1,26 @@
+meta {
+  name: Edge - demande à soi-même
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/friendships
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{memberEmail}}"
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq SELF_FRIEND
+}
+
+docs {
+  EDGE → 400 SELF_FRIEND : le membre tape sa propre adresse.
+}

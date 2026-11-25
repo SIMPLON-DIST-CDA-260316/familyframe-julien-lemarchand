@@ -32,8 +32,8 @@ export function DeletePhotoDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Supprimer cette photo ?</AlertDialogTitle>
           <AlertDialogDescription>
-            La photo envoyée par {photo.uploaderName} sera supprimée de tous les cadres. Cette
-            action est irréversible.
+            Cette photo sera supprimée de votre bibliothèque et de votre cadre. Cette action est
+            irréversible.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

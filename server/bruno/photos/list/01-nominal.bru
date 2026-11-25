@@ -1,5 +1,5 @@
 meta {
-  name: Nominal - les dernières photos
+  name: Nominal - première page de la bibliothèque
   type: http
   seq: 1
 }
@@ -12,24 +12,29 @@ get {
 
 assert {
   res.status: eq 200
-  res.body: isArray
-  res.body.length: lte 20
+  res.body.photos: isArray
+  res.body.photos.length: lte 30
 }
 
 script:post-response {
-  const dates = res.body.map((photo) => photo.createdAt)
-  const sorted = [...dates].sort().reverse()
-  test('plus récente en premier', () => {
-    expect(dates).to.eql(sorted)
+  const { photos, nextCursor } = res.body
+  test('la plus récente en premier (ids décroissants)', () => {
+    const ids = photos.map(({ id }) => id)
+    expect(ids).to.eql([...ids].sort().reverse())
   })
   test('chaque photo a sa miniature', () => {
-    for (const photo of res.body) {
+    for (const photo of photos) {
       expect(photo.thumbnailUrl).to.contain('c_fill,g_auto')
     }
+  })
+  test('nextCursor vaut null ou un id', () => {
+    expect(nextCursor === null || typeof nextCursor === 'string').to.equal(true)
   })
 }
 
 docs {
-  NOMINAL → 200, au plus 20 photos, la plus récente en premier, chacune avec
-  `url` et `thumbnailUrl`.
+  NOMINAL → 200 `{ photos, nextCursor }` : au plus 30 photos (taille par
+  défaut) du compte connecté, chacune avec `url` et `thumbnailUrl`. Un
+  ObjectId commence par sa date de création : des ids décroissants, c'est la
+  plus récente en premier.
 }

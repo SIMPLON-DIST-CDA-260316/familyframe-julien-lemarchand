@@ -1,0 +1,29 @@
+meta {
+  name: Edge - JSON malformé
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/auth/login
+  body: text
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:text {
+  {"email": "{{memberEmail}}"
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq BODY_INVALID
+}
+
+docs {
+  EDGE → 400 BODY_INVALID : `express.json()` (monté sur les routes auth
+  seulement) refuse un corps JSON illisible.
+}

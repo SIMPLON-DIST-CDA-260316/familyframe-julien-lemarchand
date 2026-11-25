@@ -1,0 +1,18 @@
+meta {
+  name: friendships
+  seq: 3
+}
+
+docs {
+  Lancé après `invitations/` (`seq: 3`) : `auth/login/05` a rangé le cookie
+  de l'admin dans `adminCookie`, `invitations/accept/05` celui d'un compte
+  tout neuf dans `inviteeCookie` (le tiers). Le membre, compte par défaut
+  de la collection, envoie toujours la demande ; une requête de l'admin ou du
+  tiers pose son cookie dans son script.
+
+  Une amitié renvoyée par l'API : `{ id, user, createdAt }`. `id` est celui
+  de l'amitié (c'est lui qu'on accepte ou supprime), `user` l'autre compte,
+  `{ id, displayName, email }`, jamais son rôle ni le hash de son mot de
+  passe. La liste : `{ friends, incoming, outgoing }`. Le dossier finit sans
+  aucune amitié entre le membre et l'admin : on peut le relancer.
+}

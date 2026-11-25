@@ -1,4 +1,14 @@
 meta {
   name: list
-  seq: 3
+  seq: 2
+}
+
+docs {
+  `GET /api/photos?cursor=<id>&limit=<n>` → 200 `{ photos, nextCursor }`, les
+  photos du compte connecté, la plus récente en premier. `limit` va de 1 à
+  100 (30 par défaut) ; `nextCursor` est l'id à passer en `cursor` pour la
+  page suivante, `null` à la dernière.
+
+  Lancé entre `create` et `delete` (`seq: 2`) : il voit les deux photos que
+  `create` vient d'ajouter, donc au moins deux pages de une photo.
 }

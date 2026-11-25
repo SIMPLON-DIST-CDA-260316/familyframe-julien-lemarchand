@@ -1,0 +1,38 @@
+meta {
+  name: Nominal - suppression d'une photo
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{baseUrl}}/api/photos/{{createdPhotoId}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 204
+}
+
+script:pre-request {
+  // Without it the request hits /api/photos/ and fails with a misleading status.
+  if (!bru.getVar('createdPhotoId')) {
+    throw new Error('createdPhotoId absent : lancer le dossier photos en entier, create/01 doit passer')
+  }
+}
+
+script:post-response {
+  const axios = require('axios')
+  test('la photo ne figure plus dans la liste', async () => {
+    // A script request does not get the collection headers: send the session cookie itself.
+    const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/photos`, {
+      headers: { Cookie: bru.getVar('sessionCookie') },
+    })
+    const ids = list.data.photos.map(({ id }) => id)
+    expect(ids).to.not.include(bru.getVar('createdPhotoId'))
+  })
+}
+
+docs {
+  NOMINAL → 204, puis `GET /api/photos` ne renvoie plus la photo.
+}

@@ -1,0 +1,27 @@
+meta {
+  name: Edge - photo déjà supprimée
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{baseUrl}}/api/photos/{{createdPhotoId}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq PHOTO_NOT_FOUND
+}
+
+script:pre-request {
+  // Without it this test would pass for the wrong reason.
+  if (!bru.getVar('createdPhotoId')) {
+    throw new Error('createdPhotoId absent : lancer le dossier photos en entier, create/01 doit passer')
+  }
+}
+
+docs {
+  EDGE → 404 `PHOTO_NOT_FOUND` : le même id, une seconde fois.
+}

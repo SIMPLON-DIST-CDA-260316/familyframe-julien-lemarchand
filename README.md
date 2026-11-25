@@ -1,6 +1,6 @@
 # FamilyFrame 🎄
 
-Cadre photo connecté pour les familles éloignées : un proche renseigne son pseudo, prend une photo depuis son smartphone, et elle apparaît en temps réel sur le cadre installé chez ses grands-parents — sans rechargement.
+Cadre photo connecté pour les familles éloignées : un proche se connecte à son compte, prend une photo depuis son smartphone, et elle apparaît en temps réel sur le cadre installé chez ses grands-parents — sans rechargement.
 
 Projet de formation **Concepteur Développeur d'Applications** (Simplon), axé sur la **conteneurisation avec Docker et Docker Compose**. Énoncé complet : [`docs/brief.md`](docs/brief.md).
 
@@ -29,31 +29,53 @@ Architecture, parcours d'une photo et choix techniques : [`ARCHITECTURE.md`](ARC
 ```bash
 pnpm install                         # installe tout le workspace + génère le client Prisma
 cp server/.env.example server/.env   # puis renseigner DATABASE_URL et les 3 variables Cloudinary
-pnpm db:push                         # crée la collection et les index dans MongoDB
+pnpm db:push                         # crée les collections et les index dans MongoDB
+pnpm db:seed                         # vide la base et crée les deux comptes de test
 pnpm dev                             # lance client et serveur en parallèle
 ```
 
-| Service       | URL                         |
-| ------------- | --------------------------- |
-| Envoi         | http://localhost:5180       |
-| Cadre         | http://localhost:5180/frame |
-| API (Express) | http://localhost:3000       |
+Comptes de test créés par `pnpm db:seed` (**développement uniquement**, mots de passe publics) :
+
+| Rôle   | E-mail                    | Mot de passe             |
+| ------ | ------------------------- | ------------------------ |
+| admin  | `admin@familyframe.test`  | `admin-familyframe-dev`  |
+| membre | `membre@familyframe.test` | `membre-familyframe-dev` |
+
+Le seed efface toutes les photos, sessions et comptes avant de recréer ces deux comptes (les images restent sur Cloudinary, sans référence). Il refuse de tourner avec `NODE_ENV=production`.
+
+Quand le schéma change sur une base qui contient déjà des photos, lancer `pnpm db:seed` **avant** `pnpm db:push` : un nouvel index unique ne peut pas se créer tant que d'anciennes photos n'ont pas les nouveaux champs.
+
+| Service       | URL                                     |
+| ------------- | --------------------------------------- |
+| Connexion     | http://localhost:5180/login             |
+| Bibliothèque  | http://localhost:5180                   |
+| Cadre         | http://localhost:5180/frame             |
+| Amis          | http://localhost:5180/friends           |
+| Invitations   | http://localhost:5180/admin/invitations |
+| API (Express) | http://localhost:3000                   |
+
+Sans session, la bibliothèque et le cadre redirigent vers `/login` ; le cadre se connecte une fois avec un compte et reste connecté tant qu'il est allumé : il recharge ses photos chaque jour, ce qui prolonge la session glissante de 90 jours.
+
+Inviter un proche : connecté en admin, ouvrir « Invitations » depuis la bibliothèque, saisir son e-mail et transmettre soi-même le lien obtenu (message, SMS : l'application n'envoie pas d'e-mail). Le lien sert une seule fois, pendant 7 jours ; il ouvre une page où la personne choisit son nom et son mot de passe. Créer les liens depuis l'adresse que la famille utilise (`http://<ip-du-pc>:5180` sur le réseau local), pas depuis `localhost` : le lien reprend l'adresse de la page. Réinviter le même e-mail remplace l'ancien lien.
+
+Ajouter un ami : ouvrir « Amis » depuis la bibliothèque et saisir l'adresse e-mail exacte de son compte FamilyFrame (la personne doit déjà avoir un compte : sinon, demander une invitation à l'admin). Elle voit la demande sous « Demandes reçues » et l'accepte ou la refuse ; une fois acceptée, chacun peut retirer l'autre. Les listes ne se mettent pas à jour toutes seules : recharger la page pour voir la réponse de l'autre.
 
 Depuis un smartphone sur le même réseau : `http://<ip-du-pc>:5180` (le pare-feu Windows doit autoriser Node sur les réseaux privés, et le Wi-Fi ne doit pas isoler les appareils entre eux).
 
 ### Scripts racine
 
-| Script                          | Rôle                                      |
-| ------------------------------- | ----------------------------------------- |
-| `pnpm dev`                      | client + serveur en mode watch            |
-| `pnpm build`                    | build des deux packages                   |
-| `pnpm typecheck`                | vérification TypeScript                   |
-| `pnpm check` / `pnpm check:fix` | lint + format + tri des imports (Biome)   |
-| `pnpm test`                     | tests unitaires du serveur (Vitest)       |
-| `pnpm test:hooks`               | tests des hooks Claude Code               |
-| `pnpm test:bruno`               | requêtes Bruno contre l'API lancée        |
-| `pnpm db:push`                  | synchronise le schéma Prisma avec MongoDB |
-| `pnpm db:studio`                | explorateur de données Prisma Studio      |
+| Script                          | Rôle                                                            |
+| ------------------------------- | --------------------------------------------------------------- |
+| `pnpm dev`                      | client + serveur en mode watch                                  |
+| `pnpm build`                    | build des deux packages                                         |
+| `pnpm typecheck`                | vérification TypeScript                                         |
+| `pnpm check` / `pnpm check:fix` | lint + format + tri des imports (Biome)                         |
+| `pnpm test`                     | tests unitaires du serveur (Vitest)                             |
+| `pnpm test:hooks`               | tests des hooks Claude Code                                     |
+| `pnpm test:bruno`               | requêtes Bruno contre l'API lancée                              |
+| `pnpm db:push`                  | synchronise le schéma Prisma avec MongoDB                       |
+| `pnpm db:seed`                  | vide la base et crée les comptes de test (refusé en production) |
+| `pnpm db:studio`                | explorateur de données Prisma Studio                            |
 
 ## Contribuer
 

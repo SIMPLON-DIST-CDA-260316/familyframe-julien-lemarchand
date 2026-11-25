@@ -1,0 +1,46 @@
+meta {
+  name: Nominal - connexion du membre
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{memberEmail}}",
+    "password": "{{memberPassword}}"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.user.id: isString
+  res.body.user.email: eq {{memberEmail}}
+  res.body.user.displayName: eq {{memberDisplayName}}
+  res.body.user.role: eq member
+  res.body.user.passwordHash: isUndefined
+}
+
+script:post-response {
+  const setCookies = [].concat(res.getHeader('set-cookie') ?? [])
+  const sessionCookie = setCookies.find((cookie) => cookie.startsWith('ff_session='))
+  test('cookie de session : jeton hexadécimal de 64 caractères, httpOnly, SameSite=Lax', () => {
+    expect(sessionCookie).to.match(/^ff_session=[0-9a-f]{64};/)
+    expect(sessionCookie).to.contain('HttpOnly')
+    expect(sessionCookie).to.contain('SameSite=Lax')
+  })
+  // Only the name=value pair goes back, in the Cookie header of collection.bru.
+  if (sessionCookie) {
+    bru.setVar('sessionCookie', sessionCookie.split(';')[0])
+  }
+}
+
+docs {
+  NOMINAL → 200 `{ user }` et le cookie `ff_session`. Le script range
+  `ff_session=<jeton>` dans `sessionCookie` pour les requêtes suivantes.
+}

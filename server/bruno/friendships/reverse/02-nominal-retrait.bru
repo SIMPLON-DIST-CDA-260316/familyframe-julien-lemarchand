@@ -1,0 +1,26 @@
+meta {
+  name: Nominal - le membre retire l'amitié croisée
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{baseUrl}}/api/friendships/{{crossFriendshipId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('crossFriendshipId')) {
+    throw new Error('crossFriendshipId absent : lancer tout le dossier, reverse/01 doit passer')
+  }
+}
+
+assert {
+  res.status: eq 204
+}
+
+docs {
+  NOMINAL → 204 : le membre retire l'amitié née de `01`. Le dossier ne
+  laisse aucune amitié entre le membre et l'admin.
+}

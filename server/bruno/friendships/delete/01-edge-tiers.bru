@@ -1,0 +1,30 @@
+meta {
+  name: Edge - amitié d'autres comptes
+  type: http
+  seq: 1
+}
+
+delete {
+  url: {{baseUrl}}/api/friendships/{{friendshipId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('inviteeCookie') || !bru.getVar('friendshipId')) {
+    throw new Error('inviteeCookie ou friendshipId absent : lancer toute la collection, invitations/accept/05 et create/01 doivent passer')
+  }
+  // The account created by invitations/accept/05 is on neither side.
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq FRIENDSHIP_NOT_FOUND
+}
+
+docs {
+  EDGE → 404 FRIENDSHIP_NOT_FOUND : un tiers (le compte créé par
+  `invitations/accept/05`) ne supprime pas le lien entre le membre et
+  l'admin, et la réponse ne dit pas qu'il existe.
+}

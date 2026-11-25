@@ -1,0 +1,20 @@
+meta {
+  name: Edge - un membre liste les invitations
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/invitations
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 403
+  res.body.error: eq FORBIDDEN
+}
+
+docs {
+  EDGE → 403 FORBIDDEN : le cookie de la collection est celui du membre.
+}

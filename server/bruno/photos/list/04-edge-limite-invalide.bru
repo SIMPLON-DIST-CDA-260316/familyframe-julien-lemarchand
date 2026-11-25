@@ -1,0 +1,21 @@
+meta {
+  name: Edge - limite invalide
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/photos?limit=0
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq QUERY_INVALID
+}
+
+docs {
+  EDGE → 400 QUERY_INVALID : `limit` va de 1 à 100. Les autres cas (101,
+  `abc`, `1.5`, paramètre répété) sont dans `photos.service.list.test.ts`.
+}

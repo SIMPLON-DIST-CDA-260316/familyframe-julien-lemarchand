@@ -1,0 +1,39 @@
+meta {
+  name: Nominal - liste de l'admin
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/friendships
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('adminCookie') || !bru.getVar('friendshipId')) {
+    throw new Error('adminCookie ou friendshipId absent : lancer toute la collection, create/01 doit passer')
+  }
+  req.setHeader('Cookie', bru.getVar('adminCookie'))
+}
+
+assert {
+  res.status: eq 200
+  res.body.incoming: isArray
+}
+
+script:post-response {
+  const friendshipId = bru.getVar('friendshipId')
+  const idsOf = (friendships) => friendships.map(({ id }) => id)
+  test('la demande est dans « reçues », venant du membre', () => {
+    const received = res.body.incoming.find(({ id }) => id === friendshipId)
+    expect(received.user.email).to.equal(bru.getEnvVar('memberEmail'))
+    expect(idsOf(res.body.outgoing)).to.not.include(friendshipId)
+    expect(idsOf(res.body.friends)).to.not.include(friendshipId)
+  })
+}
+
+docs {
+  NOMINAL → 200 : chez l'admin, la même demande est dans `incoming`, avec le
+  membre comme `user`.
+}

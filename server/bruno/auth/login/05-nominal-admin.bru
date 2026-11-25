@@ -1,0 +1,43 @@
+meta {
+  name: Nominal - connexion de l'admin
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{adminEmail}}",
+    "password": "{{adminPassword}}"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.user.role: eq admin
+}
+
+script:post-response {
+  const setCookies = [].concat(res.getHeader('set-cookie') ?? [])
+  const adminCookie = setCookies.find((cookie) => cookie.startsWith('ff_session='))
+  test('un cookie de session pour l\'admin', () => {
+    expect(adminCookie).to.match(/^ff_session=[0-9a-f]{64};/)
+  })
+  // Not sessionCookie: the member stays the account of every other request.
+  if (adminCookie) {
+    bru.setVar('adminCookie', adminCookie.split(';')[0])
+  }
+}
+
+docs {
+  NOMINAL → 200, le second compte de test. Son cookie va dans `adminCookie`,
+  pas dans `sessionCookie` : les autres requêtes restent celles du membre, et
+  les tests de `logout/` ne ferment que la session du membre. Une requête
+  passe à l'admin avec `req.setHeader('Cookie', bru.getVar('adminCookie'))`
+  dans son script.
+}

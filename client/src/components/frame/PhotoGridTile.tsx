@@ -1,6 +1,7 @@
 import type { JSX } from 'react'
 import { PhotoActionsMenu } from '@/components/frame/PhotoActionsMenu.tsx'
 import type { Photo } from '@/photo.ts'
+import { photoLabel } from '@/photoLabel.ts'
 
 type PhotoGridTileProps = {
   photo: Photo
@@ -21,17 +22,14 @@ export function PhotoGridTile({ photo, isCurrent, onSelect }: PhotoGridTileProps
         <img
           className="aspect-square w-full object-cover motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover/tile:scale-105"
           src={photo.thumbnailUrl}
-          alt={`Envoyée par ${photo.uploaderName}`}
+          alt={photoLabel(photo)}
           loading="lazy"
           decoding="async"
         />
-        <span className="absolute inset-x-0 bottom-0 truncate bg-linear-to-t from-black/75 to-transparent px-3 pt-8 pb-2 text-left text-sm font-medium text-white">
-          {photo.uploaderName}
-        </span>
       </button>
       <PhotoActionsMenu
         photo={photo}
-        label={`Actions sur la photo envoyée par ${photo.uploaderName}`}
+        label={`Actions : ${photoLabel(photo)}`}
         className="absolute top-2 right-2 rounded-full bg-black/55 text-white/80 backdrop-blur-sm hover:bg-black/75 hover:text-white dark:hover:bg-black/75"
       />
     </li>

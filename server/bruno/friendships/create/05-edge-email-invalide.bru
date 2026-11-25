@@ -1,0 +1,27 @@
+meta {
+  name: Edge - e-mail invalide
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/friendships
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "pas-un-email"
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq EMAIL_INVALID
+}
+
+docs {
+  EDGE → 400 EMAIL_INVALID : même règle que pour une invitation
+  (`lib/email.ts`).
+}

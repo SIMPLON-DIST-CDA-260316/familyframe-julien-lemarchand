@@ -1,0 +1,13 @@
+meta {
+  name: reverse
+  seq: 5
+}
+
+docs {
+  Demande croisée : `POST /api/friendships` vers quelqu'un dont la demande
+  m'attend déjà accepte cette demande au lieu d'en créer une seconde, et
+  répond 200 `{ friendship }` (201 reste la réponse d'une nouvelle demande).
+  Même écriture atomique que `POST /api/friendships/:id/accept`. Lancé après
+  `delete/`, qui ne laisse aucune amitié : `02` retire celle créée par `01`,
+  le dossier se relance.
+}

@@ -1,0 +1,42 @@
+meta {
+  name: Nominal - l'admin accepte
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/friendships/{{friendshipId}}/accept
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('adminCookie') || !bru.getVar('friendshipId')) {
+    throw new Error('adminCookie ou friendshipId absent : lancer toute la collection, create/01 doit passer')
+  }
+  req.setHeader('Cookie', bru.getVar('adminCookie'))
+}
+
+assert {
+  res.status: eq 200
+  res.body.friendship.id: eq {{friendshipId}}
+  res.body.friendship.user.email: eq {{memberEmail}}
+}
+
+script:post-response {
+  const axios = require('axios')
+  test('le membre voit l\'admin dans « Mes amis »', async () => {
+    // A script request does not get the collection headers: send the cookie itself.
+    const { data } = await axios.get(`${bru.getEnvVar('baseUrl')}/api/friendships`, {
+      headers: { Cookie: bru.getVar('sessionCookie') },
+    })
+    expect(data.friends.map(({ id }) => id)).to.include(bru.getVar('friendshipId'))
+    expect(data.outgoing.map(({ id }) => id)).to.not.include(bru.getVar('friendshipId'))
+  })
+}
+
+docs {
+  NOMINAL → 200 `{ friendship }` : l'admin accepte, `user` est le membre.
+  Le script vérifie que, chez le membre, la demande est passée de
+  `outgoing` à `friends`.
+}

@@ -1,26 +1,65 @@
 // Copy of server/src/types.ts, see why there. Keep both in sync.
 export type ApiErrorCode =
-  | 'UPLOADER_NAME_INVALID'
   | 'PHOTO_MISSING'
+  | 'EMAIL_INVALID'
   | 'UPLOAD_INVALID'
+  | 'BODY_INVALID'
+  | 'QUERY_INVALID'
+  | 'DISPLAY_NAME_INVALID'
+  | 'PASSWORD_INVALID'
+  | 'SELF_FRIEND'
+  | 'UNAUTHENTICATED'
+  | 'INVALID_CREDENTIALS'
+  | 'FORBIDDEN'
   | 'ROUTE_NOT_FOUND'
   | 'PHOTO_NOT_FOUND'
+  | 'INVITATION_NOT_FOUND'
+  | 'USER_NOT_FOUND'
+  | 'FRIENDSHIP_NOT_FOUND'
+  | 'PHOTO_DUPLICATE'
+  | 'ACCOUNT_EXISTS'
+  | 'ALREADY_FRIENDS'
+  | 'FRIEND_REQUEST_EXISTS'
+  | 'INVITATION_EXPIRED'
+  | 'INVITATION_USED'
   | 'PHOTO_TOO_LARGE'
   | 'FORMAT_UNSUPPORTED'
   | 'IMAGE_UNREADABLE'
   | 'SERVER_ERROR'
 
 const ERROR_MESSAGES: Record<ApiErrorCode, string> = {
-  UPLOADER_NAME_INVALID: 'Indiquez un pseudo (30 caractères maximum).',
   PHOTO_MISSING: 'Prenez ou choisissez une photo.',
+  EMAIL_INVALID: 'Adresse e-mail invalide.',
   UPLOAD_INVALID: 'Envoi invalide : une seule photo à la fois.',
+  BODY_INVALID: 'Requête invalide. Rechargez la page et réessayez.',
+  QUERY_INVALID: 'Requête invalide. Rechargez la page et réessayez.',
+  DISPLAY_NAME_INVALID: 'Choisissez un nom de 1 à 50 caractères.',
+  PASSWORD_INVALID: 'Le mot de passe doit faire entre 12 et 128 caractères.',
+  SELF_FRIEND: 'Vous ne pouvez pas vous ajouter vous-même.',
+  UNAUTHENTICATED: 'Votre session a expiré. Reconnectez-vous.',
+  INVALID_CREDENTIALS: 'E-mail ou mot de passe incorrect.',
+  FORBIDDEN: "Cette action est réservée à l'administrateur.",
   ROUTE_NOT_FOUND: "Cette adresse n'existe pas sur le serveur.",
   PHOTO_NOT_FOUND: 'Cette photo a déjà été supprimée.',
+  INVITATION_NOT_FOUND: "Ce lien d'invitation n'est pas valide. Demandez-en un nouveau.",
+  USER_NOT_FOUND:
+    "Aucun compte n'utilise cette adresse e-mail. Demandez à l'administrateur d'inviter cette personne.",
+  FRIENDSHIP_NOT_FOUND: "Cette demande ou cette amitié n'existe plus.",
+  PHOTO_DUPLICATE: 'Cette photo est déjà dans votre bibliothèque.',
+  ACCOUNT_EXISTS: 'Un compte existe déjà pour cette adresse e-mail.',
+  ALREADY_FRIENDS: 'Vous êtes déjà amis.',
+  FRIEND_REQUEST_EXISTS:
+    'Vous avez déjà envoyé une demande à cette personne : elle attend sa réponse.',
+  INVITATION_EXPIRED: "Ce lien d'invitation a expiré. Demandez-en un nouveau.",
+  INVITATION_USED: "Ce lien d'invitation a déjà servi. Connectez-vous.",
   PHOTO_TOO_LARGE: 'La photo est trop lourde (10 Mo maximum).',
   FORMAT_UNSUPPORTED: 'Format non pris en charge : JPEG, PNG ou WebP uniquement.',
   IMAGE_UNREADABLE: "Ce fichier n'est pas une image lisible.",
   SERVER_ERROR: 'Le serveur a rencontré un problème. Réessayez plus tard.',
 }
+
+// UNAUTHENTICATED: the session ended on the server, the client drops its user.
+export const UNAUTHORIZED_STATUS = 401
 
 const GENERIC_MESSAGE = "L'opération a échoué. Vérifiez la connexion et réessayez."
 

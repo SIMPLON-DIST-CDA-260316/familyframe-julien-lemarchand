@@ -1,0 +1,38 @@
+meta {
+  name: Nominal - le membre supprime le lien
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{baseUrl}}/api/friendships/{{friendshipId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('adminCookie') || !bru.getVar('friendshipId')) {
+    throw new Error('adminCookie ou friendshipId absent : lancer toute la collection, create/01 doit passer')
+  }
+}
+
+assert {
+  res.status: eq 204
+}
+
+script:post-response {
+  const axios = require('axios')
+  test('le lien disparaît aussi chez l\'admin', async () => {
+    const { data } = await axios.get(`${bru.getEnvVar('baseUrl')}/api/friendships`, {
+      headers: { Cookie: bru.getVar('adminCookie') },
+    })
+    const ids = [...data.friends, ...data.incoming, ...data.outgoing].map(({ id }) => id)
+    expect(ids).to.not.include(bru.getVar('friendshipId'))
+  })
+}
+
+docs {
+  NOMINAL → 204 : le membre supprime le lien de `create/01`, devenu une amitié
+  acceptée par `accept/03` : un retrait d'ami.
+  Le script vérifie qu'aucune des trois listes de l'admin ne l'a plus.
+}

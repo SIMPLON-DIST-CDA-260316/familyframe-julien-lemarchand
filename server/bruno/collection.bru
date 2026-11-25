@@ -2,19 +2,42 @@ meta {
   name: familyframe
 }
 
+headers {
+  Cookie: {{sessionCookie}}
+}
+
 auth {
   mode: none
 }
 
 docs {
-  Requêtes de l'API, avec leurs assertions. Prérequis : `server/.env` rempli
-  et l'API lancée (`pnpm dev`, port 3000).
+  Requêtes de l'API, avec leurs assertions. Prérequis : `server/.env` rempli,
+  la base remplie par `pnpm db:seed` et l'API lancée (`pnpm dev`, port 3000).
 
   Lancer toute la collection depuis la racine du dépôt : `pnpm test:bruno`.
   Ou ouvrir le dossier `server/bruno/` dans l'application Bruno.
 
-  Les envois nominaux publient de vraies photos (Cloudinary + MongoDB) avec
-  le pseudo `bruno` : elles apparaissent sur le cadre.
+  Session : le dossier `auth/` passe en premier et range le cookie de session
+  dans la variable `sessionCookie`, envoyée à toutes les requêtes par l'en-tête
+  `Cookie` ci-dessus. Le CLI tourne avec `--disable-cookies` : sa propre boîte
+  à cookies renverrait sinon la session même aux requêtes « sans cookie ».
+
+  Les envois nominaux publient de vraies photos (Cloudinary + MongoDB) dans
+  la bibliothèque du membre de test : elles apparaissent sur son cadre, et
+  `photos/delete` les supprime en fin de lancement. Le second compte (l'admin,
+  `auth/login/05`, cookie dans la variable `adminCookie`) crée les
+  invitations et vérifie qu'un compte ne touche pas aux photos d'un autre. Si
+  un lancement s'arrête avant `photos/delete`, ses photos restent : le
+  suivant répond 409 `PHOTO_DUPLICATE` à `create/01` ; `pnpm db:seed` remet
+  la base à zéro.
+
+  Chaque lancement crée aussi un compte membre à une adresse neuve
+  (`invitations/accept/05`, `invite-<horodatage>@familyframe.test`) : ces
+  comptes restent jusqu'au prochain `pnpm db:seed`. Son cookie va dans
+  `inviteeCookie` : le dossier `friendships/` s'en sert comme tiers, ni
+  membre ni admin. Ce dossier crée et supprime ses propres amitiés entre le
+  membre et l'admin : il n'en laisse aucune, et commence par effacer celles
+  d'un lancement interrompu.
 
   Chemins `@file()` relatifs à la racine de la collection (`server/bruno/`).
 }

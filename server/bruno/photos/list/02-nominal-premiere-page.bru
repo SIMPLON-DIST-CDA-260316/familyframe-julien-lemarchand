@@ -1,0 +1,28 @@
+meta {
+  name: Nominal - première page d'une photo
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/photos?limit=1
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body.photos.length: eq 1
+  res.body.nextCursor: isString
+}
+
+script:post-response {
+  // 03 asks for the page after this one.
+  bru.setVar('firstPagePhotoId', res.body.photos?.[0]?.id)
+  bru.setVar('nextCursor', res.body.nextCursor)
+}
+
+docs {
+  NOMINAL → 200, une seule photo et un `nextCursor` : `create/01` et
+  `create/02` viennent d'ajouter deux photos, il y a donc une page suivante.
+}

@@ -7,12 +7,79 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  member
+  admin
+}
+
+enum FriendshipStatus {
+  pending
+  accepted
+}
+
+model User {
+  id                     String       @id @default(auto()) @map("_id") @db.ObjectId
+  email                  String       @unique
+  displayName            String
+  passwordHash           String
+  role                   Role         @default(member)
+  createdAt              DateTime     @default(now())
+  sessions               Session[]
+  photos                 Photo[]
+  invitations            Invitation[]
+  sentFriendRequests     Friendship[] @relation("FriendshipRequester")
+  receivedFriendRequests Friendship[] @relation("FriendshipAddressee")
+}
+
+model Session {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  tokenHash String   @unique
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
 model Photo {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  ownerId      String   @db.ObjectId
+  owner        User     @relation(fields: [ownerId], references: [id])
   url          String
-  cloudinaryId String   @unique
-  uploaderName String
+  cloudinaryId String
+  sha256       String
   createdAt    DateTime @default(now())
 
-  @@index([createdAt])
+  @@unique([ownerId, sha256])
+  @@index([ownerId, id])
+  @@index([cloudinaryId])
+}
+
+model Invitation {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  tokenHash   String    @unique
+  email       String
+  invitedById String    @db.ObjectId
+  invitedBy   User      @relation(fields: [invitedById], references: [id])
+  expiresAt   DateTime
+  usedAt      DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([email])
+}
+
+model Friendship {
+  id          String           @id @default(auto()) @map("_id") @db.ObjectId
+  requesterId String           @db.ObjectId
+  requester   User             @relation("FriendshipRequester", fields: [requesterId], references: [id])
+  addresseeId String           @db.ObjectId
+  addressee   User             @relation("FriendshipAddressee", fields: [addresseeId], references: [id])
+  // Both ids sorted: the unique index then refuses a pair in either order.
+  pairKey     String           @unique
+  status      FriendshipStatus @default(pending)
+  createdAt   DateTime         @default(now())
+
+  @@index([requesterId])
+  @@index([addresseeId])
 }
