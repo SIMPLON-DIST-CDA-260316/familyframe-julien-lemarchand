@@ -28,7 +28,7 @@ Envoyer une photo à un ou plusieurs amis la fait entrer dans sa bibliothèque e
 11. R-PAR-45 · Le bouton indique combien de personnes recevront la photo et reste grisé tant que personne n'est choisi.
 12. R-PAR-46 · Dès qu'au moins une personne a reçu la photo, le panneau se ferme et une notification dit à qui elle est partie, ainsi que pour qui l'envoi a échoué. Si personne ne l'a reçue, le panneau reste ouvert avec les raisons, et le choix est gardé.
 13. R-PAR-47 · Le rond de chaque proche porte sa photo de profil quand il en a une, et sa première lettre en majuscule sinon.
-14. R-PAR-48 · Le message est facultatif et fait 200 caractères au plus ; un compteur indique combien il en reste. Les espaces au début et à la fin sont retirés, et un message vide ou fait seulement d'espaces compte comme aucun message. Envoyée à plusieurs proches en une fois, la photo leur parvient à tous avec le même message.
+14. R-PAR-48 · Le message est facultatif et fait 200 caractères au plus ; un compteur indique combien de caractères sont écrits (par exemple « 12 / 200 »). Les espaces au début et à la fin sont retirés, et un message vide ou fait seulement d'espaces compte comme aucun message. Envoyée à plusieurs proches en une fois, la photo leur parvient à tous avec le même message.
 
 **Messages affichés**
 
