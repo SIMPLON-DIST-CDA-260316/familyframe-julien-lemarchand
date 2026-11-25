@@ -27,6 +27,10 @@ const LIBRARY = [
   IN_TWO_COLLECTIONS,
   UNRELATED,
 ]
+// 11:00 in Paris, 25 November 2026.
+const MORNING = new Date('2026-11-25T10:00:00Z')
+const EVENING = new Date('2026-11-25T21:00:00Z')
+const NEXT_DAY = new Date('2026-11-26T10:00:00Z')
 const COLLECTIONS = [
   [START.id, IN_TWO_COLLECTIONS.id],
   [IN_TWO_COLLECTIONS.id, START.id],
@@ -34,8 +38,11 @@ const COLLECTIONS = [
   [UNRELATED.id],
 ]
 
-// With random always 0, Fisher-Yates swaps each item with the first: [a, b] becomes [b, a].
-function makeDeps(photos: SelectionPhoto[] = LIBRARY, collections: string[][] = COLLECTIONS) {
+function makeDeps(
+  photos: SelectionPhoto[] = LIBRARY,
+  collections: string[][] = COLLECTIONS,
+  now: Date = MORNING,
+) {
   return {
     repository: {
       findOpenedPhotos: vi.fn<SelectionsRepository['findOpenedPhotos']>().mockResolvedValue(photos),
@@ -43,8 +50,7 @@ function makeDeps(photos: SelectionPhoto[] = LIBRARY, collections: string[][] = 
         .fn<SelectionsRepository['findCollectionPhotoIds']>()
         .mockResolvedValue(collections),
     },
-    now: () => new Date('2026-11-25T10:00:00Z'),
-    random: vi.fn(() => 0),
+    now: () => now,
   }
 }
 
@@ -79,33 +85,35 @@ describe('radioSelection', () => {
       FOUR_DAYS_LATER.id,
       SAME_SENDER.id,
       // No link: eight days is no longer close, and the collection without START does not count.
-      UNRELATED.id,
+      // Their order is MORNING's draw.
       EIGHT_DAYS_LATER.id,
+      UNRELATED.id,
     ])
   })
 
   it('does not link two photos the owner added as the same sender', async () => {
     const ownStart = photo(10, '2026-06-01T10:00:00Z')
-    const ownCloser = photo(11, '2026-02-01T10:00:00Z')
-    const ownFarther = photo(12, '2026-01-01T10:00:00Z')
+    const ownCloser = photo(12, '2026-02-01T10:00:00Z')
+    const ownFarther = photo(11, '2026-01-01T10:00:00Z')
     const deps = makeDeps([ownStart, ownCloser, ownFarther], [])
 
-    // Linked, they would come closest first; unlinked, the draw swaps them.
+    // Linked, they would come closest first; unlinked, MORNING's draw puts the farther first.
     expect(await radioFrom(ownStart.id, deps)).toEqual([ownStart.id, ownFarther.id, ownCloser.id])
   })
 
-  it('tops up with the unlinked photos in the order the draw gives', async () => {
-    const deps = makeDeps()
-    // Close to 1, Fisher-Yates swaps nothing: the library's order, where a draw of 0 reverses it.
-    const drawWithoutSwap = 0.99
-    deps.random.mockReturnValue(drawWithoutSwap)
+  it('tops up with the unlinked photos in the same order all day', async () => {
+    const eveningRadio = await radioFrom(START.id, makeDeps(LIBRARY, COLLECTIONS, EVENING))
 
-    const unlinkedTail = (await radioFrom(START.id, deps)).slice(-2)
-
-    expect(unlinkedTail).toEqual([EIGHT_DAYS_LATER.id, UNRELATED.id])
+    expect(eveningRadio).toEqual(await radioFrom(START.id))
   })
 
-  it('stops at RADIO_LENGTH photos, without a draw when the linked photos fill it', async () => {
+  it('draws the unlinked photos in another order the next day', async () => {
+    const nextDayRadio = await radioFrom(START.id, makeDeps(LIBRARY, COLLECTIONS, NEXT_DAY))
+
+    expect(nextDayRadio.slice(-2)).toEqual([UNRELATED.id, EIGHT_DAYS_LATER.id])
+  })
+
+  it('stops at RADIO_LENGTH photos', async () => {
     const moreThanRadioLength = RADIO_LENGTH + 10
     const sameWeek = Array.from({ length: moreThanRadioLength }, (_, index) =>
       photo(LIBRARY.length + 1 + index, '2026-06-02T10:00:00Z'),
@@ -113,7 +121,6 @@ describe('radioSelection', () => {
     const deps = makeDeps([START, ...sameWeek], [])
 
     expect(await radioFrom(START.id, deps)).toHaveLength(RADIO_LENGTH)
-    expect(deps.random).not.toHaveBeenCalled()
   })
 
   it('plays the photo alone in a library of one', async () => {

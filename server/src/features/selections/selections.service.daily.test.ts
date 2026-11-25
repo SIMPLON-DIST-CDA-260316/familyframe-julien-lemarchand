@@ -32,7 +32,6 @@ function makeDeps(photos: SelectionPhoto[] = LIBRARY, now: Date = MORNING) {
       findCollectionPhotoIds: vi.fn<SelectionsRepository['findCollectionPhotoIds']>(),
     },
     now: () => now,
-    random: Math.random,
   }
 }
 

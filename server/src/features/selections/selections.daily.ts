@@ -20,15 +20,16 @@ export function dayOf(date: Date): string {
 }
 
 // A hash, not Math.random: the same seed and photo always get the same rank, so every device and
-// every reload shows the same lot all day, and another seed shuffles them anew.
+// every reload shows the same draw all day, and another seed shuffles them anew.
 function drawRank(seed: string, photoId: string): string {
   return createHash('sha256').update(`${seed}:${photoId}`).digest('hex')
 }
 
-function idsInDrawOrder(photos: SelectionPhoto[], seed: string): string[] {
+// Also the radio's random tail: reloading a radio gives the same suite within the day.
+export function idsInDrawOrder(photos: SelectionPhoto[], seed: string): string[] {
   return photos
     .map(({ id }) => ({ id, rank: drawRank(seed, id) }))
-    .sort((a, b) => (a.rank < b.rank ? -1 : 1))
+    .sort((a, b) => a.rank.localeCompare(b.rank))
     .map(({ id }) => id)
 }
 

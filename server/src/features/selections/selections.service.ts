@@ -1,15 +1,14 @@
 import { AppError } from '../../errors/app-error.js'
 import type { Selection } from '../../types.js'
 import { parsePhotoId } from '../photos/photos.input.js'
-import { drawDailySelection } from './selections.daily.js'
+import { dayOf, drawDailySelection } from './selections.daily.js'
 import { buildRadio } from './selections.radio.js'
 import type { SelectionsRepository } from './selections.repository.js'
 
 export type SelectionsServiceDeps = {
   repository: SelectionsRepository
-  // Injected: a test picks the day, and fixes the radio's draw.
+  // Injected: a test picks the day, which seeds both draws.
   now: () => Date
-  random: () => number
 }
 
 // photoId comes from the URL; ownerId is the logged-in account.
@@ -30,7 +29,7 @@ async function dailySelection(
 
 // Unknown, someone else's and still unopened photos all answer « not found », like opening one.
 async function radioSelection(
-  { repository, random }: SelectionsServiceDeps,
+  { repository, now }: SelectionsServiceDeps,
   { ownerId, photoId }: RadioRequest,
 ): Promise<Selection> {
   // MongoDB answers ObjectIds in lowercase: an id sent in capitals must compare equal to it.
@@ -41,7 +40,7 @@ async function radioSelection(
     throw new AppError('PHOTO_NOT_FOUND')
   }
   const collections = await repository.findCollectionPhotoIds(ownerId)
-  return { photoIds: buildRadio({ photos, start, collections, random }) }
+  return { photoIds: buildRadio({ photos, start, collections, day: dayOf(now()) }) }
 }
 
 export function createSelectionsService(deps: SelectionsServiceDeps): SelectionsService {

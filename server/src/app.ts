@@ -85,7 +85,6 @@ function assembleSelectionsRouter(): Router {
   const service = createSelectionsService({
     repository: createSelectionsRepository(prisma),
     now: () => new Date(),
-    random: Math.random,
   })
   return createSelectionsRouter(createSelectionsController(service))
 }

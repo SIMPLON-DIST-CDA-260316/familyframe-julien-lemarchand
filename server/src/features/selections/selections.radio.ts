@@ -1,3 +1,4 @@
+import { idsInDrawOrder } from './selections.daily.js'
 import type { SelectionPhoto } from './selections.repository.js'
 
 // The photo it starts from and 29 more: a few minutes of frame before it loops.
@@ -12,7 +13,8 @@ export type RadioDraw = {
   start: SelectionPhoto
   // One list of photo ids per collection of the owner.
   collections: string[][]
-  random: () => number
+  // The Paris day (dayOf): it seeds the draw of the unlinked photos.
+  day: string
 }
 
 type RadioContext = { start: SelectionPhoto; startCollections: string[][] }
@@ -40,20 +42,10 @@ function byLinks(a: ScoredPhoto, b: ScoredPhoto): number {
   return b.linkCount - a.linkCount || a.gapMs - b.gapMs
 }
 
-// Fisher-Yates on a copy: every order is equally likely.
-function shuffled(items: ScoredPhoto[], random: () => number): ScoredPhoto[] {
-  const result = [...items]
-  for (let index = result.length - 1; index > 0; index--) {
-    const swapIndex = Math.floor(random() * (index + 1))
-    const swapped = result[index]
-    result[index] = result[swapIndex]
-    result[swapIndex] = swapped
-  }
-  return result
-}
-
-// The start photo, then the photos linked to it, then, when they run out, the others at random.
-export function buildRadio({ photos, start, collections, random }: RadioDraw): string[] {
+// The start photo, then the photos linked to it, then, when they run out, the others at random:
+// drawn like the day's selection, seeded by the start photo and the day, so a reload of the same
+// radio plays the same suite that day.
+export function buildRadio({ photos, start, collections, day }: RadioDraw): string[] {
   const startCollections = collections.filter((photoIds) => photoIds.includes(start.id))
   const context = { start, startCollections }
   const scored = photos
@@ -63,11 +55,11 @@ export function buildRadio({ photos, start, collections, random }: RadioDraw): s
       linkCount: countLinks(photo, context),
       gapMs: timeGapMs(photo, start),
     }))
-  const linked = scored.filter(({ linkCount }) => linkCount > 0).sort(byLinks)
-  const unlinked = shuffled(
-    scored.filter(({ linkCount }) => linkCount === 0),
-    random,
-  )
-  const followingIds = [...linked, ...unlinked].map(({ photo }) => photo.id)
-  return [start.id, ...followingIds].slice(0, RADIO_LENGTH)
+  const linkedIds = scored
+    .filter(({ linkCount }) => linkCount > 0)
+    .sort(byLinks)
+    .map(({ photo }) => photo.id)
+  const unlinkedPhotos = scored.filter(({ linkCount }) => linkCount === 0).map(({ photo }) => photo)
+  const unlinkedIds = idsInDrawOrder(unlinkedPhotos, `${start.id}:${day}`)
+  return [start.id, ...linkedIds, ...unlinkedIds].slice(0, RADIO_LENGTH)
 }
