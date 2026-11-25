@@ -36,6 +36,14 @@ script:post-response {
   test('triées à la française : « Été 2026 » avant « Noël »', () => {
     expect(res.body.collections.map(({ name }) => name)).to.eql(['Été 2026', 'Noël'])
   })
+  test('chaque collection a sa couverture et ses dates, texte ou null', () => {
+    for (const collection of res.body.collections) {
+      for (const field of ['coverUrl', 'oldestPhotoAt', 'newestPhotoAt']) {
+        expect(collection).to.have.property(field)
+        expect(collection[field] === null || typeof collection[field] === 'string').to.equal(true)
+      }
+    }
+  })
   test('le membre ne voit pas les collections du compte jetable', async () => {
     expect(await namesOf(bru.getVar('sessionCookie'))).to.not.include('Été 2026')
   })
@@ -44,5 +52,7 @@ script:post-response {
 docs {
   NOMINAL → 200 avec les deux collections de `create/`. Un tri par octets
   placerait « Été » après « Noël » : le serveur trie comme en français. Le
-  script vérifie aussi que le membre ne les voit pas.
+  script vérifie aussi que le membre ne les voit pas, et que chaque
+  collection porte `coverUrl`, `oldestPhotoAt` et `newestPhotoAt` (texte,
+  ou null pour une collection vide).
 }

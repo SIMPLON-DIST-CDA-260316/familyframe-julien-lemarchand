@@ -32,20 +32,27 @@ assert {
 script:post-response {
   const axios = require('axios')
   // A script request does not get the collection headers: send the cookie itself.
-  const photoIdsOf = async (collectionId) => {
+  const collectionOf = async (collectionId) => {
     const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/collections`, {
       headers: { Cookie: bru.getVar('inviteeCookie') },
     })
-    return list.data.collections.find(({ id }) => id === collectionId).photoIds
+    return list.data.collections.find(({ id }) => id === collectionId)
   }
   test('la collection ne liste plus la photo supprimée', async () => {
-    expect(await photoIdsOf(bru.getVar('collectionId'))).to.eql([])
+    expect((await collectionOf(bru.getVar('collectionId'))).photoIds).to.eql([])
+  })
+  test('vide, elle perd sa couverture et ses dates', async () => {
+    const collection = await collectionOf(bru.getVar('collectionId'))
+    expect(collection.coverUrl).to.equal(null)
+    expect(collection.oldestPhotoAt).to.equal(null)
+    expect(collection.newestPhotoAt).to.equal(null)
   })
 }
 
 docs {
   NOMINAL → 204 : le compte jetable supprime de sa bibliothèque une photo
   rangée dans la collection (le script de départ l'y remet). Le script
-  relit la liste : la collection ne la montre plus. Supprime aussi la
-  photo de `01`.
+  relit la liste : la collection ne la montre plus et, vide, n'a plus ni
+  couverture ni dates (`coverUrl`, `oldestPhotoAt`, `newestPhotoAt` à
+  null). Supprime aussi la photo de `01`.
 }
