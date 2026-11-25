@@ -8,8 +8,10 @@ type PhotoGridProps = {
   // null on the library page: no photo is on screen there.
   currentId: string | null
   onSelect: (id: string) => void
-  // Items placed before the photos: the library's uploads still on their way.
+  // Items placed before the photos of the day keyed childrenDayKey: the library's uploads still
+  // on their way, under today.
   children?: ReactNode
+  childrenDayKey?: string
 }
 
 // Edge to edge with the page's header. Three tight columns on a phone, as photo apps do, so a
@@ -18,14 +20,20 @@ const GRID_CLASSES =
   'grid grid-cols-3 gap-1 sm:grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] sm:gap-4'
 
 // One grid per day, under its date: a day with two photos leaves the rest of its row empty.
-// children go first in the first day, « Aujourd'hui », where their photos appear once sent.
-export function PhotoGrid({ days, currentId, onSelect, children }: PhotoGridProps): JSX.Element {
+// children go first in their day, « Aujourd'hui », where their photos appear once sent.
+export function PhotoGrid({
+  days,
+  currentId,
+  onSelect,
+  children,
+  childrenDayKey,
+}: PhotoGridProps): JSX.Element {
   return (
     <div className="flex flex-col gap-6">
-      {days.map((day, index) => (
+      {days.map((day) => (
         <DateGroup key={day.key} day={day}>
           <ul className={GRID_CLASSES}>
-            {index === 0 && children}
+            {day.key === childrenDayKey && children}
             {day.photos.map((photo) => (
               <PhotoGridTile
                 key={photo.id}

@@ -18,7 +18,7 @@ const DAY_WITH_YEAR_FORMAT = new Intl.DateTimeFormat('fr-FR', {
 
 // The device's own calendar day: a photo added at 23:30 belongs to that evening, not to the
 // next day in UTC. Zero-padded (2026-01-05), so comparing two keys compares their days.
-function dayKey(date: Date): string {
+export function dayKey(date: Date): string {
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
   return `${date.getFullYear()}-${month}-${day}`
@@ -53,10 +53,11 @@ export function groupByDay(photos: Photo[], now: Date): PhotoDay[] {
   return newestDayFirst([...days.values()])
 }
 
-// Puts an empty « Aujourd'hui » first when today has no photo yet: the uploads on their way
-// need a day to sit in.
+// Adds an empty « Aujourd'hui » when today has no photo yet: the uploads on their way need a
+// day to sit in. Searched, not just the first day: with the device's clock behind the server,
+// a photo can be dated tomorrow and come first.
 export function withToday(days: PhotoDay[], now: Date): PhotoDay[] {
   const key = dayKey(now)
-  if (days[0]?.key === key) return days
-  return [{ key, label: dayLabel(now, now), photos: [] }, ...days]
+  if (days.some((day) => day.key === key)) return days
+  return newestDayFirst([...days, { key, label: dayLabel(now, now), photos: [] }])
 }

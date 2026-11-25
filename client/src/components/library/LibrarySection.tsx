@@ -9,7 +9,7 @@ import {
 import { Button } from '@/components/ui/button.tsx'
 import type { LibraryLayout } from '@/hooks/useLibraryLayout.ts'
 import type { PhotoLibrary } from '@/hooks/usePhotoLibrary.ts'
-import { groupByDay, type PhotoDay, withToday } from '@/photoDays.ts'
+import { dayKey, groupByDay, type PhotoDay, withToday } from '@/photoDays.ts'
 import type { PendingUpload } from '@/upload/uploadQueue.ts'
 
 type LibrarySectionProps = {
@@ -34,12 +34,15 @@ function LoadMoreButton({ isLoadingMore, loadMore }: LoadMoreButtonProps): JSX.E
   )
 }
 
+// today: the day the uploads on their way sit in.
+type LibraryDays = { days: PhotoDay[]; today: string }
+
 // Every loaded page at once: « Charger plus » extends the last day instead of repeating it.
 // An upload on its way belongs to today, even before today has a photo.
-function libraryDays(library: PhotoLibrary, pending: PendingUpload[]): PhotoDay[] {
+function libraryDays(library: PhotoLibrary, pending: PendingUpload[]): LibraryDays {
   const now = new Date()
   const days = groupByDay(library.photos, now)
-  return pending.length > 0 ? withToday(days, now) : days
+  return { days: pending.length > 0 ? withToday(days, now) : days, today: dayKey(now) }
 }
 
 function LibraryPhotos({
@@ -53,19 +56,19 @@ function LibraryPhotos({
     return <p className="px-6 py-16 text-center text-muted-foreground">Chargement…</p>
   }
   if (library.photos.length === 0 && pending.length === 0) return emptyState
-  const days = libraryDays(library, pending)
+  const { days, today } = libraryDays(library, pending)
   // Newest first, like the photos: the upload in progress sits right above the photos, where
   // its photo appears once sent.
   const newestFirst = pending.toReversed()
   // currentId null: no photo is on screen here, so no tile gets the frame's ring.
   return layout === 'grid' ? (
-    <PhotoGrid days={days} currentId={null} onSelect={onOpenPhoto}>
+    <PhotoGrid days={days} currentId={null} onSelect={onOpenPhoto} childrenDayKey={today}>
       {newestFirst.map((upload) => (
         <PendingGridTile key={upload.id} upload={upload} />
       ))}
     </PhotoGrid>
   ) : (
-    <PhotoList days={days} currentId={null} onSelect={onOpenPhoto}>
+    <PhotoList days={days} currentId={null} onSelect={onOpenPhoto} childrenDayKey={today}>
       {newestFirst.map((upload) => (
         <PendingListRow key={upload.id} upload={upload} />
       ))}

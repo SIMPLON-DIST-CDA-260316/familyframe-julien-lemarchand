@@ -8,19 +8,27 @@ type PhotoListProps = {
   // null on the library page: no photo is on screen there.
   currentId: string | null
   onSelect: (id: string) => void
-  // Items placed before the photos: the library's uploads still on their way.
+  // Items placed before the photos of the day keyed childrenDayKey: the library's uploads still
+  // on their way, under today.
   children?: ReactNode
+  childrenDayKey?: string
 }
 
-// The same days as the grid, children first in the first day. The page's full width:
+// The same days as the grid, children first in their day. The page's full width:
 // thumbnails and « … » line up with the header's edges.
-export function PhotoList({ days, currentId, onSelect, children }: PhotoListProps): JSX.Element {
+export function PhotoList({
+  days,
+  currentId,
+  onSelect,
+  children,
+  childrenDayKey,
+}: PhotoListProps): JSX.Element {
   return (
     <div className="flex flex-col gap-6">
-      {days.map((day, index) => (
+      {days.map((day) => (
         <DateGroup key={day.key} day={day}>
           <ul className="flex flex-col gap-1">
-            {index === 0 && children}
+            {day.key === childrenDayKey && children}
             {day.photos.map((photo) => (
               <PhotoListRow
                 key={photo.id}
