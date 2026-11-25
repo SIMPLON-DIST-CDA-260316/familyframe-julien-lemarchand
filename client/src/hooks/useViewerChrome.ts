@@ -88,7 +88,9 @@ export function useViewerChrome(): ViewerChrome {
     },
     // A mouse click on the photo would hide what the mouse movement just showed.
     onPhotoClick: () => {
-      if (pointerTypeRef.current !== 'mouse') setIsVisible((wasVisible) => !wasVisible)
+      if (pointerTypeRef.current === 'mouse') return
+      if (isVisible) moveFocusOffControls()
+      setIsVisible(!isVisible)
     },
   }
 }
