@@ -25,20 +25,21 @@ Personne ne s'inscrit seul dans FamilyFrame : l'administrateur crée un lien d'i
 9. R-INV-09 · Le bouton « Copier le lien » n'apparaît que si l'appareil autorise la copie automatique ; sinon, le champ du lien se sélectionne en entier au toucher pour une copie manuelle. Après une copie réussie, le bouton affiche « Lien copié » pendant 2 secondes.
 10. R-INV-10 · Après une création réussie, le champ e-mail se vide et la liste des invitations se met à jour.
 11. R-INV-11 · L'application n'envoie aucun e-mail : c'est l'administrateur qui transmet le lien.
-12. R-INV-41 · Le bouton « Partager le lien » n'apparaît que sur un appareil qui sait partager vers ses autres applications (la plupart des téléphones) : il ouvre le menu de partage de l'appareil (Messages, WhatsApp, e-mail…) avec le lien. Renoncer au partage ne montre aucun message ; le lien reste affiché, à copier.
+12. R-INV-41 · Le bouton « Partager le lien » n'apparaît que sur un appareil qui sait partager vers ses autres applications (la plupart des téléphones) : il ouvre le menu de partage de l'appareil (Messages, WhatsApp, e-mail…) avec le lien. Renoncer au partage ne montre aucun message ; si le partage échoue, le message « Le lien n'a pas pu être partagé. » s'affiche. Dans les deux cas, le lien reste affiché, à copier.
 
 **Messages affichés**
 
-| Situation                        | Message                                                                                                                      |
-| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| En-tête de la page               | « Invitations » — « Créez un lien pour inviter un proche dans FamilyFrame. »                                                 |
-| Champ de saisie                  | « E-mail de la personne invitée »                                                                                            |
-| Création en cours                | « Création… » (sur le bouton « Créer le lien »)                                                                              |
-| Lien créé                        | « Lien d'invitation », puis « Envoyez ce lien vous-même. Il sert une seule fois, pendant 7 jours, et ne sera plus affiché. » |
-| Copie réussie                    | « Lien copié » (pendant 2 secondes, à la place de « Copier le lien »)                                                        |
-| Adresse mal formée               | « Adresse e-mail invalide. »                                                                                                 |
-| L'adresse a déjà un compte       | « Un compte existe déjà pour cette adresse e-mail. »                                                                         |
-| Un membre tente d'ouvrir la page | « Cette page est réservée à l'administrateur. »                                                                              |
+| Situation                             | Message                                                                                                                      |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| En-tête de la page                    | « Invitations » — « Créez un lien pour inviter un proche dans FamilyFrame. »                                                 |
+| Champ de saisie                       | « E-mail de la personne invitée »                                                                                            |
+| Création en cours                     | « Création… » (sur le bouton « Créer le lien »)                                                                              |
+| Lien créé                             | « Lien d'invitation », puis « Envoyez ce lien vous-même. Il sert une seule fois, pendant 7 jours, et ne sera plus affiché. » |
+| Copie réussie                         | « Lien copié » (pendant 2 secondes, à la place de « Copier le lien »)                                                        |
+| Partage du lien impossible (R-INV-41) | « Le lien n'a pas pu être partagé. »                                                                                         |
+| Adresse mal formée                    | « Adresse e-mail invalide. »                                                                                                 |
+| L'adresse a déjà un compte            | « Un compte existe déjà pour cette adresse e-mail. »                                                                         |
+| Un membre tente d'ouvrir la page      | « Cette page est réservée à l'administrateur. »                                                                              |
 
 **Ce qui n'est pas possible**
 

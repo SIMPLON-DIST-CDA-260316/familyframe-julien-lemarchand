@@ -1,10 +1,17 @@
 import { type JSX, useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button.tsx'
 import { Input } from '@/components/ui/input.tsx'
 import { Label } from '@/components/ui/label.tsx'
 import { canShareLinks, shareLink } from '@/nativeShare.ts'
 
 const COPIED_FEEDBACK_MS = 2000
+
+// Closing the share sheet is a choice, not a failure: it says nothing.
+async function shareInvitation(link: string): Promise<void> {
+  const result = await shareLink(link)
+  if (!result.isShared && !result.isCancelled) toast.error("Le lien n'a pas pu être partagé.")
+}
 
 type LinkCopy = { isCopied: boolean; copy: () => Promise<void> }
 
@@ -47,9 +54,9 @@ export function InvitationLink({ link }: { link: string }): JSX.Element {
           {isCopied ? 'Lien copié' : 'Copier le lien'}
         </Button>
       )}
-      {/* The phone's share sheet: the link goes straight into a message. Cancelling says nothing. */}
+      {/* The phone's share sheet: the link goes straight into a message. */}
       {canShareLinks() && (
-        <Button type="button" variant="outline" onClick={() => shareLink(link)}>
+        <Button type="button" variant="outline" onClick={() => shareInvitation(link)}>
           Partager le lien
         </Button>
       )}
