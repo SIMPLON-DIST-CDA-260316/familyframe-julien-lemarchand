@@ -1,9 +1,10 @@
 import type { JSX, ReactNode } from 'react'
 import { PhotoGridTile } from '@/components/frame/PhotoGridTile.tsx'
-import type { Photo } from '@/photo.ts'
+import { DateGroup } from '@/components/library/DateGroup.tsx'
+import type { PhotoDay } from '@/photoDays.ts'
 
 type PhotoGridProps = {
-  photos: Photo[]
+  days: PhotoDay[]
   // null on the library page: no photo is on screen there.
   currentId: string | null
   onSelect: (id: string) => void
@@ -16,18 +17,26 @@ type PhotoGridProps = {
 const GRID_CLASSES =
   'grid grid-cols-3 gap-1 sm:grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] sm:gap-4'
 
-export function PhotoGrid({ photos, currentId, onSelect, children }: PhotoGridProps): JSX.Element {
+// One grid per day, under its date: a day with two photos leaves the rest of its row empty.
+// children go first in the first day, « Aujourd'hui », where their photos appear once sent.
+export function PhotoGrid({ days, currentId, onSelect, children }: PhotoGridProps): JSX.Element {
   return (
-    <ul className={GRID_CLASSES}>
-      {children}
-      {photos.map((photo) => (
-        <PhotoGridTile
-          key={photo.id}
-          photo={photo}
-          isCurrent={photo.id === currentId}
-          onSelect={onSelect}
-        />
+    <div className="flex flex-col gap-6">
+      {days.map((day, index) => (
+        <DateGroup key={day.key} day={day}>
+          <ul className={GRID_CLASSES}>
+            {index === 0 && children}
+            {day.photos.map((photo) => (
+              <PhotoGridTile
+                key={photo.id}
+                photo={photo}
+                isCurrent={photo.id === currentId}
+                onSelect={onSelect}
+              />
+            ))}
+          </ul>
+        </DateGroup>
       ))}
-    </ul>
+    </div>
   )
 }

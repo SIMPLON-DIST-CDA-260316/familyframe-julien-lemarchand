@@ -81,7 +81,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 
 **Ce que l'on peut faire**
 
-- Voir ses photos sous l'en-tête « Bibliothèque », qui indique leur nombre, en miniatures (grille de vignettes carrées) ou en liste.
+- Voir ses photos sous l'en-tête « Bibliothèque », qui indique leur nombre, en miniatures (grille de vignettes carrées) ou en liste, regroupées par jour sous la date (« Aujourd'hui », « Hier », « dim. 22 nov. »…).
 - Passer de l'un à l'autre avec les boutons « Miniatures » et « Liste ».
 - Charger les photos plus anciennes avec « Charger plus ».
 - Ouvrir une photo en grand dans l'application, puis passer à la suivante ou à la précédente d'un geste du doigt, avec les flèches à l'écran ou celles du clavier.
@@ -97,7 +97,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 1. R-BIB-20 · Les photos sont classées de la plus récente à la plus ancienne, selon leur date d'ajout ou de réception.
 2. R-BIB-21 · La bibliothèque affiche d'abord les 30 photos les plus récentes. « Charger plus » ajoute les 30 suivantes, et ainsi de suite ; le bouton disparaît quand toutes les photos sont affichées.
 3. R-BIB-22 · Les vignettes sont carrées : la photo est recadrée autour de son sujet principal. La photo entière reste visible en l'ouvrant.
-4. R-BIB-23 · En miniatures, chaque vignette est seule. En liste, chaque ligne montre la vignette, la date et l'heure d'ajout (par exemple « 24 nov. 2026, 14:05 ») et, pour une photo reçue, « Envoyée par » suivi du nom de l'expéditeur.
+4. R-BIB-23 · En miniatures, chaque vignette est seule. En liste, chaque ligne montre la vignette, l'heure d'ajout (par exemple « 14:05 » ; le jour est dans le titre du groupe, R-BIB-66) et, pour une photo reçue, « Envoyée par » suivi du nom de l'expéditeur.
 5. R-BIB-24 · L'affichage choisi (miniatures ou liste) est retenu sur l'appareil Par défaut : miniatures.
 6. R-BIB-25 · Cliquer sur une photo l'ouvre en grand dans l'application.
 7. R-BIB-26 · Remplacée : une photo reçue n'apparaît plus dès son arrivée, mais une fois découverte (R-BIB-42).
@@ -119,6 +119,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 23. R-BIB-52 · Les boutons apparaissent et s'effacent en fondu ; si l'appareil demande de réduire les animations, ils apparaissent et disparaissent d'un coup.
 24. R-BIB-53 · Les photos de la bibliothèque, en miniatures comme en liste, s'affichent sur le fond de la page et suivent le thème choisi, clair ou sombre, comme le reste de l'application ; leur menu « … » et les fenêtres qu'il ouvre aussi. Seul le cadre, et une photo ouverte en grand, restent toujours sombres. Sur une miniature, le bouton « … » reste un rond sombre, posé sur la photo. Sur un téléphone, les miniatures tiennent sur trois colonnes serrées ; leur bouton « … », plus petit et collé au coin, cache peu de la photo mais reste aussi facile à toucher. Sur Android, un appui long sur une miniature ouvre le même menu, sans ouvrir la photo en lâchant ; sur iPhone, le bouton « … » reste le chemin. Au clavier, sur une miniature, la touche Menu ou Maj+F10 ouvre aussi ce menu.
 25. R-BIB-42 · La bibliothèque se met à jour seule, sans recharger la page : une photo ajoutée depuis un autre appareil apparaît en tête, une photo reçue y entre à sa date de réception dès qu'elle est découverte (sur cet appareil ou un autre), une photo supprimée disparaît.
+26. R-BIB-66 · En miniatures comme en liste, les photos sont regroupées par jour d'ajout ou de réception, du plus récent au plus ancien, chaque jour sous un petit titre : « Aujourd'hui », « Hier », puis le jour abrégé (« dim. 22 nov. »), suivi de l'année quand ce n'est pas l'année en cours (« sam. 14 juin 2025 »). Le jour est celui de l'appareil : une photo ajoutée à 23 h 30 compte pour ce soir-là. Un jour commence une nouvelle rangée de vignettes. « Charger plus » continue le dernier jour affiché sans répéter son titre. Les titres changent au rechargement de la page, ou dès que la bibliothèque bouge : une page laissée ouverte après minuit peut encore dire « Aujourd'hui » pour la veille. Les photos en cours d'envoi (R-BIB-54) se placent en tête du jour « Aujourd'hui », qui s'affiche pour elles même quand aucune photo n'a encore été ajoutée ce jour-là.
 
 **Messages affichés**
 
@@ -129,6 +130,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 | Chargement de la bibliothèque                             | « Chargement… »                                                                                                |
 | Bibliothèque vide                                         | « Aucune photo pour l'instant. » et le bouton « Ajouter une photo »                                            |
 | Photo en cours d'arrivée                                  | « Chargement… »                                                                                                |
+| Titre d'un jour de photos                                 | « Aujourd'hui », « Hier », « dim. 22 nov. », ou « sam. 14 juin 2025 » une autre année                          |
 | Chargement des photos suivantes                           | « Chargement… » (sur le bouton « Charger plus »)                                                               |
 | Photos reçues en attente                                  | « Vous avez N nouvelles photos » et le bouton « Découvrir » (voir [partage.md](partage.md#recevoir-une-photo)) |
 | Description d'une photo (lecture d'écran)                 | « Photo du 24 novembre 2026 » ou « Photo envoyée par [nom], du 24 novembre 2026 »                              |

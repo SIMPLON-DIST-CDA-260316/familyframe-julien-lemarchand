@@ -9,6 +9,7 @@ import {
 import { Button } from '@/components/ui/button.tsx'
 import type { LibraryLayout } from '@/hooks/useLibraryLayout.ts'
 import type { PhotoLibrary } from '@/hooks/usePhotoLibrary.ts'
+import { groupByDay, type PhotoDay, withToday } from '@/photoDays.ts'
 import type { PendingUpload } from '@/upload/uploadQueue.ts'
 
 type LibrarySectionProps = {
@@ -33,6 +34,14 @@ function LoadMoreButton({ isLoadingMore, loadMore }: LoadMoreButtonProps): JSX.E
   )
 }
 
+// Every loaded page at once: « Charger plus » extends the last day instead of repeating it.
+// An upload on its way belongs to today, even before today has a photo.
+function libraryDays(library: PhotoLibrary, pending: PendingUpload[]): PhotoDay[] {
+  const now = new Date()
+  const days = groupByDay(library.photos, now)
+  return pending.length > 0 ? withToday(days, now) : days
+}
+
 function LibraryPhotos({
   library,
   layout,
@@ -44,18 +53,19 @@ function LibraryPhotos({
     return <p className="px-6 py-16 text-center text-muted-foreground">Chargement…</p>
   }
   if (library.photos.length === 0 && pending.length === 0) return emptyState
+  const days = libraryDays(library, pending)
   // Newest first, like the photos: the upload in progress sits right above the photos, where
   // its photo appears once sent.
   const newestFirst = pending.toReversed()
   // currentId null: no photo is on screen here, so no tile gets the frame's ring.
   return layout === 'grid' ? (
-    <PhotoGrid photos={library.photos} currentId={null} onSelect={onOpenPhoto}>
+    <PhotoGrid days={days} currentId={null} onSelect={onOpenPhoto}>
       {newestFirst.map((upload) => (
         <PendingGridTile key={upload.id} upload={upload} />
       ))}
     </PhotoGrid>
   ) : (
-    <PhotoList photos={library.photos} currentId={null} onSelect={onOpenPhoto}>
+    <PhotoList days={days} currentId={null} onSelect={onOpenPhoto}>
       {newestFirst.map((upload) => (
         <PendingListRow key={upload.id} upload={upload} />
       ))}

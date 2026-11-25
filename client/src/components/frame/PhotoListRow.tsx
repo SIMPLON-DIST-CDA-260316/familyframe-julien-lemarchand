@@ -3,11 +3,8 @@ import { PhotoActionsMenu } from '@/components/frame/PhotoActionsMenu.tsx'
 import type { Photo } from '@/photo.ts'
 import { photoLabel } from '@/photoLabel.ts'
 
-// In a list, photos of the same day are told apart by their time.
-const ROW_DATE_FORMAT = new Intl.DateTimeFormat('fr-FR', {
-  dateStyle: 'medium',
-  timeStyle: 'short',
-})
+// The day is in the group's header: a row tells the photos of that day apart by their time.
+const ROW_TIME_FORMAT = new Intl.DateTimeFormat('fr-FR', { timeStyle: 'short' })
 
 type PhotoListRowProps = {
   photo: Photo
@@ -40,7 +37,7 @@ export function PhotoListRow({ photo, isCurrent, onSelect }: PhotoListRowProps):
             dateTime={photo.createdAt}
             className="truncate text-sm font-medium tabular-nums sm:text-base"
           >
-            {ROW_DATE_FORMAT.format(new Date(photo.createdAt))}
+            {ROW_TIME_FORMAT.format(new Date(photo.createdAt))}
           </time>
           {photo.senderName !== null && (
             <span className="truncate text-sm text-muted-foreground">
