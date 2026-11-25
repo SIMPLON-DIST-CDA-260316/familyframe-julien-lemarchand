@@ -86,6 +86,7 @@ Ceux du panneau d'envoi (voir [Choisir à qui envoyer](#choisir-à-qui-envoyer))
 2. R-PAR-21 · Les règles d'ajout s'appliquent comme pour sa propre bibliothèque : formats JPEG, PNG ou WebP, 10 Mo au plus, image lisible, photo préparée pour l'affichage et informations cachées retirées (voir [bibliotheque.md](bibliotheque.md#ajouter-une-photo), R-BIB-03 à R-BIB-09). Les messages d'erreur sont les mêmes.
 3. R-PAR-22 · « Envoyer à un ami » ferme le panneau « Ajouter une photo » et ouvre le panneau d'envoi avec la photo choisie. Après un envoi réussi, il se ferme ; le fermer sans envoyer abandonne la photo.
 4. R-PAR-23 · La notification « Photo ajoutée à votre bibliothèque. » et la vignette grisée de l'envoi en cours ne concernent que l'ajout à sa bibliothèque ; l'envoi à des amis se confirme par sa propre notification (« Envoyée à … »).
+5. R-PAR-24 · « Envoyer à un ami » envoie une seule photo : quand plusieurs photos sont choisies, le bouton reste désactivé et le panneau demande d'en choisir une seule. Chaque photo envoyée garde ainsi son propre message.
 
 **Messages affichés**
 
@@ -93,6 +94,7 @@ Ceux du panneau d'envoi (voir [Choisir à qui envoyer](#choisir-à-qui-envoyer))
 
 **Ce qui n'est pas possible**
 
+- Envoyer plusieurs photos à un ami en une fois : les ajouter à sa bibliothèque, puis les envoyer une par une depuis leur menu « … ».
 - Envoyer une photo à un ami et la garder dans sa bibliothèque en une seule action : il faut l'ajouter à sa bibliothèque, puis l'envoyer depuis son menu « … ».
 
 ## Recevoir une photo

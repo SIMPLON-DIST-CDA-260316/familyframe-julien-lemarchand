@@ -25,7 +25,7 @@ function AddPhotoHeading(): JSX.Element {
     <div className="flex flex-col gap-1 pr-10">
       <DialogTitle>Ajouter une photo</DialogTitle>
       <DialogDescription>
-        Ajoutez-la à votre bibliothèque ou envoyez-la directement à un ami.
+        Ajoutez-en une ou plusieurs à votre bibliothèque, ou envoyez-en une directement à un ami.
       </DialogDescription>
     </div>
   )

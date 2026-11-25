@@ -55,3 +55,12 @@ export function pendingProgressLabel(progress: number | null): string {
   if (progress === FULL_PERCENT) return 'Finalisation…'
   return `${progress} %`
 }
+
+export function chosenPhotosLabel(count: number): string {
+  return count === 1 ? '1 photo choisie' : `${count} photos choisies`
+}
+
+// Only reached above the maximum, so the count is always plural.
+export function tooManyPhotosMessage(maxCount: number, chosenCount: number): string {
+  return `${maxCount} photos au plus à la fois : vous en avez choisi ${chosenCount}.`
+}

@@ -1,10 +1,16 @@
 import { CameraIcon, ImageIcon, SendIcon } from 'lucide-react'
-import { type ChangeEvent, type JSX, type SubmitEvent, useRef, useState } from 'react'
+import { type ChangeEvent, type JSX, type SubmitEvent, useId, useRef, useState } from 'react'
+import { UploadPreview } from '@/components/library/UploadPreview.tsx'
+import { tooManyPhotosMessage } from '@/components/library/uploadTexts.ts'
+import { Alert, AlertDescription } from '@/components/ui/alert.tsx'
 import { Button } from '@/components/ui/button.tsx'
-import { usePreviewUrl } from '@/hooks/usePreviewUrl.ts'
 
 // The server's accepted types: a HEIC or GIF picked here would only be refused after the upload.
 const ACCEPTED_IMAGE_TYPES = 'image/jpeg,image/png,image/webp'
+
+// Enough for an outing's best shots; past it the queue would run for many minutes on a phone
+// network, and the preview would push the buttons out of the panel.
+const MAX_PHOTOS_PER_CHOICE = 20
 
 type UploadFormProps = {
   onUpload: (files: File[]) => void
@@ -16,17 +22,19 @@ type PickButtonProps = {
   label: string
   icon: JSX.Element
   capture?: 'environment'
+  // The gallery only: the camera takes one photo at a time.
+  multiple?: boolean
   onChange: (event: ChangeEvent<HTMLInputElement>) => void
 }
 
 type UploadButtonsProps = {
-  hasFile: boolean
+  fileCount: number
   onShare: () => void
 }
 
 // A button rather than the raw file input: the browser's « Choose file » cannot be styled or
 // translated. The hidden input does the picking.
-function PickButton({ label, icon, capture, onChange }: PickButtonProps): JSX.Element {
+function PickButton({ label, icon, capture, multiple, onChange }: PickButtonProps): JSX.Element {
   const inputRef = useRef<HTMLInputElement>(null)
   return (
     <>
@@ -45,6 +53,7 @@ function PickButton({ label, icon, capture, onChange }: PickButtonProps): JSX.El
         type="file"
         accept={ACCEPTED_IMAGE_TYPES}
         capture={capture}
+        multiple={multiple}
         className="hidden"
         onChange={onChange}
       />
@@ -62,57 +71,78 @@ function PickButtons({ onChange }: Pick<PickButtonProps, 'onChange'>): JSX.Eleme
         onChange={onChange}
       />
       <PickButton
-        label="Choisir une image"
+        label="Choisir des images"
         icon={<ImageIcon aria-hidden className="size-6" />}
+        multiple
         onChange={onChange}
       />
     </div>
   )
 }
 
-function UploadButtons({ hasFile, onShare }: UploadButtonsProps): JSX.Element {
+// A friend gets one photo at a time: the send panel shows one photo with its message.
+function UploadButtons({ fileCount, onShare }: UploadButtonsProps): JSX.Element {
+  const shareHintId = useId()
   return (
     <div className="flex flex-col gap-2">
-      <Button type="submit" size="lg" disabled={!hasFile}>
+      <Button type="submit" size="lg" disabled={fileCount === 0}>
         Ajouter à ma bibliothèque
       </Button>
-      <Button type="button" variant="outline" size="lg" disabled={!hasFile} onClick={onShare}>
+      <Button
+        type="button"
+        variant="outline"
+        size="lg"
+        disabled={fileCount !== 1}
+        aria-describedby={fileCount > 1 ? shareHintId : undefined}
+        onClick={onShare}
+      >
         <SendIcon aria-hidden data-icon="inline-start" />
         Envoyer à un ami
       </Button>
+      {fileCount > 1 && (
+        <p id={shareHintId} className="text-sm text-muted-foreground">
+          Pour envoyer à un ami, choisissez une seule photo.
+        </p>
+      )}
     </div>
   )
 }
 
-function FilePreview({ file }: { file: File | null }): JSX.Element | null {
-  const previewUrl = usePreviewUrl(file)
-  if (!previewUrl) return null
+function TooManyAlert({ message }: { message: string }): JSX.Element | null {
+  if (message === '') return null
   return (
-    <img
-      className="max-h-[35svh] w-full rounded-lg object-contain"
-      src={previewUrl}
-      alt="Aperçu avant envoi"
-    />
+    <Alert variant="destructive">
+      <AlertDescription>{message}</AlertDescription>
+    </Alert>
   )
 }
 
 export function UploadForm({ onUpload, onShare }: UploadFormProps): JSX.Element {
-  const [file, setFile] = useState<File | null>(null)
+  const [files, setFiles] = useState<File[]>([])
+  const [tooManyMessage, setTooManyMessage] = useState('')
 
+  // Too many: nothing is kept, so the message never sits next to photos that would be sent.
   function handleFileChange(event: ChangeEvent<HTMLInputElement>): void {
-    setFile(event.target.files?.[0] ?? null)
+    const chosen = Array.from(event.target.files ?? [])
+    const isTooMany = chosen.length > MAX_PHOTOS_PER_CHOICE
+    setFiles(isTooMany ? [] : chosen)
+    setTooManyMessage(isTooMany ? tooManyPhotosMessage(MAX_PHOTOS_PER_CHOICE, chosen.length) : '')
   }
 
   function handleSubmit(event: SubmitEvent<HTMLFormElement>): void {
     event.preventDefault()
-    if (file) onUpload([file])
+    if (files.length > 0) onUpload(files)
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <PickButtons onChange={handleFileChange} />
-      <FilePreview file={file} />
-      <UploadButtons hasFile={file !== null} onShare={() => file && onShare(file)} />
+      <TooManyAlert message={tooManyMessage} />
+      <UploadPreview files={files} />
+      <UploadButtons
+        fileCount={files.length}
+        onShare={() => files.length === 1 && onShare(files[0])}
+      />
     </form>
   )
 }
