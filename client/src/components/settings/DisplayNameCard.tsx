@@ -20,6 +20,7 @@ export function DisplayNameCard({ displayName }: { displayName: string }): JSX.E
     >
       <TextField
         id="display-name"
+        enterKeyHint="done"
         label="Nom"
         type="text"
         autoComplete="name"

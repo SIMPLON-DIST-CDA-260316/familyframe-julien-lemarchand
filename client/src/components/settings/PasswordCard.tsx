@@ -58,6 +58,7 @@ function NewPasswordFields({ fields, setField }: FieldsState): JSX.Element {
       />
       <TextField
         id="new-password-confirmation"
+        enterKeyHint="done"
         label="Confirmer le nouveau mot de passe"
         type="password"
         autoComplete="new-password"

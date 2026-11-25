@@ -87,6 +87,7 @@ function CollectionNameForm({ target, onDone }: CollectionNameFormProps): JSX.El
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       <TextField
         id="collection-name"
+        enterKeyHint="done"
         label="Nom de la collection"
         type="text"
         autoComplete="off"

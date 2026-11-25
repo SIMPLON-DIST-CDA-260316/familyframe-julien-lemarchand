@@ -146,6 +146,7 @@ Le menu à trois traits a laissé sa place à la barre d'onglets (R-APP-60) et a
 
 1. R-APP-56 · Sur un téléphone à encoche, à coins arrondis ou à barre de navigation en bas, l'application occupe tout l'écran, mais aucun bouton ni texte ne passe sous l'encoche, dans un coin ou sous cette barre : la barre du haut, les panneaux qui montent du bas, la photo ouverte en grand, la découverte des photos reçues et le cadre gardent leurs boutons et leurs légendes dans la partie utilisable de l'écran, téléphone tenu droit ou couché.
 2. R-APP-57 · La barre du navigateur, autour de l'adresse, prend la couleur claire ou sombre du réglage de l'appareil, et la page s'affiche dans ces couleurs dès son ouverture. Avec un thème choisi à l'inverse de l'appareil (« Sombre » sur un appareil réglé en clair, par exemple), la barre du navigateur garde la couleur de l'appareil.
+3. R-APP-72 · Sur le clavier d'un téléphone, une adresse e-mail se tape sans majuscule automatique ni correction, et la touche Entrée du dernier champ d'un formulaire annonce ce qu'elle fait : « Aller » pour se connecter ou créer son compte, « Envoyer » pour une invitation ou une demande d'ami, « OK » pour un nom ou un mot de passe. Le mot exact dépend du téléphone.
 
 **Messages affichés**
 

@@ -94,6 +94,7 @@ export function InviteForm(props: InviteFormProps): JSX.Element {
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       <TextField
         id="display-name"
+        enterKeyHint="go"
         label="Votre nom"
         type="text"
         autoComplete="name"
