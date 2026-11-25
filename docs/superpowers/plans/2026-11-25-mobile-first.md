@@ -4,8 +4,8 @@ status: done
 spec: docs/superpowers/specs/2026-11-25-mobile-first-design.md
 branch: feat/mobile-tabbar (PR A), feat/mobile-touch-targets (PR B), feat/frame-wake-lock (PR C), feat/viewer-chrome (PR D), feat/library-surface (PR E)
 worktree: false
-tasks_total: 24
-tasks_done: 24
+tasks_total: 25
+tasks_done: 25
 current_task: null
 last_commit: null
 last_updated: 2026-11-25
@@ -3430,7 +3430,7 @@ index 085bbc2..af9089a 100644
 
 **Scope:** Tile « … » `pointer-coarse:hidden`, the dark pill back for the mouse; R-BIB-53 and the capability list. Spec D23.
 
-**Gate:** `pnpm check` and `pnpm typecheck` green. `pnpm build` and `pnpm test` green at the tip.
+**Gate:** `pnpm check` and `pnpm typecheck` green.
 
 - [x] **Final diff**
 
@@ -3479,6 +3479,187 @@ index 0ff278f..b8434ac 100644
  **Messages affichés**
 ~~~~
 
+### Task 17: Compact tile ellipsis and long-press menu
+
+**Commit:** `feat(client): compact tile ellipsis and long-press menu`
+
+**Scope:** Tile « … » back on every pointer, 28 px look with a 44 px invisible target; `useTileContextMenu` (native `contextmenu`); `PhotoActionsMenu` `open` / `onOpenChange`; R-BIB-53. Spec D23 amended.
+
+**Gate:** `pnpm check` and `pnpm typecheck` green; `pnpm build` and `pnpm test` green at the tip.
+
+- [x] **Final diff**
+
+~~~~diff
+diff --git a/client/src/components/frame/PhotoActionsMenu.tsx b/client/src/components/frame/PhotoActionsMenu.tsx
+index 353c180..6ea54a7 100644
+--- a/client/src/components/frame/PhotoActionsMenu.tsx
++++ b/client/src/components/frame/PhotoActionsMenu.tsx
+@@ -30,6 +30,9 @@ type PhotoActionsMenuProps = {
+   className?: string
+   // Items above "Supprimer": the slideshow adds its speed.
+   children?: ReactNode
++  // Set by a grid tile, whose long press opens the menu too; left out, the menu runs itself.
++  open?: boolean
++  onOpenChange?: (isOpen: boolean) => void
+ }
+ 
+ // The photo picked when a dialog opened: the slideshow may move on while it stays open.
+@@ -152,6 +155,8 @@ export function PhotoActionsMenu({
+   theme = 'dark',
+   className,
+   children,
++  open,
++  onOpenChange,
+ }: PhotoActionsMenuProps): JSX.Element {
+   const [dialog, setDialog] = useState<MenuDialog>(null)
+   const triggerRef = useRef<HTMLButtonElement>(null)
+@@ -159,7 +164,7 @@ export function PhotoActionsMenu({
+ 
+   return (
+     <>
+-      <DropdownMenu>
++      <DropdownMenu open={open} onOpenChange={onOpenChange}>
+         <MenuTrigger label={label} className={className} triggerRef={triggerRef} />
+         <MenuItems photo={photo} themeClass={themeClass} onOpen={setDialog}>
+           {children}
+diff --git a/client/src/components/frame/PhotoGridTile.tsx b/client/src/components/frame/PhotoGridTile.tsx
+index b9a1f19..e48db8f 100644
+--- a/client/src/components/frame/PhotoGridTile.tsx
++++ b/client/src/components/frame/PhotoGridTile.tsx
+@@ -1,5 +1,6 @@
+ import type { JSX } from 'react'
+ import { PhotoActionsMenu } from '@/components/frame/PhotoActionsMenu.tsx'
++import { useTileContextMenu } from '@/hooks/useTileContextMenu.ts'
+ import type { Photo } from '@/photo.ts'
+ import { photoLabel } from '@/photoLabel.ts'
+ 
+@@ -7,11 +8,16 @@ import { photoLabel } from '@/photoLabel.ts'
+ const TILE_CLASSES =
+   'group relative block w-full overflow-hidden rounded-sm outline-none ring-offset-2 ring-offset-background focus-visible:z-10 focus-visible:ring-3 focus-visible:ring-ring sm:rounded-xl sm:ring-offset-4 aria-[current=true]:ring-2 aria-[current=true]:ring-frame-accent'
+ 
+-// A dark pill whatever the theme: it sits on the photo, not on the page. Under a finger there is
+-// none: a 44 px target would hide too much of a ~120 px phone tile, and a tap opens the photo,
+-// whose own « … » holds the same menu. z-10: stays above its own tile when that tile is focused.
++// The touch callout (« Enregistrer l'image »…) would fight the long-press menu.
++const IMAGE_CLASSES =
++  'aspect-square w-full object-cover [-webkit-touch-callout:none] select-none motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover/tile:scale-105'
++
++// A dark pill whatever the theme: it sits on the photo, not on the page. Under a finger it keeps
++// the mouse's 28 px look, 4 px from the corner, so it hides little of a ~115 px phone tile; an
++// invisible `after` 8 px wider on each side gives the finger its 44 px. z-10: stays above its own
++// tile when that tile is focused.
+ const ELLIPSIS_CLASSES =
+-  'absolute top-2 right-2 z-10 rounded-full bg-black/55 text-white/80 backdrop-blur-sm hover:bg-black/75 hover:text-white aria-expanded:bg-black/75 aria-expanded:text-white dark:hover:bg-black/75 pointer-coarse:hidden'
++  'absolute top-2 right-2 z-10 rounded-full bg-black/55 text-white/80 backdrop-blur-sm hover:bg-black/75 hover:text-white aria-expanded:bg-black/75 aria-expanded:text-white dark:hover:bg-black/75 pointer-coarse:top-1 pointer-coarse:right-1 pointer-coarse:size-7 pointer-coarse:after:absolute pointer-coarse:after:-inset-2'
+ 
+ type PhotoGridTileProps = {
+   photo: Photo
+@@ -19,20 +25,21 @@ type PhotoGridTileProps = {
+   onSelect: (id: string) => void
+ }
+ 
++// The ellipsis is a sibling of the tile button: a button cannot hold a button.
+ export function PhotoGridTile({ photo, isCurrent, onSelect }: PhotoGridTileProps): JSX.Element {
++  const { tileProps, menuProps } = useTileContextMenu(() => onSelect(photo.id))
+   return (
+-    // The ellipsis is a sibling of the tile button: a button cannot hold a button.
+     <li className="group/tile relative">
+       <button
+         type="button"
+-        onClick={() => onSelect(photo.id)}
++        {...tileProps}
+         aria-current={isCurrent}
+         // The viewer focuses this tile when it closes on this photo.
+         data-photo-id={photo.id}
+         className={TILE_CLASSES}
+       >
+         <img
+-          className="aspect-square w-full object-cover motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover/tile:scale-105"
++          className={IMAGE_CLASSES}
+           src={photo.thumbnailUrl}
+           alt={photoLabel(photo)}
+           loading="lazy"
+@@ -44,6 +51,7 @@ export function PhotoGridTile({ photo, isCurrent, onSelect }: PhotoGridTileProps
+         label={`Actions : ${photoLabel(photo)}`}
+         theme="app"
+         className={ELLIPSIS_CLASSES}
++        {...menuProps}
+       />
+     </li>
+   )
+diff --git a/client/src/hooks/useTileContextMenu.ts b/client/src/hooks/useTileContextMenu.ts
+new file mode 100644
+index 0000000..68dfa87
+--- /dev/null
++++ b/client/src/hooks/useTileContextMenu.ts
+@@ -0,0 +1,43 @@
++import { type MouseEvent, type PointerEvent, useRef, useState } from 'react'
++
++type TileProps = {
++  onClick: () => void
++  onPointerDown: (event: PointerEvent) => void
++  onKeyDown: () => void
++  onContextMenu: (event: MouseEvent) => void
++}
++
++type MenuProps = { open: boolean; onOpenChange: (isOpen: boolean) => void }
++
++export type TileContextMenu = { tileProps: TileProps; menuProps: MenuProps }
++
++// A long press on Android, Shift+F10 or the menu key fire `contextmenu`: they open the tile's
++// photo menu. A mouse keeps the browser's own right-click menu. iOS Safari fires no
++// `contextmenu` on a long press: there the « … » is the way. A touch's pointerup goes back to the
++// tile (implicit capture), so lifting the finger never picks a menu item under it.
++export function useTileContextMenu(onTap: () => void): TileContextMenu {
++  const [isMenuOpen, setIsMenuOpen] = useState(false)
++  const isMouse = useRef(false)
++  // The click that ends a long press must not also open the photo.
++  const isLongPress = useRef(false)
++  const tileProps: TileProps = {
++    onClick: () => {
++      if (!isLongPress.current) onTap()
++      isLongPress.current = false
++    },
++    onPointerDown: (event) => {
++      isMouse.current = event.pointerType === 'mouse'
++      isLongPress.current = false
++    },
++    onKeyDown: () => {
++      isMouse.current = false
++    },
++    onContextMenu: (event) => {
++      if (isMouse.current) return
++      event.preventDefault()
++      isLongPress.current = true
++      setIsMenuOpen(true)
++    },
++  }
++  return { tileProps, menuProps: { open: isMenuOpen, onOpenChange: setIsMenuOpen } }
++}
+diff --git a/docs/produit/bibliotheque.md b/docs/produit/bibliotheque.md
+index b8434ac..f7602a3 100644
+--- a/docs/produit/bibliotheque.md
++++ b/docs/produit/bibliotheque.md
+@@ -62,7 +62,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
+ - Charger les photos plus anciennes avec « Charger plus ».
+ - Ouvrir une photo en grand dans l'application, puis passer à la suivante ou à la précédente d'un geste du doigt, avec les flèches à l'écran ou celles du clavier.
+ - Sur une photo ouverte, laisser la photo seule à l'écran : les boutons, le compteur, la légende et les flèches s'effacent, et reviennent quand on en a besoin.
+-- Ouvrir le menu « … » d'une photo (sur un écran tactile, depuis la photo ouverte en grand ou depuis la liste) pour lancer sa radio sur le cadre (voir [cadre.md](cadre.md#radio)), l'envoyer à un ami, la ranger dans ses collections (voir [collections.md](collections.md#ranger-ses-photos-dans-une-collection)) ou la supprimer.
++- Ouvrir le menu « … » d'une photo (ou, sur Android, appuyer longuement sur sa miniature) pour lancer sa radio sur le cadre (voir [cadre.md](cadre.md#radio)), l'envoyer à un ami, la ranger dans ses collections (voir [collections.md](collections.md#ranger-ses-photos-dans-une-collection)) ou la supprimer.
+ - Lancer le mode cadre, en plein écran, depuis la bibliothèque (« Mode cadre » sur un ordinateur, l'onglet « Cadre » sur un téléphone), ou depuis une photo ouverte pour que le diaporama commence par elle (voir [cadre.md](cadre.md)).
+ - Découvrir les photos envoyées par ses proches depuis l'annonce placée sous l'en-tête (voir [partage.md](partage.md#recevoir-une-photo)).
+ - N'afficher que les photos d'une collection, depuis la rangée « Toutes », « Noël », « Les vacances »… placée sous l'annonce (voir [collections.md](collections.md#parcourir-une-collection)).
+@@ -93,7 +93,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
+ 21. R-BIB-50 · À la souris, les boutons, le compteur, la légende et les flèches apparaissent dès que la souris bouge et s'effacent après 3 secondes sans mouvement. Ils restent tant que la souris est sur un bouton ou qu'un menu ou une fenêtre est ouvert (menu « … », « Envoyer à des proches », « Supprimer cette photo ? »). Cliquer sur la photo ne les efface pas.
+ 22. R-BIB-51 · Au clavier, les flèches gauche et droite changent de photo sans faire revenir les boutons ; la touche Tab les fait revenir et passe d'un bouton à l'autre. Ils restent tant que l'un d'eux est choisi au clavier. Effacés, ils ne peuvent pas être choisis.
+ 23. R-BIB-52 · Les boutons apparaissent et s'effacent en fondu ; si l'appareil demande de réduire les animations, ils apparaissent et disparaissent d'un coup.
+-24. R-BIB-53 · Les photos de la bibliothèque, en miniatures comme en liste, s'affichent sur le fond de la page et suivent le thème choisi, clair ou sombre, comme le reste de l'application ; leur menu « … » et les fenêtres qu'il ouvre aussi. Seul le cadre, et une photo ouverte en grand, restent toujours sombres. Sur une miniature, le bouton « … » reste un rond sombre, posé sur la photo. Sur un téléphone, les miniatures tiennent sur trois colonnes serrées. Sur un écran tactile, elles n'ont pas de bouton « … » : toucher la photo l'ouvre en grand, où le même menu se trouve. En liste, chaque ligne garde son bouton « … ».
++24. R-BIB-53 · Les photos de la bibliothèque, en miniatures comme en liste, s'affichent sur le fond de la page et suivent le thème choisi, clair ou sombre, comme le reste de l'application ; leur menu « … » et les fenêtres qu'il ouvre aussi. Seul le cadre, et une photo ouverte en grand, restent toujours sombres. Sur une miniature, le bouton « … » reste un rond sombre, posé sur la photo. Sur un téléphone, les miniatures tiennent sur trois colonnes serrées ; leur bouton « … », plus petit et collé au coin, cache peu de la photo mais reste aussi facile à toucher. Sur Android, un appui long sur une miniature ouvre le même menu, sans ouvrir la photo en lâchant ; sur iPhone, le bouton « … » reste le chemin. Au clavier, sur une miniature, la touche Menu ou Maj+F10 ouvre aussi ce menu.
+ 25. R-BIB-42 · La bibliothèque se met à jour seule, sans recharger la page : une photo ajoutée depuis un autre appareil apparaît en tête, une photo reçue y entre à sa date de réception dès qu'elle est découverte (sur cet appareil ou un autre), une photo supprimée disparaît.
+ 
+ **Messages affichés**
+~~~~
+
 ---
 
 ## Final verification (controller)
@@ -3518,3 +3699,4 @@ index 0ff278f..b8434ac 100644
   - Task 14: the controller asked for R-APP-66 in its own commit; it went into the behaviour's commit instead, as AGENTS.md requires ("Behaviour change → product doc in the same commit").
   - Task 15: Wake Lock needs a secure context, like the Secure cookie.
 - **Gates for Tasks 11 to 16:** `pnpm check` and `pnpm typecheck` green on each commit; at the tip `pnpm build` green and `pnpm test` → `Test Files  25 passed (25)`, `Tests  301 passed (301)`.
+- **Task 17** (the author, relayed: opening a photo to reach its menu is not a good idea): Task 16 is undone by an added commit, not reverted. The tile « … » is compact under a finger, with a 44 px invisible target, and a long press opens the same menu through `contextmenu`. iOS Safari fires no `contextmenu` on a long press, so on iPhone the « … » is the path; a pointer timer was judged not worth its code. Spec D23 amended in place (new in this stack). Gates: `pnpm check` and `pnpm typecheck` green; at the tip `pnpm build` green, `pnpm test` → `Test Files  25 passed (25)`, `Tests  301 passed (301)`.
