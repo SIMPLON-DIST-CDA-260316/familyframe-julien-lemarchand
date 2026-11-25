@@ -8,7 +8,6 @@ Les règles ci-dessous décrivent l'intention ; elles recevront leur identifiant
 
 **Prévu**
 
-- Passage en plein écran d'un simple toucher ; le bouton ✕ et la touche Échap en sortent.
 - Trois modèles d'affichage : plein format, passe-partout, polaroïd.
 - Lecture en boucle ou aléatoire.
 - Réglages retenus par appareil : chaque cadre garde ses propres choix d'un jour à l'autre.

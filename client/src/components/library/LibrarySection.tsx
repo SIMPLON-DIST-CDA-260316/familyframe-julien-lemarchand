@@ -5,6 +5,7 @@ import { LayoutToggle } from '@/components/frame/LayoutToggle.tsx'
 import { PhotoGrid } from '@/components/frame/PhotoGrid.tsx'
 import { PhotoList } from '@/components/frame/PhotoList.tsx'
 import { Button } from '@/components/ui/button.tsx'
+import { enterFullscreen } from '@/fullscreen.ts'
 import type { LibraryLayout } from '@/hooks/useLibraryLayout.ts'
 import { useLibraryLayout } from '@/hooks/useLibraryLayout.ts'
 import type { PhotoLibrary } from '@/hooks/usePhotoLibrary.ts'
@@ -54,8 +55,9 @@ function LibrarySectionHeader({ layout, onLayoutChange }: LibraryHeaderProps): J
           size="lg"
           className="rounded-full bg-frame-accent px-4 text-black hover:bg-frame-accent/85"
         >
-          {/* The state: leaving the frame comes back to this library entry. */}
-          <Link to="/frame" state={LIBRARY_BELOW_STATE}>
+          {/* The state: leaving the frame comes back to this library entry. Full screen is asked
+              on the click itself: browsers grant it only during a user gesture. */}
+          <Link to="/frame" state={LIBRARY_BELOW_STATE} onClick={enterFullscreen}>
             <PlayIcon data-icon="inline-start" />
             Mode cadre
           </Link>

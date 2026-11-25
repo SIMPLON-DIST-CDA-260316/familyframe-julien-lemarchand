@@ -1,6 +1,6 @@
 # Cadre
 
-Le cadre est la page à laisser affichée en plein écran sur l'appareil posé chez soi (tablette, vieil ordinateur, télévision). Il montre toutes les photos de la bibliothèque du compte connecté (voir [bibliotheque.md](bibliotheque.md)) et reçoit les nouvelles en direct. On l'ouvre avec l'entrée « Cadre » de la barre du haut. Il n'affiche que le diaporama (une photo à la fois) ; les vignettes et la liste sont dans la bibliothèque.
+Le cadre est la page à laisser affichée en plein écran sur l'appareil posé chez soi (tablette, vieil ordinateur, télévision). Il montre toutes les photos de la bibliothèque du compte connecté (voir [bibliotheque.md](bibliotheque.md)) et reçoit les nouvelles en direct. On l'ouvre avec l'entrée « Cadre » de la barre du haut, ou avec « Mode cadre » depuis la bibliothèque ou une photo ouverte : il passe alors en plein écran. Il n'affiche que le diaporama (une photo à la fois) ; les vignettes et la liste sont dans la bibliothèque.
 
 ## Mettre en place un cadre
 
@@ -8,7 +8,8 @@ Le cadre est la page à laisser affichée en plein écran sur l'appareil posé c
 
 - Se connecter sur l'appareil du cadre avec le compte dont on veut afficher les photos, puis ouvrir « Cadre ».
 - Laisser l'appareil allumé : le cadre reste connecté et à jour sans intervention.
-- Quitter le diaporama pour revenir à la bibliothèque, sur la photo qui était affichée.
+- Ouvrir le cadre en plein écran d'un seul toucher, depuis la barre du haut, la bibliothèque ou une photo ouverte.
+- Quitter le cadre (✕, Échap ou sortie du plein écran) pour revenir à la bibliothèque, sur la photo qui était affichée.
 
 **Règles**
 
@@ -25,6 +26,9 @@ Le cadre est la page à laisser affichée en plein écran sur l'appareil posé c
 11. R-CAD-55 · Sans photo à montrer, le cadre dit pourquoi : chargement en cours, aucune photo encore, ou chargement impossible ; il réessaie tout seul quand la connexion revient.
 12. R-CAD-56 · Un bouton « Retour à la bibliothèque » permet toujours de sortir du cadre.
 13. R-CAD-57 · Lancé depuis une photo, le diaporama commence par cette photo.
+14. R-CAD-58 · Ouvert depuis l'application (« Cadre » dans la barre du haut, « Mode cadre » dans la bibliothèque ou sur une photo ouverte), le cadre passe en plein écran. Sur un appareil qui ne le permet pas (iPhone), ou si le navigateur le refuse, le cadre s'affiche dans la page, sans message.
+15. R-CAD-59 · Sortir du plein écran, de n'importe quelle façon (✕, touche Échap, touche F11, geste de l'appareil), quitte le cadre : on revient à la bibliothèque, sur la photo qui était affichée, ou à la bibliothèque seule s'il n'y avait pas de photo.
+16. R-CAD-60 · Quitter le cadre autrement (bouton retour du navigateur, « Retour à la bibliothèque ») sort aussi du plein écran : la bibliothèque ne reste jamais en plein écran.
 
 **Messages affichés**
 
@@ -39,7 +43,8 @@ Le cadre est la page à laisser affichée en plein écran sur l'appareil posé c
 
 - Associer un cadre à un compte sans saisir le mot de passe sur l'appareil (par exemple avec un code).
 - Afficher sur un même cadre les photos de plusieurs comptes.
-- Passer en plein écran depuis l'application : prévu, voir [a-venir.md](a-venir.md).
+- Passer en plein écran sur iPhone : Safari ne le permet pas, le cadre s'affiche dans la page.
+- Rester en plein écran après avoir quitté le cadre.
 
 ## Vue bibliothèque du cadre (retirée)
 
@@ -66,7 +71,7 @@ Le cadre n'a plus de vue bibliothèque : voir R-CAD-53. Les règles ci-dessous g
 - Choisir la vitesse : 5 s, 10 s ou 20 s par photo (menu « … », « Vitesse »).
 - Afficher ou masquer un bandeau de vignettes (« Vignettes ») et toucher une vignette pour aller à cette photo.
 - Envoyer la photo affichée à un ami ou la supprimer (menu « … »).
-- Quitter le mode cadre (bouton ✕ ou touche Échap) pour revenir à la bibliothèque, sur la photo affichée.
+- Quitter le mode cadre (bouton ✕, touche Échap ou sortie du plein écran) pour revenir à la bibliothèque, sur la photo affichée.
 
 **Règles**
 

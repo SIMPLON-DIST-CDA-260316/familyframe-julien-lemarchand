@@ -1,4 +1,5 @@
 import { useSearchParams } from 'react-router'
+import { useFrameFullscreen } from '@/hooks/useFrameFullscreen.ts'
 import { type FrameSelection, useFrameSelection } from '@/hooks/useFrameSelection.ts'
 import { useIdle } from '@/hooks/useIdle.ts'
 import { useLeaveFrame } from '@/hooks/useLeaveFrame.ts'
@@ -35,6 +36,7 @@ export function useFrameMode(): FrameMode {
   const leaveFrame = useLeaveFrame()
   const currentPhoto = photos.find(({ id }) => id === selection.currentId)
   const leave = (): void => leaveFrame(currentPhoto?.id ?? null)
+  useFrameFullscreen(leave)
 
   return { photos, status, currentPhoto, isActive, settings, selection, leave }
 }

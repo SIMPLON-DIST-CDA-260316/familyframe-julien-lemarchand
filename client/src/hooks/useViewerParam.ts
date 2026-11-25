@@ -1,4 +1,5 @@
 import { useLocation, useNavigate, useSearchParams } from 'react-router'
+import { enterFullscreen } from '@/fullscreen.ts'
 import { isLibraryBelow, LIBRARY_BELOW_STATE, PHOTO_PARAM, photoPath } from '@/viewerHistory.ts'
 
 export type ViewerParam = {
@@ -39,6 +40,7 @@ export function useViewerParam(): ViewerParam {
   // Replace, keeping the viewer's state: the frame takes the viewer's place above the library,
   // so leaving the frame brings back one viewer, not two.
   function startFrame(photoId: string): void {
+    enterFullscreen()
     navigate(photoPath('/frame', photoId), { replace: true, state: location.state })
   }
 

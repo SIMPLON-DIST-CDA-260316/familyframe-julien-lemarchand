@@ -23,9 +23,33 @@ function navLinkClasses({ isActive }: { isActive: boolean }): string {
   )
 }
 
+// onNavigate closes the sheet; an item's own onClick (the frame's full screen) runs in the same click.
+function MobileNavLinks({ onNavigate }: { onNavigate: () => void }): JSX.Element {
+  const items = useNavItems()
+  return (
+    <nav className="flex flex-col gap-1 px-2">
+      {items.map(({ to, label, icon: Icon, onClick }) => (
+        // end: "/" would otherwise stay active on every page.
+        <NavLink
+          key={to}
+          to={to}
+          end
+          className={navLinkClasses}
+          onClick={() => {
+            onNavigate()
+            onClick?.()
+          }}
+        >
+          <Icon aria-hidden className="size-4" />
+          {label}
+        </NavLink>
+      ))}
+    </nav>
+  )
+}
+
 export function MobileNav(): JSX.Element {
   const [isOpen, setIsOpen] = useState(false)
-  const items = useNavItems()
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -40,21 +64,7 @@ export function MobileNav(): JSX.Element {
           <SheetDescription className="sr-only">Navigation</SheetDescription>
           <UserBadge />
         </SheetHeader>
-        <nav className="flex flex-col gap-1 px-2">
-          {items.map(({ to, label, icon: Icon }) => (
-            // end: "/" would otherwise stay active on every page.
-            <NavLink
-              key={to}
-              to={to}
-              end
-              className={navLinkClasses}
-              onClick={() => setIsOpen(false)}
-            >
-              <Icon aria-hidden className="size-4" />
-              {label}
-            </NavLink>
-          ))}
-        </nav>
+        <MobileNavLinks onNavigate={() => setIsOpen(false)} />
         <div className="mt-auto flex flex-col border-t p-2">
           {/* With the account actions, not in the pages list: it is about me, not a place. */}
           <NavLink to="/settings" className={navLinkClasses} onClick={() => setIsOpen(false)}>
