@@ -3,6 +3,7 @@ import { useAuth } from '@/auth/AuthContext.ts'
 import { AvatarCard } from '@/components/settings/AvatarCard.tsx'
 import { DisplayNameCard } from '@/components/settings/DisplayNameCard.tsx'
 import { EmailCard } from '@/components/settings/EmailCard.tsx'
+import { FrameSettingsCard } from '@/components/settings/FrameSettingsCard.tsx'
 import { PasswordCard } from '@/components/settings/PasswordCard.tsx'
 
 export default function SettingsPage(): JSX.Element | null {
@@ -15,13 +16,14 @@ export default function SettingsPage(): JSX.Element | null {
       <header className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold tracking-tight">Préférences</h1>
         <p className="text-sm text-muted-foreground">
-          Votre profil et la sécurité de votre compte.
+          Votre profil, la sécurité de votre compte et le cadre de cet appareil.
         </p>
       </header>
       <AvatarCard name={user.displayName} avatarUrl={user.avatarUrl} />
       <DisplayNameCard displayName={user.displayName} />
       <EmailCard email={user.email} />
       <PasswordCard />
+      <FrameSettingsCard />
     </main>
   )
 }
