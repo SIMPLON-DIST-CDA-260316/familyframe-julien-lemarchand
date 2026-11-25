@@ -4,8 +4,8 @@ status: done
 spec: docs/superpowers/specs/2026-11-25-mobile-first-design.md
 branch: feat/mobile-tabbar (PR A), feat/mobile-touch-targets (PR B), feat/frame-wake-lock (PR C), feat/viewer-chrome (PR D), feat/library-surface (PR E)
 worktree: false
-tasks_total: 25
-tasks_done: 25
+tasks_total: 26
+tasks_done: 26
 current_task: null
 last_commit: null
 last_updated: 2026-11-25
@@ -3485,7 +3485,7 @@ index 0ff278f..b8434ac 100644
 
 **Scope:** Tile « … » back on every pointer, 28 px look with a 44 px invisible target; `useTileContextMenu` (native `contextmenu`); `PhotoActionsMenu` `open` / `onOpenChange`; R-BIB-53. Spec D23 amended.
 
-**Gate:** `pnpm check` and `pnpm typecheck` green; `pnpm build` and `pnpm test` green at the tip.
+**Gate:** `pnpm check` and `pnpm typecheck` green; `pnpm build` and `pnpm test` green.
 
 - [x] **Final diff**
 
@@ -3660,6 +3660,41 @@ index b8434ac..f7602a3 100644
  **Messages affichés**
 ~~~~
 
+### Task 18: Photo menu as wide as its items
+
+**Commit:** `fix(client): photo menu as wide as its items`
+
+**Scope:** `PhotoActionsMenu` content `w-max`: under the 28 px « … » its items wrapped, with a mouse too.
+
+**Gate:** `pnpm check` and `pnpm typecheck` green; `pnpm build` and `pnpm test` green on `feat/library-timeline`, which holds it.
+
+- [x] **Final diff**
+
+~~~~diff
+diff --git a/client/src/components/frame/PhotoActionsMenu.tsx b/client/src/components/frame/PhotoActionsMenu.tsx
+index 6ea54a7..8b77f44 100644
+--- a/client/src/components/frame/PhotoActionsMenu.tsx
++++ b/client/src/components/frame/PhotoActionsMenu.tsx
+@@ -15,6 +15,7 @@ import {
+   DropdownMenuTrigger,
+ } from '@/components/ui/dropdown-menu.tsx'
+ import { useStartRadio } from '@/hooks/useStartRadio.ts'
++import { cn } from '@/lib/utils.ts'
+ import type { Photo } from '@/photo.ts'
+ 
+ // The frame and the viewer are always dark; the library follows the app's theme.
+@@ -126,7 +127,8 @@ type MenuItemsProps = {
+ function MenuItems({ photo, themeClass, onOpen, children }: MenuItemsProps): JSX.Element {
+   const startRadio = useStartRadio()
+   return (
+-    <DropdownMenuContent align="end" className={themeClass}>
++    // w-max: the content would take the small « … »'s width and wrap « Lancer la radio ».
++    <DropdownMenuContent align="end" className={cn('w-max', themeClass)}>
+       {children}
+       <DropdownMenuItem onSelect={() => startRadio(photo.id)}>
+         <RadioIcon />
+~~~~
+
 ---
 
 ## Final verification (controller)
@@ -3700,3 +3735,4 @@ index b8434ac..f7602a3 100644
   - Task 15: Wake Lock needs a secure context, like the Secure cookie.
 - **Gates for Tasks 11 to 16:** `pnpm check` and `pnpm typecheck` green on each commit; at the tip `pnpm build` green and `pnpm test` → `Test Files  25 passed (25)`, `Tests  301 passed (301)`.
 - **Task 17** (the author, relayed: opening a photo to reach its menu is not a good idea): Task 16 is undone by an added commit, not reverted. The tile « … » is compact under a finger, with a 44 px invisible target, and a long press opens the same menu through `contextmenu`. iOS Safari fires no `contextmenu` on a long press, so on iPhone the « … » is the path; a pointer timer was judged not worth its code. Spec D23 amended in place (new in this stack). Gates: `pnpm check` and `pnpm typecheck` green; at the tip `pnpm build` green, `pnpm test` → `Test Files  25 passed (25)`, `Tests  301 passed (301)`.
+- **Task 18** (the controller, in Chrome at 360 px): Radix's menu content takes its trigger's width with a 128 px floor, so under the 28 px « … » « Lancer la radio » and « Envoyer à un ami » wrapped, with a mouse too. `w-max` on the photo menu's content; the collection menu gets the same on `feat/library-timeline`. Recorded here from that branch's docs commit, since this plan's own commits were already picked.
