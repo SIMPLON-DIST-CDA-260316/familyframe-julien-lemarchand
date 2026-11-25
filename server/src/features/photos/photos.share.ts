@@ -1,14 +1,30 @@
 import { AppError } from '../../errors/app-error.js'
-import { OBJECT_ID_PATTERN, parseFile, parsePhotoId, type UploadedFile } from './photos.input.js'
+import {
+  OBJECT_ID_PATTERN,
+  parseFile,
+  parseMessage,
+  parsePhotoId,
+  type UploadedFile,
+} from './photos.input.js'
 import type { NewPhoto, PhotoRecord, StoredPhoto } from './photos.repository.js'
 import type { PhotosServiceDeps } from './photos.service.js'
 import { rejectKnownFile, storeNewPhoto } from './photos.store.js'
 
-// photoId comes from the URL, friendId straight from the JSON body: validated here.
-export type LibraryShare = { senderId: string; photoId: string; friendId: unknown }
+// photoId comes from the URL, friendId and message straight from the JSON body: validated here.
+export type LibraryShare = {
+  senderId: string
+  photoId: string
+  friendId: unknown
+  message: unknown
+}
 
-// friendId is a multipart text field: validated here too.
-export type DeviceShare = { senderId: string; file: UploadedFile | undefined; friendId: unknown }
+// friendId and message are multipart text fields: validated here too.
+export type DeviceShare = {
+  senderId: string
+  file: UploadedFile | undefined
+  friendId: unknown
+  message: unknown
+}
 
 // Missing, malformed, unknown, pending or oneself: one answer, the id is no accepted friend's.
 // A malformed id never reaches the database: Prisma would fail on it.
@@ -51,13 +67,16 @@ async function saveCopy(deps: PhotosServiceDeps, photo: NewPhoto): Promise<Photo
 // The friend gets a new photo pointing to the same Cloudinary image: nothing is uploaded again.
 export async function shareFromLibrary(
   deps: PhotosServiceDeps,
-  { senderId, photoId, friendId }: LibraryShare,
+  { senderId, photoId, friendId, message }: LibraryShare,
 ): Promise<PhotoRecord> {
   const validPhotoId = parsePhotoId(photoId)
+  const validMessage = parseMessage(message)
   const recipientId = await requireFriend(deps, friendId, senderId)
   const { id, url, cloudinaryId, sha256 } = await findOwnedPhoto(deps, validPhotoId, senderId)
   await rejectKnownFile(deps, recipientId, sha256)
-  const record = await saveCopy(deps, { ownerId: recipientId, senderId, url, cloudinaryId, sha256 })
+  // The copy carries this sender's message, never the one the original came with.
+  const copy = { ownerId: recipientId, senderId, message: validMessage, url, cloudinaryId, sha256 }
+  const record = await saveCopy(deps, copy)
   deps.logger.info('photo.shared', {
     photoId: record.id,
     sourcePhotoId: id,
@@ -65,6 +84,7 @@ export async function shareFromLibrary(
     userId: senderId,
     recipientId,
     source: 'library',
+    hasMessage: validMessage !== undefined,
   })
   return record
 }
@@ -72,17 +92,20 @@ export async function shareFromLibrary(
 // An upload with the friend as owner: converted and uploaded like any new photo.
 export async function shareFromDevice(
   deps: PhotosServiceDeps,
-  { senderId, file, friendId }: DeviceShare,
+  { senderId, file, friendId, message }: DeviceShare,
 ): Promise<PhotoRecord> {
   const { buffer } = parseFile(file)
+  const validMessage = parseMessage(message)
   const recipientId = await requireFriend(deps, friendId, senderId)
-  const record = await storeNewPhoto(deps, { ownerId: recipientId, senderId, buffer })
+  const upload = { ownerId: recipientId, senderId, message: validMessage, buffer }
+  const record = await storeNewPhoto(deps, upload)
   deps.logger.info('photo.shared', {
     photoId: record.id,
     cloudinaryId: record.cloudinaryId,
     userId: senderId,
     recipientId,
     source: 'device',
+    hasMessage: validMessage !== undefined,
   })
   return record
 }

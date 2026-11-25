@@ -12,6 +12,7 @@ const ORIGINAL: StoredPhoto = {
   id: '6b044f9d56a44767c7079a01',
   ownerId: SENDER_ID,
   senderId: null,
+  message: null,
   ...IMAGE,
   sha256: 'sha-of-the-original-bytes',
   createdAt: new Date('2026-11-23T10:00:00Z'),
@@ -66,6 +67,7 @@ function shareOriginal(deps: PhotosServiceDeps, friendId: unknown): Promise<Phot
     senderId: SENDER_ID,
     photoId: ORIGINAL.id,
     friendId,
+    message: undefined,
   })
 }
 
@@ -101,6 +103,7 @@ describe('shareFromLibrary', () => {
       userId: SENDER_ID,
       recipientId: FRIEND_ID,
       source: 'library',
+      hasMessage: false,
     })
     expect(JSON.stringify(deps.logger.info.mock.calls)).not.toContain('Membre')
   })
@@ -113,6 +116,7 @@ describe('shareFromLibrary', () => {
         senderId: SENDER_ID,
         photoId: 'pas-un-id',
         friendId: FRIEND_ID,
+        message: undefined,
       }),
     ).rejects.toMatchObject({ code: 'PHOTO_NOT_FOUND' })
     expect(deps.areFriends).not.toHaveBeenCalled()
@@ -178,6 +182,7 @@ function sharePng(deps: PhotosServiceDeps, friendId: unknown): Promise<PhotoReco
     senderId: SENDER_ID,
     file: PNG_FILE,
     friendId,
+    message: undefined,
   })
 }
 
@@ -204,6 +209,7 @@ describe('shareFromDevice', () => {
       userId: SENDER_ID,
       recipientId: FRIEND_ID,
       source: 'device',
+      hasMessage: false,
     })
   })
 
@@ -242,6 +248,7 @@ describe('shareFromDevice', () => {
         senderId: SENDER_ID,
         file: undefined,
         friendId: FRIEND_ID,
+        message: undefined,
       }),
     ).rejects.toMatchObject({ code: 'PHOTO_MISSING' })
     expect(deps.areFriends).not.toHaveBeenCalled()

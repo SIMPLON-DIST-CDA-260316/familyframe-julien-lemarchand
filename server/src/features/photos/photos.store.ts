@@ -3,8 +3,8 @@ import { AppError } from '../../errors/app-error.js'
 import type { NewPhoto, PhotoRecord } from './photos.repository.js'
 import type { PhotosServiceDeps } from './photos.service.js'
 
-// senderId only when the file goes to a friend's library.
-export type NewUpload = { ownerId: string; senderId?: string; buffer: Buffer }
+// senderId and message only when the file goes to a friend's library.
+export type NewUpload = { ownerId: string; senderId?: string; message?: string; buffer: Buffer }
 
 // The original bytes, before sharp: its output is not guaranteed to be stable.
 function sha256Of(buffer: Buffer): string {
@@ -79,12 +79,12 @@ async function saveRecord(deps: PhotosServiceDeps, photo: NewPhoto): Promise<Pho
 // one's own library and for a file sent to a friend.
 export async function storeNewPhoto(
   deps: PhotosServiceDeps,
-  { ownerId, senderId, buffer }: NewUpload,
+  { ownerId, senderId, message, buffer }: NewUpload,
 ): Promise<PhotoRecord> {
   const sha256 = sha256Of(buffer)
   await rejectKnownFile(deps, ownerId, sha256)
   const jpeg = await convertToFrameJpeg(deps, buffer)
   // Cloudinary and database failures are ours: they stay 500s.
   const image = await deps.uploadImage(jpeg)
-  return saveRecord(deps, { ownerId, senderId, ...image, sha256 })
+  return saveRecord(deps, { ownerId, senderId, message, ...image, sha256 })
 }

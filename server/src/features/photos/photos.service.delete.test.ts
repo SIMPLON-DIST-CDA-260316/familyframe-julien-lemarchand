@@ -9,6 +9,7 @@ const RECORD: PhotoRecord = {
   id: '6b044f9d56a44767c7079a01',
   ownerId: OWNER_ID,
   senderId: null,
+  message: null,
   sender: null,
   ...IMAGE,
   sha256: 'sha-of-the-original-bytes',

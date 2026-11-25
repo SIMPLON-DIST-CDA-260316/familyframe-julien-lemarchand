@@ -56,6 +56,8 @@ model Photo {
   url          String
   cloudinaryId String
   sha256       String
+  // The sender's note, 200 characters at most; absent when there is none.
+  message      String?
   createdAt    DateTime @default(now())
 
   @@unique([ownerId, sha256])

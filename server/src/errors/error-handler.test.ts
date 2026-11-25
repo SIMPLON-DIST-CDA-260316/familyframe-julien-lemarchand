@@ -11,6 +11,13 @@ describe('toErrorResponse', () => {
     })
   })
 
+  it('answers a share message that is too long or not text with 400', () => {
+    expect(toErrorResponse(new AppError('MESSAGE_INVALID'))).toEqual({
+      status: 400,
+      body: { error: 'MESSAGE_INVALID' },
+    })
+  })
+
   it('answers a member on an admin route with 403', () => {
     expect(toErrorResponse(new AppError('FORBIDDEN'))).toEqual({
       status: 403,

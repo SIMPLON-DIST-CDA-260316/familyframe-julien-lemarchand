@@ -14,6 +14,7 @@ const HTTP_STATUS_BY_CODE: Record<ApiErrorCode, number> = {
   PASSWORD_INVALID: 400,
   // 400, not 401: the session is valid, only the typed password is wrong.
   PASSWORD_INCORRECT: 400,
+  MESSAGE_INVALID: 400,
   SELF_FRIEND: 400,
   UNAUTHENTICATED: 401,
   INVALID_CREDENTIALS: 401,

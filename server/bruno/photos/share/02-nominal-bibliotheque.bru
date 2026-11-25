@@ -12,7 +12,8 @@ post {
 
 body:json {
   {
-    "friendId": "{{adminId}}"
+    "friendId": "{{adminId}}",
+    "message": "  Joyeux anniversaire !  "
   }
 }
 
@@ -39,6 +40,7 @@ assert {
   res.status: eq 201
   res.body.id: isString
   res.body.senderName: eq {{memberDisplayName}}
+  res.body.message: eq Joyeux anniversaire !
 }
 
 script:post-response {
@@ -69,7 +71,8 @@ docs {
   NOMINAL → 201 avec la nouvelle photo de l'admin, `senderName` `Membre`.
   Le script de départ rend le membre et l'admin amis (demande puis
   acceptation, id dans `shareFriendshipId`). La photo reçue pointe vers la
-  même image Cloudinary que celle du membre. Son id va dans `sharedPhotoId`.
+  même image Cloudinary que celle du membre, et le message sans les espaces
+  autour (« Joyeux anniversaire ! »). Son id va dans `sharedPhotoId`.
   Le script vérifie qu'elle est dans la liste de l'admin avec le nom du
   membre, et que la liste du membre ne gagne pas de photo.
 }

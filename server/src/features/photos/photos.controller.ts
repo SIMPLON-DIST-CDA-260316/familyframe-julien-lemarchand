@@ -25,6 +25,7 @@ function toPhotoDto(record: PhotoRecord): Photo {
     ...deliveryUrls(record.cloudinaryId),
     createdAt: record.createdAt.toISOString(),
     senderName: record.sender?.displayName ?? null,
+    message: record.message,
   }
 }
 
@@ -71,16 +72,18 @@ async function shareFromLibrary(
     senderId: currentUser(req).id,
     photoId: req.params.id,
     friendId: req.body?.friendId,
+    message: req.body?.message,
   })
   announceNewPhoto(deps, res, record)
 }
 
-// multer fills req.body with the text fields: friendId is one of them.
+// multer fills req.body with the text fields: friendId and message are two of them.
 async function shareFromDevice(deps: ControllerDeps, req: Request, res: Response): Promise<void> {
   const record = await deps.service.shareFromDevice({
     senderId: currentUser(req).id,
     file: req.file,
     friendId: req.body?.friendId,
+    message: req.body?.message,
   })
   announceNewPhoto(deps, res, record)
 }

@@ -4,11 +4,11 @@ meta {
 }
 
 docs {
-  `POST /api/photos/:id/share`, JSON `{ friendId }` : envoie une photo de sa
+  `POST /api/photos/:id/share`, JSON `{ friendId, message }` : envoie une photo de sa
   bibliothèque à un ami accepté. L'ami reçoit une nouvelle photo qui pointe
   vers la même image Cloudinary (rien n'est renvoyé à Cloudinary), avec
   `senderName`, le nom de l'expéditeur. `POST /api/photos/share`, multipart
-  (`photo` et `friendId`) : envoie un fichier de l'appareil, converti et
+  (`photo`, `friendId` et `message`) : envoie un fichier de l'appareil, converti et
   envoyé à Cloudinary comme un envoi normal, mais qui n'entre que dans la
   bibliothèque de l'ami. Réponse : 201 avec la photo de l'ami, telle qu'il
   la voit ; l'événement Socket.IO `photo:new` part vers les connexions de
@@ -17,7 +17,10 @@ docs {
   Un `friendId` absent, mal formé, inconnu, en attente ou le sien répond
   403 `NOT_FRIENDS` ; une photo d'un autre compte ou un id mal formé, 404
   `PHOTO_NOT_FOUND` ; un fichier que l'ami a déjà (même SHA-256), 409
-  `PHOTO_DUPLICATE`.
+  `PHOTO_DUPLICATE`. `message` est facultatif : du texte de 200 caractères au
+  plus, espaces autour retirés ; vide ou absent, pas de message. Trop long ou
+  pas du texte : 400 `MESSAGE_INVALID`, vérifié avant l'ami (`14` à `16`
+  passent après la fin de l'amitié).
 
   Le membre envoie à l'admin. `01` lit les deux ids (`memberId`, `adminId`)
   par `GET /api/auth/me` et supprime une amitié laissée par un lancement

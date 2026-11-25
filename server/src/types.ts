@@ -10,6 +10,7 @@ export type ApiErrorCode =
   | 'DISPLAY_NAME_INVALID'
   | 'PASSWORD_INVALID'
   | 'PASSWORD_INCORRECT'
+  | 'MESSAGE_INVALID'
   | 'SELF_FRIEND'
   | 'UNAUTHENTICATED'
   | 'INVALID_CREDENTIALS'
@@ -84,13 +85,15 @@ export type FriendshipList = {
 }
 
 // createdAt is an ISO 8601 string: JSON has no dates. senderName is the display name of the
-// friend who sent the photo, null for a photo its owner uploaded.
+// friend who sent the photo, null for a photo its owner uploaded. message is the note the
+// friend wrote with it, null without one.
 export type Photo = {
   id: string
   url: string
   thumbnailUrl: string
   createdAt: string
   senderName: string | null
+  message: string | null
 }
 
 // nextCursor is the id to send as cursor for the next page; null on the last page.

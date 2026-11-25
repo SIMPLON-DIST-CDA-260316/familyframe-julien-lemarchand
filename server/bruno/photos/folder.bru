@@ -10,12 +10,14 @@ docs {
   photos du compte connecté.
 
   Une photo renvoyée par l'API : `{ id, url, thumbnailUrl, createdAt,
-  senderName }` (`createdAt` en ISO 8601 ; `senderName`, le nom de l'ami qui
-  l'a envoyée, `null` pour une photo ajoutée par son propriétaire). Une
+  senderName, message }` (`createdAt` en ISO 8601 ; `senderName`, le nom de
+  l'ami qui l'a envoyée, `null` pour une photo ajoutée par son propriétaire ;
+  `message`, le mot de l'ami joint à la photo, `null` sans message). Une
   erreur : `{ error }`, un code
   (`PHOTO_MISSING`, `UPLOAD_INVALID`, `BODY_INVALID`, `QUERY_INVALID`,
   `UNAUTHENTICATED`, `NOT_FRIENDS`, `PHOTO_NOT_FOUND`, `PHOTO_DUPLICATE`,
-  `PHOTO_TOO_LARGE`, `FORMAT_UNSUPPORTED`, `IMAGE_UNREADABLE`, `SERVER_ERROR`)
+  `PHOTO_TOO_LARGE`, `FORMAT_UNSUPPORTED`, `IMAGE_UNREADABLE`, `MESSAGE_INVALID`,
+  `SERVER_ERROR`)
   que le client traduit en français.
   Ordre des dossiers : `create`, `list`, `share`, `delete`.
 }

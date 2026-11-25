@@ -12,6 +12,7 @@ function recordWithId(id: string): PhotoRecord {
     id,
     ownerId: OWNER_ID,
     senderId: null,
+    message: null,
     sender: null,
     url: 'https://res.cloudinary.com/demo/photo.jpg',
     cloudinaryId: `familyframe/${id}`,
