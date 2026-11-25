@@ -4,8 +4,8 @@ status: done
 spec: docs/superpowers/specs/2026-11-25-design-tokens-design.md
 branch: feat/design-tokens
 worktree: false
-tasks_total: 9
-tasks_done: 9
+tasks_total: 11
+tasks_done: 11
 current_task: null
 last_commit: null
 last_updated: 2026-11-26
@@ -48,3 +48,4 @@ Each task: `pnpm check`, `pnpm typecheck`; tasks 6 and 7 also `pnpm build`. Then
 2. **Product rules.** R-APP-78 (Encre by default, Actuelle kept, accent follows the palette), R-APP-79 (browser bar follows the chosen theme and palette, replaces R-APP-57 for the bar), R-APP-80 (palette independent of the theme, applied at once), R-APP-81 (remembered per device and browser). Other branches may claim numbers in the same range: renumber on merge if they collide.
 3. **The frame gradient's `via` stop** was kept dropped after review: recorded in spec D5.
 4. **Selected item in the account menu toggles.** The controller's Chrome pass found the chosen « Thème » and « Palette » item barely visible in dark (Encre `muted` 0.27 on `popover` 0.23; already true of `ThemeToggle` before). Both toggles now invert the chosen item (`bg-foreground` / `text-background`), as `SettingToggleGroup` does: about 14:1 against the menu in every palette and mode.
+5. **Rebased onto `fix/stabilisation` (6a6a985)**, after steps 17, 15 and 16. The product rules were renumbered in the commits that introduce them: R-APP-78 (Encre by default), R-APP-79 (browser bar, replaces R-APP-57 for the bar), R-APP-80, R-APP-81; the four are listed in number order. Conflicts were only in `docs/produit/apparence-et-navigation.md` (step 15's R-APP-74 and R-APP-75 next to the R-APP-57 line, kept). A re-grep of `client/src` found one new hard-coded colour, the viewer's loading placeholder (`bg-white/10`), now `bg-overlay-hover`. Step 15's `manifest.webmanifest` takes Encre's light background (`#fcfaf7`) for `background_color` and `theme_color`; its `index.html` manifest links are kept, and `themeColor.ts` still syncs both `theme-color` metas.
