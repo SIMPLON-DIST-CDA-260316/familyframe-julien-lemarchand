@@ -17,7 +17,7 @@ type LoadMoreButtonProps = Pick<PhotoLibrary, 'isLoadingMore' | 'loadMore'>
 
 function LoadMoreButton({ isLoadingMore, loadMore }: LoadMoreButtonProps): JSX.Element {
   return (
-    <div className="flex justify-center px-4 pb-6 sm:px-8 sm:pb-8">
+    <div className="flex justify-center pt-6">
       <Button variant="outline" onClick={loadMore} disabled={isLoadingMore}>
         {isLoadingMore ? 'Chargement…' : 'Charger plus'}
       </Button>

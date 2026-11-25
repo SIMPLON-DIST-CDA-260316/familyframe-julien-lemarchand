@@ -9,9 +9,14 @@ type PhotoGridProps = {
   onSelect: (id: string) => void
 }
 
+// Edge to edge with the page's header. Two columns on a phone: each tile carries a 44 px « … »
+// that would hide too much of a third-width photo. From sm, as many ~12rem columns as fit.
+const GRID_CLASSES =
+  'grid grid-cols-2 gap-2 sm:grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] sm:gap-4'
+
 export function PhotoGrid({ photos, currentId, onSelect }: PhotoGridProps): JSX.Element {
   return (
-    <ul className="grid grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] gap-4 p-8">
+    <ul className={GRID_CLASSES}>
       {photos.map((photo) => (
         <PhotoGridTile
           key={photo.id}

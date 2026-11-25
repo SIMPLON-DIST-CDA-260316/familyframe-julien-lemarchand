@@ -11,7 +11,8 @@ type PhotoListProps = {
 
 export function PhotoList({ photos, currentId, onSelect }: PhotoListProps): JSX.Element {
   return (
-    <ul className="mx-auto flex max-w-3xl flex-col gap-1 p-8">
+    // The page's full width: thumbnails and « … » line up with the header's edges.
+    <ul className="flex flex-col gap-1">
       {photos.map((photo) => (
         <PhotoListRow
           key={photo.id}
