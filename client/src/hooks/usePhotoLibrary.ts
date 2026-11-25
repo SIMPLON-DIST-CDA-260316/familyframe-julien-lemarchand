@@ -163,16 +163,23 @@ function connectLibrary(
   }
 }
 
-// A collection's list waits for collections:changed: an upload enters it once filed there.
+// A collection's list waits for collections:changed: an upload enters it once filed there. A ref:
+// an upload that ends after a switch to a collection must not land in it.
 function usePhotoAdder(
   liveLoads: LiveLoads,
   setPhotos: Dispatch<SetStateAction<Photo[]>>,
   collectionId: CollectionFilter,
 ): (photo: Photo) => void {
-  return useMemo(
-    () => (collectionId === null ? createPhotoAdder(liveLoads, setPhotos) : () => {}),
-    [liveLoads, setPhotos, collectionId],
-  )
+  const shownCollectionId = useRef(collectionId)
+  useEffect(() => {
+    shownCollectionId.current = collectionId
+  }, [collectionId])
+  return useMemo(() => {
+    const addPhoto = createPhotoAdder(liveLoads, setPhotos)
+    return (photo) => {
+      if (shownCollectionId.current === null) addPhoto(photo)
+    }
+  }, [liveLoads, setPhotos])
 }
 
 // Rebuilt when the next page changes, so loadMore always fetches the page after the current one.
@@ -232,6 +239,7 @@ function useLibraryStore(collectionId: CollectionFilter): LibraryStore {
     setShownCollectionId(collectionId)
     setPhotos([])
     setNextPage(null)
+    setIsLoadingMore(false)
     setIsFirstPageLoaded(false)
   }
   const state = { photos, nextPage, isLoadingMore, isFirstPageLoaded }
