@@ -11,6 +11,11 @@ export function formatPhotoDay(iso: string): string {
   return new Date(iso).toLocaleDateString('fr-FR', PHOTO_DAY_FORMAT)
 }
 
+// French quotation marks with their non-breaking spaces: the message reads as said by the sender.
+export function quotedMessage(message: string): string {
+  return `«\u00a0${message}\u00a0»`
+}
+
 // Alt texts and aria-labels: the day names the photo, the sender tells a received one apart.
 export function photoLabel({ createdAt, senderName }: Photo): string {
   const day = formatPhotoDay(createdAt)

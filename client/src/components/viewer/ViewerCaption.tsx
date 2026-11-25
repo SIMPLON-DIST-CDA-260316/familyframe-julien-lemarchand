@@ -1,6 +1,6 @@
 import type { JSX } from 'react'
 import type { Photo } from '@/photo.ts'
-import { formatPhotoDay } from '@/photoLabel.ts'
+import { formatPhotoDay, quotedMessage } from '@/photoLabel.ts'
 
 type ViewerCaptionProps = {
   photo: Photo
@@ -15,6 +15,11 @@ export function ViewerCaption({ photo }: ViewerCaptionProps): JSX.Element {
       </p>
       {photo.senderName !== null && (
         <p className="text-sm text-white/80 drop-shadow-md">Envoyée par {photo.senderName}</p>
+      )}
+      {photo.message !== null && (
+        <p className="mt-2 text-base whitespace-pre-line drop-shadow-md">
+          {quotedMessage(photo.message)}
+        </p>
       )}
     </div>
   )

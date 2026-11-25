@@ -1,7 +1,7 @@
 import type { JSX, ReactNode } from 'react'
 import { cn } from '@/lib/utils.ts'
 import type { Photo } from '@/photo.ts'
-import { formatPhotoDay } from '@/photoLabel.ts'
+import { formatPhotoDay, quotedMessage } from '@/photoLabel.ts'
 
 type PolaroidPrintProps = {
   photo: Photo
@@ -33,6 +33,12 @@ export function PolaroidPrint({ photo, children }: PolaroidPrintProps): JSX.Elem
         </p>
         {photo.senderName !== null && (
           <p className="text-[clamp(0.875rem,2.2vmin,1.5rem)]">Envoyée par {photo.senderName}</p>
+        )}
+        {/* Written on the band like a note under a print: three lines, as on the other captions. */}
+        {photo.message !== null && (
+          <p className="mt-[1vmin] line-clamp-3 text-[clamp(0.875rem,2.2vmin,1.5rem)] whitespace-pre-line italic">
+            {quotedMessage(photo.message)}
+          </p>
         )}
       </figcaption>
     </figure>

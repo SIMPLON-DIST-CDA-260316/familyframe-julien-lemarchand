@@ -3,6 +3,7 @@ import { type JSX, useState } from 'react'
 import { Link } from 'react-router'
 import { FriendPicker } from '@/components/sharing/FriendPicker.tsx'
 import { FRIEND_SEARCH_MIN_COUNT, filterFriends } from '@/components/sharing/friendSearch.ts'
+import { ShareMessageField } from '@/components/sharing/ShareMessageField.tsx'
 import { sendButtonLabel } from '@/components/sharing/shareTexts.ts'
 import { Alert, AlertDescription } from '@/components/ui/alert.tsx'
 import { Button } from '@/components/ui/button.tsx'
@@ -72,9 +73,11 @@ function selectedUsers(friends: Friendship[], selectedIds: string[]): Friendship
 }
 
 // The selection survives the search: a friend chosen then filtered out is still sent the photo.
+// One message for everyone chosen: it goes with each copy.
 function FriendSelection({ friends, target, onSent }: FriendSelectionProps): JSX.Element {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [query, setQuery] = useState('')
+  const [message, setMessage] = useState('')
   const sending = useShareSending(target, onSent)
 
   return (
@@ -89,11 +92,16 @@ function FriendSelection({ friends, target, onSent }: FriendSelectionProps): JSX
         isDisabled={sending.isSending}
         onToggle={(friendId) => setSelectedIds((ids) => toggledIds(ids, friendId))}
       />
+      <ShareMessageField
+        message={message}
+        isDisabled={sending.isSending}
+        onMessageChange={setMessage}
+      />
       {sending.error && <ErrorAlert message={sending.error} />}
       <Button
         size="lg"
         disabled={selectedIds.length === 0 || sending.isSending}
-        onClick={() => sending.sendTo(selectedUsers(friends, selectedIds))}
+        onClick={() => sending.sendTo(selectedUsers(friends, selectedIds), message)}
       >
         {sending.isSending ? 'Envoi…' : sendButtonLabel(selectedIds.length)}
       </Button>

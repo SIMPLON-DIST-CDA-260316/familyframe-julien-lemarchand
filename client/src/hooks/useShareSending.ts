@@ -17,13 +17,13 @@ export type ShareTarget = { kind: 'library'; photo: Photo } | { kind: 'device'; 
 export type ShareSending = {
   isSending: boolean
   error: string
-  sendTo: (friends: FriendUser[]) => Promise<void>
+  sendTo: (friends: FriendUser[], message: string) => Promise<void>
 }
 
-function postShare(target: ShareTarget, friendId: string): Promise<ShareResult> {
+function postShare(target: ShareTarget, friendId: string, message: string): Promise<ShareResult> {
   return target.kind === 'library'
-    ? postLibraryShare(target.photo.id, friendId)
-    : postDeviceShare(target.file, friendId)
+    ? postLibraryShare(target.photo.id, friendId, message)
+    : postDeviceShare(target.file, friendId, message)
 }
 
 // One friend after the other: a device share uploads the whole file each time. null: the
@@ -31,10 +31,11 @@ function postShare(target: ShareTarget, friendId: string): Promise<ShareResult> 
 async function shareWithEach(
   target: ShareTarget,
   friends: FriendUser[],
+  message: string,
 ): Promise<ShareOutcome[] | null> {
   const outcomes: ShareOutcome[] = []
   for (const friend of friends) {
-    const result = await postShare(target, friend.id)
+    const result = await postShare(target, friend.id, message)
     if (result.status === 'unauthenticated') return null
     outcomes.push({ ...result, name: firstName(friend.displayName) })
   }
@@ -55,10 +56,10 @@ export function useShareSending(target: ShareTarget, onSent: () => void): ShareS
   const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState('')
 
-  async function sendTo(friends: FriendUser[]): Promise<void> {
+  async function sendTo(friends: FriendUser[], message: string): Promise<void> {
     setIsSending(true)
     setError('')
-    const outcomes = await shareWithEach(target, friends)
+    const outcomes = await shareWithEach(target, friends, message)
     setIsSending(false)
     // The session ended on the server: RequireAuth sends the user to /login.
     if (outcomes === null) {

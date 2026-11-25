@@ -10,6 +10,7 @@ Envoyer une photo à un ou plusieurs amis la fait entrer dans sa bibliothèque e
 - Voir un aperçu de la photo, puis ses amis sous forme de ronds portant leur photo de profil ou, sans photo, leur initiale.
 - Envoyer une photo à plusieurs proches en une fois, en touchant leur visage puis un seul bouton.
 - Rechercher un ami par son nom ou son adresse e-mail quand on en a beaucoup.
+- Écrire un petit message qui accompagne la photo, si on le souhaite.
 - Fermer avec la croix, la touche Échap ou en touchant à côté.
 
 **Règles**
@@ -27,6 +28,7 @@ Envoyer une photo à un ou plusieurs amis la fait entrer dans sa bibliothèque e
 11. R-PAR-45 · Le bouton indique combien de personnes recevront la photo et reste grisé tant que personne n'est choisi.
 12. R-PAR-46 · Dès qu'au moins une personne a reçu la photo, le panneau se ferme et une notification dit à qui elle est partie, ainsi que pour qui l'envoi a échoué. Si personne ne l'a reçue, le panneau reste ouvert avec les raisons, et le choix est gardé.
 13. R-PAR-47 · Le rond de chaque proche porte sa photo de profil quand il en a une, et sa première lettre en majuscule sinon.
+14. R-PAR-48 · Le message est facultatif et fait 200 caractères au plus ; un compteur indique combien il en reste. Les espaces au début et à la fin sont retirés, et un message vide ou fait seulement d'espaces compte comme aucun message. Envoyée à plusieurs proches en une fois, la photo leur parvient à tous avec le même message.
 
 **Messages affichés**
 
@@ -36,6 +38,8 @@ Envoyer une photo à un ou plusieurs amis la fait entrer dans sa bibliothèque e
 | Chargement des amis                  | « Chargement… »                                                                    |
 | Aucun ami                            | « Vous n'avez pas encore d'amis. » et le lien « Ajouter un ami » vers la page Amis |
 | Recherche sans résultat              | « Aucun ami ne correspond à « [texte saisi] ». »                                   |
+| Champ du message                     | « Message (facultatif) », avec le compteur « N / 200 »                             |
+| Message trop long                    | « Le message doit faire 200 caractères au plus. »                                  |
 | Bouton                               | « Envoyer », « Envoyer à 1 personne », « Envoyer à N personnes »                   |
 | Envoi en cours                       | « Envoi… »                                                                         |
 | Envoi réussi                         | « Envoyée à Mamie et Tata » (exemple)                                              |
@@ -47,7 +51,8 @@ Envoyer une photo à un ou plusieurs amis la fait entrer dans sa bibliothèque e
 
 - Envoyer à une personne qui n'est pas un ami, ou à soi-même.
 - Fermer le panneau en le faisant glisser vers le bas : il se ferme avec la croix, la touche Échap ou en touchant à côté.
-- Joindre un message à la photo : prévu, voir [a-venir.md](a-venir.md).
+- Modifier ou retirer le message une fois la photo envoyée.
+- Écrire un message différent à chaque proche dans le même envoi : il faut faire un envoi par personne.
 
 ## Envoyer une photo de sa bibliothèque
 
@@ -106,12 +111,15 @@ Ceux du panneau d'envoi (voir [Choisir à qui envoyer](#choisir-à-qui-envoyer))
 5. R-PAR-34 · Sa date est celle de sa réception, pas celle de son ajout chez l'expéditeur : elle se range donc en tête de la bibliothèque.
 6. R-PAR-35 · La photo s'affiche sur tous les appareils du destinataire connectés à ce moment-là ; l'expéditeur ne voit aucun changement sur ses propres écrans.
 7. R-PAR-36 · Sur un cadre en diaporama, la photo reçue s'affiche selon les règles d'arrivée d'une nouvelle photo (voir [cadre.md](cadre.md#arrivée-dune-nouvelle-photo)).
+8. R-PAR-49 · Le message de l'expéditeur s'affiche entre guillemets sous la mention « Envoyée par » : sur la photo ouverte en grand, dans la légende du diaporama et sur la bande blanche du polaroid. Sur le cadre, il tient sur trois lignes au plus ; la photo ouverte en grand le montre en entier.
+9. R-PAR-50 · Une photo transférée de nouveau porte le message de la dernière personne qui l'a envoyée, ou aucun message si elle n'en a pas écrit : le message reçu avec la photo ne la suit pas.
 
 **Messages affichés**
 
 | Situation                    | Message               |
 | ---------------------------- | --------------------- |
 | Photo reçue (légende, liste) | « Envoyée par [nom] » |
+| Photo reçue avec un message  | « « [message] » »     |
 
 **Ce qui n'est pas possible**
 

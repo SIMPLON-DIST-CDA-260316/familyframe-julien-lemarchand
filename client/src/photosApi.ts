@@ -124,16 +124,30 @@ async function sendShare(url: string, init: RequestInit): Promise<ShareResult> {
   }
 }
 
-export function postLibraryShare(photoId: string, friendId: string): Promise<ShareResult> {
+// A blank message is no message: the field stays out of the request.
+export function postLibraryShare(
+  photoId: string,
+  friendId: string,
+  message: string,
+): Promise<ShareResult> {
+  const trimmedMessage = message.trim()
   return sendShare(`/api/photos/${photoId}/share`, {
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ friendId }),
+    body: JSON.stringify(
+      trimmedMessage === '' ? { friendId } : { friendId, message: trimmedMessage },
+    ),
   })
 }
 
-export function postDeviceShare(file: File, friendId: string): Promise<ShareResult> {
+export function postDeviceShare(
+  file: File,
+  friendId: string,
+  message: string,
+): Promise<ShareResult> {
+  const trimmedMessage = message.trim()
   const body = new FormData()
   body.append('photo', file)
   body.append('friendId', friendId)
+  if (trimmedMessage !== '') body.append('message', trimmedMessage)
   return sendShare('/api/photos/share', { body })
 }
