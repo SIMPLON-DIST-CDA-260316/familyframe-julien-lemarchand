@@ -74,4 +74,9 @@ docs {
   « Strict transformations » activé dans la console Cloudinary (Settings →
   Security) : sans ce réglage, Cloudinary accepte n'importe quelle
   transformation et le test échoue.
+
+  Limite connue : « Strict transformations » bloque les transformations
+  modifiées, pas l'original sans transformation. Une URL livrée dont on
+  retire la transformation donne l'image stockée en 4096 px : même public,
+  même photo. Ce cas n'est pas testé ici.
 }
