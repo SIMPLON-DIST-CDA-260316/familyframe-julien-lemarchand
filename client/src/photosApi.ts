@@ -5,6 +5,7 @@ import { postWithProgress } from '@/upload/postWithProgress.ts'
 
 // The server's MAX_PAGE_SIZE: the fewest requests for many photos.
 const MAX_PAGE_SIZE = 100
+const NOT_FOUND_STATUS = 404
 
 // collectionId: only that collection's photos; left out for the whole library.
 export type PageRequest = { cursor?: string; limit?: number; collectionId?: string }
@@ -41,8 +42,13 @@ export async function fetchPhotoPage(
       onUnauthenticated()
       return null
     }
-    // A refused load, such as a collection deleted elsewhere (404): the page says so already.
-    if (!res.ok) return null
+    // A collection deleted elsewhere: the page says so already.
+    if (res.status === NOT_FOUND_STATUS) return null
+    // Any other refusal, such as a 500, is a fault the page cannot explain: keep a trace of it.
+    if (!res.ok) {
+      console.error('Photos load refused by the API', res.status)
+      return null
+    }
     const data: unknown = await res.json()
     if (isPhotoPage(data)) return data
     // Client and API images out of sync: say so instead of waiting forever.
