@@ -1,6 +1,5 @@
 import { type JSX, useState } from 'react'
 import { CollectionChips } from '@/components/collections/CollectionChips.tsx'
-import { CollectionsCard } from '@/components/collections/CollectionsCard.tsx'
 import { SelectedCollectionBar } from '@/components/collections/SelectedCollectionBar.tsx'
 import { AddPhotoPanel } from '@/components/library/AddPhotoPanel.tsx'
 import { LibraryHeader } from '@/components/library/LibraryHeader.tsx'
@@ -64,7 +63,6 @@ function LibraryContent(props: LibraryContentProps): JSX.Element {
       <LibraryHeader library={library} layout={layout} onLayoutChange={setLayout} onAdd={onAdd} />
       {/* Above the photos: news from the family comes first. */}
       <LibraryMail />
-      <CollectionsCard />
       <CollectionChips selectedId={selectedCollectionId(selected)} />
       {selected.status === 'found' && <SelectedCollectionBar collection={selected.collection} />}
       <LibraryBody {...props} layout={layout} />

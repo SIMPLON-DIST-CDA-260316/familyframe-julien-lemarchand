@@ -1,6 +1,8 @@
-import { type JSX, useEffect, useRef } from 'react'
-import { Link } from 'react-router'
+import { PlusIcon } from 'lucide-react'
+import { type JSX, useEffect, useRef, useState } from 'react'
+import { Link, useNavigate } from 'react-router'
 import { useCollections } from '@/collections/CollectionsContext.ts'
+import { CollectionNameDialog } from '@/components/collections/CollectionNameDialog.tsx'
 import { cn } from '@/lib/utils.ts'
 import { libraryPath } from '@/viewerHistory.ts'
 
@@ -35,6 +37,25 @@ function ChipLink({ collectionId, isSelected, label }: ChipLinkProps): JSX.Eleme
   )
 }
 
+// The new collection opens at once: it is empty, its notice tells how to fill it.
+function NewCollectionChip(): JSX.Element {
+  const [isCreating, setIsCreating] = useState(false)
+  const navigate = useNavigate()
+  return (
+    <>
+      <button type="button" className={CHIP_CLASSES} onClick={() => setIsCreating(true)}>
+        <PlusIcon aria-hidden className="size-4" />
+        Nouvelle collection
+      </button>
+      <CollectionNameDialog
+        target={isCreating ? { kind: 'create' } : null}
+        onClose={() => setIsCreating(false)}
+        onSaved={(collection) => navigate(libraryPath(collection.id))}
+      />
+    </>
+  )
+}
+
 // Only this row scrolls sideways; it reaches the screen edges so a cut chip says « more ».
 export function CollectionChips({ selectedId }: CollectionChipsProps): JSX.Element {
   const { collections, status } = useCollections()
@@ -54,6 +75,9 @@ export function CollectionChips({ selectedId }: CollectionChipsProps): JSX.Eleme
             Vos collections n'ont pas pu être chargées.
           </li>
         )}
+        <li>
+          <NewCollectionChip />
+        </li>
       </ul>
     </nav>
   )
