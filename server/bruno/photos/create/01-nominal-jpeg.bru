@@ -32,6 +32,9 @@ script:post-response {
     expect(url).to.contain('f_auto,q_auto')
     expect(thumbnailUrl).to.contain('f_auto,q_auto')
   })
+  test('photo entière limitée à 1920 px pour les écrans, jamais agrandie', () => {
+    expect(url).to.contain('c_limit,h_1920,w_1920')
+  })
   test('miniature carrée de 640 px, recadrée sur le sujet', () => {
     expect(thumbnailUrl).to.contain('c_fill,g_auto,h_640,w_640')
   })
@@ -45,13 +48,14 @@ script:post-response {
   test('URL signées : une transformation modifiée est refusée', async () => {
     expect(url).to.match(/\/s--[\w-]+--\//)
     expect(thumbnailUrl).to.match(/\/s--[\w-]+--\//)
-    const tampered = thumbnailUrl.replace('w_640', 'w_641')
     // Bruno's axios throws on 4xx even with validateStatus: read the status from the error.
-    const status = await axios.get(tampered).then(
-      (image) => image.status,
-      (error) => error.response?.status,
-    )
-    expect(status).to.equal(401)
+    for (const tampered of [thumbnailUrl.replace('w_640', 'w_641'), url.replace('w_1920', 'w_4096')]) {
+      const status = await axios.get(tampered).then(
+        (image) => image.status,
+        (error) => error.response?.status,
+      )
+      expect(status).to.equal(401)
+    }
   })
 }
 
@@ -60,11 +64,13 @@ docs {
   la réponse ne porte plus de nom d'expéditeur (`uploaderName`) ; `senderName`
   vaut `null`, car le membre a envoyé la photo lui-même.
   `cloudinaryId` n'est pas exposé : le serveur envoie des URL prêtes, `url`
-  (photo entière) et `thumbnailUrl` (miniature), toutes deux en
-  `f_auto,q_auto`. Le test télécharge les deux URL : une transformation
+  (photo entière, limitée à 1920 px par `c_limit` : l'image stockée va
+  jusqu'à 4096 px pour l'impression) et `thumbnailUrl` (miniature), toutes
+  deux en `f_auto,q_auto`. Le test télécharge les deux URL : une transformation
   refusée par Cloudinary ferait échouer le test.
 
-  Les URL sont signées (`s--…--`). Le test de l'URL modifiée suppose
+  Les URL sont signées (`s--…--`). Les tests des URL modifiées (miniature
+  agrandie, photo entière demandée à 4096 px) supposent
   « Strict transformations » activé dans la console Cloudinary (Settings →
   Security) : sans ce réglage, Cloudinary accepte n'importe quelle
   transformation et le test échoue.

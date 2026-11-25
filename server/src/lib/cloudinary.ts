@@ -12,6 +12,9 @@ cloudinary.config({
 // Covers a contact sheet cell (up to about 320 CSS px) on a 2x screen.
 const THUMBNAIL_SIZE = 640
 
+// The frame and the viewer: a full HD screen. The stored photo is larger, kept for printing.
+const DISPLAY_SIZE = 1920
+
 // Decided per request: WebP when the browser takes it and it is lighter, else JPEG.
 // Compression is picked from the image content.
 const OPTIMIZED_DELIVERY: ImageTransformationOptions = { fetch_format: 'auto', quality: 'auto' }
@@ -57,8 +60,14 @@ function deliveryUrl(cloudinaryId: string, transformation: ImageTransformationOp
   })
 }
 
-// No resize for the full photo: sharp already capped it at upload.
+// limit: shrinks a larger photo, never enlarges one; photos stored before the 4096 px cap stay
+// at 1920 px and go through unchanged.
 export function deliveryUrls(cloudinaryId: string): DeliveryUrls {
+  const display: ImageTransformationOptions = {
+    crop: 'limit',
+    width: DISPLAY_SIZE,
+    height: DISPLAY_SIZE,
+  }
   const thumbnail: ImageTransformationOptions = {
     crop: 'fill',
     gravity: 'auto',
@@ -66,7 +75,7 @@ export function deliveryUrls(cloudinaryId: string): DeliveryUrls {
     height: THUMBNAIL_SIZE,
   }
   return {
-    url: deliveryUrl(cloudinaryId, [OPTIMIZED_DELIVERY]),
+    url: deliveryUrl(cloudinaryId, [display, OPTIMIZED_DELIVERY]),
     thumbnailUrl: deliveryUrl(cloudinaryId, [thumbnail, OPTIMIZED_DELIVERY]),
   }
 }
