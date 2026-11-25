@@ -6,7 +6,7 @@ Envoyer une photo à un ou plusieurs amis la leur fait parvenir comme du courrie
 
 **Ce que l'on peut faire**
 
-- Ouvrir « Envoyer à des proches » depuis la page « Envoyer », depuis une photo de sa bibliothèque ou depuis le panneau « Ajouter une photo » (voir les sections suivantes).
+- Ouvrir « Envoyer à des proches » depuis la page « Envoyer » ou depuis une photo de sa bibliothèque (voir les sections suivantes).
 - Voir un aperçu de la photo, puis ses amis sous forme de ronds portant leur photo de profil ou, sans photo, leur initiale.
 - Envoyer une photo à plusieurs proches en une fois, en touchant leur visage puis un seul bouton.
 - Rechercher un ami par son nom ou son adresse e-mail quand on en a beaucoup.
@@ -54,7 +54,7 @@ Envoyer une photo à un ou plusieurs amis la leur fait parvenir comme du courrie
 - Modifier ou retirer le message une fois la photo envoyée.
 - Écrire un message différent à chaque proche dans le même envoi : il faut faire un envoi par personne.
 
-## Envoyer une photo depuis la page « Envoyer »
+## Envoyer une photo depuis la page Envoyer
 
 **Ce que l'on peut faire**
 
@@ -112,15 +112,15 @@ Ceux du panneau d'envoi (voir [Choisir à qui envoyer](#choisir-à-qui-envoyer))
 
 **Ce que l'on peut faire**
 
-- Dans le panneau « Ajouter une photo » (bouton « Ajouter » de la bibliothèque), prendre ou choisir une photo, puis cliquer sur « Envoyer à un ami » au lieu de « Ajouter à ma bibliothèque ».
+- Sur la page « Envoyer », toucher « Envoyer une photo », puis « Prendre une photo » ou « Choisir sur l'appareil » (voir [Envoyer une photo depuis la page Envoyer](#envoyer-une-photo-depuis-la-page-envoyer)).
 
 **Règles**
 
 1. R-PAR-20 · La photo entre uniquement dans la bibliothèque de l'ami : elle n'est pas ajoutée à celle de l'expéditeur.
 2. R-PAR-21 · Les règles d'ajout s'appliquent comme pour sa propre bibliothèque : formats JPEG, PNG ou WebP, 10 Mo au plus (une photo très grande ou plus lourde étant d'abord réduite, R-BIB-63), image lisible, photo préparée avant d'être gardée (4096 pixels au plus, assez pour un tirage 20×30 cm) et informations cachées retirées (voir [bibliotheque.md](bibliotheque.md#ajouter-une-photo), R-BIB-03 à R-BIB-09). Les messages d'erreur sont les mêmes.
-3. R-PAR-22 · « Envoyer à un ami » ferme le panneau « Ajouter une photo » et ouvre le panneau d'envoi avec la photo choisie. Après un envoi réussi, il se ferme ; le fermer sans envoyer abandonne la photo.
+3. R-PAR-22 · Remplacée : l'envoi depuis l'appareil part de la page « Envoyer » ; le panneau « Ajouter une photo » ne fait plus qu'ajouter (R-PAR-71, R-BIB-67).
 4. R-PAR-23 · La notification « Photo ajoutée à votre bibliothèque. » et la vignette grisée de l'envoi en cours ne concernent que l'ajout à sa bibliothèque ; l'envoi à des amis se confirme par sa propre notification (« Envoyée à … »).
-5. R-PAR-24 · « Envoyer à un ami » envoie une seule photo : quand plusieurs photos sont choisies, le bouton reste désactivé et le panneau demande d'en choisir une seule. Chaque photo envoyée garde ainsi son propre message.
+5. R-PAR-24 · Remplacée : « Choisir sur l'appareil » ne prend qu'une image (R-PAR-69).
 
 **Messages affichés**
 
@@ -128,8 +128,8 @@ Ceux du panneau d'envoi (voir [Choisir à qui envoyer](#choisir-à-qui-envoyer))
 
 **Ce qui n'est pas possible**
 
-- Envoyer plusieurs photos à un ami en une fois : les ajouter à sa bibliothèque, puis les envoyer une par une depuis leur menu « … ».
-- Envoyer une photo à un ami et la garder dans sa bibliothèque en une seule action : il faut l'ajouter à sa bibliothèque, puis l'envoyer depuis son menu « … ».
+- Envoyer plusieurs photos à un ami en une fois : les ajouter à sa bibliothèque, puis les envoyer une par une depuis leur menu « … » ou depuis la page « Envoyer ».
+- Envoyer une photo à un ami et la garder dans sa bibliothèque en une seule action : il faut l'ajouter à sa bibliothèque, puis l'envoyer depuis son menu « … » ou par « Depuis ma bibliothèque ».
 
 ## Recevoir une photo
 

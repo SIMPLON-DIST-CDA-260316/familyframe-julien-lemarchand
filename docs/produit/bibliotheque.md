@@ -8,13 +8,12 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 
 - Toucher « Ajouter », en haut de la bibliothèque sur un ordinateur, ou le bouton rond « + » en bas à droite de l'écran sur un téléphone : le panneau « Ajouter une photo » s'ouvre, par le bas de l'écran sur un téléphone, au centre sur un ordinateur.
 - Dans ce panneau, prendre une photo avec l'appareil photo du téléphone (« Prendre une photo ») ou choisir une ou plusieurs images déjà enregistrées (« Choisir des images »).
-- Voir un aperçu de la photo choisie avant de l'envoyer, ou de petites vignettes quand plusieurs photos sont choisies.
-- L'ajouter à sa bibliothèque avec « Ajouter à ma bibliothèque », ou l'envoyer directement à un ami avec « Envoyer à un ami » (voir [partage.md](partage.md#envoyer-une-photo-depuis-son-appareil)).
+- Les photos choisies sont ajoutées aussitôt à sa bibliothèque : il n'y a rien d'autre à confirmer. Pour envoyer une photo à un ami sans la garder, passer par la page « Envoyer » (voir [partage.md](partage.md#envoyer-une-photo-depuis-la-page-envoyer)).
 - Suivre l'envoi sur la vignette de la photo, qui apparaît aussitôt dans la bibliothèque.
 
 **Règles**
 
-1. R-BIB-01 · Les deux boutons restent désactivés tant qu'aucune photo n'est choisie.
+1. R-BIB-01 · Remplacée : il n'y a plus de bouton à confirmer, choisir les photos les ajoute (R-BIB-67).
 2. R-BIB-02 · Remplacée : plusieurs photos peuvent être ajoutées d'un coup (R-BIB-60).
 3. R-BIB-03 · Formats acceptés : JPEG, PNG et WebP. Seuls ces formats peuvent être choisis ; le téléphone convertit lui-même une photo prise avec l'appareil photo. Tout autre format (GIF, HEIC, vidéo…) est refusé.
 4. R-BIB-04 · Une photo envoyée pèse au plus 10 Mo. Une photo plus lourde est d'abord réduite sur l'appareil (R-BIB-63) ; si l'appareil ne sait pas la lire, elle part telle quelle et elle est refusée.
@@ -28,45 +27,43 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 12. R-BIB-11 · Remplacée : le panneau n'attend plus la fin de l'envoi (R-BIB-54).
 13. R-BIB-12 · Après un ajout réussi, la vignette grisée laisse place à la photo, un message de réussite s'affiche, et la photo apparaît en tête de la bibliothèque et sur le cadre qui lit toute la bibliothèque, sur tous les appareils connectés au compte, sans recharger la page. Ajoutée pendant qu'une collection est affichée, elle est aussi rangée dans cette collection (R-COL-21).
 14. R-BIB-13 · Remplacée : un échec se signale sur la bibliothèque, le panneau étant déjà fermé (R-BIB-55).
-15. R-BIB-44 · Fermer le panneau sans rien envoyer abandonne la photo choisie : il s'ouvre vide la fois suivante.
+15. R-BIB-44 · Remplacée : le panneau ne garde plus de photo choisie, elle part dès qu'on la choisit (R-BIB-67).
 16. R-BIB-48 · Sur un téléphone, « Ajouter » est un bouton rond « + » en bas à droite de l'écran, au-dessus de la barre d'onglets, bien visible en thème clair comme sombre ; il n'apparaît que sur la bibliothèque. Il s'efface pendant que l'on fait défiler les photos vers le bas, pour ne pas cacher leurs boutons « … », et revient dès que l'on remonte, en haut de la page ou à la fin de la liste. Au clavier, il revient quand on l'atteint ; effacé, il ne garde pas la sélection. Si l'appareil demande de réduire les animations, il disparaît et revient sans glisser. L'en-tête n'y montre plus « Ajouter » ni « Mode cadre » : le cadre s'ouvre avec l'onglet « Cadre » (R-APP-64). La fin de la page reste visible au-dessus du bouton.
-17. R-BIB-54 · « Ajouter à ma bibliothèque » ferme aussitôt le panneau. La photo apparaît tout de suite en tête des photos affichées, en vignette grisée qui indique où en est l'envoi : « En attente », puis le pourcentage envoyé (« 42 % »), puis « Finalisation… » pendant que la photo est préparée. Sur un téléphone, où les vignettes sont petites, seuls le pourcentage et la barre de progression s'affichent. Tant qu'elle est grisée, elle ne s'ouvre pas et n'a pas de menu « … ».
+17. R-BIB-54 · Choisir les photos ferme aussitôt le panneau (R-BIB-67). La photo apparaît tout de suite en tête des photos affichées, en vignette grisée qui indique où en est l'envoi : « En attente », puis le pourcentage envoyé (« 42 % »), puis « Finalisation… » pendant que la photo est préparée. Sur un téléphone, où les vignettes sont petites, seuls le pourcentage et la barre de progression s'affichent. Tant qu'elle est grisée, elle ne s'ouvre pas et n'a pas de menu « … ».
 18. R-BIB-55 · Après un échec, la vignette grisée disparaît et une notification donne la raison, avec le nom du fichier. Un envoi qui n'a pas abouti au bout de 2 minutes échoue de la même façon, avec le message d'erreur de connexion, et les photos suivantes partent.
 19. R-BIB-56 · Les photos partent une par une, dans l'ordre où elles ont été ajoutées : ajouter une photo pendant qu'une autre s'envoie la met en attente derrière. Un seul message de réussite s'affiche, quand la dernière est envoyée.
 20. R-BIB-57 · La vignette grisée s'affiche dans la vue d'où la photo a été ajoutée : toute la bibliothèque, ou la collection affichée (voir [collections.md](collections.md#parcourir-une-collection)). Dans une collection, la vignette grisée reste jusqu'à ce que la photo y soit rangée.
 21. R-BIB-58 · Quitter la bibliothèque pour une autre page de l'application n'interrompt pas les envois, qui continuent un par un ; les vignettes grisées sont de nouveau là au retour. Choisir d'autres photos entre-temps les met en attente derrière les premières. Fermer l'application ou recharger la page interrompt ceux qui ne sont pas terminés. Se déconnecter les interrompt aussi, sans message : aucune photo choisie ne part vers le compte qui se connecte ensuite.
 22. R-BIB-59 · Un lecteur d'écran annonce le nombre de photos en cours d'envoi chaque fois qu'il change.
-23. R-BIB-60 · « Choisir des images » permet de choisir jusqu'à 20 photos d'un coup ; « Prendre une photo » en prend une à la fois. Choisir de nouveau remplace les photos choisies dans le panneau. Refermer le sélecteur sans rien choisir garde les photos déjà choisies ; choisir de nouveau la même photo fonctionne.
-24. R-BIB-61 · Au-delà de 20 photos choisies d'un coup, aucune n'est gardée et un message demande d'en choisir moins.
+23. R-BIB-60 · « Choisir des images » permet de choisir jusqu'à 20 photos d'un coup ; « Prendre une photo » en prend une à la fois. Refermer le sélecteur sans rien choisir laisse le panneau ouvert, sans rien ajouter ; choisir de nouveau la même photo fonctionne (elle est alors refusée comme doublon, R-BIB-43).
+24. R-BIB-61 · Au-delà de 20 photos choisies d'un coup, aucune n'est ajoutée : le panneau reste ouvert et un message demande d'en choisir moins.
 25. R-BIB-62 · Chaque photo choisie a sa propre vignette grisée. Une photo refusée n'arrête pas les suivantes : sa vignette disparaît, sa raison s'affiche, et le message de fin compte les photos ajoutées et refusées.
 26. R-BIB-63 · Une très grande photo, de plus de 4096 pixels sur son plus grand côté, est réduite sur l'appareil avant l'envoi, à 4096 pixels sur ce côté, pour pouvoir être envoyée. Une photo de plus de 10 Mo mais moins grande garde sa taille : elle est seulement réenregistrée plus légère. Les autres photos partent telles quelles, sans aucune retouche. Sur un navigateur ancien, qui ne sait pas remettre une photo à l'endroit, une photo de 10 Mo au plus part telle quelle, même très grande : l'application la réduit et la remet à l'endroit elle-même. Il n'y a rien à régler. Une photo assez grande au départ reste imprimable en 20×30 cm jusqu'au bout : réduite sur l'appareil puis gardée à 4096 pixels au plus (R-BIB-08).
 27. R-BIB-64 · Une image que l'appareil ne sait pas lire part telle quelle : l'application l'accepte ou la refuse avec sa raison, comme toute photo.
-28. R-BIB-65 · Quand le panneau « Ajouter une photo » se ferme, ou le panneau d'envoi ouvert depuis lui avec « Envoyer à un ami », la navigation au clavier reprend sur le bouton « Ajouter » affiché : celui de l'en-tête sur un ordinateur, le bouton rond « + » sur un téléphone (qui réapparaît s'il s'était effacé), même si le panneau avait été ouvert depuis une bibliothèque vide.
+28. R-BIB-65 · Quand le panneau « Ajouter une photo » se ferme, la navigation au clavier reprend sur le bouton « Ajouter » affiché : celui de l'en-tête sur un ordinateur, le bouton rond « + » sur un téléphone (qui réapparaît s'il s'était effacé), même si le panneau avait été ouvert depuis une bibliothèque vide.
+29. R-BIB-67 · Le panneau « Ajouter une photo » ne sert qu'à ajouter : prendre ou choisir des photos les ajoute aussitôt à sa bibliothèque et ferme le panneau, sans aperçu ni bouton à confirmer. L'envoi à un ami a quitté ce panneau pour la page « Envoyer » (voir [partage.md](partage.md#envoyer-une-photo-depuis-la-page-envoyer)).
 
 **Messages affichés**
 
-| Situation                       | Message                                                                                                               |
-| ------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| En-tête du panneau              | « Ajouter une photo » — « Ajoutez-en une ou plusieurs à votre bibliothèque, ou envoyez-en une directement à un ami. » |
-| Aperçu                          | Image décrite comme « Aperçu avant envoi »                                                                            |
-| Aperçu de plusieurs photos      | De petites vignettes et « 3 photos choisies »                                                                         |
-| Trop de photos choisies         | « 20 photos au plus à la fois : vous en avez choisi 25. »                                                             |
-| Plusieurs photos choisies       | « Pour envoyer à un ami, choisissez une seule photo. », sous « Envoyer à un ami » désactivé                           |
-| Envoi en attente                | « En attente », sur la vignette grisée (la barre vide seule sur un téléphone)                                         |
-| Envoi en cours                  | « 42 % » et une barre de progression, sur la vignette grisée                                                          |
-| Photo en préparation            | « Finalisation… », sur la vignette grisée (« 100 % » sur un téléphone)                                                |
-| Annonce du lecteur d'écran      | « Envoi d'une photo en cours. » ou « Envoi de 3 photos en cours. »                                                    |
-| Photo ajoutée                   | « Photo ajoutée à votre bibliothèque. », dans une courte notification en bas de l'écran qui disparaît d'elle-même     |
-| Plusieurs photos ajoutées       | « 3 photos ajoutées à votre bibliothèque. », dans la même notification, une fois la dernière envoyée                  |
-| Certaines photos refusées       | « 2 photos ajoutées à votre bibliothèque, 1 refusée. », en avertissement                                              |
-| Toutes les photos refusées      | « Aucune photo ajoutée, 3 refusées. », en erreur                                                                      |
-| Photo refusée                   | La raison (voir ci-dessous) et le nom du fichier, dans une notification                                               |
-| Aucun fichier reçu              | « Prenez ou choisissez une photo. »                                                                                   |
-| Plusieurs fichiers d'un coup    | « Envoi invalide : une seule photo à la fois. »                                                                       |
-| Format refusé                   | « Format non pris en charge : JPEG, PNG ou WebP uniquement. »                                                         |
-| Fichier trop lourd              | « La photo est trop lourde (10 Mo maximum). »                                                                         |
-| Fichier illisible               | « Ce fichier n'est pas une image lisible. »                                                                           |
-| Photo déjà dans la bibliothèque | « Cette photo est déjà dans votre bibliothèque, ou attend d'être découverte. »                                        |
+| Situation                       | Message                                                                                                           |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| En-tête du panneau              | « Ajouter une photo » — « Ajoutez-en une ou plusieurs à votre bibliothèque. »                                     |
+| Trop de photos choisies         | « 20 photos au plus à la fois : vous en avez choisi 25. »                                                         |
+| Envoi en attente                | « En attente », sur la vignette grisée (la barre vide seule sur un téléphone)                                     |
+| Envoi en cours                  | « 42 % » et une barre de progression, sur la vignette grisée                                                      |
+| Photo en préparation            | « Finalisation… », sur la vignette grisée (« 100 % » sur un téléphone)                                            |
+| Annonce du lecteur d'écran      | « Envoi d'une photo en cours. » ou « Envoi de 3 photos en cours. »                                                |
+| Photo ajoutée                   | « Photo ajoutée à votre bibliothèque. », dans une courte notification en bas de l'écran qui disparaît d'elle-même |
+| Plusieurs photos ajoutées       | « 3 photos ajoutées à votre bibliothèque. », dans la même notification, une fois la dernière envoyée              |
+| Certaines photos refusées       | « 2 photos ajoutées à votre bibliothèque, 1 refusée. », en avertissement                                          |
+| Toutes les photos refusées      | « Aucune photo ajoutée, 3 refusées. », en erreur                                                                  |
+| Photo refusée                   | La raison (voir ci-dessous) et le nom du fichier, dans une notification                                           |
+| Aucun fichier reçu              | « Prenez ou choisissez une photo. »                                                                               |
+| Plusieurs fichiers d'un coup    | « Envoi invalide : une seule photo à la fois. »                                                                   |
+| Format refusé                   | « Format non pris en charge : JPEG, PNG ou WebP uniquement. »                                                     |
+| Fichier trop lourd              | « La photo est trop lourde (10 Mo maximum). »                                                                     |
+| Fichier illisible               | « Ce fichier n'est pas une image lisible. »                                                                       |
+| Photo déjà dans la bibliothèque | « Cette photo est déjà dans votre bibliothèque, ou attend d'être découverte. »                                    |
 
 **Ce qui n'est pas possible**
 
