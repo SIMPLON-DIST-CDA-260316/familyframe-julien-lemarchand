@@ -1,5 +1,6 @@
 import { ImagesIcon, TriangleAlertIcon } from 'lucide-react'
 import type { JSX, ReactNode } from 'react'
+import { FullscreenButton } from '@/components/frame/FullscreenButton.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import { cn } from '@/lib/utils.ts'
 
@@ -48,6 +49,10 @@ export function FrameStatusScreen({
         'grid place-items-center bg-radial from-frame-accent/10 to-transparent to-70%',
       )}
     >
+      {/* Where the slideshow has it: a frame stuck on loading can still go full screen. */}
+      <div className="fixed top-0 right-0 px-6 py-4">
+        <FullscreenButton />
+      </div>
       <div className="flex flex-col items-center gap-4 px-6 text-center">
         <Icon aria-hidden className="size-16 text-frame-accent/80 motion-safe:animate-pulse" />
         <StatusMessage status={status} />

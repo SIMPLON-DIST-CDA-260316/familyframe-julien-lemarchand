@@ -1,6 +1,7 @@
 import type { JSX } from 'react'
 import { CloseButton } from '@/components/frame/CloseButton.tsx'
 import { ControlsBar } from '@/components/frame/ControlsBar.tsx'
+import { FullscreenButton } from '@/components/frame/FullscreenButton.tsx'
 import { SlideshowMenu } from '@/components/frame/SlideshowMenu.tsx'
 import type { SlideshowSettings } from '@/hooks/useSlideshowSettings.ts'
 import type { Photo } from '@/photo.ts'
@@ -26,11 +27,14 @@ export function SlideshowTopBar({
       className="fixed inset-x-0 top-0 z-10 justify-between"
     >
       <CloseButton onClose={onClose} />
-      <SlideshowMenu
-        photo={photo}
-        intervalMs={settings.intervalMs}
-        onIntervalChange={settings.onIntervalChange}
-      />
+      <div className="flex items-center gap-2">
+        <FullscreenButton />
+        <SlideshowMenu
+          photo={photo}
+          intervalMs={settings.intervalMs}
+          onIntervalChange={settings.onIntervalChange}
+        />
+      </div>
     </ControlsBar>
   )
 }

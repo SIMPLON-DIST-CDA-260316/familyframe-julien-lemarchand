@@ -9,6 +9,7 @@ Le cadre est la page à laisser affichée en plein écran sur l'appareil posé c
 - Se connecter sur l'appareil du cadre avec le compte dont on veut afficher les photos, puis ouvrir « Cadre ».
 - Laisser l'appareil allumé : le cadre reste connecté et à jour sans intervention.
 - Ouvrir le cadre en plein écran d'un seul toucher, depuis la barre du haut, la bibliothèque ou une photo ouverte.
+- Passer en plein écran avec le bouton « Plein écran » quand le cadre a été ouvert directement (au démarrage de l'appareil, par exemple).
 - Quitter le cadre (✕, Échap ou sortie du plein écran) pour revenir à la bibliothèque, sur la photo qui était affichée.
 
 **Règles**
@@ -29,6 +30,7 @@ Le cadre est la page à laisser affichée en plein écran sur l'appareil posé c
 14. R-CAD-58 · Ouvert depuis l'application (« Cadre » dans la barre du haut, « Mode cadre » dans la bibliothèque ou sur une photo ouverte), le cadre passe en plein écran. Sur un appareil qui ne le permet pas (iPhone), ou si le navigateur le refuse, le cadre s'affiche dans la page, sans message.
 15. R-CAD-59 · Sortir du plein écran, de n'importe quelle façon (✕, touche Échap, touche F11, geste de l'appareil), quitte le cadre : on revient à la bibliothèque, sur la photo qui était affichée, ou à la bibliothèque seule s'il n'y avait pas de photo.
 16. R-CAD-60 · Quitter le cadre autrement (bouton retour du navigateur, « Retour à la bibliothèque ») sort aussi du plein écran : la bibliothèque ne reste jamais en plein écran.
+17. R-CAD-61 · Tant que le cadre n'est pas en plein écran, un bouton « Plein écran » s'affiche en haut à droite, sur le diaporama comme sur les écrans sans photo. Sur le diaporama, il s'efface avec les autres boutons (R-CAD-24). Il n'apparaît pas sur un appareil qui ne permet pas le plein écran.
 
 **Messages affichés**
 
@@ -37,6 +39,7 @@ Le cadre est la page à laisser affichée en plein écran sur l'appareil posé c
 | Aucune photo à afficher | « En attente de la première photo… » — « Envoyez-en une depuis votre téléphone : [adresse du site] » |
 | Chargement en cours     | « Chargement des photos… »                                                                           |
 | Chargement impossible   | « Les photos n'ont pas pu être chargées. » — « Le cadre réessaiera dès que la connexion reviendra. » |
+| Passer en plein écran   | « Plein écran » (bouton)                                                                             |
 | Sortir du cadre         | « Retour à la bibliothèque »                                                                         |
 
 **Ce qui n'est pas possible**
@@ -89,11 +92,11 @@ Le cadre n'a plus de vue bibliothèque : voir R-CAD-53. Les règles ci-dessous g
 
 **Messages affichés**
 
-| Situation                                  | Message                                                                                                     |
-| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
-| Légende d'une photo                        | « [date] » et, pour une photo reçue, « Envoyée par [nom] »                                                  |
-| Choix de vitesse                           | « Vitesse » : « 5 s », « 10 s », « 20 s »                                                                   |
-| Noms des boutons (survol, lecture d'écran) | « Quitter le mode cadre », « Photo précédente », « Lecture automatique », « Photo suivante », « Vignettes » |
+| Situation                                  | Message                                                                                                                      |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| Légende d'une photo                        | « [date] » et, pour une photo reçue, « Envoyée par [nom] »                                                                   |
+| Choix de vitesse                           | « Vitesse » : « 5 s », « 10 s », « 20 s »                                                                                    |
+| Noms des boutons (survol, lecture d'écran) | « Quitter le mode cadre », « Plein écran », « Photo précédente », « Lecture automatique », « Photo suivante », « Vignettes » |
 
 **Ce qui n'est pas possible**
 
