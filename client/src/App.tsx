@@ -15,14 +15,18 @@ import LibraryPage from './pages/LibraryPage.tsx'
 import LoginPage from './pages/LoginPage.tsx'
 import NotFoundPage from './pages/NotFoundPage.tsx'
 import SettingsPage from './pages/SettingsPage.tsx'
+import { UploadsProvider } from './upload/UploadsProvider.tsx'
 
 // One layout route guards every logged-in page, instead of wrapping each one. The collections
-// load once for all of them: the library, the menus and the frame show the same list.
+// load once for all of them: the library, the menus and the frame show the same list. The upload
+// queue lives here too, inside the collections it files photos into.
 function LoggedInLayout(): JSX.Element {
   return (
     <RequireAuth>
       <CollectionsProvider>
-        <Outlet />
+        <UploadsProvider>
+          <Outlet />
+        </UploadsProvider>
       </CollectionsProvider>
     </RequireAuth>
   )

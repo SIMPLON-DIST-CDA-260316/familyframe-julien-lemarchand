@@ -33,8 +33,8 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 17. R-BIB-54 · « Ajouter à ma bibliothèque » ferme aussitôt le panneau. La photo apparaît tout de suite en tête des photos affichées, en vignette grisée qui indique où en est l'envoi : « En attente », puis le pourcentage envoyé (« 42 % »), puis « Finalisation… » pendant que la photo est préparée. Sur un téléphone, où les vignettes sont petites, seuls le pourcentage et la barre de progression s'affichent. Tant qu'elle est grisée, elle ne s'ouvre pas et n'a pas de menu « … ».
 18. R-BIB-55 · Après un échec, la vignette grisée disparaît et une notification donne la raison, avec le nom du fichier.
 19. R-BIB-56 · Les photos partent une par une, dans l'ordre où elles ont été ajoutées : ajouter une photo pendant qu'une autre s'envoie la met en attente derrière. Un seul message de réussite s'affiche, quand la dernière est envoyée.
-20. R-BIB-57 · La vignette grisée s'affiche dans la vue d'où la photo a été ajoutée : toute la bibliothèque, ou la collection affichée (voir [collections.md](collections.md#parcourir-une-collection)). Dans une collection, la photo apparaît quand elle y est rangée, juste après la fin de l'envoi.
-21. R-BIB-58 · Quitter la bibliothèque pour une autre page de l'application n'interrompt pas les envois ; fermer l'application ou recharger la page interrompt ceux qui ne sont pas terminés.
+20. R-BIB-57 · La vignette grisée s'affiche dans la vue d'où la photo a été ajoutée : toute la bibliothèque, ou la collection affichée (voir [collections.md](collections.md#parcourir-une-collection)). Dans une collection, la vignette grisée reste jusqu'à ce que la photo y soit rangée.
+21. R-BIB-58 · Quitter la bibliothèque pour une autre page de l'application n'interrompt pas les envois, qui continuent un par un ; les vignettes grisées sont de nouveau là au retour. Choisir d'autres photos entre-temps les met en attente derrière les premières. Fermer l'application ou recharger la page interrompt ceux qui ne sont pas terminés.
 22. R-BIB-59 · Un lecteur d'écran annonce le nombre de photos en cours d'envoi chaque fois qu'il change.
 
 **Messages affichés**

@@ -9,7 +9,7 @@ import {
 import { Button } from '@/components/ui/button.tsx'
 import type { LibraryLayout } from '@/hooks/useLibraryLayout.ts'
 import type { PhotoLibrary } from '@/hooks/usePhotoLibrary.ts'
-import type { PendingUpload } from '@/hooks/usePhotoUploads.ts'
+import type { PendingUpload } from '@/upload/uploadQueue.ts'
 
 type LibrarySectionProps = {
   library: PhotoLibrary

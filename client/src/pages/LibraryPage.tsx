@@ -14,13 +14,14 @@ import { LibraryMail } from '@/components/mail/LibraryMail.tsx'
 import { PhotoViewer } from '@/components/viewer/PhotoViewer.tsx'
 import { type LibraryLayout, useLibraryLayout } from '@/hooks/useLibraryLayout.ts'
 import { type PhotoLibrary, usePhotoLibrary } from '@/hooks/usePhotoLibrary.ts'
-import { type PendingUpload, usePhotoUploads } from '@/hooks/usePhotoUploads.ts'
+import { usePhotoUploads } from '@/hooks/usePhotoUploads.ts'
 import {
   type SelectedCollection,
   selectedCollectionId,
   useSelectedCollection,
 } from '@/hooks/useSelectedCollection.ts'
 import { useViewerParam, type ViewerParam } from '@/hooks/useViewerParam.ts'
+import type { PendingUpload } from '@/upload/uploadQueue.ts'
 
 type LibraryContentProps = {
   selected: SelectedCollection
