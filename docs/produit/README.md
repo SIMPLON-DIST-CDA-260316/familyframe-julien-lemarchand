@@ -13,21 +13,22 @@ Cette documentation décrit ce que l'application permet de faire et selon quelle
 
 ## Glossaire
 
-| Terme              | Sens dans FamilyFrame                                                                                                                                                  |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Compte**         | L'accès personnel d'une personne : une adresse e-mail, un nom affiché et un mot de passe. Chaque compte a une seule bibliothèque, que tous ses cadres affichent.       |
-| **Administrateur** | Le compte qui peut créer des invitations. Il est aussi un membre comme les autres.                                                                                     |
-| **Membre**         | Toute personne qui a un compte. Un compte créé par invitation est toujours un compte membre.                                                                           |
-| **Invitation**     | Un lien personnel, créé par l'administrateur pour une adresse e-mail, qui permet à une personne de créer son compte. Il sert une seule fois et pendant 7 jours.        |
-| **Proche / ami**   | Un autre membre avec qui l'on a une amitié acceptée des deux côtés. On ne peut envoyer des photos qu'à ses amis.                                                       |
-| **Demande d'ami**  | La proposition d'amitié envoyée à un autre membre. Elle reste « en attente » jusqu'à ce que l'autre l'accepte ou la refuse, ou que l'on l'annule.                      |
-| **Bibliothèque**   | L'ensemble des photos d'un compte : celles qu'il a ajoutées et celles que ses amis lui ont envoyées. Elle est privée : personne d'autre ne la voit.                    |
-| **Photo reçue**    | Une photo qu'un ami a envoyée. Elle fait partie de la bibliothèque du destinataire comme les autres et porte la mention « Envoyée par » suivie du nom de l'expéditeur. |
-| **Expéditeur**     | Le membre qui a envoyé une photo reçue.                                                                                                                                |
-| **Cadre**          | L'affichage plein écran de sa bibliothèque, pensé pour un écran posé chez soi. Il montre toutes les photos du compte connecté.                                         |
-| **Diaporama**      | Le mode du cadre qui affiche une photo à la fois, en grand, et passe seul à la suivante.                                                                               |
-| **Vignette**       | La petite image carrée qui représente une photo dans une grille, une liste ou un bandeau.                                                                              |
-| **Thème**          | L'apparence claire ou sombre de l'application, choisie par chaque personne sur chaque appareil.                                                                        |
+| Terme                  | Sens dans FamilyFrame                                                                                                                                                  |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Compte**             | L'accès personnel d'une personne : une adresse e-mail, un nom affiché et un mot de passe. Chaque compte a une seule bibliothèque, que tous ses cadres affichent.       |
+| **Administrateur**     | Le compte qui peut créer des invitations. Il est aussi un membre comme les autres.                                                                                     |
+| **Membre**             | Toute personne qui a un compte. Un compte créé par invitation est toujours un compte membre.                                                                           |
+| **Invitation**         | Un lien personnel, créé par l'administrateur pour une adresse e-mail, qui permet à une personne de créer son compte. Il sert une seule fois et pendant 7 jours.        |
+| **Proche / ami**       | Un autre membre avec qui l'on a une amitié acceptée des deux côtés. On ne peut envoyer des photos qu'à ses amis.                                                       |
+| **Demande d'ami**      | La proposition d'amitié envoyée à un autre membre. Elle reste « en attente » jusqu'à ce que l'autre l'accepte ou la refuse, ou que l'on l'annule.                      |
+| **Bibliothèque**       | L'ensemble des photos d'un compte : celles qu'il a ajoutées et celles que ses amis lui ont envoyées. Elle est privée : personne d'autre ne la voit.                    |
+| **Photo reçue**        | Une photo qu'un ami a envoyée. Elle fait partie de la bibliothèque du destinataire comme les autres et porte la mention « Envoyée par » suivie du nom de l'expéditeur. |
+| **Expéditeur**         | Le membre qui a envoyé une photo reçue.                                                                                                                                |
+| **Cadre**              | L'affichage plein écran de sa bibliothèque, pensé pour un écran posé chez soi. Il montre toutes les photos du compte connecté.                                         |
+| **Diaporama**          | Le mode du cadre qui affiche une photo à la fois, en grand, et passe seul à la suivante.                                                                               |
+| **Modèle d'affichage** | La façon dont le cadre présente chaque photo : ajustée sur un fond flouté, en plein format, dans un passe-partout ou en polaroïd. Chaque appareil garde le sien.       |
+| **Vignette**           | La petite image carrée qui représente une photo dans une grille, une liste ou un bandeau.                                                                              |
+| **Thème**              | L'apparence claire ou sombre de l'application, choisie par chaque personne sur chaque appareil.                                                                        |
 
 ## Fichiers
 

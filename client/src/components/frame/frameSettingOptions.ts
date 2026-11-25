@@ -1,4 +1,4 @@
-import { type PlaybackOrder, SLIDESHOW_INTERVALS_MS } from '@/frameSettings.ts'
+import { type FrameTemplate, type PlaybackOrder, SLIDESHOW_INTERVALS_MS } from '@/frameSettings.ts'
 
 export type SettingOption<Value> = { value: Value; label: string }
 
@@ -14,6 +14,13 @@ export function optionSelector<Value>(
 }
 
 const MS_PER_SECOND = 1000
+
+export const TEMPLATE_OPTIONS: SettingOption<FrameTemplate>[] = [
+  { value: 'fit', label: 'Ajusté' },
+  { value: 'fill', label: 'Plein format' },
+  { value: 'mat', label: 'Passe-partout' },
+  { value: 'polaroid', label: 'Polaroïd' },
+]
 
 export const ORDER_OPTIONS: SettingOption<PlaybackOrder>[] = [
   { value: 'newest', label: "Dans l'ordre" },

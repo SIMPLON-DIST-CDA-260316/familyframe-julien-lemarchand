@@ -4,12 +4,6 @@ Fonctionnalités prévues mais pas encore livrées, regroupées par étape. Rien
 
 Les règles ci-dessous décrivent l'intention ; elles recevront leur identifiant définitif à la livraison.
 
-## Étape 8 · Mode cadre
-
-**Prévu**
-
-- Trois modèles d'affichage : plein format, passe-partout, polaroïd.
-
 ## Étape 9 · Courrier photo
 
 **Prévu**
