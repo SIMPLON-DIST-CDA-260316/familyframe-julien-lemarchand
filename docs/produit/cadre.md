@@ -159,7 +159,7 @@ Le cadre n'a plus de vue bibliothèque : voir R-CAD-53. Les règles ci-dessous g
 
 **Règles**
 
-1. R-CAD-84 · La sélection du jour compte 20 photos de la bibliothèque, tirées au hasard. Une photo reçue n'y entre qu'une fois découverte. Avec 20 photos ou moins, la sélection les contient toutes. Le choix est retenu sur l'appareil, comme les autres choix de « Photos » (R-CAD-77).
+1. R-CAD-84 · La sélection du jour compte 20 photos de la bibliothèque, tirées au hasard parmi celles d'avant aujourd'hui ; s'il en manque, les photos du jour complètent dans l'ordre de leur arrivée (R-CAD-86). Une photo reçue n'y entre qu'une fois découverte. Avec 20 photos ou moins, la sélection les contient toutes. Le choix est retenu sur l'appareil, comme les autres choix de « Photos » (R-CAD-77).
 2. R-CAD-85 · Le lot reste le même toute la journée, à chaque ouverture et sur tous les appareils du compte. Un nouveau lot est tiré chaque jour à minuit, heure de Paris ; un cadre allumé y passe dans le quart d'heure qui suit, sans recharger.
 3. R-CAD-86 · Une photo ajoutée ou découverte dans la journée ne remplace pas une photo du lot : elle n'y entre que s'il reste de la place, après celles ajoutées ou découvertes plus tôt dans la journée, sinon elle peut être tirée les jours suivants. Une photo reçue la veille et découverte ce matin compte donc comme une photo du jour.
 4. R-CAD-87 · Une photo supprimée quitte la sélection en quelques instants ; une autre photo de la bibliothèque prend sa place s'il y en a.

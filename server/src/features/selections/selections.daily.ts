@@ -60,8 +60,8 @@ function idsInJoiningOrder(photos: SelectionPhoto[]): string[] {
 }
 
 // Photos from before today come first: one added or opened today only fills a lot with room left.
-// The lot still changes during the day when a photo leaves it: deleted, the next one in draw
-// order takes its place.
+// The lot still changes during the day when a photo leaves it: deleted, the next one in line
+// takes its place.
 export function drawDailySelection(photos: SelectionPhoto[], ownerId: string, now: Date): string[] {
   const today = dayOf(now)
   const seed = `${ownerId}:${today}`
