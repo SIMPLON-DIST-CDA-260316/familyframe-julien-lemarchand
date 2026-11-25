@@ -182,7 +182,7 @@ Le cadre n'a plus de vue bibliothèque : voir R-CAD-53. Les règles ci-dessous g
 2. R-CAD-91 · Deux photos que l'on a ajoutées soi-même ne comptent pas comme venant du même expéditeur : ce lien ne vaut que pour les photos reçues d'un ami.
 3. R-CAD-92 · Quand les photos liées ne suffisent pas, d'autres photos de la bibliothèque, tirées au hasard, complètent la radio, jusqu'à 30 photos en tout. Une photo reçue n'y entre qu'une fois découverte.
 4. R-CAD-93 · « Dans l'ordre » lit la radio dans cet ordre, en boucle ; « Aléatoire » la mélange. La vitesse et le modèle d'affichage restent ceux choisis.
-5. R-CAD-94 · La radio est construite à son lancement et ne change plus : une photo ajoutée ou découverte ensuite n'y entre pas ; une photo supprimée en sort en quelques instants.
+5. R-CAD-94 · La radio est construite à son lancement et ne change plus : une photo ajoutée ou découverte ensuite n'y entre pas ; une photo supprimée en sort en quelques instants. Recharger la page le même jour redonne la même suite ; seules les photos ajoutées ou découvertes entre-temps peuvent y prendre place.
 6. R-CAD-95 · La radio n'est pas retenue sur l'appareil. Tant qu'elle joue, « Photos » la montre en tête, cochée, sous le nom « Radio » ; choisir une autre option l'arrête et retient ce choix. Quitter le cadre l'arrête aussi : rouvert, le cadre lit le choix retenu.
 7. R-CAD-96 · Lancée depuis le diaporama, la radio remplace aussitôt ce qu'il lisait et repart de la photo choisie. Quitter le cadre ramène, comme toujours, à la photo qui était affichée (R-CAD-59).
 8. R-CAD-97 · Si la radio ne peut pas être chargée (photo supprimée entre-temps, coupure de réseau), le cadre lit toute la bibliothèque, sans message. Le menu garde « Radio » coché.
