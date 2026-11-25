@@ -10,7 +10,7 @@ La page où chacun règle son compte : sa photo de profil, son nom affiché et s
 
 **Règles**
 
-1. R-PRF-01 · L'entrée « Préférences » est dans le menu du compte, juste au-dessus du choix du thème, sur un ordinateur comme sur un téléphone. Sur un téléphone, l'onglet « Compte » ouvre aussi la page (R-APP-63).
+1. R-PRF-01 · L'entrée « Préférences » est dans le menu du compte, au-dessus du choix du thème, sur un ordinateur comme sur un téléphone ; sur un téléphone, l'administrateur a « Invitations » entre les deux (R-APP-12). Sur un téléphone, l'onglet « Compte » ouvre aussi la page (R-APP-63).
 2. R-PRF-02 · Remplacée : le menu mobile n'existe plus ; l'onglet « Compte » ouvre la page d'un toucher (R-APP-63).
 3. R-PRF-03 · La page est réservée aux personnes connectées, comme les autres pages (R-CNX-30). Elle a la barre du haut et, sur un téléphone, la barre d'onglets, « Compte » mis en évidence.
 4. R-PRF-04 · Chaque encart s'enregistre seul : « Enregistrer » n'envoie que les changements de son encart, ce qui est saisi dans les autres reste en place. L'encart « Cadre de cet appareil » n'a pas de bouton : un choix s'applique aussitôt (R-PRF-50).
