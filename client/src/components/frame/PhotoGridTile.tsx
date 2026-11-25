@@ -7,11 +7,11 @@ import { photoLabel } from '@/photoLabel.ts'
 const TILE_CLASSES =
   'group relative block w-full overflow-hidden rounded-sm outline-none ring-offset-2 ring-offset-background focus-visible:z-10 focus-visible:ring-3 focus-visible:ring-ring sm:rounded-xl sm:ring-offset-4 aria-[current=true]:ring-2 aria-[current=true]:ring-frame-accent'
 
-// White on the photo whatever the theme. On a phone tile (~120 px) a 44 px pill would hide too
-// much of it: the icon alone, shadowed, keeps the 44 px target in the corner. From sm, a dark pill.
-// z-10: stays above its own tile when that tile is focused.
+// A dark pill whatever the theme: it sits on the photo, not on the page. Under a finger there is
+// none: a 44 px target would hide too much of a ~120 px phone tile, and a tap opens the photo,
+// whose own « … » holds the same menu. z-10: stays above its own tile when that tile is focused.
 const ELLIPSIS_CLASSES =
-  'absolute top-0 right-0 z-10 rounded-full text-white drop-shadow-[0_1px_2px_rgb(0_0_0/0.8)] hover:bg-black/75 hover:text-white aria-expanded:bg-black/75 aria-expanded:text-white dark:hover:bg-black/75 sm:top-2 sm:right-2 sm:bg-black/55 sm:text-white/80 sm:drop-shadow-none sm:backdrop-blur-sm'
+  'absolute top-2 right-2 z-10 rounded-full bg-black/55 text-white/80 backdrop-blur-sm hover:bg-black/75 hover:text-white aria-expanded:bg-black/75 aria-expanded:text-white dark:hover:bg-black/75 pointer-coarse:hidden'
 
 type PhotoGridTileProps = {
   photo: Photo
