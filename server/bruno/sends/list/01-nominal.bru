@@ -1,0 +1,46 @@
+meta {
+  name: Nominal - historique du membre
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/sends
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('deviceSendId')) {
+    throw new Error('deviceSendId absent : lancer toute la collection, photos/share/08 doit passer')
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.sends: isArray
+  res.body.sends[0].id: eq {{deviceSendId}}
+  res.body.sends[1].id: eq {{librarySendId}}
+  res.body.sends[1].message: eq Joyeux anniversaire !
+  res.body.sends[1].recipients[0].id: eq {{adminId}}
+}
+
+script:post-response {
+  test('une ligne donne des adresses toutes prêtes, sans identifiant Cloudinary', () => {
+    const [line] = res.body.sends
+    expect(line.thumbnailUrl).to.be.a('string')
+    expect(line.url).to.be.a('string')
+    expect(line).to.not.have.property('cloudinaryId')
+    expect(line).to.not.have.property('senderId')
+  })
+  test('un destinataire ne donne que son id et son nom', () => {
+    expect(Object.keys(res.body.sends[0].recipients[0]).sort()).to.eql(['displayName', 'id'])
+  })
+}
+
+docs {
+  NOMINAL → 200. Les deux envois de `photos/share/` sont les plus récents :
+  celui de l'appareil (`deviceSendId`), puis celui de la bibliothèque
+  (`librarySendId`), avec son message et l'admin pour seul destinataire
+  (le membre, refusé `not_friends`, n'y figure pas).
+}

@@ -1,0 +1,32 @@
+meta {
+  name: Edge - l'historique de l'admin
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/sends
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  req.setHeader('Cookie', bru.getVar('adminCookie'))
+}
+
+assert {
+  res.status: eq 200
+}
+
+script:post-response {
+  test('les envois du membre n\'y sont pas, même ceux que l\'admin a reçus', () => {
+    const ids = res.body.sends.map(({ id }) => id)
+    expect(ids).to.not.include(bru.getVar('librarySendId'))
+    expect(ids).to.not.include(bru.getVar('deviceSendId'))
+  })
+}
+
+docs {
+  EDGE → 200 : l'admin, destinataire des deux envois, ne les voit pas dans
+  son historique. L'historique est celui de l'expéditeur seul.
+}

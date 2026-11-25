@@ -1,0 +1,27 @@
+meta {
+  name: Edge - envoi déjà retiré
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{baseUrl}}/api/sends/{{librarySendId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('deviceSendId')) {
+    throw new Error('deviceSendId absent : lancer toute la collection, photos/share/08 doit passer')
+  }
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq SEND_NOT_FOUND
+}
+
+docs {
+  EDGE → 404 SEND_NOT_FOUND : retirer deux fois la même ligne. La page le
+  dit (« Cet envoi a déjà été retiré de l'historique. »).
+}

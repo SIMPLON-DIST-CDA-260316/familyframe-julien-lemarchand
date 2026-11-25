@@ -18,6 +18,7 @@ export type ApiErrorCode =
   | 'FORBIDDEN'
   | 'ROUTE_NOT_FOUND'
   | 'PHOTO_NOT_FOUND'
+  | 'SEND_NOT_FOUND'
   | 'INVITATION_NOT_FOUND'
   | 'USER_NOT_FOUND'
   | 'FRIENDSHIP_NOT_FOUND'

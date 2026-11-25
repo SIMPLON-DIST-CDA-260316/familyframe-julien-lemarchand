@@ -17,6 +17,7 @@ export type ApiErrorCode =
   | 'NOT_FRIENDS'
   | 'ROUTE_NOT_FOUND'
   | 'PHOTO_NOT_FOUND'
+  | 'SEND_NOT_FOUND'
   | 'INVITATION_NOT_FOUND'
   | 'USER_NOT_FOUND'
   | 'FRIENDSHIP_NOT_FOUND'
@@ -51,6 +52,7 @@ const ERROR_MESSAGES: Record<ApiErrorCode, string> = {
   NOT_FRIENDS: 'Cette personne ne fait pas partie de vos amis.',
   ROUTE_NOT_FOUND: "Cette adresse n'existe pas sur le serveur.",
   PHOTO_NOT_FOUND: 'Cette photo a déjà été supprimée.',
+  SEND_NOT_FOUND: "Cet envoi a déjà été retiré de l'historique.",
   INVITATION_NOT_FOUND: "Ce lien d'invitation n'est pas valide. Demandez-en un nouveau.",
   USER_NOT_FOUND:
     "Aucun compte n'utilise cette adresse e-mail. Demandez à l'administrateur d'inviter cette personne.",

@@ -1,0 +1,22 @@
+meta {
+  name: sends
+}
+
+docs {
+  L'historique des envois du compte connecté : `GET /api/sends` → 200
+  `{ sends, nextCursor }`, du plus récent au plus ancien, par pages
+  (`limit` de 1 à 100, 30 par défaut ; `cursor`, l'id du dernier envoi de
+  la page précédente). Un envoi vaut `{ id, url, thumbnailUrl, createdAt,
+  message, recipients }`, `recipients` étant les amis qui ont reçu la
+  photo, `{ id, displayName }` seulement. `DELETE /api/sends/:id` → 204
+  retire une ligne de l'historique sans toucher aux photos des amis ; un
+  envoi inconnu, déjà retiré, d'un autre compte ou un id mal formé : 404
+  `SEND_NOT_FOUND`. L'image Cloudinary part avec son dernier usage, photo
+  ou envoi.
+
+  Sans `seq` : ce dossier passe après `photos/` (ordre alphabétique des
+  dossiers sans `seq`), dont il lit `librarySendId` et `deviceSendId`, et
+  après `collections/` et `selections/` (`collectionSendId`,
+  `radioSendId`). Il retire ces quatre envois : la base de dev ne garde
+  aucune ligne d'historique de la collection. Ordre : `list`, `delete`.
+}

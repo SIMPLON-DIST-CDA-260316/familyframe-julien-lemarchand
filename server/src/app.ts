@@ -36,7 +36,10 @@ import { createSelectionsController } from './features/selections/selections.con
 import { createSelectionsRepository } from './features/selections/selections.repository.js'
 import { createSelectionsRouter } from './features/selections/selections.routes.js'
 import { createSelectionsService } from './features/selections/selections.service.js'
+import { createSendsController } from './features/sends/sends.controller.js'
 import { createSendsRepository } from './features/sends/sends.repository.js'
+import { createSendsRouter } from './features/sends/sends.routes.js'
+import { createSendsService } from './features/sends/sends.service.js'
 import {
   avatarUrl,
   deleteImage,
@@ -79,6 +82,15 @@ function assemblePhotosRouter(
     logger,
   })
   return createPhotosRouter(createPhotosController(service, io))
+}
+
+function assembleSendsRouter(): Router {
+  const service = createSendsService({
+    repository: createSendsRepository(prisma),
+    deleteImage,
+    logger,
+  })
+  return createSendsRouter(createSendsController(service))
 }
 
 function assembleCollectionsRouter(io: SocketServer): Router {
@@ -165,6 +177,7 @@ export function createApp(io: SocketServer, authService: AuthService): Express {
   app.use('/api/account', requireAuth, assembleAccountRouter())
   app.use('/api/collections', requireAuth, assembleCollectionsRouter(io))
   app.use('/api/selections', requireAuth, assembleSelectionsRouter())
+  app.use('/api/sends', requireAuth, assembleSendsRouter())
 
   app.use(notFound)
   app.use(errorHandler)

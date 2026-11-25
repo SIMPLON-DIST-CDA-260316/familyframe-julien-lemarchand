@@ -52,8 +52,9 @@ docs {
   le temps de ses requêtes, puis supprime cette amitié. Les photos que l'admin
   y reçoit restent après la fin de l'amitié : `photos/delete` les supprime.
   Chaque envoi entre dans l'historique du membre ; ceux de `photos/share/`
-  gardent leur image Cloudinary jusqu'à `sends/`, lancé après `photos/`
-  (ordre alphabétique des dossiers sans `seq`), qui les retire.
+  et ceux de `collections/photos/07` et `selections/radio/09` gardent leur
+  image Cloudinary jusqu'à `sends/`, lancé après `photos/` (ordre
+  alphabétique des dossiers sans `seq`), qui les retire tous.
 
   Environnement `Prod` : la stack de prod ne publie pas le port 3000, l'API
   se joint par le proxy du client (`http://localhost:5180/api`). La prod n'a

@@ -1,0 +1,41 @@
+meta {
+  name: Nominal - une page d'un envoi puis la suivante
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/sends?limit=1
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('deviceSendId')) {
+    throw new Error('deviceSendId absent : lancer toute la collection, photos/share/08 doit passer')
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.sends.length: eq 1
+  res.body.sends[0].id: eq {{deviceSendId}}
+  res.body.nextCursor: eq {{deviceSendId}}
+}
+
+script:post-response {
+  const axios = require('axios')
+  test('la page suivante commence par l\'envoi d\'avant', async () => {
+    const next = await axios.get(
+      `${bru.getEnvVar('baseUrl')}/api/sends?limit=1&cursor=${res.body.nextCursor}`,
+      { headers: { Cookie: bru.getVar('sessionCookie') } },
+    )
+    expect(next.data.sends[0].id).to.equal(bru.getVar('librarySendId'))
+  })
+}
+
+docs {
+  NOMINAL → 200 avec un seul envoi et `nextCursor`, son id. La page
+  suivante, demandée avec ce curseur, commence par l'envoi de la
+  bibliothèque.
+}

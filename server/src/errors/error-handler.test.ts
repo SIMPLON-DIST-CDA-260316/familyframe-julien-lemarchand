@@ -39,6 +39,13 @@ describe('toErrorResponse', () => {
     })
   })
 
+  it("answers a send gone from the history, or someone else's, with 404", () => {
+    expect(toErrorResponse(new AppError('SEND_NOT_FOUND'))).toEqual({
+      status: 404,
+      body: { error: 'SEND_NOT_FOUND' },
+    })
+  })
+
   it('answers an unknown, replaced or malformed invitation token with 404', () => {
     expect(toErrorResponse(new AppError('INVITATION_NOT_FOUND'))).toEqual({
       status: 404,
