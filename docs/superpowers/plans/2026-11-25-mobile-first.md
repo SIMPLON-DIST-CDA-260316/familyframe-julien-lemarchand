@@ -4,8 +4,8 @@ status: done
 spec: docs/superpowers/specs/2026-11-25-mobile-first-design.md
 branch: feat/mobile-tabbar (PR A), feat/mobile-touch-targets (PR B), feat/frame-wake-lock (PR C), feat/viewer-chrome (PR D), feat/library-surface (PR E)
 worktree: false
-tasks_total: 18
-tasks_done: 18
+tasks_total: 24
+tasks_done: 24
 current_task: null
 last_commit: null
 last_updated: 2026-11-25
@@ -3054,6 +3054,431 @@ index 92c5364..27cce7f 100644
        </Button>
 ~~~~
 
+### Task 11: Three photo columns on phones
+
+**Commit:** `feat(client): three photo columns on phones`
+
+**Scope:** `PhotoGrid` 3 columns, 4 px gaps below `sm`; tile `rounded-sm` and raised when focused; list date `text-sm font-medium` below `sm`. Spec D22 amended.
+
+**Gate:** `pnpm check` and `pnpm typecheck` green.
+
+- [x] **Final diff**
+
+~~~~diff
+diff --git a/client/src/components/frame/PhotoGrid.tsx b/client/src/components/frame/PhotoGrid.tsx
+index e417c32..44976c7 100644
+--- a/client/src/components/frame/PhotoGrid.tsx
++++ b/client/src/components/frame/PhotoGrid.tsx
+@@ -9,10 +9,10 @@ type PhotoGridProps = {
+   onSelect: (id: string) => void
+ }
+ 
+-// Edge to edge with the page's header. Two columns on a phone: each tile carries a 44 px « … »
+-// that would hide too much of a third-width photo. From sm, as many ~12rem columns as fit.
++// Edge to edge with the page's header. Three tight columns on a phone, as photo apps do, so a
++// screen shows a dozen photos. From sm, as many ~12rem columns as fit.
+ const GRID_CLASSES =
+-  'grid grid-cols-2 gap-2 sm:grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] sm:gap-4'
++  'grid grid-cols-3 gap-1 sm:grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] sm:gap-4'
+ 
+ export function PhotoGrid({ photos, currentId, onSelect }: PhotoGridProps): JSX.Element {
+   return (
+diff --git a/client/src/components/frame/PhotoGridTile.tsx b/client/src/components/frame/PhotoGridTile.tsx
+index 6fc10a2..cd5238c 100644
+--- a/client/src/components/frame/PhotoGridTile.tsx
++++ b/client/src/components/frame/PhotoGridTile.tsx
+@@ -3,6 +3,16 @@ import { PhotoActionsMenu } from '@/components/frame/PhotoActionsMenu.tsx'
+ import type { Photo } from '@/photo.ts'
+ import { photoLabel } from '@/photoLabel.ts'
+ 
++// focus-visible:z-10: with 4 px gaps on a phone, the next tiles would paint over the focus ring.
++const TILE_CLASSES =
++  'group relative block w-full overflow-hidden rounded-sm outline-none ring-offset-2 ring-offset-background focus-visible:z-10 focus-visible:ring-3 focus-visible:ring-ring sm:rounded-xl sm:ring-offset-4 aria-[current=true]:ring-2 aria-[current=true]:ring-frame-accent'
++
++// White on the photo whatever the theme. On a phone tile (~120 px) a 44 px pill would hide too
++// much of it: the icon alone, shadowed, keeps the 44 px target in the corner. From sm, a dark pill.
++// z-10: stays above its own tile when that tile is focused.
++const ELLIPSIS_CLASSES =
++  'absolute top-0 right-0 z-10 rounded-full text-white drop-shadow-[0_1px_2px_rgb(0_0_0/0.8)] hover:bg-black/75 hover:text-white aria-expanded:bg-black/75 aria-expanded:text-white dark:hover:bg-black/75 sm:top-2 sm:right-2 sm:bg-black/55 sm:text-white/80 sm:drop-shadow-none sm:backdrop-blur-sm'
++
+ type PhotoGridTileProps = {
+   photo: Photo
+   isCurrent: boolean
+@@ -19,7 +29,7 @@ export function PhotoGridTile({ photo, isCurrent, onSelect }: PhotoGridTileProps
+         aria-current={isCurrent}
+         // The viewer focuses this tile when it closes on this photo.
+         data-photo-id={photo.id}
+-        className="group relative block w-full overflow-hidden rounded-xl outline-none ring-offset-4 ring-offset-background focus-visible:ring-3 focus-visible:ring-ring aria-[current=true]:ring-2 aria-[current=true]:ring-frame-accent"
++        className={TILE_CLASSES}
+       >
+         <img
+           className="aspect-square w-full object-cover motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover/tile:scale-105"
+@@ -29,12 +39,11 @@ export function PhotoGridTile({ photo, isCurrent, onSelect }: PhotoGridTileProps
+           decoding="async"
+         />
+       </button>
+-      {/* A dark pill whatever the theme: it sits on the photo, not on the page. */}
+       <PhotoActionsMenu
+         photo={photo}
+         label={`Actions : ${photoLabel(photo)}`}
+         theme="app"
+-        className="absolute top-2 right-2 rounded-full bg-black/55 text-white/80 backdrop-blur-sm hover:bg-black/75 hover:text-white aria-expanded:bg-black/75 aria-expanded:text-white dark:hover:bg-black/75"
++        className={ELLIPSIS_CLASSES}
+       />
+     </li>
+   )
+diff --git a/client/src/components/frame/PhotoListRow.tsx b/client/src/components/frame/PhotoListRow.tsx
+index d28c244..41f0a1d 100644
+--- a/client/src/components/frame/PhotoListRow.tsx
++++ b/client/src/components/frame/PhotoListRow.tsx
+@@ -36,7 +36,10 @@ export function PhotoListRow({ photo, isCurrent, onSelect }: PhotoListRowProps):
+           decoding="async"
+         />
+         <span className="flex min-w-0 flex-1 flex-col">
+-          <time dateTime={photo.createdAt} className="truncate text-base tabular-nums sm:text-lg">
++          <time
++            dateTime={photo.createdAt}
++            className="truncate text-sm font-medium tabular-nums sm:text-base"
++          >
+             {ROW_DATE_FORMAT.format(new Date(photo.createdAt))}
+           </time>
+           {photo.senderName !== null && (
+~~~~
+
+### Task 12: Photo menu windows follow the library theme
+
+**Commit:** `fix(client): photo menu windows follow the library theme`
+
+**Scope:** `CollectionsSubmenu` and `DeletePhotoDialog` take `className`; `PhotoActionsMenu` passes its theme class; stale comments. Spec D24.
+
+**Gate:** `pnpm check` and `pnpm typecheck` green.
+
+- [x] **Final diff**
+
+~~~~diff
+diff --git a/client/src/components/collections/CollectionNameDialog.tsx b/client/src/components/collections/CollectionNameDialog.tsx
+index 14131b3..0d13e19 100644
+--- a/client/src/components/collections/CollectionNameDialog.tsx
++++ b/client/src/components/collections/CollectionNameDialog.tsx
+@@ -21,7 +21,7 @@ type CollectionNameDialogProps = {
+   // After a success: the photo menu adds its photo to the collection it just created.
+   onSaved?: (collection: Collection) => void
+   onCloseAutoFocus?: (event: Event) => void
+-  // `dark` from the frame: the dialog portals to body, outside the frame's dark <main>.
++  // The dialog portals to body: the caller passes its theme (`dark` on the frame).
+   className?: string
+ }
+ 
+diff --git a/client/src/components/collections/CollectionsSubmenu.tsx b/client/src/components/collections/CollectionsSubmenu.tsx
+index acd75eb..ef74cb2 100644
+--- a/client/src/components/collections/CollectionsSubmenu.tsx
++++ b/client/src/components/collections/CollectionsSubmenu.tsx
+@@ -11,16 +11,18 @@ import {
+   DropdownMenuSubContent,
+   DropdownMenuSubTrigger,
+ } from '@/components/ui/dropdown-menu.tsx'
++import { cn } from '@/lib/utils.ts'
+ 
+-// `dark`: the submenu portals to body, outside the frame's dark <main>. A long list scrolls
+-// inside the screen instead of being cut.
++// A long list scrolls inside the screen instead of being cut.
+ const SUB_CONTENT_CLASS =
+-  'dark max-h-(--radix-dropdown-menu-content-available-height) max-w-64 overflow-y-auto'
++  'max-h-(--radix-dropdown-menu-content-available-height) max-w-64 overflow-y-auto'
+ 
+ type CollectionsSubmenuProps = {
+   photoId: string
+   // Opens the naming dialog: the photo menu adds its photo to the new collection.
+   onCreate: () => void
++  // The submenu portals to body: the photo menu passes its theme (`dark` on the frame).
++  className?: string
+ }
+ 
+ // A failure shows in a toast; the box follows the list, so it stays as it was.
+@@ -55,7 +57,11 @@ function CollectionCheckboxes({ photoId }: { photoId: string }): JSX.Element {
+   )
+ }
+ 
+-export function CollectionsSubmenu({ photoId, onCreate }: CollectionsSubmenuProps): JSX.Element {
++export function CollectionsSubmenu({
++  photoId,
++  onCreate,
++  className,
++}: CollectionsSubmenuProps): JSX.Element {
+   return (
+     <DropdownMenuSub>
+       <DropdownMenuSubTrigger>
+@@ -63,7 +69,7 @@ export function CollectionsSubmenu({ photoId, onCreate }: CollectionsSubmenuProp
+         Collections
+       </DropdownMenuSubTrigger>
+       <DropdownMenuPortal>
+-        <DropdownMenuSubContent className={SUB_CONTENT_CLASS}>
++        <DropdownMenuSubContent className={cn(SUB_CONTENT_CLASS, className)}>
+           <CollectionCheckboxes photoId={photoId} />
+           <DropdownMenuItem onSelect={onCreate}>
+             <PlusIcon />
+diff --git a/client/src/components/frame/DeletePhotoDialog.tsx b/client/src/components/frame/DeletePhotoDialog.tsx
+index 4e4179f..133e4e5 100644
+--- a/client/src/components/frame/DeletePhotoDialog.tsx
++++ b/client/src/components/frame/DeletePhotoDialog.tsx
+@@ -17,18 +17,20 @@ type DeletePhotoDialogProps = {
+   photo: Photo | null
+   onClose: () => void
+   onCloseAutoFocus: (event: Event) => void
++  // The dialog portals to body: the photo menu passes its theme (`dark` on the frame).
++  className?: string
+ }
+ 
+ export function DeletePhotoDialog({
+   photo,
+   onClose,
+   onCloseAutoFocus,
++  className,
+ }: DeletePhotoDialogProps): JSX.Element | null {
+   if (!photo) return null
+   return (
+     <AlertDialog open onOpenChange={onClose}>
+-      {/* `dark`: the dialog portals to body, outside the frame's dark <main>. */}
+-      <AlertDialogContent className="dark" onCloseAutoFocus={onCloseAutoFocus}>
++      <AlertDialogContent className={className} onCloseAutoFocus={onCloseAutoFocus}>
+         <AlertDialogHeader>
+           <AlertDialogTitle>Supprimer cette photo ?</AlertDialogTitle>
+           <AlertDialogDescription>
+diff --git a/client/src/components/frame/PhotoActionsMenu.tsx b/client/src/components/frame/PhotoActionsMenu.tsx
+index 3239b57..353c180 100644
+--- a/client/src/components/frame/PhotoActionsMenu.tsx
++++ b/client/src/components/frame/PhotoActionsMenu.tsx
+@@ -80,6 +80,7 @@ function MenuDialogs({ dialog, themeClass, onClose, triggerRef }: MenuDialogsPro
+         photo={photoFor('delete')}
+         onClose={onClose}
+         onCloseAutoFocus={focusTrigger}
++        className={themeClass}
+       />
+       <CollectionNameDialog
+         target={photoFor('createCollection') ? { kind: 'create' } : null}
+@@ -135,6 +136,7 @@ function MenuItems({ photo, themeClass, onOpen, children }: MenuItemsProps): JSX
+       <CollectionsSubmenu
+         photoId={photo.id}
+         onCreate={() => onOpen({ kind: 'createCollection', photo })}
++        className={themeClass}
+       />
+       <DropdownMenuItem variant="destructive" onSelect={() => onOpen({ kind: 'delete', photo })}>
+         <Trash2Icon />
+~~~~
+
+### Task 13: A focused viewer arrow keeps the controls shown
+
+**Commit:** `fix(client): a focused viewer arrow keeps the controls shown`
+
+**Scope:** `useViewerChrome` `isUsingControls` checks the element's own `:focus-visible`. Spec D26.
+
+**Gate:** `pnpm check` and `pnpm typecheck` green.
+
+- [x] **Final diff**
+
+~~~~diff
+diff --git a/client/src/hooks/useViewerChrome.ts b/client/src/hooks/useViewerChrome.ts
+index 8c00b8e..c20d4c3 100644
+--- a/client/src/hooks/useViewerChrome.ts
++++ b/client/src/hooks/useViewerChrome.ts
+@@ -12,11 +12,15 @@ export type ViewerChrome = {
+ }
+ 
+ // Someone pointing at a button, tabbing through them or reading a menu is still using the
+-// controls: they must not vanish under them.
++// controls: they must not vanish under them. The arrows carry the marker on the button itself,
++// so the element's own focus counts as well as a focused child.
+ function isUsingControls(): boolean {
+   if (isOverlayOpen()) return true
+   return Array.from(document.querySelectorAll(CONTROLS_SELECTOR)).some(
+-    (controls) => controls.matches(':hover') || controls.querySelector(':focus-visible') !== null,
++    (controls) =>
++      controls.matches(':hover') ||
++      controls.matches(':focus-visible') ||
++      controls.querySelector(':focus-visible') !== null,
+   )
+ }
+ 
+~~~~
+
+### Task 14: Toasts rise above the floating add button
+
+**Commit:** `fix(client): toasts rise above the floating add button`
+
+**Scope:** `AddPhotoFab` sets `data-fab-shown` on `<html>` while shown; `index.css` raises `--toast-bottom` below `md`. R-APP-66 amended in the same commit. Spec D25.
+
+**Gate:** `pnpm check` and `pnpm typecheck` green.
+
+- [x] **Final diff**
+
+~~~~diff
+diff --git a/client/src/components/library/AddPhotoFab.tsx b/client/src/components/library/AddPhotoFab.tsx
+index 535ab5b..142a2db 100644
+--- a/client/src/components/library/AddPhotoFab.tsx
++++ b/client/src/components/library/AddPhotoFab.tsx
+@@ -1,5 +1,5 @@
+ import { PlusIcon } from 'lucide-react'
+-import type { JSX } from 'react'
++import { type JSX, useEffect } from 'react'
+ import { Button } from '@/components/ui/button.tsx'
+ import { useHideOnScrollDown } from '@/hooks/useHideOnScrollDown.ts'
+ import { cn } from '@/lib/utils.ts'
+@@ -13,6 +13,18 @@ const FAB_CLASSES =
+ // keyboard reaching it brings it back.
+ const HIDDEN_CLASSES = 'pointer-events-none translate-y-24 opacity-0 motion-reduce:translate-y-0'
+ 
++// Toasts sit just above the tab bar, where this button floats: while it shows, the page says so
++// on <html> and index.css lifts the toasts above it (below md only, where it exists).
++function useLiftToasts(isShown: boolean): void {
++  useEffect(() => {
++    if (!isShown) return
++    document.documentElement.dataset.fabShown = ''
++    return () => {
++      delete document.documentElement.dataset.fabShown
++    }
++  }, [isShown])
++}
++
+ type AddPhotoFabProps = {
+   onAdd: () => void
+ }
+@@ -21,6 +33,7 @@ type AddPhotoFabProps = {
+ // A computer keeps the button in the header.
+ export function AddPhotoFab({ onAdd }: AddPhotoFabProps): JSX.Element {
+   const { isHidden, ref, onFocus } = useHideOnScrollDown()
++  useLiftToasts(!isHidden)
+   return (
+     <Button
+       ref={ref}
+diff --git a/client/src/index.css b/client/src/index.css
+index b4230c6..d82062c 100644
+--- a/client/src/index.css
++++ b/client/src/index.css
+@@ -120,6 +120,19 @@
+   }
+ }
+ 
++/* While the floating « Ajouter » shows (AddPhotoFab), toasts also clear it: its 3.5rem and a gap. */
++@media (width < 48rem) {
++  :root[data-fab-shown] {
++    --toast-bottom: calc(
++      var(--tab-bar-height) +
++      env(safe-area-inset-bottom) +
++      16px +
++      3.5rem +
++      12px
++    );
++  }
++}
++
+ .dark {
+   color-scheme: dark;
+   --background: oklch(0.145 0 0);
+diff --git a/docs/produit/apparence-et-navigation.md b/docs/produit/apparence-et-navigation.md
+index 6b2880a..1adbf4c 100644
+--- a/docs/produit/apparence-et-navigation.md
++++ b/docs/produit/apparence-et-navigation.md
+@@ -169,7 +169,7 @@ Aucun message.
+ 4. R-APP-63 · « Compte » ouvre la page « Préférences » (voir [preferences.md](preferences.md)). Le thème et « Se déconnecter » restent dans le menu du compte (rond de profil, en haut à droite).
+ 5. R-APP-64 · « Cadre » ouvre le cadre en plein écran, comme « Mode cadre » (R-CAD-58). Ouvert depuis la bibliothèque, quitter le cadre ramène à cette bibliothèque.
+ 6. R-APP-65 · La barre d'onglets reste en bas de l'écran quand on fait défiler la page, et la fin de chaque page reste visible au-dessus d'elle.
+-7. R-APP-66 · Tant que la barre d'onglets est affichée (écran étroit), les courtes notifications (R-APP-53) s'affichent au-dessus d'elle, sans la cacher, quelle que soit la largeur de l'écran.
++7. R-APP-66 · Tant que la barre d'onglets est affichée (écran étroit), les courtes notifications (R-APP-53) s'affichent au-dessus d'elle, sans la cacher. Dans la bibliothèque, tant que le bouton rond « Ajouter » est visible, elles s'affichent aussi au-dessus de lui ; quand il s'efface au défilement, elles redescendent juste au-dessus de la barre.
+ 
+ **Messages affichés**
+ 
+~~~~
+
+### Task 15: Wake lock needs a secure context
+
+**Commit:** `docs: wake lock needs a secure context`
+
+**Scope:** ARCHITECTURE.md line next to the Secure cookie warning; R-CAD-98 lists the insecure address.
+
+**Gate:** `pnpm check` green.
+
+- [x] **Final diff**
+
+~~~~diff
+diff --git a/ARCHITECTURE.md b/ARCHITECTURE.md
+index 0b6c5a9..3f17da2 100644
+--- a/ARCHITECTURE.md
++++ b/ARCHITECTURE.md
+@@ -321,3 +321,4 @@ Points déjà connus :
+ - **argon2** charge un binaire précompilé livré dans le paquet (Linux x64/arm64, glibc et musl, Windows x64) : son script de build reste bloqué par pnpm (`ignoredBuiltDependencies`). Comme Sharp, il doit être installé dans l'image, jamais copié depuis le `node_modules` Windows.
+ - Le serveur qui sert le client doit faire le **SPA fallback** pour `/login`, `/frame`, `/friends`, `/settings`, `/invite/:token` et `/admin/invitations` (voir [Pages](#pages)).
+ - Avec `NODE_ENV=production`, le cookie de session est `Secure` : servi en http simple (cadre sur le réseau local, Compose en local), le navigateur l'ignore et la connexion échoue sans message. Servir en HTTPS, ou ne pas définir `NODE_ENV=production` en http.
++- Wake Lock : contexte sécurisé (HTTPS ou localhost) uniquement. Servi en http simple sur le réseau local, le cadre ne garde pas l'écran allumé (R-CAD-98), sans erreur visible.
+diff --git a/docs/produit/cadre.md b/docs/produit/cadre.md
+index 085bbc2..af9089a 100644
+--- a/docs/produit/cadre.md
++++ b/docs/produit/cadre.md
+@@ -31,7 +31,7 @@ Le cadre est la page à laisser affichée en plein écran sur l'appareil posé c
+ 15. R-CAD-59 · Sortir du plein écran, de n'importe quelle façon (✕, touche Échap, touche F11, geste de l'appareil), quitte le cadre : on revient à la bibliothèque, sur la photo qui était affichée, ou à la bibliothèque seule s'il n'y avait pas de photo. Exception : si un menu ou une fenêtre est ouvert (menu « … », « Envoyer à des proches », « Supprimer cette photo ? »), sortir du plein écran ne quitte pas le cadre, car la touche Échap visait ce menu : le cadre reste affiché, hors plein écran, et le bouton « Plein écran » revient.
+ 16. R-CAD-60 · Quitter le cadre autrement (bouton retour du navigateur, « Retour à la bibliothèque ») sort aussi du plein écran : la bibliothèque ne reste jamais en plein écran.
+ 17. R-CAD-61 · Tant que le cadre n'est pas en plein écran, un bouton « Plein écran » s'affiche en haut à droite, sur le diaporama comme sur les écrans sans photo. Sur le diaporama, il s'efface avec les autres boutons (R-CAD-24). Il n'apparaît pas sur un appareil qui ne permet pas le plein écran.
+-18. R-CAD-98 · Tant que le cadre est affiché, l'écran de l'appareil reste allumé : il ne s'assombrit pas et ne se verrouille pas, même sans toucher l'appareil. Quitter le cadre rend à l'appareil son réglage de mise en veille. Si l'on passe à une autre application puis revient au cadre, l'écran reste de nouveau allumé. Sur un appareil ou un navigateur qui ne le permet pas, ou en mode économie d'énergie, l'écran suit son propre réglage, sans message.
++18. R-CAD-98 · Tant que le cadre est affiché, l'écran de l'appareil reste allumé : il ne s'assombrit pas et ne se verrouille pas, même sans toucher l'appareil. Quitter le cadre rend à l'appareil son réglage de mise en veille. Si l'on passe à une autre application puis revient au cadre, l'écran reste de nouveau allumé. Sur un appareil ou un navigateur qui ne le permet pas, en mode économie d'énergie, ou si le cadre est ouvert à une adresse non sécurisée, l'écran suit son propre réglage, sans message.
+ 
+ **Messages affichés**
+ 
+~~~~
+
+### Task 16: No ellipsis on grid tiles under a finger
+
+**Commit:** `feat(client): no ellipsis on grid tiles under a finger`
+
+**Scope:** Tile « … » `pointer-coarse:hidden`, the dark pill back for the mouse; R-BIB-53 and the capability list. Spec D23.
+
+**Gate:** `pnpm check` and `pnpm typecheck` green. `pnpm build` and `pnpm test` green at the tip.
+
+- [x] **Final diff**
+
+~~~~diff
+diff --git a/client/src/components/frame/PhotoGridTile.tsx b/client/src/components/frame/PhotoGridTile.tsx
+index cd5238c..b9a1f19 100644
+--- a/client/src/components/frame/PhotoGridTile.tsx
++++ b/client/src/components/frame/PhotoGridTile.tsx
+@@ -7,11 +7,11 @@ import { photoLabel } from '@/photoLabel.ts'
+ const TILE_CLASSES =
+   'group relative block w-full overflow-hidden rounded-sm outline-none ring-offset-2 ring-offset-background focus-visible:z-10 focus-visible:ring-3 focus-visible:ring-ring sm:rounded-xl sm:ring-offset-4 aria-[current=true]:ring-2 aria-[current=true]:ring-frame-accent'
+ 
+-// White on the photo whatever the theme. On a phone tile (~120 px) a 44 px pill would hide too
+-// much of it: the icon alone, shadowed, keeps the 44 px target in the corner. From sm, a dark pill.
+-// z-10: stays above its own tile when that tile is focused.
++// A dark pill whatever the theme: it sits on the photo, not on the page. Under a finger there is
++// none: a 44 px target would hide too much of a ~120 px phone tile, and a tap opens the photo,
++// whose own « … » holds the same menu. z-10: stays above its own tile when that tile is focused.
+ const ELLIPSIS_CLASSES =
+-  'absolute top-0 right-0 z-10 rounded-full text-white drop-shadow-[0_1px_2px_rgb(0_0_0/0.8)] hover:bg-black/75 hover:text-white aria-expanded:bg-black/75 aria-expanded:text-white dark:hover:bg-black/75 sm:top-2 sm:right-2 sm:bg-black/55 sm:text-white/80 sm:drop-shadow-none sm:backdrop-blur-sm'
++  'absolute top-2 right-2 z-10 rounded-full bg-black/55 text-white/80 backdrop-blur-sm hover:bg-black/75 hover:text-white aria-expanded:bg-black/75 aria-expanded:text-white dark:hover:bg-black/75 pointer-coarse:hidden'
+ 
+ type PhotoGridTileProps = {
+   photo: Photo
+diff --git a/docs/produit/bibliotheque.md b/docs/produit/bibliotheque.md
+index 0ff278f..b8434ac 100644
+--- a/docs/produit/bibliotheque.md
++++ b/docs/produit/bibliotheque.md
+@@ -62,7 +62,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
+ - Charger les photos plus anciennes avec « Charger plus ».
+ - Ouvrir une photo en grand dans l'application, puis passer à la suivante ou à la précédente d'un geste du doigt, avec les flèches à l'écran ou celles du clavier.
+ - Sur une photo ouverte, laisser la photo seule à l'écran : les boutons, le compteur, la légende et les flèches s'effacent, et reviennent quand on en a besoin.
+-- Ouvrir le menu « … » d'une photo pour lancer sa radio sur le cadre (voir [cadre.md](cadre.md#radio)), l'envoyer à un ami, la ranger dans ses collections (voir [collections.md](collections.md#ranger-ses-photos-dans-une-collection)) ou la supprimer.
++- Ouvrir le menu « … » d'une photo (sur un écran tactile, depuis la photo ouverte en grand ou depuis la liste) pour lancer sa radio sur le cadre (voir [cadre.md](cadre.md#radio)), l'envoyer à un ami, la ranger dans ses collections (voir [collections.md](collections.md#ranger-ses-photos-dans-une-collection)) ou la supprimer.
+ - Lancer le mode cadre, en plein écran, depuis la bibliothèque (« Mode cadre » sur un ordinateur, l'onglet « Cadre » sur un téléphone), ou depuis une photo ouverte pour que le diaporama commence par elle (voir [cadre.md](cadre.md)).
+ - Découvrir les photos envoyées par ses proches depuis l'annonce placée sous l'en-tête (voir [partage.md](partage.md#recevoir-une-photo)).
+ - N'afficher que les photos d'une collection, depuis la rangée « Toutes », « Noël », « Les vacances »… placée sous l'annonce (voir [collections.md](collections.md#parcourir-une-collection)).
+@@ -93,7 +93,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
+ 21. R-BIB-50 · À la souris, les boutons, le compteur, la légende et les flèches apparaissent dès que la souris bouge et s'effacent après 3 secondes sans mouvement. Ils restent tant que la souris est sur un bouton ou qu'un menu ou une fenêtre est ouvert (menu « … », « Envoyer à des proches », « Supprimer cette photo ? »). Cliquer sur la photo ne les efface pas.
+ 22. R-BIB-51 · Au clavier, les flèches gauche et droite changent de photo sans faire revenir les boutons ; la touche Tab les fait revenir et passe d'un bouton à l'autre. Ils restent tant que l'un d'eux est choisi au clavier. Effacés, ils ne peuvent pas être choisis.
+ 23. R-BIB-52 · Les boutons apparaissent et s'effacent en fondu ; si l'appareil demande de réduire les animations, ils apparaissent et disparaissent d'un coup.
+-24. R-BIB-53 · Les photos de la bibliothèque, en miniatures comme en liste, s'affichent sur le fond de la page et suivent le thème choisi, clair ou sombre, comme le reste de l'application ; leur menu « … » et les fenêtres qu'il ouvre aussi. Seul le cadre, et une photo ouverte en grand, restent toujours sombres. Sur une miniature, le bouton « … » reste un rond sombre, posé sur la photo.
++24. R-BIB-53 · Les photos de la bibliothèque, en miniatures comme en liste, s'affichent sur le fond de la page et suivent le thème choisi, clair ou sombre, comme le reste de l'application ; leur menu « … » et les fenêtres qu'il ouvre aussi. Seul le cadre, et une photo ouverte en grand, restent toujours sombres. Sur une miniature, le bouton « … » reste un rond sombre, posé sur la photo. Sur un téléphone, les miniatures tiennent sur trois colonnes serrées. Sur un écran tactile, elles n'ont pas de bouton « … » : toucher la photo l'ouvre en grand, où le même menu se trouve. En liste, chaque ligne garde son bouton « … ».
+ 25. R-BIB-42 · La bibliothèque se met à jour seule, sans recharger la page : une photo ajoutée depuis un autre appareil apparaît en tête, une photo reçue y entre à sa date de réception dès qu'elle est découverte (sur cet appareil ou un autre), une photo supprimée disparaît.
+ 
+ **Messages affichés**
+~~~~
+
 ---
 
 ## Final verification (controller)
@@ -3086,3 +3511,10 @@ index 92c5364..27cce7f 100644
   - Layout: the photo grid and list keep their padding, so desktop only loses the panel colour. At 360 px nothing gets wider.
 - **PR E, widths** (the author's desktop screenshots at 2000 px, and the phone: « problème de cohérence sur la largeur des éléments et des conteneurs du contenu par rapport aux listes de photos, et sur mobile c'est pas fameux non plus »): the list sat in a narrower centred column (`max-w-3xl mx-auto p-8`), the grid inset by `p-8`, both leftovers of the black panel removed in Task 8. Task 10 aligns both with the page container (spec D22). Phone grid: 2 columns, not 3, because of the tile's 44 px « … ». At 360 px the date gets about 212 px (328 px container − 56 px thumbnail − 12 px gap − 48 px for the « … ») and « 30 sept. 2026, 23:59 » at 16 px needs about 170 px. No horizontal scroll at 360, 768 or 1280 px: the phone grid is `grid-cols-2` (`minmax(0, 1fr)`), and from `sm` the container (≥ 608 px) always fits one 12rem column. No product rule mentions widths or columns: `docs/produit/` unchanged.
 - **Gates for PR E:** `pnpm check` and `pnpm typecheck` green on each of the 5 commits; at the tip `pnpm build` green and `pnpm test` → `Test Files  25 passed (25)`, `Tests  301 passed (301)`.
+- **PR E, phone grid and final review** (the controller's 412 px evidence, then a review of the whole stack, then Google Photos as the model):
+  - Task 11: three phone columns with 4 px gaps, reversing the two of Task 10 (spec D22 amended in place). The list was already on the container's edges in Task 10; the evidence's inset matched the code before Task 10, which cannot be re-checked here without starting Vite. Dates drop to `text-sm`.
+  - Task 11 first gave the phone tile's « … » a pill-less, shadowed white icon; the controller then asked for no tile « … » under a finger at all (Task 16, spec D23), as photo apps do. The viewer's « … » is the same component, so no action moves.
+  - Tasks 12 and 13: review findings (dark submenu and delete dialog on the light library; a focused arrow let the controls hide).
+  - Task 14: the controller asked for R-APP-66 in its own commit; it went into the behaviour's commit instead, as AGENTS.md requires ("Behaviour change → product doc in the same commit").
+  - Task 15: Wake Lock needs a secure context, like the Secure cookie.
+- **Gates for Tasks 11 to 16:** `pnpm check` and `pnpm typecheck` green on each commit; at the tip `pnpm build` green and `pnpm test` → `Test Files  25 passed (25)`, `Tests  301 passed (301)`.
