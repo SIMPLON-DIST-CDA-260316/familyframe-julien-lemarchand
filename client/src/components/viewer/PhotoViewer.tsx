@@ -4,6 +4,7 @@ import { ViewerCaption } from '@/components/viewer/ViewerCaption.tsx'
 import { ViewerCarousel } from '@/components/viewer/ViewerCarousel.tsx'
 import { ViewerTopBar } from '@/components/viewer/ViewerTopBar.tsx'
 import type { PhotoLibrary } from '@/hooks/usePhotoLibrary.ts'
+import { useViewerChrome } from '@/hooks/useViewerChrome.ts'
 import type { ViewerParam } from '@/hooks/useViewerParam.ts'
 import { useViewerPhoto } from '@/hooks/useViewerPhoto.ts'
 import type { Photo } from '@/photo.ts'
@@ -30,12 +31,19 @@ function focusPhotoTile(event: Event, photoId: string): void {
 }
 
 function ViewerPhoto({ library, viewer, photo, index }: ViewerPhotoProps): JSX.Element {
+  const chrome = useViewerChrome()
   return (
     <>
-      <ViewerCarousel photos={library.photos} currentId={photo.id} onCurrentChange={viewer.show} />
-      <ViewerCaption photo={photo} />
+      <ViewerCarousel
+        photos={library.photos}
+        currentId={photo.id}
+        onCurrentChange={viewer.show}
+        chrome={chrome}
+      />
+      <ViewerCaption photo={photo} isVisible={chrome.isVisible} />
       <ViewerTopBar
         photo={photo}
+        isVisible={chrome.isVisible}
         counter={viewerCounter(index, library)}
         onClose={viewer.close}
         onStartFrame={() => viewer.startFrame(photo.id)}

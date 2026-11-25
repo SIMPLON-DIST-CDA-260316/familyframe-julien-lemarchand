@@ -2,12 +2,13 @@ import { PlayIcon, XIcon } from 'lucide-react'
 import type { JSX } from 'react'
 import { PhotoActionsMenu } from '@/components/frame/PhotoActionsMenu.tsx'
 import { Button } from '@/components/ui/button.tsx'
-import { VIEWER_BUTTON_CLASSES } from '@/components/viewer/viewerClasses.ts'
+import { chromeClasses, VIEWER_BUTTON_CLASSES } from '@/components/viewer/viewerClasses.ts'
 import { cn } from '@/lib/utils.ts'
 import type { Photo } from '@/photo.ts'
 
 type ViewerTopBarProps = {
   photo: Photo
+  isVisible: boolean
   counter: string
   onClose: () => void
   onStartFrame: () => void
@@ -44,6 +45,7 @@ function CloseViewerButton({ onClose }: Pick<ViewerTopBarProps, 'onClose'>): JSX
 
 export function ViewerTopBar({
   photo,
+  isVisible,
   counter,
   onClose,
   onStartFrame,
@@ -51,8 +53,16 @@ export function ViewerTopBar({
   return (
     // ✕ top left and the actions top right, as on the slideshow. The row spans the screen: only
     // its buttons take pointers, swipes beside them reach the carousel. Its shade runs under the
-    // notch, its buttons stay below it.
-    <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center gap-2 bg-linear-to-b from-black/60 to-transparent pt-[max(0.75rem,env(safe-area-inset-top))] pr-[max(1rem,env(safe-area-inset-right))] pb-3 pl-[max(1rem,env(safe-area-inset-left))] *:pointer-events-auto">
+    // notch, its buttons stay below it. Hidden, inert keeps its buttons out of focus and clicks.
+    <div
+      data-viewer-controls
+      inert={!isVisible}
+      className={cn(
+        'pointer-events-none absolute inset-x-0 top-0 flex items-center gap-2 bg-linear-to-b from-black/60 to-transparent pt-[max(0.75rem,env(safe-area-inset-top))] pr-[max(1rem,env(safe-area-inset-right))] pb-3 pl-[max(1rem,env(safe-area-inset-left))]',
+        isVisible && '*:pointer-events-auto',
+        chromeClasses(isVisible),
+      )}
+    >
       <CloseViewerButton onClose={onClose} />
       <p aria-live="polite" className="mx-auto text-sm text-white/80 tabular-nums">
         {counter}

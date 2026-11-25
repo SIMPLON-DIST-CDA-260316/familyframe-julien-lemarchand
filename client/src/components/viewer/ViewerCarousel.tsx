@@ -7,26 +7,30 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel.tsx'
-import { VIEWER_BUTTON_CLASSES } from '@/components/viewer/viewerClasses.ts'
+import { chromeClasses, VIEWER_BUTTON_CLASSES } from '@/components/viewer/viewerClasses.ts'
 import { useCarouselArrowKeys } from '@/hooks/useCarouselArrowKeys.ts'
 import { useCarouselPhoto } from '@/hooks/useCarouselPhoto.ts'
+import type { ViewerChrome } from '@/hooks/useViewerChrome.ts'
 import { cn } from '@/lib/utils.ts'
 import type { Photo } from '@/photo.ts'
 import { photoLabel } from '@/photoLabel.ts'
 
-// At the first or last photo the arrow has nowhere to go: it steps aside.
-const ARROW_CLASSES = cn(VIEWER_BUTTON_CLASSES, 'disabled:opacity-0')
+// At the first or last photo the arrow has nowhere to go: it steps aside. A finger swipes: no
+// arrows on a touch screen.
+const ARROW_CLASSES = cn(VIEWER_BUTTON_CLASSES, 'disabled:opacity-0 pointer-coarse:hidden')
 
 type ViewerCarouselProps = {
   photos: Photo[]
   currentId: string
   onCurrentChange: (photoId: string) => void
+  chrome: ViewerChrome
 }
 
 export function ViewerCarousel({
   photos,
   currentId,
   onCurrentChange,
+  chrome,
 }: ViewerCarouselProps): JSX.Element {
   const [api, setApi] = useState<CarouselApi>()
   // Frozen at mount: Embla re-inits on new options, and would on every swipe.
@@ -35,12 +39,14 @@ export function ViewerCarousel({
   }))
   useCarouselPhoto({ api, photos, currentId, onCurrentChange })
   useCarouselArrowKeys(api)
+  const arrowClasses = cn(ARROW_CLASSES, chromeClasses(chrome.isVisible))
 
   return (
     <Carousel setApi={setApi} opts={options}>
       <CarouselContent>
         {photos.map((photo) => (
           <CarouselItem key={photo.id}>
+            {/* biome-ignore lint/a11y/useKeyWithClickEvents: the tap toggle is for touch; a keyboard shows the controls with Tab (useViewerChrome). */}
             <img
               className="h-svh w-full object-contain"
               src={photo.url}
@@ -49,6 +55,8 @@ export function ViewerCarousel({
               decoding="async"
               // The browser's own image drag would steal the mouse from the carousel's swipe.
               draggable={false}
+              onPointerDown={chrome.onPhotoPointerDown}
+              onClick={chrome.onPhotoClick}
             />
           </CarouselItem>
         ))}
@@ -56,12 +64,16 @@ export function ViewerCarousel({
       <CarouselPrevious
         variant="ghost"
         aria-label="Photo précédente"
-        className={cn(ARROW_CLASSES, 'left-[max(1rem,env(safe-area-inset-left))]')}
+        data-viewer-controls
+        inert={!chrome.isVisible}
+        className={cn(arrowClasses, 'left-[max(1rem,env(safe-area-inset-left))]')}
       />
       <CarouselNext
         variant="ghost"
         aria-label="Photo suivante"
-        className={cn(ARROW_CLASSES, 'right-[max(1rem,env(safe-area-inset-right))]')}
+        data-viewer-controls
+        inert={!chrome.isVisible}
+        className={cn(arrowClasses, 'right-[max(1rem,env(safe-area-inset-right))]')}
       />
     </Carousel>
   )
