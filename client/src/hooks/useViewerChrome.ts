@@ -46,7 +46,6 @@ function createHideTimer(setIsVisible: (isVisible: boolean) => void): HideTimer 
   return { restart, clear: () => window.clearTimeout(hideTimer) }
 }
 
-// A plain function the effect wires up; it returns its cleanup.
 function watchActivity(setIsVisible: (isVisible: boolean) => void): () => void {
   const hideTimer = createHideTimer(setIsVisible)
   function handlePointerMove(event: globalThis.PointerEvent): void {
