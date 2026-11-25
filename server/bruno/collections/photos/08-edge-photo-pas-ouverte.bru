@@ -1,0 +1,37 @@
+meta {
+  name: Edge - photo reçue pas encore ouverte
+  type: http
+  seq: 8
+}
+
+put {
+  url: {{baseUrl}}/api/collections/{{collectionId}}/photos/{{unopenedPhotoId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('collectionId') || !bru.getVar('unopenedPhotoId')) {
+    throw new Error('collectionId ou unopenedPhotoId absent : lancer tout le dossier, photos/07 doit passer')
+  }
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq PHOTO_NOT_FOUND
+}
+
+script:post-response {
+  const axios = require('axios')
+  // The photo was only for this test: deleted, its image leaves Cloudinary.
+  await axios.delete(`${bru.getEnvVar('baseUrl')}/api/photos/${bru.getVar('unopenedPhotoId')}`, {
+    headers: { Cookie: bru.getVar('inviteeCookie') },
+  })
+}
+
+docs {
+  EDGE → 404 PHOTO_NOT_FOUND : une photo reçue n'entre dans une collection
+  qu'une fois ouverte, comme dans la bibliothèque. Le script supprime
+  ensuite la photo reçue.
+}

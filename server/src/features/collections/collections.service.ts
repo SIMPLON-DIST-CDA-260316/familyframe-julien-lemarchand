@@ -1,7 +1,7 @@
 import { AppError } from '../../errors/app-error.js'
 import type { Logger } from '../../lib/logger.js'
 import type { ApiErrorCode, Collection } from '../../types.js'
-import { OBJECT_ID_PATTERN } from '../photos/photos.input.js'
+import { OBJECT_ID_PATTERN, parsePhotoId } from '../photos/photos.input.js'
 import type {
   CollectionRecord,
   CollectionsRepository,
@@ -24,6 +24,9 @@ export type CollectionAction = { id: string; ownerId: string }
 
 export type CollectionRename = CollectionAction & { name: unknown }
 
+// photoId comes from the URL too.
+export type PhotoMembership = CollectionAction & { photoId: string }
+
 export type CollectionsServiceDeps = {
   repository: CollectionsRepository
   logger: Logger
@@ -34,6 +37,8 @@ export type CollectionsService = {
   createCollection: (collection: NewCollection) => Promise<Collection>
   renameCollection: (rename: CollectionRename) => Promise<Collection>
   deleteCollection: (action: CollectionAction) => Promise<void>
+  addPhoto: (membership: PhotoMembership) => Promise<Collection>
+  removePhoto: (membership: PhotoMembership) => Promise<Collection>
 }
 
 // Trimmed, like a display name: « Noël » and « Noël  » are the same name.
@@ -132,11 +137,88 @@ async function deleteCollection(
   logger.info('collection.deleted', { collectionId: deleted.id, userId: ownerId })
 }
 
+// MongoDB answers ObjectIds in lowercase: an id sent in capitals must compare equal to it.
+function parseMemberPhotoId(photoId: string): string {
+  return parsePhotoId(photoId).toLowerCase()
+}
+
+async function findOwnedOrThrow(
+  { repository }: CollectionsServiceDeps,
+  id: string,
+  ownerId: string,
+): Promise<CollectionRecord> {
+  const record = await repository.findOwned(id, ownerId)
+  if (!record) {
+    throw new AppError('COLLECTION_NOT_FOUND')
+  }
+  return record
+}
+
+// Unknown, someone else's and still unopened photos all answer « not found ». Adding a photo
+// already in changes nothing: the write found no match, the collection is read as it is.
+async function addPhoto(
+  deps: CollectionsServiceDeps,
+  { id, ownerId, ...membership }: PhotoMembership,
+): Promise<Collection> {
+  const collectionId = parseCollectionId(id)
+  const photoId = parseMemberPhotoId(membership.photoId)
+  if (!(await deps.repository.hasOpenedPhoto(ownerId, photoId))) {
+    throw new AppError('PHOTO_NOT_FOUND')
+  }
+  const added = await deps.repository.addPhoto(collectionId, ownerId, photoId)
+  if (added) {
+    deps.logger.info('collection.photo_added', { collectionId, photoId, userId: ownerId })
+  }
+  return toCollection(deps, added ?? (await findOwnedOrThrow(deps, collectionId, ownerId)))
+}
+
+type Removal = { record: CollectionRecord; isRemoved: boolean }
+
+// Prisma has no $pull: the list is written back without the photo, only if it is still the
+// list read. null: it changed in between, nothing was written.
+async function removeOnce(
+  deps: CollectionsServiceDeps,
+  collectionId: string,
+  { ownerId, photoId }: Omit<PhotoMembership, 'id'>,
+): Promise<Removal | null> {
+  const record = await findOwnedOrThrow(deps, collectionId, ownerId)
+  if (!record.photoIds.includes(photoId)) {
+    return { record, isRemoved: false }
+  }
+  const kept = record.photoIds.filter((inCollection) => inCollection !== photoId)
+  const updated = await deps.repository.setPhotoIds(collectionId, ownerId, record.photoIds, kept)
+  return updated ? { record: updated, isRemoved: true } : null
+}
+
+// A photo that is not in the collection, or no longer exists, changes nothing. One retry: the
+// second read sees the other device's write, or the collection gone (404).
+async function removePhoto(
+  deps: CollectionsServiceDeps,
+  { id, ownerId, ...input }: PhotoMembership,
+): Promise<Collection> {
+  const collectionId = parseCollectionId(id)
+  const photoId = parseMemberPhotoId(input.photoId)
+  const membership = { ownerId, photoId }
+  const removal =
+    (await removeOnce(deps, collectionId, membership)) ??
+    (await removeOnce(deps, collectionId, membership))
+  if (!removal) {
+    // Changed again between the second read and write: a 500, never a silent loss.
+    throw new Error('Collection kept changing while a photo was removed')
+  }
+  if (removal.isRemoved) {
+    deps.logger.info('collection.photo_removed', { collectionId, photoId, userId: ownerId })
+  }
+  return toCollection(deps, removal.record)
+}
+
 export function createCollectionsService(deps: CollectionsServiceDeps): CollectionsService {
   return {
     listCollections: (ownerId) => listCollections(deps, ownerId),
     createCollection: (collection) => createCollection(deps, collection),
     renameCollection: (rename) => renameCollection(deps, rename),
     deleteCollection: (action) => deleteCollection(deps, action),
+    addPhoto: (membership) => addPhoto(deps, membership),
+    removePhoto: (membership) => removePhoto(deps, membership),
   }
 }

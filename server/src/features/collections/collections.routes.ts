@@ -9,5 +9,8 @@ export function createCollectionsRouter(controller: CollectionsController): Rout
   router.post('/', controller.create)
   router.patch('/:id', controller.rename)
   router.delete('/:id', controller.remove)
+  // PUT, not POST: adding the same photo twice leaves the collection as it was.
+  router.put('/:id/photos/:photoId', controller.addPhoto)
+  router.delete('/:id/photos/:photoId', controller.removePhoto)
   return router
 }

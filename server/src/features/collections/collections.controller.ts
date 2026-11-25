@@ -10,7 +10,11 @@ export type CollectionsController = {
   create: (req: Request, res: Response) => Promise<void>
   rename: (req: Request<{ id: string }>, res: Response) => Promise<void>
   remove: (req: Request<{ id: string }>, res: Response) => Promise<void>
+  addPhoto: (req: Request<MembershipParams>, res: Response) => Promise<void>
+  removePhoto: (req: Request<MembershipParams>, res: Response) => Promise<void>
 }
+
+type MembershipParams = { id: string; photoId: string }
 
 type ControllerDeps = { service: CollectionsService; io: SocketServer }
 
@@ -58,6 +62,30 @@ async function remove(
   res.status(204).end()
 }
 
+async function addPhoto(
+  deps: ControllerDeps,
+  req: Request<MembershipParams>,
+  res: Response,
+): Promise<void> {
+  const ownerId = currentUser(req).id
+  const { id, photoId } = req.params
+  const collection = await deps.service.addPhoto({ id, ownerId, photoId })
+  announceChange(deps, ownerId)
+  res.json(collection)
+}
+
+async function removePhoto(
+  deps: ControllerDeps,
+  req: Request<MembershipParams>,
+  res: Response,
+): Promise<void> {
+  const ownerId = currentUser(req).id
+  const { id, photoId } = req.params
+  const collection = await deps.service.removePhoto({ id, ownerId, photoId })
+  announceChange(deps, ownerId)
+  res.json(collection)
+}
+
 export function createCollectionsController(
   service: CollectionsService,
   io: SocketServer,
@@ -68,5 +96,7 @@ export function createCollectionsController(
     create: (req, res) => create(deps, req, res),
     rename: (req, res) => rename(deps, req, res),
     remove: (req, res) => remove(deps, req, res),
+    addPhoto: (req, res) => addPhoto(deps, req, res),
+    removePhoto: (req, res) => removePhoto(deps, req, res),
   }
 }

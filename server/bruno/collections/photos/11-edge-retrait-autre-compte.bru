@@ -1,0 +1,42 @@
+meta {
+  name: Edge - retirer d'une collection d'un autre compte
+  type: http
+  seq: 11
+}
+
+delete {
+  url: {{baseUrl}}/api/collections/{{collectionId}}/photos/{{collectionPhotoId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('collectionId') || !bru.getVar('collectionPhotoId')) {
+    throw new Error('collectionId ou collectionPhotoId absent : lancer toute la collection, collections/create/01 et photos/01 doivent passer')
+  }
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq COLLECTION_NOT_FOUND
+}
+
+script:post-response {
+  const axios = require('axios')
+  // A script request does not get the collection headers: send the cookie itself.
+  const photoIdsOf = async (collectionId) => {
+    const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/collections`, {
+      headers: { Cookie: bru.getVar('inviteeCookie') },
+    })
+    return list.data.collections.find(({ id }) => id === collectionId).photoIds
+  }
+  test('la photo est toujours dans la collection du compte jetable', async () => {
+    expect(await photoIdsOf(bru.getVar('collectionId'))).to.eql([bru.getVar('collectionPhotoId')])
+  })
+}
+
+docs {
+  EDGE → 404 COLLECTION_NOT_FOUND : le membre (cookie par défaut) veut
+  retirer la photo de la collection du compte jetable. La collection n'est
+  pas la sienne : il n'apprend rien, et la photo y reste.
+}

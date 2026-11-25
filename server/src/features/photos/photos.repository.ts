@@ -43,7 +43,7 @@ export type PhotosRepository = {
 
 // isOpened is unset on photos saved before step 9: they count as opened. Prisma's
 // { not: false } would leave them out, it matches only a stored true or null.
-const IS_OPENED = {
+export const IS_OPENED = {
   OR: [{ isOpened: true }, { isOpened: { isSet: false } }],
 } satisfies Prisma.PhotoWhereInput
 

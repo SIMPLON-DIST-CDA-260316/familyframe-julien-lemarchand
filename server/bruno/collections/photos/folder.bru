@@ -1,0 +1,19 @@
+meta {
+  name: photos
+  seq: 4
+}
+
+docs {
+  `PUT /api/collections/:id/photos/:photoId` → 200 avec la collection, la
+  photo à la fin ; `DELETE` sur le même chemin → 200 avec la collection sans
+  la photo. Les deux sont idempotents : ajouter une photo déjà là, ou
+  retirer une photo absente, répond la collection telle quelle. Seule une
+  photo ouverte de la bibliothèque du compte entre dans une collection :
+  inconnue, d'un autre compte ou reçue pas encore ouverte, elle répond 404
+  `PHOTO_NOT_FOUND`.
+
+  Travaille sur la collection `collectionId` (« Noël 2026 » après
+  `rename/`) avec une photo que `01` ajoute à la bibliothèque du compte
+  jetable ; `14` supprime cette photo, `08` la photo reçue pour le test :
+  rien ne reste sur Cloudinary.
+}

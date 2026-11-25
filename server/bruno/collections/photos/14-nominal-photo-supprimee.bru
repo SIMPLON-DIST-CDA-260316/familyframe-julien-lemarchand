@@ -1,0 +1,51 @@
+meta {
+  name: Nominal - photo supprimée de la bibliothèque
+  type: http
+  seq: 14
+}
+
+delete {
+  url: {{baseUrl}}/api/photos/{{collectionPhotoId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const axios = require('axios')
+  if (!bru.getVar('collectionId') || !bru.getVar('collectionPhotoId')) {
+    throw new Error('collectionId ou collectionPhotoId absent : lancer toute la collection, collections/create/01 et photos/01 doivent passer')
+  }
+  const headers = { Cookie: bru.getVar('inviteeCookie') }
+  req.setHeader('Cookie', headers.Cookie)
+  // The photo goes back in the collection, then this request deletes it from the library.
+  await axios.put(
+    `${bru.getEnvVar('baseUrl')}/api/collections/${bru.getVar('collectionId')}/photos/${bru.getVar('collectionPhotoId')}`,
+    null,
+    { headers },
+  )
+}
+
+assert {
+  res.status: eq 204
+}
+
+script:post-response {
+  const axios = require('axios')
+  // A script request does not get the collection headers: send the cookie itself.
+  const photoIdsOf = async (collectionId) => {
+    const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/collections`, {
+      headers: { Cookie: bru.getVar('inviteeCookie') },
+    })
+    return list.data.collections.find(({ id }) => id === collectionId).photoIds
+  }
+  test('la collection ne liste plus la photo supprimée', async () => {
+    expect(await photoIdsOf(bru.getVar('collectionId'))).to.eql([])
+  })
+}
+
+docs {
+  NOMINAL → 204 : le compte jetable supprime de sa bibliothèque une photo
+  rangée dans la collection (le script de départ l'y remet). Le script
+  relit la liste : la collection ne la montre plus. Supprime aussi la
+  photo de `01`.
+}

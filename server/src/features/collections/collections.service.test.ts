@@ -37,6 +37,10 @@ function makeDeps() {
       create: vi.fn<CollectionsRepository['create']>().mockResolvedValue(ETE),
       rename: vi.fn<CollectionsRepository['rename']>().mockResolvedValue(NOEL),
       deleteOwned: vi.fn<CollectionsRepository['deleteOwned']>().mockResolvedValue(NOEL),
+      findOwned: vi.fn<CollectionsRepository['findOwned']>(),
+      hasOpenedPhoto: vi.fn<CollectionsRepository['hasOpenedPhoto']>(),
+      addPhoto: vi.fn<CollectionsRepository['addPhoto']>(),
+      setPhotoIds: vi.fn<CollectionsRepository['setPhotoIds']>(),
     },
     logger: {
       info: vi.fn<Logger['info']>(),
