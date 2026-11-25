@@ -2,10 +2,10 @@
 plan: mobile-first
 status: done
 spec: docs/superpowers/specs/2026-11-25-mobile-first-design.md
-branch: feat/mobile-tabbar (PR A), feat/mobile-touch-targets (PR B), feat/frame-wake-lock (PR C), feat/viewer-chrome (PR D)
+branch: feat/mobile-tabbar (PR A), feat/mobile-touch-targets (PR B), feat/frame-wake-lock (PR C), feat/viewer-chrome (PR D), feat/library-surface (PR E)
 worktree: false
-tasks_total: 15
-tasks_done: 15
+tasks_total: 17
+tasks_done: 17
 current_task: null
 last_commit: null
 last_updated: 2026-11-25
@@ -45,6 +45,7 @@ last_updated: 2026-11-25
 - `chromeClasses(isVisible: boolean): string` (`components/viewer/viewerClasses.ts`).
 - Props added: `ViewerTopBar.isVisible`, `ViewerCaption.isVisible`, `ViewerCarousel.chrome`.
 - CSS: `--tab-bar-height: 4rem` and `--toast-bottom` (`index.css`); the `[data-viewer-controls]` attribute marks the viewer's controls.
+- `useHideOnScrollDown(): HideOnScrollDown` with `HideOnScrollDown = { isHidden: boolean; ref: RefObject<HTMLButtonElement | null>; onFocus: () => void }` (`hooks/useHideOnScrollDown.ts`); `PhotoActionsMenu` prop `theme?: 'dark' | 'app'`.
 - Removed: `COARSE_POINTER_TARGET_CLASSES` (`components/frame/controlClasses.ts`).
 
 ## Stack and branches
@@ -53,6 +54,7 @@ last_updated: 2026-11-25
 - **PR B `feat/mobile-touch-targets`**: Tasks 4 and 5.
 - **PR C `feat/frame-wake-lock`**: Tasks 6 and 6a.
 - **PR D `feat/viewer-chrome`**: Tasks 7 to 7c.
+- **PR E `feat/library-surface`** (after the author's phone test, added on top once PRs A to D were in the repo): Tasks 8 and 9, then this plan's follow-up.
 
 ## Baselines
 
@@ -2571,7 +2573,7 @@ index d15321b..b656f68 100644
 
 **Scope:** `moveFocusOffControls` before a tap hides. Found by the fresh-context review.
 
-**Gate:** `pnpm check` and `pnpm typecheck` green. `pnpm build` and `pnpm test` green at the tip.
+**Gate:** `pnpm check` and `pnpm typecheck` green.
 
 - [x] **Final diff**
 
@@ -2595,10 +2597,369 @@ index b656f68..8c00b8e 100644
 
 ---
 
+## `feat/library-surface`
+
+### Task 8: Library photos on the page surface
+
+**Commit:** `feat(client): library photos on the app's own surface`
+
+**Scope:** `LibrarySection` without `dark` and `bg-frame-background`; list rows on theme tokens; grid tile ⋯ keeps its dark pill (open too); `PhotoActionsMenu` `theme` prop; R-BIB-28 « Remplacée », R-BIB-53, R-APP-34.
+
+**Gate:** `pnpm check` and `pnpm typecheck` green.
+
+- [x] **Final diff**
+
+~~~~diff
+diff --git a/client/src/components/frame/PhotoActionsMenu.tsx b/client/src/components/frame/PhotoActionsMenu.tsx
+index e6b0342..3239b57 100644
+--- a/client/src/components/frame/PhotoActionsMenu.tsx
++++ b/client/src/components/frame/PhotoActionsMenu.tsx
+@@ -17,9 +17,16 @@ import {
+ import { useStartRadio } from '@/hooks/useStartRadio.ts'
+ import type { Photo } from '@/photo.ts'
+ 
++// The frame and the viewer are always dark; the library follows the app's theme.
++type MenuTheme = 'dark' | 'app'
++
++const THEME_CLASSES: Record<MenuTheme, string | undefined> = { dark: 'dark', app: undefined }
++
+ type PhotoActionsMenuProps = {
+   photo: Photo
+   label: string
++  // 'dark' by default: the menu and its dialogs portal to body, outside a dark screen.
++  theme?: MenuTheme
+   className?: string
+   // Items above "Supprimer": the slideshow adds its speed.
+   children?: ReactNode
+@@ -30,6 +37,7 @@ type MenuDialog = { kind: 'share' | 'delete' | 'createCollection'; photo: Photo
+ 
+ type MenuDialogsProps = {
+   dialog: MenuDialog
++  themeClass: string | undefined
+   onClose: () => void
+   triggerRef: RefObject<HTMLButtonElement | null>
+ }
+@@ -54,8 +62,7 @@ function focusOnClose(triggerRef: RefObject<HTMLButtonElement | null>): (event:
+ }
+ 
+ // Outside the menu content: closing the menu must not unmount the dialogs.
+-// `dark`: the sheet and dialogs portal to body, outside the frame's dark <main>.
+-function MenuDialogs({ dialog, onClose, triggerRef }: MenuDialogsProps): JSX.Element {
++function MenuDialogs({ dialog, themeClass, onClose, triggerRef }: MenuDialogsProps): JSX.Element {
+   const addToNewCollection = useAddToNewCollection(dialog?.photo)
+   const focusTrigger = focusOnClose(triggerRef)
+   const photoFor = (kind: NonNullable<MenuDialog>['kind']) =>
+@@ -67,7 +74,7 @@ function MenuDialogs({ dialog, onClose, triggerRef }: MenuDialogsProps): JSX.Ele
+         target={sharedPhoto ? { kind: 'library', photo: sharedPhoto } : null}
+         onClose={onClose}
+         onCloseAutoFocus={focusTrigger}
+-        className="dark"
++        className={themeClass}
+       />
+       <DeletePhotoDialog
+         photo={photoFor('delete')}
+@@ -79,7 +86,7 @@ function MenuDialogs({ dialog, onClose, triggerRef }: MenuDialogsProps): JSX.Ele
+         onClose={onClose}
+         onSaved={addToNewCollection}
+         onCloseAutoFocus={focusTrigger}
+-        className="dark"
++        className={themeClass}
+       />
+     </>
+   )
+@@ -107,15 +114,15 @@ function MenuTrigger({ label, className, triggerRef }: MenuTriggerProps): JSX.El
+ 
+ type MenuItemsProps = {
+   photo: Photo
++  themeClass: string | undefined
+   onOpen: (dialog: MenuDialog) => void
+   children?: ReactNode
+ }
+ 
+-function MenuItems({ photo, onOpen, children }: MenuItemsProps): JSX.Element {
++function MenuItems({ photo, themeClass, onOpen, children }: MenuItemsProps): JSX.Element {
+   const startRadio = useStartRadio()
+   return (
+-    // `dark`: the menu portals to body, outside the frame's dark <main>.
+-    <DropdownMenuContent align="end" className="dark">
++    <DropdownMenuContent align="end" className={themeClass}>
+       {children}
+       <DropdownMenuItem onSelect={() => startRadio(photo.id)}>
+         <RadioIcon />
+@@ -140,21 +147,28 @@ function MenuItems({ photo, onOpen, children }: MenuItemsProps): JSX.Element {
+ export function PhotoActionsMenu({
+   photo,
+   label,
++  theme = 'dark',
+   className,
+   children,
+ }: PhotoActionsMenuProps): JSX.Element {
+   const [dialog, setDialog] = useState<MenuDialog>(null)
+   const triggerRef = useRef<HTMLButtonElement>(null)
++  const themeClass = THEME_CLASSES[theme]
+ 
+   return (
+     <>
+       <DropdownMenu>
+         <MenuTrigger label={label} className={className} triggerRef={triggerRef} />
+-        <MenuItems photo={photo} onOpen={setDialog}>
++        <MenuItems photo={photo} themeClass={themeClass} onOpen={setDialog}>
+           {children}
+         </MenuItems>
+       </DropdownMenu>
+-      <MenuDialogs dialog={dialog} onClose={() => setDialog(null)} triggerRef={triggerRef} />
++      <MenuDialogs
++        dialog={dialog}
++        themeClass={themeClass}
++        onClose={() => setDialog(null)}
++        triggerRef={triggerRef}
++      />
+     </>
+   )
+ }
+diff --git a/client/src/components/frame/PhotoGridTile.tsx b/client/src/components/frame/PhotoGridTile.tsx
+index 4cea2c7..6fc10a2 100644
+--- a/client/src/components/frame/PhotoGridTile.tsx
++++ b/client/src/components/frame/PhotoGridTile.tsx
+@@ -19,7 +19,7 @@ export function PhotoGridTile({ photo, isCurrent, onSelect }: PhotoGridTileProps
+         aria-current={isCurrent}
+         // The viewer focuses this tile when it closes on this photo.
+         data-photo-id={photo.id}
+-        className="group relative block w-full overflow-hidden rounded-xl outline-none ring-offset-4 ring-offset-frame-background focus-visible:ring-3 focus-visible:ring-ring aria-[current=true]:ring-2 aria-[current=true]:ring-frame-accent"
++        className="group relative block w-full overflow-hidden rounded-xl outline-none ring-offset-4 ring-offset-background focus-visible:ring-3 focus-visible:ring-ring aria-[current=true]:ring-2 aria-[current=true]:ring-frame-accent"
+       >
+         <img
+           className="aspect-square w-full object-cover motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover/tile:scale-105"
+@@ -29,10 +29,12 @@ export function PhotoGridTile({ photo, isCurrent, onSelect }: PhotoGridTileProps
+           decoding="async"
+         />
+       </button>
++      {/* A dark pill whatever the theme: it sits on the photo, not on the page. */}
+       <PhotoActionsMenu
+         photo={photo}
+         label={`Actions : ${photoLabel(photo)}`}
+-        className="absolute top-2 right-2 rounded-full bg-black/55 text-white/80 backdrop-blur-sm hover:bg-black/75 hover:text-white dark:hover:bg-black/75"
++        theme="app"
++        className="absolute top-2 right-2 rounded-full bg-black/55 text-white/80 backdrop-blur-sm hover:bg-black/75 hover:text-white aria-expanded:bg-black/75 aria-expanded:text-white dark:hover:bg-black/75"
+       />
+     </li>
+   )
+diff --git a/client/src/components/frame/PhotoListRow.tsx b/client/src/components/frame/PhotoListRow.tsx
+index 0a8ef66..d4d48d4 100644
+--- a/client/src/components/frame/PhotoListRow.tsx
++++ b/client/src/components/frame/PhotoListRow.tsx
+@@ -25,7 +25,7 @@ export function PhotoListRow({ photo, isCurrent, onSelect }: PhotoListRowProps):
+         aria-current={isCurrent}
+         // The viewer focuses this row when it closes on this photo.
+         data-photo-id={photo.id}
+-        className="flex w-full items-center gap-4 rounded-xl p-2 pr-14 text-left outline-none hover:bg-white/5 focus-visible:ring-3 focus-visible:ring-ring aria-[current=true]:ring-2 aria-[current=true]:ring-frame-accent"
++        className="flex w-full items-center gap-4 rounded-xl p-2 pr-14 text-left outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring aria-[current=true]:ring-2 aria-[current=true]:ring-frame-accent"
+       >
+         <img
+           className="size-14 shrink-0 rounded-lg object-cover"
+@@ -39,14 +39,17 @@ export function PhotoListRow({ photo, isCurrent, onSelect }: PhotoListRowProps):
+             {ROW_DATE_FORMAT.format(new Date(photo.createdAt))}
+           </time>
+           {photo.senderName !== null && (
+-            <span className="truncate text-sm text-white/70">Envoyée par {photo.senderName}</span>
++            <span className="truncate text-sm text-muted-foreground">
++              Envoyée par {photo.senderName}
++            </span>
+           )}
+         </span>
+       </button>
+       <PhotoActionsMenu
+         photo={photo}
+         label={`Actions : ${photoLabel(photo)}`}
+-        className="absolute top-1/2 right-3 -translate-y-1/2 rounded-full text-white/80"
++        theme="app"
++        className="absolute top-1/2 right-3 -translate-y-1/2 rounded-full text-muted-foreground"
+       />
+     </li>
+   )
+diff --git a/client/src/components/library/LibrarySection.tsx b/client/src/components/library/LibrarySection.tsx
+index ba5d3f3..92c5364 100644
+--- a/client/src/components/library/LibrarySection.tsx
++++ b/client/src/components/library/LibrarySection.tsx
+@@ -47,8 +47,8 @@ export function LibrarySection(props: LibrarySectionProps): JSX.Element {
+   const { hasMore, isLoadingMore, loadMore } = props.library
+ 
+   return (
+-    // `dark` and the frame background: the frame's components look as designed.
+-    <section aria-label="Photos" className="dark rounded-2xl bg-frame-background text-foreground">
++    // The page's own surface: the library follows the app's theme; only the frame is always dark.
++    <section aria-label="Photos">
+       <LibraryPhotos {...props} />
+       {hasMore && <LoadMoreButton isLoadingMore={isLoadingMore} loadMore={loadMore} />}
+     </section>
+diff --git a/docs/produit/apparence-et-navigation.md b/docs/produit/apparence-et-navigation.md
+index 4206eb6..6b2880a 100644
+--- a/docs/produit/apparence-et-navigation.md
++++ b/docs/produit/apparence-et-navigation.md
+@@ -75,7 +75,7 @@ Le menu à trois traits a laissé sa place à la barre d'onglets (R-APP-60) et a
+ 2. R-APP-31 · En « Système », un changement de réglage de l'appareil (passage automatique en sombre le soir, par exemple) s'applique aussitôt, sans recharger.
+ 3. R-APP-32 · Le choix s'applique immédiatement à toute l'application.
+ 4. R-APP-33 · Le choix est retenu sur cet appareil et dans ce navigateur seulement : il ne suit pas le compte sur ses autres appareils. Si l'appareil ne permet pas de le retenir (navigation privée, par exemple), le choix vaut jusqu'à la fermeture de la page, puis l'application revient à « Système ».
+-5. R-APP-34 · Le cadre et les photos de la bibliothèque restent toujours sur fond sombre, quel que soit le thème (R-CAD-02, R-BIB-28).
++5. R-APP-34 · Le cadre et une photo ouverte en grand restent toujours sur fond sombre, quel que soit le thème (R-CAD-02). Les photos de la bibliothèque, elles, suivent le thème (R-BIB-53).
+ 
+ **Messages affichés**
+ 
+diff --git a/docs/produit/bibliotheque.md b/docs/produit/bibliotheque.md
+index 13704ac..bbee259 100644
+--- a/docs/produit/bibliotheque.md
++++ b/docs/produit/bibliotheque.md
+@@ -78,7 +78,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
+ 6. R-BIB-25 · Cliquer sur une photo l'ouvre en grand dans l'application.
+ 7. R-BIB-26 · Remplacée : une photo reçue n'apparaît plus dès son arrivée, mais une fois découverte (R-BIB-42).
+ 8. R-BIB-27 · Après une coupure de réseau, la bibliothèque se recharge seule depuis le début dès que la connexion revient, pour rattraper ce qui a changé entre-temps, sans revenir aux 30 premières photos.
+-9. R-BIB-28 · Les photos de la bibliothèque sont toujours sur fond sombre, quel que soit le thème choisi, pour présenter les photos comme sur le cadre.
++9. R-BIB-28 · Remplacée : les photos de la bibliothèque suivent désormais le thème choisi (R-BIB-53). Elles étaient toujours sur fond sombre, comme sur le cadre.
+ 10. R-BIB-29 · Remplacée : la carte « Vos proches » a quitté la bibliothèque (R-BIB-45).
+ 11. R-BIB-36 · La photo affiche sa date, et « Envoyée par » suivi du nom quand elle a été reçue.
+ 12. R-BIB-37 · Un compteur indique la position de la photo (« 3 / 42 ») ; « 30+ » signifie que d'autres photos plus anciennes ne sont pas encore chargées.
+@@ -93,7 +93,8 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
+ 21. R-BIB-50 · À la souris, les boutons, le compteur, la légende et les flèches apparaissent dès que la souris bouge et s'effacent après 3 secondes sans mouvement. Ils restent tant que la souris est sur un bouton ou qu'un menu ou une fenêtre est ouvert (menu « … », « Envoyer à des proches », « Supprimer cette photo ? »). Cliquer sur la photo ne les efface pas.
+ 22. R-BIB-51 · Au clavier, les flèches gauche et droite changent de photo sans faire revenir les boutons ; la touche Tab les fait revenir et passe d'un bouton à l'autre. Ils restent tant que l'un d'eux est choisi au clavier. Effacés, ils ne peuvent pas être choisis.
+ 23. R-BIB-52 · Les boutons apparaissent et s'effacent en fondu ; si l'appareil demande de réduire les animations, ils apparaissent et disparaissent d'un coup.
+-24. R-BIB-42 · La bibliothèque se met à jour seule, sans recharger la page : une photo ajoutée depuis un autre appareil apparaît en tête, une photo reçue y entre à sa date de réception dès qu'elle est découverte (sur cet appareil ou un autre), une photo supprimée disparaît.
++24. R-BIB-53 · Les photos de la bibliothèque, en miniatures comme en liste, s'affichent sur le fond de la page et suivent le thème choisi, clair ou sombre, comme le reste de l'application ; leur menu « … » et les fenêtres qu'il ouvre aussi. Seul le cadre, et une photo ouverte en grand, restent toujours sombres. Sur une miniature, le bouton « … » reste un rond sombre, posé sur la photo.
++25. R-BIB-42 · La bibliothèque se met à jour seule, sans recharger la page : une photo ajoutée depuis un autre appareil apparaît en tête, une photo reçue y entre à sa date de réception dès qu'elle est découverte (sur cet appareil ou un autre), une photo supprimée disparaît.
+ 
+ **Messages affichés**
+ 
+~~~~
+
+### Task 9: Add button steps aside while scrolling down
+
+**Commit:** `feat(client): add button steps aside while scrolling down`
+
+**Scope:** `useHideOnScrollDown`; `AddPhotoFab` hides and returns, ring of page colour; R-BIB-48 amended.
+
+**Gate:** `pnpm check` and `pnpm typecheck` green. `pnpm build` and `pnpm test` green at the tip.
+
+- [x] **Final diff**
+
+~~~~diff
+diff --git a/client/src/components/library/AddPhotoFab.tsx b/client/src/components/library/AddPhotoFab.tsx
+index 189b9e3..535ab5b 100644
+--- a/client/src/components/library/AddPhotoFab.tsx
++++ b/client/src/components/library/AddPhotoFab.tsx
+@@ -1,20 +1,34 @@
+ import { PlusIcon } from 'lucide-react'
+ import type { JSX } from 'react'
+ import { Button } from '@/components/ui/button.tsx'
++import { useHideOnScrollDown } from '@/hooks/useHideOnScrollDown.ts'
++import { cn } from '@/lib/utils.ts'
++
++// pointer-coarse:size-14 beats the Button's coarse h-11. The ring of page colour keeps the
++// button apart from a photo under it, in either theme.
++const FAB_CLASSES =
++  'fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[calc(var(--tab-bar-height)_+_env(safe-area-inset-bottom)_+_1rem)] z-20 size-14 rounded-full pointer-coarse:size-14 shadow-lg ring-2 ring-background transition-[translate,opacity] duration-200 ease-out motion-reduce:transition-none md:hidden'
++
++// Slides below the screen edge; with reduced motion it only disappears. Still focusable: the
++// keyboard reaching it brings it back.
++const HIDDEN_CLASSES = 'pointer-events-none translate-y-24 opacity-0 motion-reduce:translate-y-0'
+ 
+ type AddPhotoFabProps = {
+   onAdd: () => void
+ }
+ 
+ // A phone's « Ajouter », where the thumb rests: bottom right, above the tab bar and the home bar.
+-// A computer keeps the button in the header. pointer-coarse:size-14 beats the Button's coarse h-11.
++// A computer keeps the button in the header.
+ export function AddPhotoFab({ onAdd }: AddPhotoFabProps): JSX.Element {
++  const { isHidden, ref, onFocus } = useHideOnScrollDown()
+   return (
+     <Button
++      ref={ref}
+       onClick={onAdd}
++      onFocus={onFocus}
+       aria-label="Ajouter une photo"
+       title="Ajouter une photo"
+-      className="fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[calc(var(--tab-bar-height)_+_env(safe-area-inset-bottom)_+_1rem)] z-20 size-14 rounded-full pointer-coarse:size-14 shadow-lg md:hidden"
++      className={cn(FAB_CLASSES, isHidden && HIDDEN_CLASSES)}
+     >
+       <PlusIcon aria-hidden className="size-6" />
+     </Button>
+diff --git a/client/src/hooks/useHideOnScrollDown.ts b/client/src/hooks/useHideOnScrollDown.ts
+new file mode 100644
+index 0000000..f354a8a
+--- /dev/null
++++ b/client/src/hooks/useHideOnScrollDown.ts
+@@ -0,0 +1,50 @@
++import { type RefObject, useEffect, useRef, useState } from 'react'
++
++// Smaller moves are a finger resting on the screen, not a scroll: the button would flicker.
++const SCROLL_THRESHOLD_PX = 12
++// At the end of the list the page's bottom padding keeps the button clear of the last row.
++const END_MARGIN_PX = 48
++
++export type HideOnScrollDown = {
++  isHidden: boolean
++  ref: RefObject<HTMLButtonElement | null>
++  onFocus: () => void
++}
++
++function isAtPageEnd(): boolean {
++  const scrolledTo = window.innerHeight + window.scrollY
++  return scrolledTo >= document.documentElement.scrollHeight - END_MARGIN_PX
++}
++
++// Keyboard focus keeps the button shown. Focus left by a tap or a closing panel is dropped
++// instead: a hidden button must not hold it.
++function keepsKeyboardFocus(button: HTMLButtonElement | null): boolean {
++  if (button === null || document.activeElement !== button) return false
++  if (button.matches(':focus-visible')) return true
++  button.blur()
++  return false
++}
++
++// A floating button covers what scrolls under it: it steps aside while the page goes down and
++// comes back when it goes up, at the top, at the end, or when the keyboard reaches it.
++export function useHideOnScrollDown(): HideOnScrollDown {
++  const [isHidden, setIsHidden] = useState(false)
++  const ref = useRef<HTMLButtonElement>(null)
++
++  useEffect(() => {
++    let lastY = window.scrollY
++    function handleScroll(): void {
++      const y = window.scrollY
++      if (Math.abs(y - lastY) < SCROLL_THRESHOLD_PX) return
++      const isGoingDown = y > lastY
++      lastY = y
++      // y <= 0: the top, iOS bounces below it.
++      if (!isGoingDown || y <= 0 || isAtPageEnd()) setIsHidden(false)
++      else if (!keepsKeyboardFocus(ref.current)) setIsHidden(true)
++    }
++    window.addEventListener('scroll', handleScroll, { passive: true })
++    return () => window.removeEventListener('scroll', handleScroll)
++  }, [])
++
++  return { isHidden, ref, onFocus: () => setIsHidden(false) }
++}
+diff --git a/docs/produit/bibliotheque.md b/docs/produit/bibliotheque.md
+index bbee259..0ff278f 100644
+--- a/docs/produit/bibliotheque.md
++++ b/docs/produit/bibliotheque.md
+@@ -28,7 +28,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
+ 13. R-BIB-12 · Après un ajout réussi, le panneau se ferme, un message de réussite s'affiche, et la photo apparaît en tête de la bibliothèque et sur le cadre qui lit toute la bibliothèque, sur tous les appareils connectés au compte, sans recharger la page. Ajoutée pendant qu'une collection est affichée, elle est aussi rangée dans cette collection (R-COL-21).
+ 14. R-BIB-13 · Après un échec, la photo reste choisie dans le panneau et un message explique la raison.
+ 15. R-BIB-44 · Fermer le panneau sans rien envoyer abandonne la photo choisie : il s'ouvre vide la fois suivante.
+-16. R-BIB-48 · Sur un téléphone, « Ajouter » est un bouton rond « + » qui reste en bas à droite de l'écran, au-dessus de la barre d'onglets, pendant que l'on fait défiler les photos ; il n'apparaît que sur la bibliothèque. L'en-tête n'y montre plus « Ajouter » ni « Mode cadre » : le cadre s'ouvre avec l'onglet « Cadre » (R-APP-64). La fin de la page reste visible au-dessus du bouton.
++16. R-BIB-48 · Sur un téléphone, « Ajouter » est un bouton rond « + » en bas à droite de l'écran, au-dessus de la barre d'onglets, bien visible en thème clair comme sombre ; il n'apparaît que sur la bibliothèque. Il s'efface pendant que l'on fait défiler les photos vers le bas, pour ne pas cacher leurs boutons « … », et revient dès que l'on remonte, en haut de la page ou à la fin de la liste. Au clavier, il revient quand on l'atteint ; effacé, il ne garde pas la sélection. Si l'appareil demande de réduire les animations, il disparaît et revient sans glisser. L'en-tête n'y montre plus « Ajouter » ni « Mode cadre » : le cadre s'ouvre avec l'onglet « Cadre » (R-APP-64). La fin de la page reste visible au-dessus du bouton.
+ 
+ **Messages affichés**
+ 
+~~~~
+
+---
+
 ## Final verification (controller)
 
 - Chrome, desktop (≥ 768 px): top bar unchanged (links, avatar menu without « Invitations »), header « Ajouter » and « Mode cadre », no tab bar, no floating button, toasts bottom right as before, mouse sizes unchanged; viewer: controls fade after 3 s still, return on movement, stay while hovering a button or with the « … » menu open, Tab brings them back.
 - Chrome, 360 px phone viewport (a same-origin iframe, or device mode with touch): tab bar on `/`, `/friends`, `/settings`, `/admin/invitations`, absent on `/frame`, `/login`, `/invite/…`, the 404; active tab marked; « Cadre » opens the frame; « + » opens the add panel; nothing hidden behind the bar or the button; no horizontal scroll; toasts above the bar (also at 700 px wide); 44 px controls in device mode (coarse pointer).
+- Library surface (PR E): light and dark themes, grid and list, the page background under the photos, readable rows and dates, the tile's ⋯ pill dark on the photo (also while its menu is open), its menu and dialogs in the app's theme; at 360 px the « + » hides while scrolling down, returns on the way up and at the end, Tab reaches it when hidden; desktop unchanged apart from the panel colour.
 - Real phone (the author): safe areas around the notch and the home bar, tap and swipe in the viewer, the screen staying awake on the frame, the browser bar colour.
 
 ## Drift Log
@@ -2618,3 +2979,8 @@ index b656f68..8c00b8e 100644
   - Task 7c: hiding by tap did not move focus off the controls, unlike the timer.
   - Checked by the reviewer and found fine: no primitive variant shrinks or distorts a component; routes per D2; Embla swallows the click that ends a swipe; wake lock races and StrictMode double mount; Tab un-inerts before focus moves; the hidden desktop « Invitations » item is skipped by keyboard navigation.
 - **Gates after the rebase:** `pnpm check` and `pnpm typecheck` green on each of the 16 commits; at the tip `pnpm build` green and `pnpm test` → `Test Files  25 passed (25)`, `Tests  301 passed (301)`.
+- **PR E, library surface** (the author's phone test: « Le fond noir de la liste photo, aucune bonne raison d'avoir ce style »; the black « + » nearly vanished on the black panel and covered the rows' ⋯). Relayed by the controller after PRs A to D were cherry-picked into the repo, so those 16 commits stay as they are and PR E goes on top:
+  - Task 8: the panel drops `dark` and `bg-frame-background`. `PhotoActionsMenu` forced `dark` on its menu and dialogs, which portal to `body`; on the library they now follow the theme through a `theme` prop (`'dark'` by default for the frame and the viewer, `'app'` for the library). The tile's ⋯ needed `aria-expanded:bg-black/75`: the ghost variant's `aria-expanded:bg-muted` would turn the open pill light under white icons in the light theme. Pending tiles do not exist on this stack (step 14). R-BIB-28 « Remplacée », R-BIB-53 new, R-APP-34 amended.
+  - Task 9: "hidden must not keep focus" and "focusing it shows it" are met together. The hidden button stays focusable (no `inert`); keyboard focus (`:focus-visible`) keeps it shown; any other focus (a tap, or a panel returning focus to it) is dropped before it hides. Spec D21.
+  - Layout: the photo grid and list keep their padding, so desktop only loses the panel colour. At 360 px nothing gets wider.
+- **Gates for PR E:** `pnpm check` and `pnpm typecheck` green on each commit; at the tip `pnpm build` green and `pnpm test` → `Test Files  25 passed (25)`, `Tests  301 passed (301)`.
