@@ -68,7 +68,7 @@ Comment on se déplace dans l'application, comment on choisit son thème, et les
 4. R-APP-63 · « Compte » ouvre la page « Préférences » (voir [preferences.md](preferences.md)). Le thème et « Se déconnecter » restent dans le menu du compte (rond de profil, en haut à droite).
 5. R-APP-64 · « Cadre » ouvre le cadre en plein écran, comme « Mode cadre » (R-CAD-58). Ouvert depuis la bibliothèque, quitter le cadre ramène à cette bibliothèque.
 6. R-APP-65 · La barre d'onglets reste en bas de l'écran quand on fait défiler la page, et la fin de chaque page reste visible au-dessus d'elle.
-7. R-APP-66 · Sur un téléphone, les courtes notifications (R-APP-53) s'affichent au-dessus de la barre d'onglets, sans la cacher.
+7. R-APP-66 · Tant que la barre d'onglets est affichée (écran étroit), les courtes notifications (R-APP-53) s'affichent au-dessus d'elle, sans la cacher, quelle que soit la largeur de l'écran.
 
 **Messages affichés**
 

@@ -17,8 +17,9 @@ const THEME_TOKENS: React.CSSProperties & Record<`--${string}`, string> = {
   '--border-radius': 'var(--radius)',
 }
 
-// On a phone, toasts rise above the tab bar and the home bar instead of covering them.
-const MOBILE_OFFSET = { bottom: 'calc(var(--tab-bar-height) + env(safe-area-inset-bottom) + 16px)' }
+// Sonner switches to its mobile offset only up to 600 px, the tab bar shows up to md: both
+// offsets read --toast-bottom, which index.css sets per width.
+const TOAST_OFFSET = { bottom: 'var(--toast-bottom)' }
 
 function Toaster({ ...props }: ToasterProps) {
   const theme = useAppliedTheme()
@@ -35,7 +36,8 @@ function Toaster({ ...props }: ToasterProps) {
         loading: <Loader2Icon className="size-4 animate-spin" />,
       }}
       style={THEME_TOKENS}
-      mobileOffset={MOBILE_OFFSET}
+      offset={TOAST_OFFSET}
+      mobileOffset={TOAST_OFFSET}
       {...props}
     />
   )

@@ -10,6 +10,8 @@
   color-scheme: light;
   /* One height for the phone's tab bar, the room the pages leave for it, and what floats above it. */
   --tab-bar-height: 4rem;
+  /* Toasts rise above the tab bar and the home bar while the bar shows (below md). */
+  --toast-bottom: calc(var(--tab-bar-height) + env(safe-area-inset-bottom) + 16px);
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -108,6 +110,13 @@
     to {
       transform: scale(1.06);
     }
+  }
+}
+
+/* md and up: no tab bar, Sonner's own desktop offset. */
+@media (width >= 48rem) {
+  :root {
+    --toast-bottom: 24px;
   }
 }
 
