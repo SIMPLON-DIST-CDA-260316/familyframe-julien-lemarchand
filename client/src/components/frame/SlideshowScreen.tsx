@@ -40,6 +40,7 @@ export function SlideshowScreen({
       <PhotoView
         photos={photos}
         currentId={currentPhoto.id}
+        template={settings.template}
         // The slideshow waits while someone is using the frame.
         autoAdvanceMs={settings.isPlaying && !isActive ? settings.intervalMs : null}
         onCurrentChange={selection.selectPhoto}
