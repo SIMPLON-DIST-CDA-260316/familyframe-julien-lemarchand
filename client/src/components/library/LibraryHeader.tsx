@@ -14,6 +14,8 @@ type LibraryHeaderProps = {
   layout: LibraryLayout
   onLayoutChange: (layout: LibraryLayout) => void
   onAdd: () => void
+  // false over a collection that cannot be shown: its photos, if any were loaded, are stale.
+  showsCount: boolean
 }
 
 function FrameModeButton(): JSX.Element {
@@ -38,6 +40,7 @@ export function LibraryHeader({
   layout,
   onLayoutChange,
   onAdd,
+  showsCount,
 }: LibraryHeaderProps): JSX.Element {
   return (
     // Wraps on a phone: the actions go under the title there.
@@ -45,7 +48,9 @@ export function LibraryHeader({
       <div className="flex min-w-0 flex-col">
         <h1 className="text-2xl font-semibold tracking-tight">Bibliothèque</h1>
         <p className="min-h-5 text-sm text-muted-foreground">
-          {library.isFirstPageLoaded && libraryCountLabel(library.photos.length, library.hasMore)}
+          {showsCount &&
+            library.isFirstPageLoaded &&
+            libraryCountLabel(library.photos.length, library.hasMore)}
         </p>
       </div>
       <div className="ml-auto flex flex-wrap items-center justify-end gap-2">

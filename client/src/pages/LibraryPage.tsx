@@ -65,7 +65,13 @@ function LibraryContent(props: LibraryContentProps): JSX.Element {
   const { selected, library, onAdd, allChipRef } = props
   return (
     <>
-      <LibraryHeader library={library} layout={layout} onLayoutChange={setLayout} onAdd={onAdd} />
+      <LibraryHeader
+        library={library}
+        layout={layout}
+        onLayoutChange={setLayout}
+        onAdd={onAdd}
+        showsCount={isShowingPhotos(selected)}
+      />
       {/* Above the photos: news from the family comes first. */}
       <LibraryMail />
       <CollectionChips selectedId={selectedCollectionId(selected)} allChipRef={allChipRef} />
