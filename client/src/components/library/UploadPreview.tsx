@@ -30,9 +30,10 @@ function PreviewGrid({ files }: { files: File[] }): JSX.Element {
   return (
     <figure className="flex flex-col gap-2">
       <ul className="grid max-h-[35svh] grid-cols-4 gap-1.5 overflow-y-auto sm:grid-cols-5">
-        {files.map((file) => (
-          // A picker never returns the same file twice; two albums may hold the same name.
-          <PreviewThumbnail key={`${file.name}-${file.size}-${file.lastModified}`} file={file} />
+        {files.map((file, index) => (
+          // Name, size and date were not a key: two copies of one photo share them.
+          // biome-ignore lint/suspicious/noArrayIndexKey: a new choice replaces the whole list, never reorders it.
+          <PreviewThumbnail key={index} file={file} />
         ))}
       </ul>
       <figcaption className="text-sm text-muted-foreground">
