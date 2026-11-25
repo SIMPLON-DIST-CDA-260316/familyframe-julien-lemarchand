@@ -45,6 +45,10 @@ describe('dayOf', () => {
     expect(dayOf(new Date('2026-11-25T23:00:00Z'))).toBe('2026-11-26')
   })
 
+  it('pads the month and the day: days compare as plain strings', () => {
+    expect(dayOf(new Date('2026-01-05T10:00:00Z'))).toBe('2026-01-05')
+  })
+
   it('follows summer time', () => {
     expect(dayOf(new Date('2026-07-01T22:00:00Z'))).toBe('2026-07-02')
   })

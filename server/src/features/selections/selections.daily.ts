@@ -7,16 +7,28 @@ export const DAILY_SELECTION_SIZE = 20
 // A family frame lives in one home: the day changes at midnight in France, not in UTC.
 const FAMILY_TIME_ZONE = 'Europe/Paris'
 
-// en-CA writes YYYY-MM-DD: two days compare in calendar order as plain strings.
-const DAY_FORMAT = new Intl.DateTimeFormat('en-CA', {
+const DAY_FORMAT = new Intl.DateTimeFormat('en-US', {
   timeZone: FAMILY_TIME_ZONE,
   year: 'numeric',
   month: '2-digit',
   day: '2-digit',
 })
 
+type DayPart = 'year' | 'month' | 'day'
+
+function partOf(parts: Intl.DateTimeFormatPart[], type: DayPart): string {
+  const value = parts.find((part) => part.type === type)?.value
+  if (value === undefined) {
+    throw new Error(`Intl.DateTimeFormat gave no ${type}`)
+  }
+  return value
+}
+
+// YYYY-MM-DD, built from the parts rather than a locale's whole format, which ICU data may change:
+// two days compare in calendar order as plain strings.
 export function dayOf(date: Date): string {
-  return DAY_FORMAT.format(date)
+  const parts = DAY_FORMAT.formatToParts(date)
+  return `${partOf(parts, 'year')}-${partOf(parts, 'month')}-${partOf(parts, 'day')}`
 }
 
 // A hash, not Math.random: the same seed and photo always get the same rank, so every device and
