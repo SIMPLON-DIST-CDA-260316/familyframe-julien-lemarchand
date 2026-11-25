@@ -1,0 +1,29 @@
+meta {
+  name: Nominal - photo déjà ouverte
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/photos/{{sharedPhotoId}}/open
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('sharedPhotoId') || !bru.getVar('adminCookie')) {
+    throw new Error('sharedPhotoId ou adminCookie absent : lancer toute la collection, photos/share/02 doit passer')
+  }
+  req.setHeader('Cookie', bru.getVar('adminCookie'))
+}
+
+assert {
+  res.status: eq 200
+  res.body.id: eq {{sharedPhotoId}}
+}
+
+docs {
+  NOMINAL → 200 : ouvrir une deuxième fois ne change rien et renvoie la
+  photo. Deux appareils de l'admin peuvent l'ouvrir en même temps sans
+  erreur.
+}

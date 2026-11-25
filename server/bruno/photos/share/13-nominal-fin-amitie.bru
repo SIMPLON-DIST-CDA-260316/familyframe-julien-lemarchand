@@ -22,8 +22,8 @@ assert {
 
 script:post-response {
   const axios = require('axios')
-  test('les deux photos reçues restent dans la bibliothèque de l\'admin', async () => {
-    const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/photos`, {
+  test('les deux photos reçues attendent toujours l\'admin', async () => {
+    const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/photos/unopened`, {
       headers: { Cookie: bru.getVar('adminCookie') },
     })
     const ids = list.data.photos.map(({ id }) => id)
@@ -34,6 +34,7 @@ script:post-response {
 
 docs {
   NOMINAL → 204 : le membre retire l'admin de ses amis (l'amitié de `02`).
-  Le script vérifie que les deux photos reçues (`02` et `08`) restent chez
-  l'admin : ce sont ses photos, rien ne part en cascade.
+  Le script vérifie que les deux photos reçues (`02` et `08`) attendent
+  toujours l'admin, non ouvertes : ce sont ses photos, rien ne part en
+  cascade.
 }

@@ -15,6 +15,7 @@ const ORIGINAL: StoredPhoto = {
   ...IMAGE,
   sha256: 'sha-of-the-original-bytes',
   message: 'Le message reçu avec la photo',
+  isOpened: true,
   createdAt: new Date('2026-11-23T10:00:00Z'),
 }
 const COPY: PhotoRecord = {
@@ -24,6 +25,7 @@ const COPY: PhotoRecord = {
   senderId: SENDER_ID,
   sender: { displayName: 'Membre' },
   message: 'Joyeux anniversaire !',
+  isOpened: false,
 }
 const PNG_FILE: UploadedFile = { buffer: Buffer.from('raw png'), mimetype: 'image/png' }
 const NOT_TEXT_MESSAGES: unknown[] = [42, ['un', 'deux'], { text: 'bonjour' }]
@@ -39,6 +41,8 @@ function makeDeps() {
       findOwned: vi.fn<PhotosRepository['findOwned']>().mockResolvedValue(ORIGINAL),
       create: vi.fn<PhotosRepository['create']>().mockResolvedValue(COPY),
       deleteOwned: vi.fn<PhotosRepository['deleteOwned']>(),
+      openOwned: vi.fn<PhotosRepository['openOwned']>(),
+      findUnopened: vi.fn<PhotosRepository['findUnopened']>(),
       countByCloudinaryId: vi.fn<PhotosRepository['countByCloudinaryId']>(),
     },
     toFrameJpeg: vi.fn<PhotosServiceDeps['toFrameJpeg']>().mockResolvedValue(Buffer.from('jpeg')),

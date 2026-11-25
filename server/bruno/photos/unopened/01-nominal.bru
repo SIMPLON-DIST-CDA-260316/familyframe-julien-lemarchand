@@ -1,0 +1,59 @@
+meta {
+  name: Nominal - photos reçues pas encore ouvertes
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/photos/unopened
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('sharedPhotoId') || !bru.getVar('deviceSharedPhotoId') || !bru.getVar('adminCookie')) {
+    throw new Error('sharedPhotoId, deviceSharedPhotoId ou adminCookie absent : lancer toute la collection, photos/share/02 et 08 doivent passer')
+  }
+  // The photos were sent to the admin.
+  req.setHeader('Cookie', bru.getVar('adminCookie'))
+}
+
+assert {
+  res.status: eq 200
+  res.body.photos: isArray
+}
+
+script:post-response {
+  const axios = require('axios')
+  const { photos } = res.body
+  test('les deux photos reçues dans share/ attendent, avec leur message', () => {
+    const shared = photos.find(({ id }) => id === bru.getVar('sharedPhotoId'))
+    const deviceShared = photos.find(({ id }) => id === bru.getVar('deviceSharedPhotoId'))
+    expect(shared?.message).to.equal('Joyeux anniversaire !')
+    expect(deviceShared?.message).to.equal(null)
+  })
+  test('la plus récente en premier (ids décroissants)', () => {
+    const ids = photos.map(({ id }) => id)
+    expect(ids).to.eql([...ids].sort().reverse())
+  })
+  test('chaque photo vient d\'un ami', () => {
+    for (const photo of photos) {
+      expect(photo.senderName).to.be.a('string')
+    }
+  })
+  test('elles n\'attendent pas le membre qui les a envoyées', async () => {
+    const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/photos/unopened`, {
+      headers: { Cookie: bru.getVar('sessionCookie') },
+    })
+    const ids = list.data.photos.map(({ id }) => id)
+    expect(ids).to.not.include(bru.getVar('sharedPhotoId'))
+    expect(ids).to.not.include(bru.getVar('deviceSharedPhotoId'))
+  })
+}
+
+docs {
+  NOMINAL → 200 : l'admin lit ses photos en attente. Celles de `share/02`
+  (avec « Joyeux anniversaire ! ») et de `share/08` (sans message) y sont,
+  la plus récente en premier, chacune avec le nom de l'ami qui l'a envoyée.
+  La liste du membre, qui les a envoyées, ne les contient pas.
+}

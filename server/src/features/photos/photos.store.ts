@@ -86,5 +86,7 @@ export async function storeNewPhoto(
   const jpeg = await convertToFrameJpeg(deps, buffer)
   // Cloudinary and database failures are ours: they stay 500s.
   const image = await deps.uploadImage(jpeg)
-  return saveRecord(deps, { ownerId, senderId, message, ...image, sha256 })
+  // A photo one adds oneself is already seen; one a friend sends waits to be opened.
+  const isOpened = senderId === undefined
+  return saveRecord(deps, { ownerId, senderId, message, isOpened, ...image, sha256 })
 }

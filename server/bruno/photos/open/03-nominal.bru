@@ -1,0 +1,51 @@
+meta {
+  name: Nominal - ouvrir une photo reçue
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/photos/{{sharedPhotoId}}/open
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('sharedPhotoId') || !bru.getVar('adminCookie')) {
+    throw new Error('sharedPhotoId ou adminCookie absent : lancer toute la collection, photos/share/02 doit passer')
+  }
+  // The received photo is the admin's.
+  req.setHeader('Cookie', bru.getVar('adminCookie'))
+}
+
+assert {
+  res.status: eq 200
+  res.body.id: eq {{sharedPhotoId}}
+  res.body.senderName: eq {{memberDisplayName}}
+  res.body.message: eq Joyeux anniversaire !
+}
+
+script:post-response {
+  const axios = require('axios')
+  const idsOf = async (path) => {
+    const list = await axios.get(`${bru.getEnvVar('baseUrl')}${path}`, {
+      headers: { Cookie: bru.getVar('adminCookie') },
+    })
+    return list.data.photos.map(({ id }) => id)
+  }
+  test('la photo rejoint la bibliothèque de l\'admin', async () => {
+    expect(await idsOf('/api/photos')).to.include(bru.getVar('sharedPhotoId'))
+  })
+  test('elle n\'attend plus, la photo de l\'appareil attend toujours', async () => {
+    const unopenedIds = await idsOf('/api/photos/unopened')
+    expect(unopenedIds).to.not.include(bru.getVar('sharedPhotoId'))
+    expect(unopenedIds).to.include(bru.getVar('deviceSharedPhotoId'))
+  })
+}
+
+docs {
+  NOMINAL → 200 avec la photo ouverte, son expéditeur et son message.
+  Le script vérifie qu'elle est maintenant dans la bibliothèque de l'admin,
+  plus dans ses photos en attente, et que l'autre photo reçue (`share/08`)
+  attend toujours.
+}

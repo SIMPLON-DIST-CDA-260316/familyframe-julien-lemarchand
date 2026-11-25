@@ -75,8 +75,15 @@ export async function shareFromLibrary(
   const { id, url, cloudinaryId, sha256 } = await findOwnedPhoto(deps, validPhotoId, senderId)
   await rejectKnownFile(deps, recipientId, sha256)
   // The copy carries this sender's message, never the one the original came with.
-  const copy = { ownerId: recipientId, senderId, message: validMessage, url, cloudinaryId, sha256 }
-  const record = await saveCopy(deps, copy)
+  const record = await saveCopy(deps, {
+    ownerId: recipientId,
+    senderId,
+    message: validMessage,
+    isOpened: false,
+    url,
+    cloudinaryId,
+    sha256,
+  })
   deps.logger.info('photo.shared', {
     photoId: record.id,
     sourcePhotoId: id,

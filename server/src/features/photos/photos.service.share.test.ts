@@ -13,6 +13,7 @@ const ORIGINAL: StoredPhoto = {
   ownerId: SENDER_ID,
   senderId: null,
   message: null,
+  isOpened: true,
   ...IMAGE,
   sha256: 'sha-of-the-original-bytes',
   createdAt: new Date('2026-11-23T10:00:00Z'),
@@ -23,6 +24,7 @@ const COPY: PhotoRecord = {
   id: '6b044f9d56a44767c7079a02',
   ownerId: FRIEND_ID,
   senderId: SENDER_ID,
+  isOpened: false,
   sender: { displayName: 'Membre' },
   createdAt: new Date('2026-11-24T10:00:00Z'),
 }
@@ -48,6 +50,8 @@ function makeDeps() {
       findOwned: vi.fn<PhotosRepository['findOwned']>().mockResolvedValue(ORIGINAL),
       create: vi.fn<PhotosRepository['create']>().mockResolvedValue(COPY),
       deleteOwned: vi.fn<PhotosRepository['deleteOwned']>(),
+      openOwned: vi.fn<PhotosRepository['openOwned']>(),
+      findUnopened: vi.fn<PhotosRepository['findUnopened']>(),
       countByCloudinaryId: vi.fn<PhotosRepository['countByCloudinaryId']>(),
     },
     toFrameJpeg: vi.fn<PhotosServiceDeps['toFrameJpeg']>().mockResolvedValue(FRAME_JPEG),
@@ -72,7 +76,7 @@ function shareOriginal(deps: PhotosServiceDeps, friendId: unknown): Promise<Phot
 }
 
 describe('shareFromLibrary', () => {
-  it('gives the friend a new photo of the same image, without uploading it again', async () => {
+  it('gives the friend a new, unopened photo of the same image, without uploading it again', async () => {
     const deps = makeDeps()
 
     const record = await shareOriginal(deps, FRIEND_ID)
@@ -84,6 +88,7 @@ describe('shareFromLibrary', () => {
     expect(deps.repository.create).toHaveBeenCalledWith({
       ownerId: FRIEND_ID,
       senderId: SENDER_ID,
+      isOpened: false,
       ...IMAGE,
       sha256: ORIGINAL.sha256,
     })
@@ -187,7 +192,7 @@ function sharePng(deps: PhotosServiceDeps, friendId: unknown): Promise<PhotoReco
 }
 
 describe('shareFromDevice', () => {
-  it("converts and uploads the file into the friend's library only", async () => {
+  it("converts and uploads the file into the friend's library only, unopened", async () => {
     const deps = makeDeps()
 
     const record = await sharePng(deps, FRIEND_ID)
@@ -199,6 +204,7 @@ describe('shareFromDevice', () => {
     expect(deps.repository.create).toHaveBeenCalledWith({
       ownerId: FRIEND_ID,
       senderId: SENDER_ID,
+      isOpened: false,
       ...FRESH_IMAGE,
       sha256: PNG_SHA256,
     })

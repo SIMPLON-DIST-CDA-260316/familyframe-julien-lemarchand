@@ -16,6 +16,7 @@ const RECORD: PhotoRecord = {
   ownerId: OWNER_ID,
   senderId: null,
   message: null,
+  isOpened: true,
   sender: null,
   ...IMAGE,
   sha256: JPEG_SHA256,
@@ -33,6 +34,8 @@ function makeDeps() {
       findOwned: vi.fn<PhotosRepository['findOwned']>(),
       create: vi.fn<PhotosRepository['create']>().mockResolvedValue(RECORD),
       deleteOwned: vi.fn<PhotosRepository['deleteOwned']>().mockResolvedValue(RECORD),
+      openOwned: vi.fn<PhotosRepository['openOwned']>(),
+      findUnopened: vi.fn<PhotosRepository['findUnopened']>(),
       countByCloudinaryId: vi.fn<PhotosRepository['countByCloudinaryId']>().mockResolvedValue(0),
     },
     toFrameJpeg: vi.fn<PhotosServiceDeps['toFrameJpeg']>().mockResolvedValue(FRAME_JPEG),
@@ -48,7 +51,7 @@ function makeDeps() {
 }
 
 describe('createPhoto', () => {
-  it('saves the uploaded image for its owner with the hash of the original bytes', async () => {
+  it('saves the uploaded image for its owner, already opened, with the hash of the original bytes', async () => {
     const deps = makeDeps()
 
     const record = await createPhotosService(deps).createPhoto({
@@ -63,6 +66,7 @@ describe('createPhoto', () => {
     // Not the hash of FRAME_JPEG: sharp's output is not guaranteed to be stable.
     expect(deps.repository.create).toHaveBeenCalledWith({
       ownerId: OWNER_ID,
+      isOpened: true,
       ...IMAGE,
       sha256: JPEG_SHA256,
     })

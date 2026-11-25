@@ -58,6 +58,9 @@ model Photo {
   sha256       String
   // The sender's note, 200 characters at most; absent when there is none.
   message      String?
+  // false until the owner opens a photo a friend sent. Unset on photos saved before
+  // step 9: they count as opened.
+  isOpened     Boolean?
   createdAt    DateTime @default(now())
 
   @@unique([ownerId, sha256])

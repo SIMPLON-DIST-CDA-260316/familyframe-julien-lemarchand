@@ -19,5 +19,9 @@ docs {
   `PHOTO_TOO_LARGE`, `FORMAT_UNSUPPORTED`, `IMAGE_UNREADABLE`, `MESSAGE_INVALID`,
   `SERVER_ERROR`)
   que le client traduit en français.
-  Ordre des dossiers : `create`, `list`, `share`, `delete`.
+  Une photo envoyée par un ami arrive non ouverte : elle attend dans
+  `unopened` jusqu'à ce que son propriétaire l'ouvre (`open`), puis rejoint
+  la bibliothèque.
+  Ordre des dossiers : `create`, `list`, `share`, `unopened`, `open`,
+  `delete`.
 }

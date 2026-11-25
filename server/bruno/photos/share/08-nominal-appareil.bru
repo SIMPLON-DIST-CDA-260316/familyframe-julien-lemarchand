@@ -27,22 +27,25 @@ script:post-response {
   if (res.body.id) {
     bru.setVar('deviceSharedPhotoId', res.body.id)
   }
-  const idsOf = async (cookie) => {
-    const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/photos`, {
+  const idsOf = async (cookie, path) => {
+    const list = await axios.get(`${bru.getEnvVar('baseUrl')}${path}`, {
       headers: { Cookie: cookie },
     })
     return list.data.photos.map(({ id }) => id)
   }
-  test('la photo est chez l\'admin, pas chez le membre', async () => {
-    expect(await idsOf(bru.getVar('adminCookie'))).to.include(res.body.id)
-    expect(await idsOf(bru.getVar('sessionCookie'))).to.not.include(res.body.id)
+  test('la photo attend l\'admin, non ouverte, et n\'est pas chez le membre', async () => {
+    const adminCookie = bru.getVar('adminCookie')
+    expect(await idsOf(adminCookie, '/api/photos/unopened')).to.include(res.body.id)
+    expect(await idsOf(adminCookie, '/api/photos')).to.not.include(res.body.id)
+    expect(await idsOf(bru.getVar('sessionCookie'), '/api/photos')).to.not.include(res.body.id)
   })
 }
 
 docs {
   NOMINAL → 201 avec la nouvelle photo de l'admin, `senderName` `Membre`,
-  `message` `null` (aucun message envoyé). Le fichier est converti et envoyé à Cloudinary comme un envoi normal, mais
-  n'entre que dans la bibliothèque de l'ami. Son id va dans
-  `deviceSharedPhotoId` ; le script vérifie qu'il est dans la liste de
-  l'admin et absent de celle du membre.
+  `message` `null` (aucun message envoyé). Le fichier est converti et
+  envoyé à Cloudinary comme un envoi normal, mais n'entre que chez l'ami,
+  non ouvert. Son id va dans `deviceSharedPhotoId` ; le script vérifie
+  qu'il attend l'admin dans `GET /api/photos/unopened`, hors de sa
+  bibliothèque, et qu'il est absent de celle du membre.
 }

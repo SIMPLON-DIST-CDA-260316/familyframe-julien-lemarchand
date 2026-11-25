@@ -22,6 +22,9 @@ export type NewPhotoInput = { ownerId: string; file: UploadedFile | undefined }
 
 export type PhotoDeletion = { ownerId: string; id: string }
 
+// id comes straight from the URL: validated here.
+export type PhotoOpening = { ownerId: string; id: string }
+
 // cursor and limit come straight from the query string: validated here, at the boundary.
 export type PageInput = { ownerId: string; cursor: unknown; limit: unknown }
 
@@ -41,6 +44,9 @@ export type PhotosService = {
   listPage: (input: PageInput) => Promise<RecordPage>
   createPhoto: (input: NewPhotoInput) => Promise<PhotoRecord>
   deletePhoto: (deletion: PhotoDeletion) => Promise<string>
+  listUnopened: (ownerId: string) => Promise<PhotoRecord[]>
+  // The opened photo joins the library: the controller sends it to the owner's room.
+  openPhoto: (opening: PhotoOpening) => Promise<PhotoRecord>
   // Returns the friend's new photo: the controller sends it to the friend's room.
   shareFromLibrary: (share: LibraryShare) => Promise<PhotoRecord>
   // The file lands in the friend's library only, not in the sender's.
@@ -100,6 +106,19 @@ async function deletePhoto(
   return record.id
 }
 
+// Someone else's photo answers like a missing one, as for a deletion.
+async function openPhoto(
+  { repository, logger }: PhotosServiceDeps,
+  { ownerId, id }: PhotoOpening,
+): Promise<PhotoRecord> {
+  const record = await repository.openOwned(parsePhotoId(id), ownerId)
+  if (!record) {
+    throw new AppError('PHOTO_NOT_FOUND')
+  }
+  logger.info('photo.opened', { photoId: record.id, userId: ownerId })
+  return record
+}
+
 // One record more than asked tells whether a next page exists, without a count query.
 async function listPage(
   { repository }: PhotosServiceDeps,
@@ -120,6 +139,8 @@ export function createPhotosService(deps: PhotosServiceDeps): PhotosService {
     listPage: (input) => listPage(deps, input),
     createPhoto: (input) => createPhoto(deps, input),
     deletePhoto: (deletion) => deletePhoto(deps, deletion),
+    listUnopened: (ownerId) => deps.repository.findUnopened(ownerId),
+    openPhoto: (opening) => openPhoto(deps, opening),
     shareFromLibrary: (share) => shareFromLibrary(deps, share),
     shareFromDevice: (share) => shareFromDevice(deps, share),
   }

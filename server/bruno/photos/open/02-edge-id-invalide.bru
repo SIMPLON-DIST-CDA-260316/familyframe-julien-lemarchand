@@ -1,0 +1,21 @@
+meta {
+  name: Edge - id mal formé
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/photos/pas-un-id/open
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq PHOTO_NOT_FOUND
+}
+
+docs {
+  EDGE → 404 PHOTO_NOT_FOUND : un id qui n'est pas un ObjectId ne va pas
+  jusqu'à la base, il répond comme une photo inconnue.
+}

@@ -11,8 +11,9 @@ docs {
   (`photo`, `friendId` et `message`) : envoie un fichier de l'appareil, converti et
   envoyé à Cloudinary comme un envoi normal, mais qui n'entre que dans la
   bibliothèque de l'ami. Réponse : 201 avec la photo de l'ami, telle qu'il
-  la voit ; l'événement Socket.IO `photo:new` part vers les connexions de
-  l'ami seulement.
+  la voit. Elle arrive non ouverte : hors de sa bibliothèque (`GET
+  /api/photos`), elle attend dans `GET /api/photos/unopened`. L'événement
+  Socket.IO `photo:received` part vers les connexions de l'ami seulement.
 
   Un `friendId` absent, mal formé, inconnu, en attente ou le sien répond
   403 `NOT_FRIENDS` ; une photo d'un autre compte ou un id mal formé, 404

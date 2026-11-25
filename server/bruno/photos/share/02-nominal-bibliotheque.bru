@@ -48,20 +48,26 @@ script:post-response {
   if (res.body.id) {
     bru.setVar('sharedPhotoId', res.body.id)
   }
-  const photosOf = async (cookie) => {
-    const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/photos`, {
+  // path is /api/photos (the library) or /api/photos/unopened (the photos waiting).
+  const photosOf = async (cookie, path) => {
+    const list = await axios.get(`${bru.getEnvVar('baseUrl')}${path}`, {
       headers: { Cookie: cookie },
     })
     return list.data.photos
   }
-  test('la photo reçue est dans la bibliothèque de l\'admin, envoyée par le membre', async () => {
-    const received = (await photosOf(bru.getVar('adminCookie'))).find(
+  test('la photo reçue attend l\'admin, non ouverte, avec le nom et le message', async () => {
+    const received = (await photosOf(bru.getVar('adminCookie'), '/api/photos/unopened')).find(
       ({ id }) => id === res.body.id,
     )
     expect(received?.senderName).to.equal(bru.getEnvVar('memberDisplayName'))
+    expect(received?.message).to.equal('Joyeux anniversaire !')
+  })
+  test('elle n\'est pas encore dans la bibliothèque de l\'admin', async () => {
+    const ids = (await photosOf(bru.getVar('adminCookie'), '/api/photos')).map(({ id }) => id)
+    expect(ids).to.not.include(res.body.id)
   })
   test('la bibliothèque du membre ne change pas', async () => {
-    const ids = (await photosOf(bru.getVar('sessionCookie'))).map(({ id }) => id)
+    const ids = (await photosOf(bru.getVar('sessionCookie'), '/api/photos')).map(({ id }) => id)
     expect(ids).to.not.include(res.body.id)
     expect(ids).to.include(bru.getVar('createdPhotoId'))
   })
@@ -73,6 +79,7 @@ docs {
   acceptation, id dans `shareFriendshipId`). La photo reçue pointe vers la
   même image Cloudinary que celle du membre, et le message sans les espaces
   autour (« Joyeux anniversaire ! »). Son id va dans `sharedPhotoId`.
-  Le script vérifie qu'elle est dans la liste de l'admin avec le nom du
-  membre, et que la liste du membre ne gagne pas de photo.
+  Le script vérifie qu'elle attend l'admin dans `GET /api/photos/unopened`
+  avec le nom du membre et le message, qu'elle n'est pas encore dans sa
+  bibliothèque, et que la bibliothèque du membre ne gagne pas de photo.
 }
