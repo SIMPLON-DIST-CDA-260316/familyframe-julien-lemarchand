@@ -146,8 +146,8 @@ Le menu à trois traits a laissé sa place à la barre d'onglets (R-APP-60) et a
 
 1. R-APP-56 · Sur un téléphone à encoche, à coins arrondis ou à barre de navigation en bas, l'application occupe tout l'écran, mais aucun bouton ni texte ne passe sous l'encoche, dans un coin ou sous cette barre : la barre du haut, les panneaux qui montent du bas, la photo ouverte en grand, la découverte des photos reçues et le cadre gardent leurs boutons et leurs légendes dans la partie utilisable de l'écran, téléphone tenu droit ou couché.
 2. R-APP-57 · La barre du navigateur, autour de l'adresse, prend la couleur claire ou sombre du réglage de l'appareil, et la page s'affiche dans ces couleurs dès son ouverture. Avec un thème choisi à l'inverse de l'appareil (« Sombre » sur un appareil réglé en clair, par exemple), la barre du navigateur garde la couleur de l'appareil.
-3. R-APP-72 · Sur le clavier d'un téléphone, une adresse e-mail se tape sans majuscule automatique ni correction, et la touche Entrée du dernier champ d'un formulaire annonce ce qu'elle fait : « Aller » pour se connecter ou créer son compte, « Envoyer » pour une invitation ou une demande d'ami, « OK » pour un nom ou un mot de passe. Le mot exact dépend du téléphone.
-4. R-APP-73 · Sur un téléphone, un panneau qui monte du bas de l'écran (« Ajouter », « Envoyer à des proches », les infos d'une photo…) porte une petite barre en haut : la tirer vers le bas fait suivre le panneau, et le lâcher assez bas le ferme ; lâché plus haut, il remonte. La croix et la touche Échap le ferment toujours.
+3. R-APP-74 · Sur le clavier d'un téléphone, une adresse e-mail se tape sans majuscule automatique ni correction, et la touche Entrée du dernier champ d'un formulaire annonce ce qu'elle fait : « Aller » pour se connecter ou créer son compte, « Envoyer » pour une invitation ou une demande d'ami, « OK » pour un nom ou un mot de passe. Le mot exact dépend du téléphone.
+4. R-APP-75 · Sur un téléphone, un panneau qui monte du bas de l'écran (« Ajouter », « Envoyer à des proches », les infos d'une photo…) porte une petite barre en haut : la tirer vers le bas fait suivre le panneau, et le lâcher assez bas le ferme ; lâché plus haut, il remonte. La croix et la touche Échap le ferment toujours.
 
 **Messages affichés**
 
@@ -167,9 +167,9 @@ Aucun message.
 
 **Règles**
 
-1. R-APP-69 · Pendant qu'une page charge son contenu (la bibliothèque, une photo ouverte en grand, la page « Amis », la liste des invitations), des formes grises qui pulsent doucement tiennent la place des vignettes, des lignes ou de la photo attendues, dans la disposition choisie (miniatures ou liste). Le contenu les remplace sans que la page saute. Si l'appareil demande de réduire les animations, elles ne pulsent pas. Les lecteurs d'écran annoncent « Chargement… ». Le cadre garde son propre écran (« Chargement des photos… », voir [cadre.md](cadre.md)).
-2. R-APP-70 · Quand l'appareil perd le réseau, un bandeau s'affiche sous la barre du haut, et y reste pendant le défilement, jusqu'au retour du réseau. Il n'apparaît pas sur le cadre, qui gère lui-même la coupure (voir [cadre.md](cadre.md#coupure-de-réseau)), ni sur une photo ouverte en grand.
-3. R-APP-71 · Quand le premier chargement de la bibliothèque (ou d'une collection), de la page « Amis » ou de la liste des invitations échoue, la page le dit et propose « Réessayer », qui relance ce chargement. Les photos plus anciennes qui ne se chargent pas se redemandent avec « Charger plus », toujours affiché.
+1. R-APP-71 · Pendant qu'une page charge son contenu (la bibliothèque, une photo ouverte en grand, la page « Amis », la liste des invitations), des formes grises qui pulsent doucement tiennent la place des vignettes, des lignes ou de la photo attendues, dans la disposition choisie (miniatures ou liste). Le contenu les remplace sans que la page saute. Si l'appareil demande de réduire les animations, elles ne pulsent pas. Les lecteurs d'écran annoncent « Chargement… ». Le cadre garde son propre écran (« Chargement des photos… », voir [cadre.md](cadre.md)).
+2. R-APP-72 · Quand l'appareil perd le réseau, un bandeau s'affiche sous la barre du haut, et y reste pendant le défilement, jusqu'au retour du réseau. Il n'apparaît pas sur le cadre, qui gère lui-même la coupure (voir [cadre.md](cadre.md#coupure-de-réseau)), ni sur une photo ouverte en grand.
+3. R-APP-73 · Quand le premier chargement de la bibliothèque (ou d'une collection), de la page « Amis » ou de la liste des invitations échoue, la page le dit et propose « Réessayer », qui relance ce chargement. Les photos plus anciennes qui ne se chargent pas se redemandent avec « Charger plus », toujours affiché.
 
 **Messages affichés**
 
@@ -191,8 +191,8 @@ Aucun message.
 
 **Règles**
 
-1. R-APP-67 · Installée, FamilyFrame s'ouvre depuis son icône comme une application : en plein écran, sans barre d'adresse, avec son nom « FamilyFrame » et son icône (un cadre photo avec un paysage). L'onglet du navigateur montre la même icône.
-2. R-APP-68 · Installée ou non, FamilyFrame a besoin du réseau : sans connexion, elle ne s'ouvre pas et le navigateur l'indique. Rien n'est gardé sur l'appareil pour être vu hors ligne.
+1. R-APP-69 · Installée, FamilyFrame s'ouvre depuis son icône comme une application : en plein écran, sans barre d'adresse, avec son nom « FamilyFrame » et son icône (un cadre photo avec un paysage). L'onglet du navigateur montre la même icône.
+2. R-APP-70 · Installée ou non, FamilyFrame a besoin du réseau : sans connexion, elle ne s'ouvre pas et le navigateur l'indique. Rien n'est gardé sur l'appareil pour être vu hors ligne.
 
 **Messages affichés**
 
