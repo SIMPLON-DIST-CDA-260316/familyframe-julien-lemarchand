@@ -34,7 +34,7 @@ export function UserMenu(): JSX.Element | null {
     <DropdownMenu>
       <DropdownMenuTrigger
         // A finger gets 44 px around the avatar; a mouse keeps the avatar's own size.
-        className="grid place-items-center rounded-full focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none pointer-coarse:size-11"
+        className="rounded-full focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none pointer-coarse:grid pointer-coarse:size-11 pointer-coarse:place-items-center"
         aria-label="Menu du compte"
       >
         <UserAvatar name={user.displayName} avatarUrl={user.avatarUrl} />
