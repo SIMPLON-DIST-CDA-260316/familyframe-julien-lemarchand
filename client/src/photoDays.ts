@@ -31,7 +31,7 @@ function newestDayFirst(days: PhotoDay[]): PhotoDay[] {
 }
 
 // « Aujourd'hui », « Hier », then « dim. 22 nov. »; the year only when it is not this one.
-function dayLabel(date: Date, now: Date): string {
+export function dayLabel(date: Date, now: Date): string {
   if (dayKey(date) === dayKey(now)) return "Aujourd'hui"
   const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1)
   if (dayKey(date) === dayKey(yesterday)) return 'Hier'

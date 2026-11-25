@@ -2,11 +2,17 @@ import { Dialog as DialogPrimitive } from 'radix-ui'
 import type { JSX } from 'react'
 import { LoadingStatus } from '@/components/feedback/LoadingStatus.tsx'
 import { Skeleton } from '@/components/ui/skeleton.tsx'
+import { PhotoInfoPanel } from '@/components/viewer/PhotoInfoPanel.tsx'
 import { ViewerCaption } from '@/components/viewer/ViewerCaption.tsx'
 import { ViewerCarousel } from '@/components/viewer/ViewerCarousel.tsx'
 import { ViewerTopBar } from '@/components/viewer/ViewerTopBar.tsx'
+import {
+  type PhotoInfoPanel as InfoPanelState,
+  usePhotoInfoPanel,
+} from '@/hooks/usePhotoInfoPanel.ts'
 import type { PhotoLibrary } from '@/hooks/usePhotoLibrary.ts'
-import { useViewerChrome } from '@/hooks/useViewerChrome.ts'
+import { useViewerChrome, type ViewerChrome } from '@/hooks/useViewerChrome.ts'
+import { useViewerKeys } from '@/hooks/useViewerKeys.ts'
 import type { ViewerParam } from '@/hooks/useViewerParam.ts'
 import { useViewerPhoto } from '@/hooks/useViewerPhoto.ts'
 import type { Photo } from '@/photo.ts'
@@ -32,11 +38,13 @@ function focusPhotoTile(event: Event, photoId: string): void {
   tile.focus()
 }
 
-function ViewerPhoto({ library, viewer, photo, index }: ViewerPhotoProps): JSX.Element {
-  const chrome = useViewerChrome()
+type PhotoAreaProps = ViewerPhotoProps & { chrome: ViewerChrome; info: InfoPanelState }
+
+// Everything over the photo: its own box, which shrinks when the side panel opens beside it.
+function PhotoArea({ library, viewer, photo, index, chrome, info }: PhotoAreaProps): JSX.Element {
   const counter = viewerCounter(index, library)
   return (
-    <>
+    <div className="relative min-w-0 flex-1">
       {/* Outside the top bar, which turns inert when hidden: ← → still announce the position. */}
       <p aria-live="polite" className="sr-only">
         {counter}
@@ -53,10 +61,26 @@ function ViewerPhoto({ library, viewer, photo, index }: ViewerPhotoProps): JSX.E
         photo={photo}
         isVisible={chrome.isVisible}
         counter={counter}
+        isInfoOpen={info.isOpen}
         onClose={viewer.close}
         onStartFrame={() => viewer.startFrame(photo.id)}
+        onToggleInfo={info.toggle}
       />
-    </>
+    </div>
+  )
+}
+
+function ViewerPhoto(props: ViewerPhotoProps): JSX.Element {
+  const chrome = useViewerChrome()
+  const info = usePhotoInfoPanel()
+  useViewerKeys({ i: info.toggle })
+  return (
+    <div className="flex h-svh">
+      <PhotoArea {...props} chrome={chrome} info={info} />
+      {info.isOpen && (
+        <PhotoInfoPanel photo={props.photo} isDesktop={info.isDesktop} onClose={info.close} />
+      )}
+    </div>
   )
 }
 

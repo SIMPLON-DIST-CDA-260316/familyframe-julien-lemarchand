@@ -1,7 +1,8 @@
-import { PlayIcon, XIcon } from 'lucide-react'
+import { InfoIcon, PlayIcon, XIcon } from 'lucide-react'
 import type { JSX } from 'react'
 import { PhotoActionsMenu } from '@/components/frame/PhotoActionsMenu.tsx'
 import { Button } from '@/components/ui/button.tsx'
+import { PHOTO_INFO_ID } from '@/components/viewer/PhotoInfo.tsx'
 import { chromeClasses, VIEWER_BUTTON_CLASSES } from '@/components/viewer/viewerClasses.ts'
 import { cn } from '@/lib/utils.ts'
 import type { Photo } from '@/photo.ts'
@@ -10,8 +11,29 @@ type ViewerTopBarProps = {
   photo: Photo
   isVisible: boolean
   counter: string
+  isInfoOpen: boolean
   onClose: () => void
   onStartFrame: () => void
+  onToggleInfo: () => void
+}
+
+function InfoButton({
+  isInfoOpen,
+  onToggleInfo,
+}: Pick<ViewerTopBarProps, 'isInfoOpen' | 'onToggleInfo'>): JSX.Element {
+  return (
+    <Button
+      variant="ghost"
+      size="icon-sm"
+      onClick={onToggleInfo}
+      aria-label="Infos"
+      aria-expanded={isInfoOpen}
+      aria-controls={isInfoOpen ? PHOTO_INFO_ID : undefined}
+      className={VIEWER_BUTTON_CLASSES}
+    >
+      <InfoIcon />
+    </Button>
+  )
 }
 
 function StartFrameButton({ onStartFrame }: Pick<ViewerTopBarProps, 'onStartFrame'>): JSX.Element {
@@ -47,8 +69,10 @@ export function ViewerTopBar({
   photo,
   isVisible,
   counter,
+  isInfoOpen,
   onClose,
   onStartFrame,
+  onToggleInfo,
 }: ViewerTopBarProps): JSX.Element {
   return (
     // ✕ top left and the actions top right, as on the slideshow. The row spans the screen: only
@@ -68,6 +92,7 @@ export function ViewerTopBar({
       <p aria-hidden className="mx-auto text-sm text-white/80 tabular-nums">
         {counter}
       </p>
+      <InfoButton isInfoOpen={isInfoOpen} onToggleInfo={onToggleInfo} />
       <StartFrameButton onStartFrame={onStartFrame} />
       <PhotoActionsMenu
         photo={photo}

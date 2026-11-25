@@ -1,11 +1,8 @@
 import type { JSX, ReactNode } from 'react'
 import { BottomDrawer } from '@/components/panel/BottomDrawer.tsx'
 import { Dialog, DialogContent } from '@/components/ui/dialog.tsx'
-import { useMediaQuery } from '@/hooks/useMediaQuery.ts'
+import { DESKTOP_QUERY, useMediaQuery } from '@/hooks/useMediaQuery.ts'
 import { cn } from '@/lib/utils.ts'
-
-// Tailwind's md breakpoint, where the page layout switches too.
-const DESKTOP_QUERY = '(min-width: 48rem)'
 
 type ResponsivePanelProps = {
   onClose: () => void
