@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button.tsx'
 import { Input } from '@/components/ui/input.tsx'
 import type { Friendship } from '@/friendship.ts'
 import { useFriendships } from '@/hooks/useFriendships.ts'
-import { type ShareTarget, useShareSending } from '@/hooks/useShareSending.ts'
+import { type ShareSending, type ShareTarget, useShareSending } from '@/hooks/useShareSending.ts'
 
 type ShareFriendsFormProps = {
   target: ShareTarget
@@ -24,6 +24,11 @@ type FriendSelectionProps = ShareFriendsFormProps & {
 type FriendSearchFieldProps = {
   query: string
   onQueryChange: (query: string) => void
+}
+
+type MessageAndSendButtonProps = {
+  recipients: Friendship['user'][]
+  sending: ShareSending
 }
 
 function NoFriends(): JSX.Element {
@@ -72,12 +77,33 @@ function selectedUsers(friends: Friendship[], selectedIds: string[]): Friendship
   return friends.map(({ user }) => user).filter(({ id }) => selectedIds.includes(id))
 }
 
-// The selection survives the search: a friend chosen then filtered out is still sent the photo.
 // One message for everyone chosen: it goes with each copy.
+function MessageAndSendButton({ recipients, sending }: MessageAndSendButtonProps): JSX.Element {
+  const [message, setMessage] = useState('')
+
+  return (
+    <>
+      <ShareMessageField
+        message={message}
+        isDisabled={sending.isSending}
+        onMessageChange={setMessage}
+      />
+      {sending.error && <ErrorAlert message={sending.error} />}
+      <Button
+        size="lg"
+        disabled={recipients.length === 0 || sending.isSending}
+        onClick={() => sending.sendTo(recipients, message)}
+      >
+        {sending.isSending ? 'Envoi…' : sendButtonLabel(recipients.length)}
+      </Button>
+    </>
+  )
+}
+
+// The selection survives the search: a friend chosen then filtered out is still sent the photo.
 function FriendSelection({ friends, target, onSent }: FriendSelectionProps): JSX.Element {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [query, setQuery] = useState('')
-  const [message, setMessage] = useState('')
   const sending = useShareSending(target, onSent)
 
   return (
@@ -92,19 +118,7 @@ function FriendSelection({ friends, target, onSent }: FriendSelectionProps): JSX
         isDisabled={sending.isSending}
         onToggle={(friendId) => setSelectedIds((ids) => toggledIds(ids, friendId))}
       />
-      <ShareMessageField
-        message={message}
-        isDisabled={sending.isSending}
-        onMessageChange={setMessage}
-      />
-      {sending.error && <ErrorAlert message={sending.error} />}
-      <Button
-        size="lg"
-        disabled={selectedIds.length === 0 || sending.isSending}
-        onClick={() => sending.sendTo(selectedUsers(friends, selectedIds), message)}
-      >
-        {sending.isSending ? 'Envoi…' : sendButtonLabel(selectedIds.length)}
-      </Button>
+      <MessageAndSendButton recipients={selectedUsers(friends, selectedIds)} sending={sending} />
     </div>
   )
 }
