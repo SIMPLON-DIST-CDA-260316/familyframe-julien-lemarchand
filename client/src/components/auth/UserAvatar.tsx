@@ -11,7 +11,7 @@ const AVATAR_CLASSES =
 export function UserAvatar({ name, avatarUrl, className }: UserAvatarProps): JSX.Element {
   // The URL that failed, not a flag: a new URL (new photo) gets its own try.
   const [failedUrl, setFailedUrl] = useState<string | null>(null)
-  // A signed URL can expire and Cloudinary can answer 404: the initial beats a broken image.
+  // Cloudinary answers 404 once the image is deleted: the initial beats a broken image.
   if (avatarUrl && avatarUrl !== failedUrl) {
     return (
       <img

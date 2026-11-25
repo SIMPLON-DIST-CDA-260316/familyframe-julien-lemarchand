@@ -5536,6 +5536,7 @@ Format: `date · task/step · what the plan said · what was done · why`.
 | 2026-11-25 | Task 9 | one rule R-PRF-35 for « new photo replaces the old one » and the load failure | R-PRF-35 marked « Remplacée », split into R-PRF-36 and R-PRF-37 (f963c8e) | review: one rule per behaviour; ids are never reused |
 | 2026-11-25 | Tasks 1, 3, 4 | run the failing test first (red step) | some red runs skipped, tests written with the code; all green at the gate | the plan's code came from a throwaway clone already proven green |
 | 2026-11-25 | Gates | Bruno counts `test()` calls (44 at the end) | Bruno CLI 4.2.0 prints `Tests 0/0`; requests (112) and assertions (242) checked instead, twice | the CLI does not count post-response `test()` calls |
+| 2026-11-25 | Final review | profile photo shown to friends | `avatarUrl` is also sent on pending friend requests, both ways, and in the `POST /api/friendships` response (anyone who knows an email sees that account's photo, as already for the display name); `preferences.md` says so instead of « friends only » | matches `toFriendship` and R-AMI-45; accounts are invitation-only, so kept. **Open for the author**: send `avatarUrl: null` until a request is accepted |
 
 ---
 

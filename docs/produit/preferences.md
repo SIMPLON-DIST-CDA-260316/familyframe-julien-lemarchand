@@ -87,7 +87,7 @@ La page où chacun règle son compte : sa photo de profil, son nom affiché et s
 **Ce qui n'est pas possible**
 
 - Voir la photo de profil en plus grand : le rond n'est pas cliquable.
-- Voir la photo de profil d'une personne qui n'est pas dans ses amis.
+- Voir la photo de profil d'une personne avec qui l'on n'a ni amitié ni demande d'ami en cours.
 
 ## Photo de profil
 
@@ -102,7 +102,7 @@ La page où chacun règle son compte : sa photo de profil, son nom affiché et s
 1. R-PRF-31 · Les formats acceptés et le poids maximal sont ceux des photos de la bibliothèque : JPEG, PNG ou WebP, 10 Mo au plus.
 2. R-PRF-32 · La photo est recadrée en carré, au centre, sans outil de recadrage. L'aperçu montre l'image choisie ; le recadrage se fait à l'enregistrement.
 3. R-PRF-33 · « Enregistrer » reste grisé tant qu'aucune image n'est choisie. « Annuler » n'apparaît que lorsqu'une image est choisie ; « Retirer » n'apparaît que lorsqu'une photo est enregistrée et qu'aucune image n'est choisie.
-4. R-PRF-34 · Après l'enregistrement ou le retrait, la barre du haut, les menus et, chez ses amis, la page Amis et le panneau « Envoyer à des proches » montrent le changement (R-PRF-30).
+4. R-PRF-34 · Après l'enregistrement ou le retrait, la barre du haut et les menus montrent aussitôt le changement ; chez ses amis, la page Amis et le panneau « Envoyer à des proches » le montrent à leur prochain chargement de la page (R-PRF-30, R-AMI-06).
 5. R-PRF-35 · Remplacée : une nouvelle photo remplace l'ancienne (R-PRF-36) ; si l'image ne peut pas se charger, le rond montre l'initiale (R-PRF-37).
 6. R-PRF-36 · Une nouvelle photo remplace l'ancienne.
 
