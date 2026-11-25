@@ -27,6 +27,12 @@ type PickButtonProps = {
   onChange: (event: ChangeEvent<HTMLInputElement>) => void
 }
 
+type FileChoice = {
+  files: File[]
+  tooManyMessage: string
+  handleFileChange: (event: ChangeEvent<HTMLInputElement>) => void
+}
+
 type UploadButtonsProps = {
   fileCount: number
   onShare: () => void
@@ -117,17 +123,28 @@ function TooManyAlert({ message }: { message: string }): JSX.Element | null {
   )
 }
 
-export function UploadForm({ onUpload, onShare }: UploadFormProps): JSX.Element {
+// Too many: nothing is kept, so the message never sits next to photos that would be sent.
+// The input is emptied once read, so choosing the same file again still fires change. A picker
+// closed without a choice sends no file on some browsers: the previous choice stays.
+function useFileChoice(): FileChoice {
   const [files, setFiles] = useState<File[]>([])
   const [tooManyMessage, setTooManyMessage] = useState('')
 
-  // Too many: nothing is kept, so the message never sits next to photos that would be sent.
   function handleFileChange(event: ChangeEvent<HTMLInputElement>): void {
-    const chosen = Array.from(event.target.files ?? [])
+    const input = event.target
+    const chosen = Array.from(input.files ?? [])
+    input.value = ''
+    if (chosen.length === 0) return
     const isTooMany = chosen.length > MAX_PHOTOS_PER_CHOICE
     setFiles(isTooMany ? [] : chosen)
     setTooManyMessage(isTooMany ? tooManyPhotosMessage(MAX_PHOTOS_PER_CHOICE, chosen.length) : '')
   }
+
+  return { files, tooManyMessage, handleFileChange }
+}
+
+export function UploadForm({ onUpload, onShare }: UploadFormProps): JSX.Element {
+  const { files, tooManyMessage, handleFileChange } = useFileChoice()
 
   function handleSubmit(event: SubmitEvent<HTMLFormElement>): void {
     event.preventDefault()

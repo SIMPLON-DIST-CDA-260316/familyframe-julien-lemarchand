@@ -37,7 +37,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 21. R-BIB-58 · Quitter la bibliothèque pour une autre page de l'application n'interrompt pas les envois, qui continuent un par un ; les vignettes grisées sont de nouveau là au retour. Choisir d'autres photos entre-temps les met en attente derrière les premières. Fermer l'application ou recharger la page interrompt ceux qui ne sont pas terminés.
 22. R-BIB-59 · Un lecteur d'écran annonce le nombre de photos en cours d'envoi chaque fois qu'il change.
 23. R-BIB-65 · Quand le panneau « Ajouter une photo » se ferme, ou le panneau d'envoi ouvert depuis lui avec « Envoyer à un ami », la navigation au clavier reprend sur le bouton « Ajouter » affiché : celui de l'en-tête sur un ordinateur, le bouton rond « + » sur un téléphone (qui réapparaît s'il s'était effacé), même si le panneau avait été ouvert depuis une bibliothèque vide.
-24. R-BIB-60 · « Choisir des images » permet de choisir jusqu'à 20 photos d'un coup ; « Prendre une photo » en prend une à la fois. Choisir de nouveau remplace les photos choisies dans le panneau.
+24. R-BIB-60 · « Choisir des images » permet de choisir jusqu'à 20 photos d'un coup ; « Prendre une photo » en prend une à la fois. Choisir de nouveau remplace les photos choisies dans le panneau. Refermer le sélecteur sans rien choisir garde les photos déjà choisies ; choisir de nouveau la même photo fonctionne.
 25. R-BIB-61 · Au-delà de 20 photos choisies d'un coup, aucune n'est gardée et un message demande d'en choisir moins.
 26. R-BIB-62 · Chaque photo choisie a sa propre vignette grisée. Une photo refusée n'arrête pas les suivantes : sa vignette disparaît, sa raison s'affiche, et le message de fin compte les photos ajoutées et refusées.
 
