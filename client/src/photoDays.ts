@@ -17,9 +17,17 @@ const DAY_WITH_YEAR_FORMAT = new Intl.DateTimeFormat('fr-FR', {
 })
 
 // The device's own calendar day: a photo added at 23:30 belongs to that evening, not to the
-// next day in UTC.
+// next day in UTC. Zero-padded (2026-01-05), so comparing two keys compares their days.
 function dayKey(date: Date): string {
-  return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${date.getFullYear()}-${month}-${day}`
+}
+
+// Newest day first, whatever the photos' order: an old photo opened while older pages are not
+// loaded yet arrives at the end of the list, and its day must still sit in its place.
+function newestDayFirst(days: PhotoDay[]): PhotoDay[] {
+  return days.toSorted((a, b) => (a.key < b.key ? 1 : -1))
 }
 
 // « Aujourd'hui », « Hier », then « dim. 22 nov. »; the year only when it is not this one.
@@ -31,8 +39,8 @@ function dayLabel(date: Date, now: Date): string {
   return format.format(date)
 }
 
-// One group per day, in the photos' own order (newest first). Keyed by day rather than by
-// neighbours: a day continued on the next « Charger plus » page still has one header.
+// One group per day, newest day first. Keyed by day rather than by neighbours: a day continued
+// on the next « Charger plus » page still has one header.
 export function groupByDay(photos: Photo[], now: Date): PhotoDay[] {
   const days = new Map<string, PhotoDay>()
   for (const photo of photos) {
@@ -42,7 +50,7 @@ export function groupByDay(photos: Photo[], now: Date): PhotoDay[] {
     day.photos.push(photo)
     days.set(key, day)
   }
-  return [...days.values()]
+  return newestDayFirst([...days.values()])
 }
 
 // Puts an empty « Aujourd'hui » first when today has no photo yet: the uploads on their way
