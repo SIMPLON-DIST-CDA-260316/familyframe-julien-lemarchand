@@ -3485,7 +3485,7 @@ index 0ff278f..b8434ac 100644
 
 **Scope:** Tile « … » back on every pointer, 28 px look with a 44 px invisible target; `useTileContextMenu` (native `contextmenu`); `PhotoActionsMenu` `open` / `onOpenChange`; R-BIB-53. Spec D23 amended.
 
-**Gate:** `pnpm check` and `pnpm typecheck` green; `pnpm build` and `pnpm test` green.
+**Gate:** `pnpm check` and `pnpm typecheck` green; `pnpm build` and `pnpm test` green at the tip.
 
 - [x] **Final diff**
 
@@ -3666,7 +3666,7 @@ index b8434ac..f7602a3 100644
 
 **Scope:** `PhotoActionsMenu` content `w-max`: under the 28 px « … » its items wrapped, with a mouse too.
 
-**Gate:** `pnpm check` and `pnpm typecheck` green; `pnpm build` and `pnpm test` green on `feat/library-timeline`, which holds it.
+**Gate:** `pnpm check` and `pnpm typecheck` green; `pnpm build` and `pnpm test` green on `feat/library-surface`, which holds it.
 
 - [x] **Final diff**
 
