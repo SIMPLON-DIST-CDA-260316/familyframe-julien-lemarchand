@@ -58,7 +58,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 - Passer de l'un à l'autre avec les boutons « Miniatures » et « Liste ».
 - Charger les photos plus anciennes avec « Charger plus ».
 - Ouvrir une photo en grand dans l'application, puis passer à la suivante ou à la précédente d'un geste du doigt, avec les flèches à l'écran ou celles du clavier.
-- Ouvrir le menu « … » d'une photo pour l'envoyer à un ami ou la supprimer.
+- Ouvrir le menu « … » d'une photo pour l'envoyer à un ami, la ranger dans ses collections (voir [collections.md](collections.md#ranger-ses-photos-dans-une-collection)) ou la supprimer.
 - Lancer le mode cadre, en plein écran, depuis la bibliothèque, ou depuis une photo ouverte pour que le diaporama commence par elle (voir [cadre.md](cadre.md)).
 - Découvrir les photos envoyées par ses proches depuis l'annonce en haut de la page (voir [partage.md](partage.md#recevoir-une-photo)).
 - Gérer ses collections dans la carte « Mes collections » (voir [collections.md](collections.md)).
@@ -97,7 +97,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 **Ce qui n'est pas possible**
 
 - Trier ou filtrer les photos (par date, par expéditeur…), ou les rechercher.
-- Ranger les photos dans des albums ou des collections : prévu, voir [a-venir.md](a-venir.md).
+- Ranger les photos dans des albums : les collections en tiennent lieu (voir [collections.md](collections.md)).
 - Voir la bibliothèque d'un autre membre.
 
 ## Supprimer une photo

@@ -40,7 +40,7 @@ Cette documentation décrit ce que l'application permet de faire et selon quelle
 | [amis.md](amis.md)                                       | Demandes d'ami, acceptation, refus, annulation, retrait d'un ami.                                                     |
 | [bibliotheque.md](bibliotheque.md)                       | Ajout de photos, formats acceptés, doublons, affichage, chargement, suppression.                                      |
 | [partage.md](partage.md)                                 | Envoi d'une photo à un ami, depuis sa bibliothèque ou depuis son appareil.                                            |
-| [collections.md](collections.md)                         | Création, renommage et suppression des collections.                                                                   |
+| [collections.md](collections.md)                         | Création, renommage et suppression des collections ; ranger ses photos dedans.                                        |
 | [cadre.md](cadre.md)                                     | Vue cadre, diaporama, arrivée des photos en direct, comportement sans activité ou sans connexion.                     |
 | [apparence-et-navigation.md](apparence-et-navigation.md) | Barre du haut, menus, thème, page introuvable, messages d'erreur communs.                                             |
 | [preferences.md](preferences.md)                         | Page « Préférences » : photo de profil, nom affiché, mot de passe, adresse e-mail, réglages du cadre de cet appareil. |

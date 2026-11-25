@@ -15,7 +15,7 @@ Une collection est une liste de photos de sa bibliothèque, rangées sous un nom
 1. R-COL-01 · Un nom fait de 1 à 50 caractères ; les espaces au début et à la fin ne comptent pas.
 2. R-COL-02 · Deux collections d'un même compte ne portent pas le même nom. Les majuscules et les accents comptent : « noël » et « Noël » sont deux noms différents. Renommer une collection sous le nom qu'elle porte déjà est permis.
 3. R-COL-03 · Les collections sont classées par ordre alphabétique (« Été » avant « Noël »).
-4. R-COL-04 · Une nouvelle collection est vide.
+4. R-COL-04 · Une collection créée depuis la carte « Mes collections » est vide ; créée depuis le menu « … » d'une photo, elle contient cette photo.
 5. R-COL-05 · Supprimer une collection demande une confirmation ; « Annuler » ferme la fenêtre sans rien changer. Ses photos restent dans la bibliothèque.
 6. R-COL-06 · Une collection créée, renommée ou supprimée l'est aussitôt sur tous les appareils connectés au compte, sans recharger la page.
 7. R-COL-07 · Les collections sont privées : personne d'autre ne les voit, pas même les amis.
@@ -42,3 +42,34 @@ Une collection est une liste de photos de sa bibliothèque, rangées sous un nom
 - Partager une collection avec un ami, ou voir celles d'un autre membre.
 - Changer l'ordre des collections ou leur choisir une photo de couverture.
 - Ranger une collection dans une autre.
+
+## Ranger ses photos dans une collection
+
+**Ce que l'on peut faire**
+
+- Dans le menu « … » d'une photo (bibliothèque, photo ouverte en grand ou diaporama), ouvrir « Collections » : une case par collection, cochée quand la photo y est.
+- Cocher une case pour ranger la photo dans cette collection, la décocher pour l'en retirer. Le menu reste ouvert : on peut cocher plusieurs cases à la suite.
+- Choisir « Nouvelle collection… » pour créer une collection et y ranger aussitôt la photo.
+
+**Règles**
+
+1. R-COL-08 · Une photo peut être dans plusieurs collections, mais une seule fois dans chacune : la ranger une deuxième fois ne change rien.
+2. R-COL-09 · Retirer une photo d'une collection la laisse dans la bibliothèque et dans ses autres collections.
+3. R-COL-10 · Une photo supprimée de la bibliothèque quitte toutes ses collections.
+4. R-COL-11 · Une photo reçue d'un proche ne peut être rangée qu'une fois découverte (voir [partage.md](partage.md#recevoir-une-photo)) ; avant, elle n'apparaît dans aucune collection.
+5. R-COL-12 · Seules les photos de sa propre bibliothèque peuvent être rangées dans ses collections.
+6. R-COL-13 · Une photo rangée ou retirée l'est aussitôt sur tous les appareils connectés au compte : les cases et le nombre de photos de chaque collection suivent.
+
+**Messages affichés**
+
+| Situation                                               | Message                               |
+| ------------------------------------------------------- | ------------------------------------- |
+| Photo rangée dans une nouvelle collection               | « Photo ajoutée à « Noël ». »         |
+| Photo supprimée entre-temps                             | « Cette photo a déjà été supprimée. » |
+| Collection supprimée entre-temps, sur un autre appareil | « Cette collection n'existe plus. »   |
+
+**Ce qui n'est pas possible**
+
+- Ranger plusieurs photos d'un coup.
+- Changer l'ordre des photos dans une collection.
+- Voir les photos d'une collection en dehors du cadre.

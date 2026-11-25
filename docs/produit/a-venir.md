@@ -8,7 +8,6 @@ Les règles ci-dessous décrivent l'intention ; elles recevront leur identifiant
 
 **Prévu**
 
-- Ranger ses photos dans ses collections, depuis leur menu « … ».
 - Faire passer une collection sur le cadre, en boucle ou en ordre aléatoire.
 
 ## Étape 11 · Sélections automatiques
