@@ -1,6 +1,6 @@
 # Apparence et navigation
 
-Comment on se déplace dans l'application, comment on choisit son thème, et les messages communs à toutes les pages. Le cadre a sa propre présentation, sans barre ni menus (voir [cadre.md](cadre.md)).
+Comment on se déplace dans l'application, comment on choisit son thème et ses couleurs, et les messages communs à toutes les pages. Le cadre a sa propre présentation, sans barre ni menus (voir [cadre.md](cadre.md)).
 
 ## Barre du haut
 
@@ -85,8 +85,26 @@ Le menu à trois traits a laissé sa place à la barre d'onglets (R-APP-60) et a
 
 **Ce qui n'est pas possible**
 
-- Choisir d'autres couleurs.
 - Retrouver son thème sur un nouvel appareil sans le choisir de nouveau.
+
+## Couleurs de l'application
+
+**Ce que l'on peut faire**
+
+- Profiter des couleurs « Encre » : un bleu ardoise pour les boutons principaux, sur un fond papier légèrement chaud, en clair comme en sombre.
+
+**Règles**
+
+1. R-APP-78 · Par défaut, l'application prend les couleurs « Encre ». Les couleurs d'avant, en gris neutres, restent disponibles sous le nom « Actuelle ». Le doré du « Mode cadre », du contour de la photo affichée sur le cadre et de l'annonce des photos reçues suit ces couleurs : plus doux avec « Encre », inchangé avec « Actuelle ». Le cadre et une photo ouverte en grand restent sur fond sombre (R-APP-34), dans les deux.
+2. R-APP-79 · Remplace R-APP-57 pour la couleur de la barre du navigateur : une fois la page chargée, la barre autour de l'adresse prend la couleur de fond de l'application, selon le thème choisi (« Sombre » sur un appareil réglé en clair donne une barre sombre) et selon les couleurs choisies.
+
+**Messages affichés**
+
+Aucun message.
+
+**Ce qui n'est pas possible**
+
+- Composer ses propres couleurs.
 
 ## Page introuvable
 
@@ -145,7 +163,7 @@ Le menu à trois traits a laissé sa place à la barre d'onglets (R-APP-60) et a
 **Règles**
 
 1. R-APP-56 · Sur un téléphone à encoche, à coins arrondis ou à barre de navigation en bas, l'application occupe tout l'écran, mais aucun bouton ni texte ne passe sous l'encoche, dans un coin ou sous cette barre : la barre du haut, les panneaux qui montent du bas, la photo ouverte en grand, la découverte des photos reçues et le cadre gardent leurs boutons et leurs légendes dans la partie utilisable de l'écran, téléphone tenu droit ou couché.
-2. R-APP-57 · La barre du navigateur, autour de l'adresse, prend la couleur claire ou sombre du réglage de l'appareil, et la page s'affiche dans ces couleurs dès son ouverture. Avec un thème choisi à l'inverse de l'appareil (« Sombre » sur un appareil réglé en clair, par exemple), la barre du navigateur garde la couleur de l'appareil.
+2. R-APP-57 · Remplacée en partie (R-APP-79) : la page s'affiche dans les couleurs claires ou sombres de l'appareil dès son ouverture. La barre du navigateur, autour de l'adresse, suivait toujours le réglage de l'appareil ; elle suit désormais le thème choisi dans l'application.
 3. R-APP-74 · Sur le clavier d'un téléphone, une adresse e-mail se tape sans majuscule automatique ni correction, et la touche Entrée du dernier champ d'un formulaire annonce ce qu'elle fait : « Aller » pour se connecter ou créer son compte, « Envoyer » pour une invitation ou une demande d'ami, « OK » pour un nom ou un mot de passe. Le mot exact dépend du téléphone.
 4. R-APP-75 · Sur un téléphone, un panneau qui monte du bas de l'écran (« Ajouter », « Envoyer à des proches », les infos d'une photo…) porte une petite barre en haut : la tirer vers le bas fait suivre le panneau, et le lâcher assez bas le ferme ; lâché plus haut, il remonte. La croix et la touche Échap le ferment toujours.
 

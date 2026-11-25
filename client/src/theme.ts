@@ -1,3 +1,5 @@
+import { syncThemeColor } from './themeColor.ts'
+
 export type ThemePreference = 'light' | 'dark' | 'system'
 
 const DARK_SCHEME_QUERY = '(prefers-color-scheme: dark)'
@@ -23,6 +25,7 @@ function applyTheme(preference: ThemePreference): void {
     preference === 'dark' ||
     (preference === 'system' && window.matchMedia(DARK_SCHEME_QUERY).matches)
   document.documentElement.classList.toggle('dark', isDark)
+  syncThemeColor()
 }
 
 export function saveThemePreference(preference: ThemePreference): void {
