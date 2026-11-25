@@ -104,7 +104,8 @@ export function PhotoViewer({ library, openId, viewer }: PhotoViewerProps): JSX.
           <DialogPrimitive.Title className="sr-only">Photo</DialogPrimitive.Title>
           {photo === undefined ? (
             <LoadingStatus className="grid h-svh place-items-center">
-              <Skeleton className="h-2/3 w-5/6 max-w-4xl bg-white/10" />
+              {/* The light veil of the photo chrome, not the palette's accent: the viewer is neutral. */}
+              <Skeleton className="h-2/3 w-5/6 max-w-4xl bg-overlay-hover" />
             </LoadingStatus>
           ) : (
             <ViewerPhoto library={library} viewer={viewer} photo={photo} index={index} />
