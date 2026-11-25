@@ -36,6 +36,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 20. R-BIB-57 · La vignette grisée s'affiche dans la vue d'où la photo a été ajoutée : toute la bibliothèque, ou la collection affichée (voir [collections.md](collections.md#parcourir-une-collection)). Dans une collection, la vignette grisée reste jusqu'à ce que la photo y soit rangée.
 21. R-BIB-58 · Quitter la bibliothèque pour une autre page de l'application n'interrompt pas les envois, qui continuent un par un ; les vignettes grisées sont de nouveau là au retour. Choisir d'autres photos entre-temps les met en attente derrière les premières. Fermer l'application ou recharger la page interrompt ceux qui ne sont pas terminés.
 22. R-BIB-59 · Un lecteur d'écran annonce le nombre de photos en cours d'envoi chaque fois qu'il change.
+23. R-BIB-65 · Quand le panneau « Ajouter une photo » se ferme, ou le panneau d'envoi ouvert depuis lui avec « Envoyer à un ami », la navigation au clavier reprend sur le bouton « Ajouter » affiché : celui de l'en-tête sur un ordinateur, le bouton rond « + » sur un téléphone (qui réapparaît s'il s'était effacé), même si le panneau avait été ouvert depuis une bibliothèque vide.
 
 **Messages affichés**
 

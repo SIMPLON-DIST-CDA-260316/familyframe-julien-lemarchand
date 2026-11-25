@@ -1,5 +1,5 @@
 import { PlusIcon } from 'lucide-react'
-import { type JSX, useEffect } from 'react'
+import { type JSX, type RefObject, useEffect } from 'react'
 import { Button } from '@/components/ui/button.tsx'
 import { useHideOnScrollDown } from '@/hooks/useHideOnScrollDown.ts'
 import { cn } from '@/lib/utils.ts'
@@ -27,16 +27,18 @@ function useLiftToasts(isShown: boolean): void {
 
 type AddPhotoFabProps = {
   onAdd: () => void
+  // The library page focuses it when the add panels close.
+  buttonRef: RefObject<HTMLButtonElement | null>
 }
 
 // A phone's « Ajouter », where the thumb rests: bottom right, above the tab bar and the home bar.
 // A computer keeps the button in the header.
-export function AddPhotoFab({ onAdd }: AddPhotoFabProps): JSX.Element {
-  const { isHidden, ref, onFocus } = useHideOnScrollDown()
+export function AddPhotoFab({ onAdd, buttonRef }: AddPhotoFabProps): JSX.Element {
+  const { isHidden, onFocus } = useHideOnScrollDown(buttonRef)
   useLiftToasts(!isHidden)
   return (
     <Button
-      ref={ref}
+      ref={buttonRef}
       onClick={onAdd}
       onFocus={onFocus}
       aria-label="Ajouter une photo"

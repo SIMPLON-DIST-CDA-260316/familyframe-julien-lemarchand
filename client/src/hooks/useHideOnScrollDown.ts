@@ -1,4 +1,4 @@
-import { type RefObject, useEffect, useRef, useState } from 'react'
+import { type RefObject, useEffect, useState } from 'react'
 
 // Smaller moves are a finger resting on the screen, not a scroll: the button would flicker.
 const SCROLL_THRESHOLD_PX = 12
@@ -7,7 +7,6 @@ const END_MARGIN_PX = 48
 
 export type HideOnScrollDown = {
   isHidden: boolean
-  ref: RefObject<HTMLButtonElement | null>
   onFocus: () => void
 }
 
@@ -26,10 +25,10 @@ function keepsKeyboardFocus(button: HTMLButtonElement | null): boolean {
 }
 
 // A floating button covers what scrolls under it: it steps aside while the page goes down and
-// comes back when it goes up, at the top, at the end, or when the keyboard reaches it.
-export function useHideOnScrollDown(): HideOnScrollDown {
+// comes back when it goes up, at the top, at the end, or when the keyboard reaches it. ref: the
+// button, owned by the page, which also focuses it when a panel closes.
+export function useHideOnScrollDown(ref: RefObject<HTMLButtonElement | null>): HideOnScrollDown {
   const [isHidden, setIsHidden] = useState(false)
-  const ref = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     let lastY = window.scrollY
@@ -44,7 +43,7 @@ export function useHideOnScrollDown(): HideOnScrollDown {
     }
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  }, [ref])
 
-  return { isHidden, ref, onFocus: () => setIsHidden(false) }
+  return { isHidden, onFocus: () => setIsHidden(false) }
 }

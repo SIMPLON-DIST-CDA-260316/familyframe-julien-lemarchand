@@ -1,5 +1,5 @@
 import { PlayIcon, PlusIcon } from 'lucide-react'
-import type { JSX } from 'react'
+import type { JSX, RefObject } from 'react'
 import { Link } from 'react-router'
 import { LayoutToggle } from '@/components/frame/LayoutToggle.tsx'
 import { libraryCountLabel } from '@/components/library/libraryTexts.ts'
@@ -16,6 +16,8 @@ type LibraryHeaderProps = {
   onAdd: () => void
   // false over a collection that cannot be shown: its photos, if any were loaded, are stale.
   showsCount: boolean
+  // The add and send panels give focus back to « Ajouter » when they close.
+  addButtonRef: RefObject<HTMLButtonElement | null>
 }
 
 function FrameModeButton(): JSX.Element {
@@ -42,6 +44,7 @@ export function LibraryHeader({
   onLayoutChange,
   onAdd,
   showsCount,
+  addButtonRef,
 }: LibraryHeaderProps): JSX.Element {
   return (
     // A phone has the floating « Ajouter » and the Cadre tab: only the layout toggle stays here.
@@ -55,7 +58,7 @@ export function LibraryHeader({
         </p>
       </div>
       <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
-        <Button size="lg" className="hidden md:inline-flex" onClick={onAdd}>
+        <Button ref={addButtonRef} size="lg" className="hidden md:inline-flex" onClick={onAdd}>
           <PlusIcon aria-hidden data-icon="inline-start" />
           Ajouter
         </Button>

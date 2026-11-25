@@ -29,18 +29,40 @@ type LibraryContentProps = {
   pending: PendingUpload[]
   viewer: ViewerParam
   onAdd: () => void
-  allChipRef: RefObject<HTMLAnchorElement | null>
+  addButtonRef: RefObject<HTMLButtonElement | null>
 }
 
 type LibraryBodyProps = LibraryContentProps & { layout: LibraryLayout }
 
+// The two « Ajouter » triggers, one shown at a time: the header's on a computer, the floating
+// button on a phone. Focus returns to the shown one when the panels close.
+type AddPanel = {
+  isOpen: boolean
+  open: () => void
+  close: () => void
+  headerButtonRef: RefObject<HTMLButtonElement | null>
+  fabRef: RefObject<HTMLButtonElement | null>
+}
+
 type LibraryOverlaysProps = {
   library: PhotoLibrary
   viewer: ViewerParam
-  isAdding: boolean
-  onAddClose: () => void
+  addPanel: AddPanel
   onUpload: (files: File[]) => void
   isShowingPhotos: boolean
+}
+
+function useAddPanel(): AddPanel {
+  const [isOpen, setIsOpen] = useState(false)
+  const headerButtonRef = useRef<HTMLButtonElement>(null)
+  const fabRef = useRef<HTMLButtonElement>(null)
+  return {
+    isOpen,
+    open: () => setIsOpen(true),
+    close: () => setIsOpen(false),
+    headerButtonRef,
+    fabRef,
+  }
 }
 
 function LibraryBody(props: LibraryBodyProps): JSX.Element {
@@ -66,7 +88,9 @@ function LibraryBody(props: LibraryBodyProps): JSX.Element {
 
 function LibraryContent(props: LibraryContentProps): JSX.Element {
   const [layout, setLayout] = useLibraryLayout()
-  const { selected, library, onAdd, allChipRef } = props
+  const { selected, library, onAdd, addButtonRef } = props
+  // « Toutes »: where focus lands once the shown collection is deleted.
+  const allChipRef = useRef<HTMLAnchorElement>(null)
   return (
     <>
       <LibraryHeader
@@ -75,6 +99,7 @@ function LibraryContent(props: LibraryContentProps): JSX.Element {
         onLayoutChange={setLayout}
         onAdd={onAdd}
         showsCount={isShowingPhotos(selected)}
+        addButtonRef={addButtonRef}
       />
       {/* Above the photos: news from the family comes first. */}
       <LibraryMail />
@@ -96,14 +121,19 @@ function isShowingPhotos(selected: SelectedCollection): boolean {
 function LibraryOverlays({
   library,
   viewer,
-  isAdding,
-  onAddClose,
+  addPanel,
   onUpload,
   isShowingPhotos,
 }: LibraryOverlaysProps): JSX.Element {
   return (
     <>
-      <AddPhotoPanel isOpen={isAdding} onClose={onAddClose} onUpload={onUpload} />
+      <AddPhotoPanel
+        isOpen={addPanel.isOpen}
+        onClose={addPanel.close}
+        onUpload={onUpload}
+        returnFocusRefs={[addPanel.headerButtonRef, addPanel.fabRef]}
+      />
+      <AddPhotoFab onAdd={addPanel.open} buttonRef={addPanel.fabRef} />
       {viewer.openId !== null && isShowingPhotos && (
         <PhotoViewer library={library} openId={viewer.openId} viewer={viewer} />
       )}
@@ -117,8 +147,7 @@ export default function LibraryPage(): JSX.Element {
   const library = usePhotoLibrary(collectionId)
   const viewer = useViewerParam()
   const uploads = usePhotoUploads(collectionId, library)
-  const [isAdding, setIsAdding] = useState(false)
-  const allChipRef = useRef<HTMLAnchorElement>(null)
+  const addPanel = useAddPanel()
 
   return (
     // pb-24 below md: the floating « Ajouter » never covers the last photos or « Charger plus ».
@@ -129,18 +158,16 @@ export default function LibraryPage(): JSX.Element {
         library={library}
         pending={uploads.pending}
         viewer={viewer}
-        onAdd={() => setIsAdding(true)}
-        allChipRef={allChipRef}
+        onAdd={addPanel.open}
+        addButtonRef={addPanel.headerButtonRef}
       />
       <LibraryOverlays
         library={library}
         viewer={viewer}
-        isAdding={isAdding}
-        onAddClose={() => setIsAdding(false)}
+        addPanel={addPanel}
         onUpload={uploads.enqueue}
         isShowingPhotos={isShowingPhotos(selected)}
       />
-      <AddPhotoFab onAdd={() => setIsAdding(true)} />
     </main>
   )
 }
