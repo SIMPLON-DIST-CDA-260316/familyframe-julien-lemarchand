@@ -21,6 +21,8 @@ script:pre-request {
 assert {
   res.status: eq 200
   res.body.photoIds.length: eq 0
+  res.body.coverUrl: isNull
+  res.body.newestPhotoAt: isNull
 }
 
 script:post-response {
@@ -42,7 +44,7 @@ script:post-response {
 }
 
 docs {
-  NOMINAL → 200 avec la collection vide. Retirer une photo d'une
+  NOMINAL → 200 avec la collection vide, sans couverture ni dates. Retirer une photo d'une
   collection ne la supprime pas : le script la retrouve dans la
   bibliothèque.
 }

@@ -36,7 +36,13 @@ import { createSelectionsController } from './features/selections/selections.con
 import { createSelectionsRepository } from './features/selections/selections.repository.js'
 import { createSelectionsRouter } from './features/selections/selections.routes.js'
 import { createSelectionsService } from './features/selections/selections.service.js'
-import { avatarUrl, deleteImage, uploadAvatar, uploadImage } from './lib/cloudinary.js'
+import {
+  avatarUrl,
+  deleteImage,
+  thumbnailUrl,
+  uploadAvatar,
+  uploadImage,
+} from './lib/cloudinary.js'
 import { prisma } from './lib/db.js'
 import { toAvatarJpeg, toFrameJpeg } from './lib/image.js'
 import { logger } from './lib/logger.js'
@@ -77,6 +83,7 @@ function assembleCollectionsRouter(io: SocketServer): Router {
   const service = createCollectionsService({
     repository: createCollectionsRepository(prisma),
     logger,
+    thumbnailUrl,
   })
   return createCollectionsRouter(createCollectionsController(service, io))
 }

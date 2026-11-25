@@ -30,6 +30,9 @@ assert {
   res.body.name: eq Noël
   res.body.photoIds: isArray
   res.body.photoIds.length: eq 0
+  res.body.coverUrl: isNull
+  res.body.oldestPhotoAt: isNull
+  res.body.newestPhotoAt: isNull
   res.body.ownerId: isUndefined
 }
 
@@ -49,6 +52,7 @@ script:post-response {
 }
 
 docs {
-  NOMINAL → 201 `{ id, name, photoIds }`, sans photo. Le nom part entouré d'espaces : le serveur
+  NOMINAL → 201 `{ id, name, photoIds, coverUrl, oldestPhotoAt, newestPhotoAt }`, sans photo,
+  donc sans couverture ni dates (null). Le nom part entouré d'espaces : le serveur
   le rogne. Le script relit la liste : la collection est bien enregistrée.
 }

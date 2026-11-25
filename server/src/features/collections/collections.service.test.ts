@@ -5,6 +5,7 @@ import type { ApiErrorCode } from '../../types.js'
 import type {
   CollectionRecord,
   CollectionsRepository,
+  LivePhoto,
   WriteRefusal,
 } from './collections.repository.js'
 import { createCollectionsService, parseCollectionName } from './collections.service.js'
@@ -25,15 +26,20 @@ const REFUSALS: [WriteRefusal, ApiErrorCode][] = [
   ['name_taken', 'COLLECTION_EXISTS'],
 ]
 
+// A photo still in the library; its date and Cloudinary id only matter to the cover tests.
+function livePhoto(id: string): LivePhoto {
+  return { id, cloudinaryId: `familyframe/${id}`, createdAt: new Date('2026-11-20T10:00:00Z') }
+}
+
 // Every dependency succeeds by default; each test breaks only the one it is about.
 function makeDeps() {
   return {
     repository: {
       findAllOf: vi.fn<CollectionsRepository['findAllOf']>().mockResolvedValue([NOEL, ETE]),
       // The deleted photo is no longer in the library.
-      findLivePhotoIds: vi
-        .fn<CollectionsRepository['findLivePhotoIds']>()
-        .mockResolvedValue([PHOTO_ID]),
+      findLivePhotos: vi
+        .fn<CollectionsRepository['findLivePhotos']>()
+        .mockResolvedValue([livePhoto(PHOTO_ID)]),
       create: vi.fn<CollectionsRepository['create']>().mockResolvedValue(ETE),
       rename: vi.fn<CollectionsRepository['rename']>().mockResolvedValue(NOEL),
       deleteOwned: vi.fn<CollectionsRepository['deleteOwned']>().mockResolvedValue(NOEL),
@@ -47,6 +53,7 @@ function makeDeps() {
       warn: vi.fn<Logger['warn']>(),
       error: vi.fn<Logger['error']>(),
     },
+    thumbnailUrl: (cloudinaryId: string) => `thumb:${cloudinaryId}`,
   }
 }
 
@@ -81,9 +88,9 @@ describe('listCollections', () => {
 
     const collections = await createCollectionsService(deps).listCollections(OWNER_ID)
 
-    expect(collections[1]).toEqual({ id: NOEL.id, name: 'Noël', photoIds: [PHOTO_ID] })
-    expect(deps.repository.findLivePhotoIds).toHaveBeenCalledOnce()
-    expect(deps.repository.findLivePhotoIds).toHaveBeenCalledWith(OWNER_ID, NOEL.photoIds)
+    expect(collections[1]?.photoIds).toEqual([PHOTO_ID])
+    expect(deps.repository.findLivePhotos).toHaveBeenCalledOnce()
+    expect(deps.repository.findLivePhotos).toHaveBeenCalledWith(OWNER_ID, NOEL.photoIds)
   })
 })
 
@@ -97,7 +104,14 @@ describe('createCollection', () => {
     })
 
     expect(deps.repository.create).toHaveBeenCalledWith(OWNER_ID, 'Été')
-    expect(collection).toEqual({ id: ETE.id, name: 'Été', photoIds: [] })
+    expect(collection).toEqual({
+      id: ETE.id,
+      name: 'Été',
+      photoIds: [],
+      coverUrl: null,
+      oldestPhotoAt: null,
+      newestPhotoAt: null,
+    })
   })
 
   it('refuses a name the account already uses', async () => {

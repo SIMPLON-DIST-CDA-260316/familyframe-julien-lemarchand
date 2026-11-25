@@ -1,7 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
 import { AppError } from '../../errors/app-error.js'
 import type { Logger } from '../../lib/logger.js'
-import type { CollectionRecord, CollectionsRepository } from './collections.repository.js'
+import type {
+  CollectionRecord,
+  CollectionsRepository,
+  LivePhoto,
+} from './collections.repository.js'
 import { createCollectionsService } from './collections.service.js'
 
 const OWNER_ID = '6b044f9d56a44767c7079b02'
@@ -19,14 +23,19 @@ const NOEL: CollectionRecord = {
 const WITH_PHOTO: CollectionRecord = { ...NOEL, photoIds: [OTHER_PHOTO_ID, PHOTO_ID] }
 const MEMBERSHIP = { id: NOEL.id, ownerId: OWNER_ID, photoId: PHOTO_ID }
 
+// A photo still in the library; its date and Cloudinary id only matter to the cover tests.
+function livePhoto(id: string): LivePhoto {
+  return { id, cloudinaryId: `familyframe/${id}`, createdAt: new Date('2026-11-20T10:00:00Z') }
+}
+
 // Every dependency succeeds by default; each test breaks only the one it is about.
 function makeDeps() {
   return {
     repository: {
       findAllOf: vi.fn<CollectionsRepository['findAllOf']>(),
-      findLivePhotoIds: vi
-        .fn<CollectionsRepository['findLivePhotoIds']>()
-        .mockResolvedValue([PHOTO_ID, OTHER_PHOTO_ID]),
+      findLivePhotos: vi
+        .fn<CollectionsRepository['findLivePhotos']>()
+        .mockResolvedValue([livePhoto(PHOTO_ID), livePhoto(OTHER_PHOTO_ID)]),
       create: vi.fn<CollectionsRepository['create']>(),
       rename: vi.fn<CollectionsRepository['rename']>(),
       deleteOwned: vi.fn<CollectionsRepository['deleteOwned']>(),
@@ -40,6 +49,7 @@ function makeDeps() {
       warn: vi.fn<Logger['warn']>(),
       error: vi.fn<Logger['error']>(),
     },
+    thumbnailUrl: (cloudinaryId: string) => `thumb:${cloudinaryId}`,
   }
 }
 
@@ -211,7 +221,7 @@ describe('a photo deleted from the library', () => {
   it('is left out of the collection the server answers', async () => {
     const deps = makeDeps()
     deps.repository.addPhoto.mockResolvedValue({ ...NOEL, photoIds: [DELETED_PHOTO_ID, PHOTO_ID] })
-    deps.repository.findLivePhotoIds.mockResolvedValue([PHOTO_ID])
+    deps.repository.findLivePhotos.mockResolvedValue([livePhoto(PHOTO_ID)])
 
     const collection = await createCollectionsService(deps).addPhoto(MEMBERSHIP)
 

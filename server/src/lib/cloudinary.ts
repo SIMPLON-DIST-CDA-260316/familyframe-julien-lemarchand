@@ -60,6 +60,18 @@ function deliveryUrl(cloudinaryId: string, transformation: ImageTransformationOp
   })
 }
 
+const THUMBNAIL: ImageTransformationOptions = {
+  crop: 'fill',
+  gravity: 'auto',
+  width: THUMBNAIL_SIZE,
+  height: THUMBNAIL_SIZE,
+}
+
+// The library's square thumbnail; a collection's cover reuses it, an already allowed transformation.
+export function thumbnailUrl(cloudinaryId: string): string {
+  return deliveryUrl(cloudinaryId, [THUMBNAIL, OPTIMIZED_DELIVERY])
+}
+
 // limit: shrinks a larger photo, never enlarges one; photos stored before the 4096 px cap stay
 // at 1920 px and go through unchanged.
 export function deliveryUrls(cloudinaryId: string): DeliveryUrls {
@@ -68,15 +80,9 @@ export function deliveryUrls(cloudinaryId: string): DeliveryUrls {
     width: DISPLAY_SIZE,
     height: DISPLAY_SIZE,
   }
-  const thumbnail: ImageTransformationOptions = {
-    crop: 'fill',
-    gravity: 'auto',
-    width: THUMBNAIL_SIZE,
-    height: THUMBNAIL_SIZE,
-  }
   return {
     url: deliveryUrl(cloudinaryId, [display, OPTIMIZED_DELIVERY]),
-    thumbnailUrl: deliveryUrl(cloudinaryId, [thumbnail, OPTIMIZED_DELIVERY]),
+    thumbnailUrl: thumbnailUrl(cloudinaryId),
   }
 }
 

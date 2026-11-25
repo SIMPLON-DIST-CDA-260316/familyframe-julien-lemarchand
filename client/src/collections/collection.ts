@@ -1,10 +1,19 @@
 // Copy of server/src/types.ts, see why there. Keep both in sync.
 
 // photoIds: the owner's photos, in the order they were added; a deleted photo is not listed.
+// coverUrl: the signed thumbnail of its newest photo. oldestPhotoAt and newestPhotoAt: ISO dates
+// of its oldest and newest photos. All three null while it is empty.
 export type Collection = {
   id: string
   name: string
   photoIds: string[]
+  coverUrl: string | null
+  oldestPhotoAt: string | null
+  newestPhotoAt: string | null
+}
+
+function isStringOrNull(value: unknown): value is string | null {
+  return value === null || typeof value === 'string'
 }
 
 // Same bound as the server: the field stops there instead of answering an error.
@@ -20,7 +29,13 @@ export function isCollection(value: unknown): value is Collection {
     typeof value.name === 'string' &&
     'photoIds' in value &&
     Array.isArray(value.photoIds) &&
-    value.photoIds.every((photoId) => typeof photoId === 'string')
+    value.photoIds.every((photoId) => typeof photoId === 'string') &&
+    'coverUrl' in value &&
+    isStringOrNull(value.coverUrl) &&
+    'oldestPhotoAt' in value &&
+    isStringOrNull(value.oldestPhotoAt) &&
+    'newestPhotoAt' in value &&
+    isStringOrNull(value.newestPhotoAt)
   )
 }
 

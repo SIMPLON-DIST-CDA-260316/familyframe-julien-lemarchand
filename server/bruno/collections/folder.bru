@@ -8,7 +8,10 @@ docs {
   `{ collections }`, `POST /api/collections` (JSON `{ name }`) → 201,
   `PATCH /api/collections/:id` (JSON `{ name }`) → 200, `DELETE
   /api/collections/:id` → 204. Une collection renvoyée par l'API vaut
-  `{ id, name, photoIds }`, jamais son propriétaire. Chaque écriture envoie
+  `{ id, name, photoIds, coverUrl, oldestPhotoAt, newestPhotoAt }`, jamais
+  son propriétaire : `coverUrl` est la vignette signée de sa photo la plus
+  récente, les deux dates (ISO) celles de sa photo la plus ancienne et de la
+  plus récente ; les trois valent null tant qu'elle est vide. Chaque écriture envoie
   l'événement Socket.IO `collections:changed`, sans contenu, aux connexions
   du propriétaire : elles relisent la liste.
 

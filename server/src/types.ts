@@ -109,10 +109,15 @@ export type PhotoPage = {
 export type UnopenedPhotos = { photos: Photo[] }
 
 // photoIds: the owner's photos, in the order they were added; a deleted photo is not listed.
+// coverUrl: the signed thumbnail of its newest photo. oldestPhotoAt and newestPhotoAt: ISO dates
+// of its oldest and newest photos. All three null while it is empty.
 export type Collection = {
   id: string
   name: string
   photoIds: string[]
+  coverUrl: string | null
+  oldestPhotoAt: string | null
+  newestPhotoAt: string | null
 }
 
 // Sorted by name: the order of every menu that lists them.

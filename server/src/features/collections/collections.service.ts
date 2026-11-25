@@ -5,6 +5,7 @@ import { OBJECT_ID_PATTERN, parsePhotoId } from '../photos/photos.input.js'
 import type {
   CollectionRecord,
   CollectionsRepository,
+  LivePhoto,
   WriteRefusal,
 } from './collections.repository.js'
 
@@ -30,7 +31,12 @@ export type PhotoMembership = CollectionAction & { photoId: string }
 export type CollectionsServiceDeps = {
   repository: CollectionsRepository
   logger: Logger
+  // The signed square thumbnail of the library (lib/cloudinary.ts): stubbed in the tests.
+  thumbnailUrl: (cloudinaryId: string) => string
 }
+
+// The photos still in the library, by id: a deleted photo's id stays in photoIds.
+type LivePhotos = Map<string, LivePhoto>
 
 export type CollectionsService = {
   listCollections: (ownerId: string) => Promise<Collection[]>
@@ -68,29 +74,50 @@ function orThrow(result: CollectionRecord | WriteRefusal): CollectionRecord {
   return result
 }
 
-// A deleted photo's id stays in photoIds: the DTO keeps the photos still in the library.
+type PhotoSpan = Pick<Collection, 'coverUrl' | 'oldestPhotoAt' | 'newestPhotoAt'>
+
+// The newest photo is the cover, as it comes first in the library (R-BIB-20), whatever the order
+// the photos were added in. The dates run from the oldest photo to the newest.
+export function photoSpan(
+  photos: LivePhoto[],
+  thumbnailUrl: (cloudinaryId: string) => string,
+): PhotoSpan {
+  const newestFirst = photos.toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+  const newest = newestFirst.at(0)
+  const oldest = newestFirst.at(-1)
+  return {
+    coverUrl: newest ? thumbnailUrl(newest.cloudinaryId) : null,
+    oldestPhotoAt: oldest?.createdAt.toISOString() ?? null,
+    newestPhotoAt: newest?.createdAt.toISOString() ?? null,
+  }
+}
+
+// The DTO keeps the photos still in the library, in the order they were added.
 function toCollectionDto(
+  { thumbnailUrl }: CollectionsServiceDeps,
   { id, name, photoIds }: CollectionRecord,
-  liveIds: Set<string>,
+  live: LivePhotos,
 ): Collection {
-  return { id, name, photoIds: photoIds.filter((photoId) => liveIds.has(photoId)) }
+  const photos = photoIds.flatMap((photoId) => live.get(photoId) ?? [])
+  return { id, name, photoIds: photos.map((photo) => photo.id), ...photoSpan(photos, thumbnailUrl) }
 }
 
 // One query for every collection, however many there are.
-async function findLiveIds(
+async function findLivePhotos(
   { repository }: CollectionsServiceDeps,
   ownerId: string,
   records: CollectionRecord[],
-): Promise<Set<string>> {
+): Promise<LivePhotos> {
   const allIds = records.flatMap((record) => record.photoIds)
-  return new Set(await repository.findLivePhotoIds(ownerId, allIds))
+  const photos = await repository.findLivePhotos(ownerId, allIds)
+  return new Map(photos.map((photo) => [photo.id, photo]))
 }
 
 async function toCollection(
   deps: CollectionsServiceDeps,
   record: CollectionRecord,
 ): Promise<Collection> {
-  return toCollectionDto(record, await findLiveIds(deps, record.ownerId, [record]))
+  return toCollectionDto(deps, record, await findLivePhotos(deps, record.ownerId, [record]))
 }
 
 // « Été » before « Noël »: French order, not the order of the character codes.
@@ -99,8 +126,8 @@ async function listCollections(
   ownerId: string,
 ): Promise<Collection[]> {
   const records = await deps.repository.findAllOf(ownerId)
-  const liveIds = await findLiveIds(deps, ownerId, records)
-  const collections = records.map((record) => toCollectionDto(record, liveIds))
+  const live = await findLivePhotos(deps, ownerId, records)
+  const collections = records.map((record) => toCollectionDto(deps, record, live))
   return collections.sort((a, b) => a.name.localeCompare(b.name, 'fr'))
 }
 

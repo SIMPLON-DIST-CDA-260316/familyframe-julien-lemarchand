@@ -3,13 +3,16 @@ import { IS_OPENED } from '../photos/photos.repository.js'
 
 export type CollectionRecord = Collection
 
+// What a collection shows of its photos: the cover and the dates.
+export type LivePhoto = { id: string; cloudinaryId: string; createdAt: Date }
+
 // Why a write found nothing to change: the service turns it into the error code.
 export type WriteRefusal = 'not_found' | 'name_taken'
 
 export type CollectionsRepository = {
   findAllOf: (ownerId: string) => Promise<CollectionRecord[]>
-  // Among ids, the ones still in the owner's library: a deleted photo stays in photoIds.
-  findLivePhotoIds: (ownerId: string, ids: string[]) => Promise<string[]>
+  // Among ids, the photos still in the owner's library: a deleted photo stays in photoIds.
+  findLivePhotos: (ownerId: string, ids: string[]) => Promise<LivePhoto[]>
   create: (ownerId: string, name: string) => Promise<CollectionRecord | WriteRefusal>
   rename: (id: string, ownerId: string, name: string) => Promise<CollectionRecord | WriteRefusal>
   // null unless id is one of ownerId's collections.
@@ -51,16 +54,15 @@ async function refusalOnPrismaError(
   }
 }
 
-async function findLivePhotoIds(
+function findLivePhotos(
   prisma: PrismaClient,
   ownerId: string,
   ids: string[],
-): Promise<string[]> {
-  const photos = await prisma.photo.findMany({
+): Promise<LivePhoto[]> {
+  return prisma.photo.findMany({
     where: { ownerId, id: { in: ids } },
-    select: { id: true },
+    select: { id: true, cloudinaryId: true, createdAt: true },
   })
-  return photos.map((photo) => photo.id)
 }
 
 async function nullWhenNotFound(
@@ -109,7 +111,7 @@ function setPhotoIds(
 export function createCollectionsRepository(prisma: PrismaClient): CollectionsRepository {
   return {
     findAllOf: (ownerId) => prisma.collection.findMany({ where: { ownerId } }),
-    findLivePhotoIds: (ownerId, ids) => findLivePhotoIds(prisma, ownerId, ids),
+    findLivePhotos: (ownerId, ids) => findLivePhotos(prisma, ownerId, ids),
     // photoIds: [] written for real: a missing field would never match « does not have ».
     create: (ownerId, name) =>
       refusalOnPrismaError(prisma.collection.create({ data: { ownerId, name, photoIds: [] } })),
