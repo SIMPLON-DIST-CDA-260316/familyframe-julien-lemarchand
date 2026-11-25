@@ -13,17 +13,19 @@ type AddFriendDialogProps = {
   isOpen: boolean
   onOpenChange: (isOpen: boolean) => void
   onDone: (result: FriendRequestResult) => void
+  onCloseAutoFocus: (event: Event) => void
 }
 
-// Controlled from the page: the header button and the empty state both open it.
+// Controlled from the page: its triggers open it, and the page says where focus goes after.
 export function AddFriendDialog({
   isOpen,
   onOpenChange,
   onDone,
+  onCloseAutoFocus,
 }: AddFriendDialogProps): JSX.Element {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent onCloseAutoFocus={onCloseAutoFocus}>
         <DialogHeader>
           <DialogTitle>Ajouter un ami</DialogTitle>
           <DialogDescription>

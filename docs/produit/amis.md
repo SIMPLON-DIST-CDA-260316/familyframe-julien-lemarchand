@@ -55,7 +55,7 @@ Deux membres deviennent amis quand l'un envoie une demande et que l'autre l'acce
 8. R-AMI-17 · En cas de réussite, la fenêtre se ferme, un message de confirmation s'affiche sur la page et la vue bascule : « En attente » pour une demande envoyée, « Mes amis » pour une amitié conclue (R-AMI-15).
 9. R-AMI-18 · En cas d'échec, la fenêtre reste ouverte avec le message d'erreur et l'adresse saisie. Modifier l'adresse efface le message.
 10. R-AMI-19 · La personne qui reçoit la demande la voit sous « Demandes reçues » à son prochain chargement de la page (R-AMI-06).
-11. R-AMI-46 · Sur un téléphone, « Ajouter un ami » est un bouton rond en bas à droite de l'écran, comme le « + » de la bibliothèque (R-APP-76) ; il n'est plus en haut de la page. Quand la fenêtre d'ajout se ferme, la navigation au clavier reprend sur le bouton qui l'avait ouverte.
+11. R-AMI-46 · Sur un téléphone, « Ajouter un ami » est un bouton rond en bas à droite de l'écran, comme le « + » de la bibliothèque (R-APP-76) ; il n'est plus en haut de la page. Quand la fenêtre d'ajout se ferme, la navigation au clavier reprend sur le bouton « Ajouter un ami » affiché : celui du haut de la page sur un ordinateur, le bouton rond sur un téléphone (qui réapparaît s'il s'était effacé), même si la fenêtre avait été ouverte depuis la vue « Mes amis » vide.
 
 **Messages affichés**
 

@@ -1,5 +1,5 @@
 import { UserPlusIcon } from 'lucide-react'
-import { type JSX, useRef } from 'react'
+import { type JSX, type RefObject, useRef } from 'react'
 import { RetryButton } from '@/components/feedback/RetryButton.tsx'
 import { AddFriendDialog } from '@/components/friends/AddFriendDialog.tsx'
 import { FriendshipSection } from '@/components/friends/FriendshipSection.tsx'
@@ -15,11 +15,17 @@ import type { Friendship, FriendshipList } from '@/friendship.ts'
 import type { FriendshipActions } from '@/hooks/useFriendshipActions.ts'
 import { useFriendships } from '@/hooks/useFriendships.ts'
 import { type FriendsPageState, useFriendsPage } from '@/hooks/useFriendsPage.ts'
+import { shownButton } from '@/lib/shownButton.ts'
 
 const ADD_FRIEND_LABEL = 'Ajouter un ami'
 
+type PageHeaderProps = {
+  onAddFriend: () => void
+  addButtonRef: RefObject<HTMLButtonElement | null>
+}
+
 // A phone floats « Ajouter un ami » instead, where the thumb rests, like the library's « + ».
-function PageHeader({ onAddFriend }: { onAddFriend: () => void }): JSX.Element {
+function PageHeader({ onAddFriend, addButtonRef }: PageHeaderProps): JSX.Element {
   return (
     <header className="flex flex-wrap items-end justify-between gap-4">
       <div className="flex flex-col gap-1">
@@ -28,7 +34,7 @@ function PageHeader({ onAddFriend }: { onAddFriend: () => void }): JSX.Element {
           Les proches à qui vous pouvez envoyer des photos.
         </p>
       </div>
-      <Button className="hidden md:inline-flex" onClick={onAddFriend}>
+      <Button ref={addButtonRef} className="hidden md:inline-flex" onClick={onAddFriend}>
         <UserPlusIcon aria-hidden data-icon="inline-start" />
         {ADD_FRIEND_LABEL}
       </Button>
@@ -158,10 +164,21 @@ function Notices({ error, notice }: { error: string; notice: string }): JSX.Elem
   )
 }
 
-// The dialog opens from the header, the empty list and, on a phone, this floating button. Radix
-// gives focus back to whichever opened it: the ref is only the button's own, for hiding on scroll.
-function AddFriend({ page, onOpen }: { page: FriendsPageState; onOpen: () => void }): JSX.Element {
+type AddFriendProps = {
+  page: FriendsPageState
+  onOpen: () => void
+  headerButtonRef: RefObject<HTMLButtonElement | null>
+}
+
+// The dialog opens from the header, the empty list and, on a phone, this floating button. Focus
+// goes back to the shown « Ajouter un ami », not to Radix's opener: iOS Safari does not focus a
+// tapped button, and the empty list's button leaves with the first friend.
+function AddFriend({ page, onOpen, headerButtonRef }: AddFriendProps): JSX.Element {
   const fabRef = useRef<HTMLButtonElement>(null)
+  function returnFocus(event: Event): void {
+    event.preventDefault()
+    shownButton([headerButtonRef, fabRef])?.focus()
+  }
   return (
     <>
       <PageFab icon={UserPlusIcon} label={ADD_FRIEND_LABEL} onClick={onOpen} buttonRef={fabRef} />
@@ -169,6 +186,7 @@ function AddFriend({ page, onOpen }: { page: FriendsPageState; onOpen: () => voi
         isOpen={page.isDialogOpen}
         onOpenChange={page.setIsDialogOpen}
         onDone={page.handleRequestDone}
+        onCloseAutoFocus={returnFocus}
       />
     </>
   )
@@ -178,11 +196,12 @@ export default function FriendsPage(): JSX.Element {
   const { friendships, isLoading, error, reload } = useFriendships()
   const page = useFriendsPage(reload)
   const openDialog = (): void => page.setIsDialogOpen(true)
+  const headerButtonRef = useRef<HTMLButtonElement>(null)
 
   return (
     // pb-24 below md: the floating button never covers the last friend's « Retirer ».
     <main className="mx-auto flex max-w-2xl flex-col gap-8 px-4 pt-10 pb-24 md:pb-10">
-      <PageHeader onAddFriend={openDialog} />
+      <PageHeader onAddFriend={openDialog} addButtonRef={headerButtonRef} />
       <Notices error={error || page.actions.error} notice={page.notice} />
       {/* Only for the list's own load: a failed action keeps its message and the list. */}
       {error && <RetryButton onRetry={reload} />}
@@ -196,7 +215,7 @@ export default function FriendsPage(): JSX.Element {
           onAddFriend={openDialog}
         />
       )}
-      <AddFriend page={page} onOpen={openDialog} />
+      <AddFriend page={page} onOpen={openDialog} headerButtonRef={headerButtonRef} />
     </main>
   )
 }
