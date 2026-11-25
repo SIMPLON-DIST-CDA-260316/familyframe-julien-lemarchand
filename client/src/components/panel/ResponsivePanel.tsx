@@ -30,7 +30,7 @@ function DesktopDialog({
   )
 }
 
-// A phone gets the sheet from the bottom, under the thumb.
+// A phone gets the sheet from the bottom, under the thumb; its last button stays above the home bar.
 function PhoneSheet({
   onClose,
   onCloseAutoFocus,
@@ -43,7 +43,7 @@ function PhoneSheet({
         side="bottom"
         // bg-popover matches the ring offset of the friend avatars, as in the dialog.
         className={cn(
-          'max-h-[90svh] rounded-t-2xl bg-popover px-4 pt-4 pb-6 text-popover-foreground',
+          'max-h-[90svh] rounded-t-2xl bg-popover px-4 pt-4 pb-[calc(1.5rem_+_env(safe-area-inset-bottom))] text-popover-foreground',
           className,
         )}
         onCloseAutoFocus={onCloseAutoFocus}

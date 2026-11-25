@@ -34,7 +34,8 @@ type BottomOverlayProps = {
 
 function BottomOverlay({ captionPhoto, children }: BottomOverlayProps): JSX.Element {
   return (
-    <div className="pointer-events-none absolute inset-x-0 bottom-0 isolate">
+    // The caption and the buttons stay above the home bar and beside a sideways notch.
+    <div className="pointer-events-none absolute inset-x-0 bottom-0 isolate pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]">
       {/* The shade is there for the controls: at rest it fades out with them (FramePage sets data-idle). */}
       <div
         aria-hidden

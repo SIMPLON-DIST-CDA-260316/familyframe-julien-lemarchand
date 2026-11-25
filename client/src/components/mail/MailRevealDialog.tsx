@@ -40,7 +40,7 @@ function RevealedPhoto({ photo }: { photo: Photo }): JSX.Element {
 
 function RevealTopBar({ position, count }: { position: number; count: number }): JSX.Element {
   return (
-    <div className="flex items-center gap-2 px-4 py-3">
+    <div className="flex items-center gap-2 pt-[max(0.75rem,env(safe-area-inset-top))] pr-[max(1rem,env(safe-area-inset-right))] pb-3 pl-[max(1rem,env(safe-area-inset-left))]">
       <DialogPrimitive.Close asChild>
         <Button variant="ghost" size="icon-lg" aria-label="Fermer">
           <XIcon />
@@ -74,7 +74,8 @@ export function MailRevealDialog({ photos, onOpen, onClose }: MailRevealDialogPr
         {/* Above the photo viewer and the frame's buttons: the reveal has the whole screen. */}
         <DialogPrimitive.Content
           aria-describedby={undefined}
-          className="dark fixed inset-0 z-50 flex flex-col gap-6 bg-frame-background pb-8 text-foreground outline-none"
+          // pb: « Suivante » stays above the home bar.
+          className="dark fixed inset-0 z-50 flex flex-col gap-6 bg-frame-background pb-[calc(2rem_+_env(safe-area-inset-bottom))] text-foreground outline-none"
         >
           <RevealTopBar position={index + 1} count={photos.length} />
           {/* The key restarts the reveal animation for each photo. */}

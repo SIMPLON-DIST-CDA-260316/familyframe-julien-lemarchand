@@ -27,12 +27,15 @@ function LoggedInLayout(): JSX.Element {
   )
 }
 
-// The frame is full screen: only the other pages get the account bar.
+// The frame is full screen: only the other pages get the account bar. A phone held sideways puts
+// its notch on a side: the pages stay clear of it.
 function AccountBarLayout(): JSX.Element {
   return (
     <>
       <AccountBar />
-      <Outlet />
+      <div className="pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]">
+        <Outlet />
+      </div>
     </>
   )
 }

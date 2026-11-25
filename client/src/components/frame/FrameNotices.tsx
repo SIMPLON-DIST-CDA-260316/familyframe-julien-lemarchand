@@ -18,7 +18,7 @@ export function FrameNotices({
   onShowNewest,
 }: FrameNoticesProps): JSX.Element {
   return (
-    <div className="fixed top-6 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-3">
+    <div className="fixed top-[calc(1.5rem_+_env(safe-area-inset-top))] left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-3">
       <WaitingPhotosBadge count={waitingCount} onSelect={onReveal} />
       <NewPhotosBadge count={newPhotoCount} onSelect={onShowNewest} />
     </div>

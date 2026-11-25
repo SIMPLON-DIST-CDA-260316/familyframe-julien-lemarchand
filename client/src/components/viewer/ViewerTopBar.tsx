@@ -50,8 +50,9 @@ export function ViewerTopBar({
 }: ViewerTopBarProps): JSX.Element {
   return (
     // ✕ top left and the actions top right, as on the slideshow. The row spans the screen: only
-    // its buttons take pointers, swipes beside them reach the carousel.
-    <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center gap-2 bg-linear-to-b from-black/60 to-transparent px-4 py-3 *:pointer-events-auto">
+    // its buttons take pointers, swipes beside them reach the carousel. Its shade runs under the
+    // notch, its buttons stay below it.
+    <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center gap-2 bg-linear-to-b from-black/60 to-transparent pt-[max(0.75rem,env(safe-area-inset-top))] pr-[max(1rem,env(safe-area-inset-right))] pb-3 pl-[max(1rem,env(safe-area-inset-left))] *:pointer-events-auto">
       <CloseViewerButton onClose={onClose} />
       <p aria-live="polite" className="mx-auto text-sm text-white/80 tabular-nums">
         {counter}

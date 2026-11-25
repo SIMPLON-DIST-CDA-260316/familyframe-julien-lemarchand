@@ -72,7 +72,7 @@ export function FrameStatusScreen({
       )}
     >
       {/* Where the slideshow has it: a frame stuck on loading can still go full screen. */}
-      <div className="fixed top-0 right-0 px-6 py-4">
+      <div className="fixed top-0 right-0 pt-[max(1rem,env(safe-area-inset-top))] pr-[max(1.5rem,env(safe-area-inset-right))] pb-4 pl-6">
         <FullscreenButton />
       </div>
       <div className="flex flex-col items-center gap-4 px-6 text-center">

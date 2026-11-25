@@ -56,12 +56,12 @@ export function ViewerCarousel({
       <CarouselPrevious
         variant="ghost"
         aria-label="Photo précédente"
-        className={cn(ARROW_CLASSES, 'left-4')}
+        className={cn(ARROW_CLASSES, 'left-[max(1rem,env(safe-area-inset-left))]')}
       />
       <CarouselNext
         variant="ghost"
         aria-label="Photo suivante"
-        className={cn(ARROW_CLASSES, 'right-4')}
+        className={cn(ARROW_CLASSES, 'right-[max(1rem,env(safe-area-inset-right))]')}
       />
     </Carousel>
   )

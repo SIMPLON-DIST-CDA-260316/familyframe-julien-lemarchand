@@ -101,6 +101,25 @@ Comment on se déplace dans l'application, comment on choisit son thème, et les
 - Choisir d'autres couleurs.
 - Retrouver son thème sur un nouvel appareil sans le choisir de nouveau.
 
+## Écran de téléphone
+
+**Ce que l'on peut faire**
+
+- Utiliser l'application sur toute la surface de l'écran d'un téléphone, encoche et coins arrondis compris.
+
+**Règles**
+
+1. R-APP-56 · Sur un téléphone à encoche, à coins arrondis ou à barre de navigation en bas, l'application occupe tout l'écran, mais aucun bouton ni texte ne passe sous l'encoche, dans un coin ou sous cette barre : la barre du haut, les panneaux qui montent du bas, la photo ouverte en grand, la découverte des photos reçues et le cadre gardent leurs boutons et leurs légendes dans la partie utilisable de l'écran, téléphone tenu droit ou couché.
+2. R-APP-57 · La barre du navigateur, autour de l'adresse, prend la couleur claire ou sombre du réglage de l'appareil, et la page s'affiche dans ces couleurs dès son ouverture. Avec un thème choisi à l'inverse de l'appareil (« Sombre » sur un appareil réglé en clair, par exemple), la barre du navigateur garde la couleur de l'appareil.
+
+**Messages affichés**
+
+Aucun message.
+
+**Ce qui n'est pas possible**
+
+- Choisir la couleur de la barre du navigateur.
+
 ## Page introuvable
 
 **Ce que l'on peut faire**
