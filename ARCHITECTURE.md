@@ -321,3 +321,4 @@ Points déjà connus :
 - **argon2** charge un binaire précompilé livré dans le paquet (Linux x64/arm64, glibc et musl, Windows x64) : son script de build reste bloqué par pnpm (`ignoredBuiltDependencies`). Comme Sharp, il doit être installé dans l'image, jamais copié depuis le `node_modules` Windows.
 - Le serveur qui sert le client doit faire le **SPA fallback** pour `/login`, `/frame`, `/friends`, `/settings`, `/invite/:token` et `/admin/invitations` (voir [Pages](#pages)).
 - Avec `NODE_ENV=production`, le cookie de session est `Secure` : servi en http simple (cadre sur le réseau local, Compose en local), le navigateur l'ignore et la connexion échoue sans message. Servir en HTTPS, ou ne pas définir `NODE_ENV=production` en http.
+- Wake Lock : contexte sécurisé (HTTPS ou localhost) uniquement. Servi en http simple sur le réseau local, le cadre ne garde pas l'écran allumé (R-CAD-98), sans erreur visible.
