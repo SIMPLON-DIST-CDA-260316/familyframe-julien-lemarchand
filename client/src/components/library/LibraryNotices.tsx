@@ -5,25 +5,34 @@ import { Button } from '@/components/ui/button.tsx'
 
 const NOTICE_CLASSES = 'flex flex-col items-center gap-4 px-6 py-16 text-center'
 
-export function EmptyLibrary({ onAdd }: { onAdd: () => void }): JSX.Element {
+type AddProps = { onAdd: () => void }
+
+function AddPhotoButton({ onAdd }: AddProps): JSX.Element {
+  return (
+    <Button size="lg" className="pointer-coarse:h-11" onClick={onAdd}>
+      <ImagePlusIcon aria-hidden data-icon="inline-start" />
+      Ajouter une photo
+    </Button>
+  )
+}
+
+export function EmptyLibrary({ onAdd }: AddProps): JSX.Element {
   return (
     <div className={NOTICE_CLASSES}>
       <p className="text-muted-foreground">Aucune photo pour l'instant.</p>
-      <Button size="lg" className="pointer-coarse:h-11" onClick={onAdd}>
-        <ImagePlusIcon aria-hidden data-icon="inline-start" />
-        Ajouter une photo
-      </Button>
+      <AddPhotoButton onAdd={onAdd} />
     </div>
   )
 }
 
-export function EmptyCollection(): JSX.Element {
+export function EmptyCollection({ onAdd }: AddProps): JSX.Element {
   return (
     <div className={NOTICE_CLASSES}>
       <p className="font-medium">Cette collection est vide.</p>
       <p className="max-w-xs text-sm text-muted-foreground">
-        Rangez-y des photos depuis leur menu « … », dans « Toutes ».
+        Ajoutez-y une photo, ou rangez-y celles de « Toutes » depuis leur menu « … ».
       </p>
+      <AddPhotoButton onAdd={onAdd} />
     </div>
   )
 }

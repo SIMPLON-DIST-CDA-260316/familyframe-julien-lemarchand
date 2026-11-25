@@ -163,7 +163,7 @@ function connectLibrary(
   }
 }
 
-// A new upload is in no collection yet: a collection's list leaves it out.
+// A collection's list waits for collections:changed: an upload enters it once filed there.
 function usePhotoAdder(
   liveLoads: LiveLoads,
   setPhotos: Dispatch<SetStateAction<Photo[]>>,

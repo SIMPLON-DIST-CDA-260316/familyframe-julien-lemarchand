@@ -12,6 +12,7 @@ import { LibrarySection } from '@/components/library/LibrarySection.tsx'
 import { LibraryMail } from '@/components/mail/LibraryMail.tsx'
 import { PhotoViewer } from '@/components/viewer/PhotoViewer.tsx'
 import { type LibraryLayout, useLibraryLayout } from '@/hooks/useLibraryLayout.ts'
+import { useLibraryUpload } from '@/hooks/useLibraryUpload.ts'
 import { type PhotoLibrary, usePhotoLibrary } from '@/hooks/usePhotoLibrary.ts'
 import {
   type SelectedCollection,
@@ -19,6 +20,7 @@ import {
   useSelectedCollection,
 } from '@/hooks/useSelectedCollection.ts'
 import { useViewerParam, type ViewerParam } from '@/hooks/useViewerParam.ts'
+import type { Photo } from '@/photo.ts'
 
 type LibraryContentProps = {
   selected: SelectedCollection
@@ -34,6 +36,7 @@ type LibraryOverlaysProps = {
   viewer: ViewerParam
   isAdding: boolean
   onAddClose: () => void
+  onUploaded: (photo: Photo) => void
 }
 
 function LibraryBody({ selected, library, layout, viewer, onAdd }: LibraryBodyProps): JSX.Element {
@@ -44,7 +47,7 @@ function LibraryBody({ selected, library, layout, viewer, onAdd }: LibraryBodyPr
     return <UnavailableCollection message="Cette collection n'a pas pu être chargée." />
   }
   const emptyState =
-    selected.status === 'all' ? <EmptyLibrary onAdd={onAdd} /> : <EmptyCollection />
+    selected.status === 'all' ? <EmptyLibrary onAdd={onAdd} /> : <EmptyCollection onAdd={onAdd} />
   return (
     <LibrarySection
       library={library}
@@ -76,10 +79,11 @@ function LibraryOverlays({
   viewer,
   isAdding,
   onAddClose,
+  onUploaded,
 }: LibraryOverlaysProps): JSX.Element {
   return (
     <>
-      <AddPhotoPanel isOpen={isAdding} onClose={onAddClose} onUploaded={library.addPhoto} />
+      <AddPhotoPanel isOpen={isAdding} onClose={onAddClose} onUploaded={onUploaded} />
       {viewer.openId !== null && (
         <PhotoViewer library={library} openId={viewer.openId} viewer={viewer} />
       )}
@@ -91,6 +95,7 @@ export default function LibraryPage(): JSX.Element {
   const selected = useSelectedCollection()
   const library = usePhotoLibrary(selectedCollectionId(selected))
   const viewer = useViewerParam()
+  const handleUploaded = useLibraryUpload(selected, library)
   const [isAdding, setIsAdding] = useState(false)
 
   return (
@@ -106,6 +111,7 @@ export default function LibraryPage(): JSX.Element {
         viewer={viewer}
         isAdding={isAdding}
         onAddClose={() => setIsAdding(false)}
+        onUploaded={handleUploaded}
       />
     </main>
   )

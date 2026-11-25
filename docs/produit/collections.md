@@ -81,6 +81,7 @@ Une collection est une liste de photos de sa bibliothèque, rangées sous un nom
 - Dans la bibliothèque, choisir une collection dans la rangée placée sous l'annonce des photos reçues : seules ses photos s'affichent, sous son nom.
 - Revenir à toutes les photos avec « Toutes », au début de la rangée.
 - Ouvrir une photo de la collection en grand et passer d'une photo à l'autre sans sortir de la collection.
+- Ajouter une photo avec « Ajouter » pendant qu'une collection est affichée : elle y est rangée aussitôt.
 
 **Règles**
 
@@ -88,17 +89,18 @@ Une collection est une liste de photos de sa bibliothèque, rangées sous un nom
 2. R-COL-16 · Une collection affiche ses photos dans le même ordre que la bibliothèque (R-BIB-20), 30 à la fois avec « Charger plus ».
 3. R-COL-17 · La collection choisie fait partie de l'adresse de la page : recharger la page, revenir en arrière ou ouvrir un lien enregistré montre la même collection.
 4. R-COL-18 · Une photo ouverte en grand depuis une collection fait défiler les seules photos de cette collection ; la fermer ramène dans la collection.
-5. R-COL-19 · Une collection vide le dit et explique comment y ranger des photos.
+5. R-COL-19 · Une collection vide le dit, explique comment y ranger des photos et propose « Ajouter une photo », qui ouvre le même panneau que « Ajouter ».
 6. R-COL-20 · Une collection supprimée sur un autre appareil, ou un lien vers une collection qui n'existe pas affiche « Cette collection n'existe plus. » et propose « Voir toutes les photos ».
-7. R-COL-21 · La collection affichée suit les changements sans recharger la page : une photo rangée ou retirée, sur cet appareil ou un autre, y apparaît ou en disparaît. Une photo ajoutée pendant qu'une collection est affichée n'y entre pas : elle rejoint « Toutes ».
+7. R-COL-21 · La collection affichée suit les changements sans recharger la page : une photo rangée ou retirée, sur cet appareil ou un autre, y apparaît ou en disparaît. Une photo ajoutée pendant qu'une collection est affichée entre dans la bibliothèque et est rangée dans cette collection ; si le rangement échoue, un message le dit et la photo reste dans la bibliothèque.
 
 **Messages affichés**
 
-| Situation                | Message                                                                                           |
-| ------------------------ | ------------------------------------------------------------------------------------------------- |
-| Collection vide          | « Cette collection est vide. » — « Rangez-y des photos depuis leur menu « … », dans « Toutes ». » |
-| Collection introuvable   | « Cette collection n'existe plus. » et le bouton « Voir toutes les photos »                       |
-| Collections non chargées | « Cette collection n'a pas pu être chargée. » et le bouton « Voir toutes les photos »             |
+| Situation                                  | Message                                                                                                                                               |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Collection vide                            | « Cette collection est vide. » — « Ajoutez-y une photo, ou rangez-y celles de « Toutes » depuis leur menu « … ». » et le bouton « Ajouter une photo » |
+| Collection introuvable                     | « Cette collection n'existe plus. » et le bouton « Voir toutes les photos »                                                                           |
+| Photo ajoutée dans une collection affichée | « Photo ajoutée à votre bibliothèque. » puis « Photo ajoutée à « Noël ». »                                                                            |
+| Collections non chargées                   | « Cette collection n'a pas pu être chargée. » et le bouton « Voir toutes les photos »                                                                 |
 
 **Ce qui n'est pas possible**
 
