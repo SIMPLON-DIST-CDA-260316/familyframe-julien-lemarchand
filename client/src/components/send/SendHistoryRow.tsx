@@ -1,6 +1,7 @@
 import type { JSX } from 'react'
 import { RemoveSendDialog } from '@/components/send/RemoveSendDialog.tsx'
 import { recipientsLine, sentThumbnailAlt } from '@/components/send/sendTexts.ts'
+import { quotedMessage } from '@/photoLabel.ts'
 import { fullSendDate, relativeSendDate } from '@/sendDate.ts'
 import type { SentPhoto } from '@/sentPhoto.ts'
 
@@ -36,7 +37,7 @@ export function SendHistoryRow({ send, now, onRemove }: SendHistoryRowProps): JS
         </div>
         {send.message !== null && (
           <p className="line-clamp-2 text-sm break-words text-muted-foreground">
-            « {send.message} »
+            {quotedMessage(send.message)}
           </p>
         )}
       </div>
