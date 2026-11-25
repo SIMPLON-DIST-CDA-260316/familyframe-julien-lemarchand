@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu.tsx'
 import { useStartRadio } from '@/hooks/useStartRadio.ts'
+import { cn } from '@/lib/utils.ts'
 import type { Photo } from '@/photo.ts'
 
 // The frame and the viewer are always dark; the library follows the app's theme.
@@ -126,7 +127,8 @@ type MenuItemsProps = {
 function MenuItems({ photo, themeClass, onOpen, children }: MenuItemsProps): JSX.Element {
   const startRadio = useStartRadio()
   return (
-    <DropdownMenuContent align="end" className={themeClass}>
+    // w-max: the content would take the small « … »'s width and wrap « Lancer la radio ».
+    <DropdownMenuContent align="end" className={cn('w-max', themeClass)}>
       {children}
       <DropdownMenuItem onSelect={() => startRadio(photo.id)}>
         <RadioIcon />
