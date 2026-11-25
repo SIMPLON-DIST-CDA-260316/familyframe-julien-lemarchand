@@ -4,8 +4,8 @@ status: done
 spec: docs/superpowers/specs/2026-11-25-stabilisation-design.md
 branch: fix/stabilisation
 worktree: false
-tasks_total: 6
-tasks_done: 6
+tasks_total: 7
+tasks_done: 7
 current_task: null
 last_commit: null
 last_updated: 2026-11-25
@@ -413,3 +413,8 @@ index d6236d6..31a8cf6 100644
 - **Task 6 was not in the triage list:** found while writing the step 11 checklist. Its setup uploads 25 photos on one day, and expected result 5 (« add a photo: the lot does not change ») could fail: photos of the day were ranked by hash, so a newcomer could outrank a photo already in the lot whenever the account had fewer than 20 older photos. The new unit test failed on the old code (`LATE_ARRIVAL_NUMBER` was picked so its hash ranks first among the photos of the day), then passed.
 - **Task 6, no Bruno case:** reproducing it needs more than 20 photos uploaded in one Bruno run against the shared database; the unit test pins the rule (spec, Rejected).
 - **Task 2 type:** `test(server)` rather than `fix(...)`: it adds coverage, no behaviour changes.
+- **Task 7, from the self-review:** `docs: say photos of the day complete the lot in arrival order` (R-CAD-84 still said all 20 are drawn at random; the draw comment still said « next one in draw order »). No diff block: two wording lines, see the commit.
+- **Context-free self-review** (fresh reviewer on `d58d3b8..fix/stabilisation`, after Task 6): no Critical, no Important. It confirmed every code fix, that both new unit tests fail without their fix (photo 203 ranks first of the photos of the day on 2026-11-25), the Bruno case against `parseCollectionFilter`, the console snippets against the routes, and 12 « already fixed » claims with their commits. Minors and outcome:
+  - Fixed in the spec (`docs: correct the stabilisation triage and checklists`): S5 T2 `findOwnedPhoto` was not renamed, the helper still exists (now « won't fix: naming »); the blocked-storage toast is not red (no `richColors`), it is an error toast with an octagon icon; radio step 9 put X1 before T25; step 8 said no repeated `daily` calls although steps 4 and 5 each reload it by design; step 7 now offers restarting the API if Chrome's « Offline » keeps the WebSocket open.
+  - Fixed in Task 7: R-CAD-84 wording and the draw comment.
+  - Not done, optional: move `NOT_FOUND_STATUS` next to `UNAUTHORIZED_STATUS` in `api.ts`; `api.ts` is close to step 14's upload code, and one local constant is clear enough.

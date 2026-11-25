@@ -30,7 +30,7 @@ Decision values: **fixed** (commit subject), **already fixed** (where), **won't 
 | S4 T8 · `onClick` returns an unawaited promise                       | Won't fix: `run` never rejects (the API helpers return results), and React ignores the return value.                                        |
 | S5 T1 · `findOwned` untested until T2                                | Already fixed: covered by the photo share tests since step 5 T2.                                                                            |
 | S5 T1 · `isPhoto` requires `senderName`                              | Won't fix: intended; the API always sends it and both ship together.                                                                        |
-| S5 T2 · `findOwnedPhoto` id naming                                   | Already fixed: the repository method is `findOwned(id, ownerId)`.                                                                           |
+| S5 T2 · `findOwnedPhoto` id naming                                   | Won't fix: naming; the helper `findOwnedPhoto` (`photos.share.ts`) still wraps `repository.findOwned`.                                      |
 | S5 T2 · `photo.duplicate` logged in both `saveCopy` and `saveRecord` | Won't fix: two paths (a share copy, an upload), each logs once per request.                                                                 |
 | S5 T5 · `delete/folder.bru` docs wrap                                | Won't fix: style.                                                                                                                           |
 | S7 T1 · `sonner.tsx` `Toaster` has no return type                    | Won't fix: shadcn file; no `ui/*.tsx` component declares one, and step 13 owns `ui/`.                                                       |
@@ -202,12 +202,12 @@ Day's selection, as Test S16 (30 photos: T1 to T25, R1 to R5):
 4. From another tab, delete T5: within seconds it leaves the strip and T21 takes its place (still 20).
 5. From another tab, run `await uploadPhotos('X', 1)` (after pasting `makePhoto` and `uploadPhotos`): the lot does not change, X1 is not in it. **This step failed before N1's fix** whenever X1's hash ranked it before a T photo.
 6. « Lecture » = « Aléatoire »: the 20 play shuffled, no repeat before the round ends. Switch to « Dans l'ordre », then back to « Aléatoire »: a new mix starts from the photo on screen (R-CAD-64, step 8 M1 fix).
-7. DevTools → Network → right-click `daily` → « Block request URL », reload: the whole library plays silently and « Sélection du jour » stays checked. Remove the block, then Network → throttling « Offline », then back to « No throttling »: on the socket reconnect the frame switches to the lot (otherwise within 15 minutes).
-8. Network → WS: exactly one more `socket.io` connection while the daily plays, closed when switching to the library; no repeated `daily` calls.
+7. DevTools → Network → right-click `daily` → « Block request URL », reload: the whole library plays silently and « Sélection du jour » stays checked. Remove the block, then Network → throttling « Offline », then back to « No throttling »: on the socket reconnect the frame switches to the lot (otherwise within 15 minutes). If « Offline » does not cut the open WebSocket, restart the dev API instead to force the reconnect.
+8. Network → WS: exactly one more `socket.io` connection while the daily plays, closed when switching to the library; one `daily` call per photo event (steps 4 and 5) or reconnect, no loop.
 
 Radio, as Test S16 (every photo arrived within 7 days, so each has at least the date link):
 
-9. Library → « … » on R3 → « Lancer la radio »: full screen on R3, URL `/frame?radio=<id>`, then R2 and R4 in either order, then R1 and R5 (same sender and same week, 2 links, closest in time first), then the photos with the date link only, closest in time to R3 first (X1 and T25 down to T1). 30 photos in all, start included.
+9. Library → « … » on R3 → « Lancer la radio »: full screen on R3, URL `/frame?radio=<id>`, then R2 and R4 in either order, then R1 and R5 (same sender and same week, 2 links, closest in time first), then the photos with the date link only, closest in time to R3 first (T25 down to T1, X1 placed by its own time gap, usually after T25). 30 photos in all, start included.
 10. « … » → « Photos »: « Radio » first and checked. Pick « Toute la bibliothèque »: the URL loses `radio`, the library plays and the choice is stored. Re-picking « Radio » while it plays does nothing.
 11. From the slideshow on T3, « Lancer la radio »: it restarts on T3, then T2 and T4 in either order, then T1 (T5 was deleted in step 4), all in « Radio test » (2 links), then the rest, closest in time first.
 12. Leave the frame (Escape, or exit full screen): the viewer opens on the photo shown; one Back returns to the library (not the frame, not two viewers).
@@ -231,7 +231,7 @@ Radio, as Test S16 (every photo arrived within 7 days, so each has at least the 
    ```
 
    This is what a browser that blocks site data does on a write. Reads still work, so the page keeps its current settings.
-3. « … » next to « Radio test » → « Lire sur le cadre »: a red toast « Cet appareil ne peut pas retenir ce choix. Choisissez la collection depuis le menu « … » du cadre. »; the URL stays `/?collection=<id>`, no full screen, no frame (R-COL-14).
+3. « … » next to « Radio test » → « Lire sur le cadre »: an error toast (octagon icon, neutral colours) « Cet appareil ne peut pas retenir ce choix. Choisissez la collection depuis le menu « … » du cadre. »; the URL stays `/?collection=<id>`, no full screen, no frame (R-COL-14).
 4. `localStorage.getItem('familyframe.frame-settings')` still shows the previous `source`.
 5. Restore with `Storage.prototype.setItem = realSetItem` (or reload the page), then « Lire sur le cadre » again: the frame opens full screen on « Radio test ».
 6. Optional, a real block instead of the override: Chrome Settings → Privacy and security → Site settings → Additional content settings → On-device site data → « Not allowed to save data on your device » → add the dev client's address (`http://localhost:5180`), then reload. Reads throw too in that mode: the frame settings fall back to their defaults, and step 3 gives the same toast. Remove the entry afterwards.
