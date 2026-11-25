@@ -3050,3 +3050,14 @@ index 67126b8..3cf2eff 100644
   - **Conflicts:** `PhotoGrid` and `PhotoList` (step 13's classes without padding kept, `{children}` added), `AddPhotoFab` (step 13's `useLiftToasts(!isHidden)` kept next to the `buttonRef` passed to `useHideOnScrollDown`), the messages table of `bibliotheque.md` (step 13's table kept at each commit, the two phone mentions applied to it).
   - **Task 1, pending tiles in the three phone columns** (spec D3): at 360 px a tile is about 100 px wide and « Finalisation… » no longer fit. The pill is tighter on a phone and shows only the percentage (`pendingShortLabel`), the whole label from `sm`; the tile takes step 13's corners. R-BIB-54 and the messages table say what a phone shows.
   - **Known overrun:** `LibraryPage` measures 33 lines by the size script at Tasks 1 and 1a (step 13's own version measures 31); Task 1b brings it back under the limit. Left as is rather than reshaping the page twice.
+- **Final review fixes** (controller, after the stack was picked into the real repo: 0 Critical, 1 Important, 9 Minor). Separate commits on top of Task 4, history untouched; each passes `pnpm check` and `pnpm typecheck`. Decisions D24 to D29 in the spec.
+  - I1 `fix(client): stop the upload queue when the user logs out` (D24). The controller suggested keeping the XHR in the queue's state; an `AbortController` there does the same `abort()` and keeps `postWithProgress` generic. R-BIB-58 amended, ARCHITECTURE step 2.
+  - M1 `fix(client): give up an upload after two minutes` (D25). R-BIB-55 amended, ARCHITECTURE step 2.
+  - M2 `fix(client): send the original when the browser cannot turn the photo` (D26). R-BIB-63 amended, ARCHITECTURE step 2.
+  - M3 `fix(client): always free the decoded photo and its canvas` (D27).
+  - M4 `docs: a reduced photo may escape duplicate detection` (R-BIB-43, spec open question 4).
+  - M5 `docs: strict transformations do not hide the original` (ARCHITECTURE step 7, Bruno docs block, spec open question 11).
+  - M7 `fix(client): key preview thumbnails by their position` (D28). Biome's `noArrayIndexKey` needs a `biome-ignore` with the reason, as `ViewerCarousel` already does.
+  - M9 `refactor(client): keep the upload texts beside the queue` and `docs: put R-BIB-65 after R-BIB-64 in the add photo rules` (D29).
+  - Skipped, noted as known limitations in the spec: M6 (the gap after a collection tile leaves) and M8 (memory of 20 full-size previews, for the phone walkthrough).
+  - Client code has no unit tests (`pnpm test` runs the server's): no server rule changed, so no test was added; `pnpm test` stays at 26 files, 308 tests.
