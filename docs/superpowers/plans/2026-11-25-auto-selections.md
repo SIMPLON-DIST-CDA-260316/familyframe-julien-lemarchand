@@ -88,7 +88,7 @@ last_updated: 2026-11-25
 - **PR A `feat/selections-server`** on top of `feat/collections-frame` (`f212b85`): this spec and plan (`docs: add the auto selections spec and plan`), then Tasks 1-2.
 - **PR B `feat/selections-daily`**: Task 3.
 - **PR C `feat/selections-radio`**: Task 4.
-- **db:push checkpoints: none** (no schema change).
+- **db:push checkpoints: none** (no schema change). Changed by the final review: one checkpoint on `feat/selections-server` for `Photo.openedAt` (Drift Log, I-1).
 
 ---
 
@@ -2829,6 +2829,10 @@ Format: `date · task/step · what the plan said · what was done · why`.
 | 2026-11-25 | Review (built stack), Tasks 1, 2 | unnamed numbers in the tests (`100`, `40`) | `LIBRARY.length + 1`, `RADIO_LENGTH + 10` | « no magic numbers » covers `src/**` tests too |
 | 2026-11-25 | Review (built stack), Task 1 | Bruno `daily/folder.bru` silent on midnight | notes that a run across midnight (Paris) may fail and should be run again | `daily/04` and `radio/03` assume the upload and the read fall on the same day |
 | 2026-11-25 | Review (built stack), Task 4 | a radio that fails at launch is never retried | not changed: spec Open question 7 (R-CAD-97) | a choice, not a bug: the library plays, « Radio » stays checked until another choice |
+| 2026-11-25 | Final review I-1, Task 1 | no schema change; a photo received before today and opened today counts at its reception (spec open question 3, R-CAD-86 exception) | `Photo.openedAt DateTime?`, set at the first opening only (`updateMany` on `isOpened: false`, then a read); the day's draw splits on `openedAt ?? createdAt`; new unit test; R-CAD-86 exception removed; spec « Opening date » row, open question 3 resolved; ARCHITECTURE flow and data. **db:push checkpoint** (optional field, no index, no seed) | the controller decided: opening yesterday's mail each morning is the frame's routine, and it changed the lot against the goal |
+| 2026-11-25 | Final review M-1, Task 2 | Fisher-Yates tail with an injected `random` (`Math.random`) | unlinked photos ranked by `idsInDrawOrder` seeded `<startId>:<day>`; `random` dependency removed; tests: same tail all day, another the next day; R-CAD-94 says what a reload does | a reload of `/frame?radio=` drew another tail, against R-CAD-94 |
+| 2026-11-25 | Final review M-3, Task 1 | `dayOf` formatted with `en-CA` (YYYY-MM-DD) | built from `formatToParts` (year, month, day); midnight and summer-time tests kept, a padding test added | the `en-CA` shape is ICU locale data, not a contract; the string comparison of days relied on it |
+| 2026-11-25 | Final review M-4, Task 1 | ranking comparator `a.rank < b.rank ? -1 : 1`, never 0 | `a.rank.localeCompare(b.rank)`, in the M-1 commit that shares the helper | same order on hex strings; a comparator that never returns 0 makes a reader wonder |
 
 ---
 
