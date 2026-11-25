@@ -5,6 +5,9 @@ export type ProgressResponse = { isOk: boolean; status: number; body: unknown }
 const FULL_PERCENT = 100
 const SUCCESS_STATUS_MIN = 200
 const SUCCESS_STATUS_MAX = 299
+// A 10 MB photo on a slow mobile link takes well under a minute; past two, the link is dead and
+// the queue moves on instead of waiting forever.
+const UPLOAD_TIMEOUT_MS = 120_000
 
 function toResponse(request: XMLHttpRequest): ProgressResponse {
   const { status, response } = request
@@ -14,7 +17,7 @@ function toResponse(request: XMLHttpRequest): ProgressResponse {
 
 // XMLHttpRequest rather than fetch: only it reports how much of the body has left. A same-origin
 // request sends the session cookie, as fetch does. null: the network failed, nothing came back,
-// or the signal stopped it (the user logged out).
+// timed out, or the signal stopped it (the user logged out).
 export function postWithProgress(
   url: string,
   body: FormData,
@@ -29,6 +32,7 @@ export function postWithProgress(
     const request = new XMLHttpRequest()
     request.open('POST', url)
     request.responseType = 'json'
+    request.timeout = UPLOAD_TIMEOUT_MS
     request.upload.onprogress = (event) => {
       if (event.lengthComputable) {
         onProgress(Math.round((event.loaded / event.total) * FULL_PERCENT))
@@ -37,6 +41,7 @@ export function postWithProgress(
     request.onload = () => resolve(toResponse(request))
     request.onerror = () => resolve(null)
     request.onabort = () => resolve(null)
+    request.ontimeout = () => resolve(null)
     signal.addEventListener('abort', () => request.abort(), { once: true })
     request.send(body)
   })
