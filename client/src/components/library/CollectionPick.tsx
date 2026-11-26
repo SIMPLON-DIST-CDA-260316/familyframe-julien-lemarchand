@@ -4,6 +4,7 @@ import { useCollections } from '@/collections/CollectionsContext.ts'
 import type { Collection } from '@/collections/collection.ts'
 import { PhotoMultiPicker } from '@/components/library/PhotoMultiPicker.tsx'
 import { Button } from '@/components/ui/button.tsx'
+import { usePhotoLibrary } from '@/hooks/usePhotoLibrary.ts'
 import { uploadSummary } from '@/upload/uploadTexts.ts'
 
 // Same bound as the server: past it the other tiles are disabled instead of answering an error.
@@ -40,11 +41,15 @@ function useAddChosen(collection: Collection, onAdded: () => void) {
 }
 
 export function CollectionPick({ collection, onAdded }: CollectionPickProps): JSX.Element {
-  const [chosenIds, setChosenIds] = useState<string[]>([])
+  const library = usePhotoLibrary(null)
+  const [pickedIds, setPickedIds] = useState<string[]>([])
   const { isAdding, add } = useAddChosen(collection, onAdded)
+  // A photo deleted meanwhile, here or on another device, leaves the grid and the choice with it:
+  // its tile is gone, so it could not be unticked, and the server would refuse the whole list.
+  const chosenIds = pickedIds.filter((id) => library.photos.some((photo) => photo.id === id))
 
   function toggle(photoId: string): void {
-    setChosenIds((ids) =>
+    setPickedIds((ids) =>
       ids.includes(photoId) ? ids.filter((id) => id !== photoId) : [...ids, photoId],
     )
   }
@@ -52,6 +57,7 @@ export function CollectionPick({ collection, onAdded }: CollectionPickProps): JS
   return (
     <div className="flex flex-col gap-4">
       <PhotoMultiPicker
+        library={library}
         chosenIds={chosenIds}
         inIds={collection.photoIds}
         isFull={chosenIds.length >= MAX_PHOTOS_PER_ADD}

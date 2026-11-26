@@ -1,6 +1,7 @@
 import { CheckIcon } from 'lucide-react'
 import type { JSX } from 'react'
 import { LibraryPhotoGrid } from '@/components/library/LibraryPhotoGrid.tsx'
+import type { PhotoLibrary } from '@/hooks/usePhotoLibrary.ts'
 import type { Photo } from '@/photo.ts'
 import { photoLabel } from '@/photoLabel.ts'
 
@@ -37,6 +38,7 @@ function ToggleTile({ photo, isChosen, isIn, isLocked, onToggle }: ToggleTilePro
 }
 
 type PhotoMultiPickerProps = {
+  library: PhotoLibrary
   chosenIds: string[]
   // The collection's photos: shown ticked and disabled rather than hidden, so the grid stays the
   // library the user knows.
@@ -46,9 +48,10 @@ type PhotoMultiPickerProps = {
 }
 
 export function PhotoMultiPicker(props: PhotoMultiPickerProps): JSX.Element {
-  const { chosenIds, inIds, isFull, onToggle } = props
+  const { library, chosenIds, inIds, isFull, onToggle } = props
   return (
     <LibraryPhotoGrid
+      library={library}
       renderPhoto={(photo) => (
         <ToggleTile
           key={photo.id}

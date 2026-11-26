@@ -1,5 +1,6 @@
 import type { JSX } from 'react'
 import { LibraryPhotoGrid } from '@/components/library/LibraryPhotoGrid.tsx'
+import { usePhotoLibrary } from '@/hooks/usePhotoLibrary.ts'
 import type { Photo } from '@/photo.ts'
 import { photoLabel } from '@/photoLabel.ts'
 
@@ -20,8 +21,10 @@ function PhotoChoice({ photo, onPick }: { photo: Photo; onPick: () => void }): J
 
 // One photo to send: a touch picks it.
 export function LibraryPicker({ onPick }: { onPick: (photo: Photo) => void }): JSX.Element {
+  const library = usePhotoLibrary(null)
   return (
     <LibraryPhotoGrid
+      library={library}
       renderPhoto={(photo) => (
         <PhotoChoice key={photo.id} photo={photo} onPick={() => onPick(photo)} />
       )}

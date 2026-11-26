@@ -65,7 +65,7 @@ Une collection est une liste de photos de sa bibliothèque, rangées sous un nom
 7. R-COL-28 · « Depuis ma bibliothèque » n'est proposé dans le panneau « Ajouter une photo » que lorsqu'une collection est affichée ; sur « Toutes les photos », le panneau garde ses deux choix. Il montre toute la bibliothèque, dans le même ordre et avec « Charger plus ».
 8. R-COL-29 · Toucher une photo la choisit (une coche l'indique), la toucher de nouveau la retire du choix. Les photos déjà dans la collection sont cochées et ne peuvent pas être touchées. Le bouton dit combien de photos seront ajoutées (« Ajouter 1 photo », « Ajouter 3 photos ») ; tant que rien n'est choisi, il dit « Ajouter des photos » et ne fait rien. « Retour » ramène aux choix du panneau.
 9. R-COL-30 · On peut choisir jusqu'à 100 photos à la fois ; au-delà, les autres photos ne peuvent plus être touchées tant qu'on n'en retire pas une du choix.
-10. R-COL-31 · Les photos choisies entrent dans la collection toutes ensemble, ou aucune : si l'une a été supprimée entre-temps, rien n'est rangé, un message le dit et le panneau reste ouvert avec le même choix. Sinon le panneau se ferme, la collection les montre aussitôt et un message dit combien ont été ajoutées.
+10. R-COL-31 · Une photo choisie puis supprimée, sur cet appareil ou un autre, disparaît de la grille et du choix sans message. Les photos choisies entrent dans la collection toutes ensemble, ou aucune : si l'une a été supprimée au tout dernier moment, rien n'est rangé, un message le dit et le panneau reste ouvert avec le même choix. Sinon le panneau se ferme, la collection les montre aussitôt et un message dit combien ont été ajoutées.
 
 **Messages affichés**
 
