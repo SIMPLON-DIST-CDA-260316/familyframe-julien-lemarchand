@@ -90,7 +90,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 - Agrandir une photo ouverte pour en voir les détails : en écartant deux doigts, d'un double toucher ou d'un double clic, ou avec les touches + et − du clavier ; puis la déplacer du doigt ou à la souris.
 - Ouvrir le menu « … » d'une photo (ou, sur Android, appuyer longuement sur sa miniature) pour lancer sa radio sur le cadre (voir [cadre.md](cadre.md#radio)), l'envoyer à un ami, la ranger dans ses collections (voir [collections.md](collections.md#ranger-ses-photos-dans-une-collection)) ou la supprimer.
 - Lancer le mode cadre, en plein écran, depuis la bibliothèque (« Mode cadre » sur un ordinateur, l'onglet « Cadre » sur un téléphone), ou depuis une photo ouverte pour que le diaporama commence par elle (voir [cadre.md](cadre.md)).
-- Découvrir les photos envoyées par ses proches depuis l'annonce placée sous l'en-tête (voir [partage.md](partage.md#recevoir-une-photo)).
+- Découvrir les photos envoyées par ses proches depuis l'annonce placée en haut de la page, au-dessus du titre (voir [partage.md](partage.md#recevoir-une-photo)).
 - N'afficher que les photos d'une collection, depuis la liste « Toutes les photos », « Noël », « Les vacances »… : la colonne de gauche sur un ordinateur, le titre de la page sur un téléphone (voir [collections.md](collections.md#parcourir-une-collection)).
 - Créer une collection depuis cette liste, et renommer, supprimer ou lire sur le cadre la collection affichée (voir [collections.md](collections.md)).
 

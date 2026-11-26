@@ -147,7 +147,7 @@ function PageTitle({
 }
 
 // Two columns from md: the collections on the left, what they show on the right, its actions
-// above the photos, after the news from the family when there is some.
+// right above the photos.
 function LibraryContent(props: LibraryContentProps): JSX.Element {
   const [layout, setLayout] = useLibraryLayout()
   const { selected, library, onAdd, addButtonRef } = props
@@ -158,6 +158,9 @@ function LibraryContent(props: LibraryContentProps): JSX.Element {
     <div className="flex gap-8">
       <CollectionsSidebar selectedId={selectedCollectionId(selected)} allPhotosRef={allPhotosRef} />
       <div className="flex min-w-0 flex-1 flex-col gap-4 sm:gap-6">
+        {/* First: news from the family comes before anything else, and the actions row stays right
+            above the photos it acts on. */}
+        <LibraryMail />
         <LibraryHeader
           title={<PageTitle selected={selected} library={library} {...refs} />}
           layout={layout}
@@ -165,8 +168,6 @@ function LibraryContent(props: LibraryContentProps): JSX.Element {
           onAdd={onAdd}
           addButtonRef={addButtonRef}
         />
-        {/* Above the photos: news from the family comes first. */}
-        <LibraryMail />
         <LibraryBody {...props} layout={layout} />
       </div>
     </div>
