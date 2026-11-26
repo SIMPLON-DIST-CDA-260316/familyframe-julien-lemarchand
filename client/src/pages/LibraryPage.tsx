@@ -1,5 +1,6 @@
 import { PlusIcon } from 'lucide-react'
 import { type JSX, type RefObject, useRef, useState } from 'react'
+import type { Collection } from '@/collections/collection.ts'
 import { CollectionActions } from '@/components/collections/CollectionActions.tsx'
 import { collectionSummary } from '@/components/collections/collectionSummary.ts'
 import { PageMain } from '@/components/layout/PageMain.tsx'
@@ -55,6 +56,7 @@ type LibraryOverlaysProps = {
   addPanel: AddPanel
   onUpload: (files: File[]) => void
   isShowingPhotos: boolean
+  collection: Collection | null
 }
 
 function useAddPanel(): AddPanel {
@@ -186,6 +188,7 @@ function LibraryOverlays({
   addPanel,
   onUpload,
   isShowingPhotos,
+  collection,
 }: LibraryOverlaysProps): JSX.Element {
   return (
     <>
@@ -193,6 +196,7 @@ function LibraryOverlays({
         isOpen={addPanel.isOpen}
         onClose={addPanel.close}
         onUpload={onUpload}
+        collection={collection}
         returnFocusRefs={[addPanel.headerButtonRef, addPanel.fabRef]}
       />
       <PageFab
@@ -233,6 +237,7 @@ export default function LibraryPage(): JSX.Element {
         addPanel={addPanel}
         onUpload={uploads.enqueue}
         isShowingPhotos={isShowingPhotos(selected)}
+        collection={selected.status === 'found' ? selected.collection : null}
       />
     </PageMain>
   )

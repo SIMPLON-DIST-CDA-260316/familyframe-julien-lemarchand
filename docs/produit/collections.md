@@ -51,6 +51,7 @@ Une collection est une liste de photos de sa bibliothèque, rangées sous un nom
 - Dans le menu « … » d'une photo (bibliothèque, photo ouverte en grand ou diaporama), ouvrir « Collections » : une case par collection, cochée quand la photo y est.
 - Cocher une case pour ranger la photo dans cette collection, la décocher pour l'en retirer. Le menu reste ouvert : on peut cocher plusieurs cases à la suite.
 - Choisir « Nouvelle collection… » pour créer une collection et y ranger aussitôt la photo.
+- Pendant qu'une collection est affichée, ouvrir « Ajouter », puis « Depuis ma bibliothèque » : toucher les photos à y ranger, puis « Ajouter 3 photos ».
 - Faire passer une collection sur le cadre, en boucle ou en ordre aléatoire : « Lire sur le cadre » dans le menu « … » de la collection affichée, « Photos » dans le menu « … » du cadre ou dans les préférences (voir [cadre.md](cadre.md#choisir-les-photos-du-cadre)).
 
 **Règles**
@@ -61,18 +62,24 @@ Une collection est une liste de photos de sa bibliothèque, rangées sous un nom
 4. R-COL-11 · Une photo reçue d'un proche ne peut être rangée qu'une fois découverte (voir [partage.md](partage.md#recevoir-une-photo)) ; avant, elle n'apparaît dans aucune collection.
 5. R-COL-12 · Seules les photos de sa propre bibliothèque peuvent être rangées dans ses collections.
 6. R-COL-13 · Une photo rangée ou retirée l'est aussitôt sur tous les appareils connectés au compte : les cases du menu « Collections » et la collection affichée suivent.
+7. R-COL-28 · « Depuis ma bibliothèque » n'est proposé dans le panneau « Ajouter une photo » que lorsqu'une collection est affichée ; sur « Toutes les photos », le panneau garde ses deux choix. Il montre toute la bibliothèque, dans le même ordre et avec « Charger plus ».
+8. R-COL-29 · Toucher une photo la choisit (une coche l'indique), la toucher de nouveau la retire du choix. Les photos déjà dans la collection sont cochées et ne peuvent pas être touchées. Le bouton dit combien de photos seront ajoutées (« Ajouter 1 photo », « Ajouter 3 photos ») ; tant que rien n'est choisi, il dit « Ajouter des photos » et ne fait rien. « Retour » ramène aux choix du panneau.
+9. R-COL-30 · On peut choisir jusqu'à 100 photos à la fois ; au-delà, les autres photos ne peuvent plus être touchées tant qu'on n'en retire pas une du choix.
+10. R-COL-31 · Les photos choisies entrent dans la collection toutes ensemble, ou aucune : si l'une a été supprimée entre-temps, rien n'est rangé, un message le dit et le panneau reste ouvert avec le même choix. Sinon le panneau se ferme, la collection les montre aussitôt et un message dit combien ont été ajoutées.
 
 **Messages affichés**
 
-| Situation                                               | Message                               |
-| ------------------------------------------------------- | ------------------------------------- |
-| Photo rangée dans une nouvelle collection               | « Photo ajoutée à « Noël ». »         |
-| Photo supprimée entre-temps                             | « Cette photo a déjà été supprimée. » |
-| Collection supprimée entre-temps, sur un autre appareil | « Cette collection n'existe plus. »   |
+| Situation                                               | Message                                                                          |
+| ------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Photo rangée dans une nouvelle collection               | « Photo ajoutée à « Noël ». »                                                    |
+| Photo supprimée entre-temps                             | « Cette photo a déjà été supprimée. »                                            |
+| Collection supprimée entre-temps, sur un autre appareil | « Cette collection n'existe plus. »                                              |
+| Photos ajoutées depuis la bibliothèque                  | « 3 photos ajoutées à « Noël ». » (« Photo ajoutée à « Noël ». » pour une seule) |
+| Choix depuis la bibliothèque                            | « Depuis ma bibliothèque » — « Choisissez les photos à ajouter à « Noël ». »     |
 
 **Ce qui n'est pas possible**
 
-- Ranger plusieurs photos d'un coup.
+- Ranger plusieurs photos d'un coup depuis « Toutes les photos » : il faut afficher la collection, puis « Ajouter » et « Depuis ma bibliothèque ».
 - Changer l'ordre des photos dans une collection.
 
 ## Parcourir une collection
@@ -90,7 +97,7 @@ Une collection est une liste de photos de sa bibliothèque, rangées sous un nom
 2. R-COL-16 · Une collection affiche ses photos dans le même ordre que la bibliothèque (R-BIB-20), 30 à la fois avec « Charger plus ».
 3. R-COL-17 · La collection choisie fait partie de l'adresse de la page : recharger la page, revenir en arrière ou ouvrir un lien enregistré montre la même collection.
 4. R-COL-18 · Une photo ouverte en grand depuis une collection fait défiler les seules photos de cette collection ; la fermer ramène dans la collection.
-5. R-COL-19 · Une collection vide le dit, explique comment y ranger des photos et propose « Ajouter une photo », qui ouvre le même panneau que « Ajouter ».
+5. R-COL-19 · Une collection vide le dit, explique comment y ranger des photos et propose « Ajouter une photo », qui ouvre le même panneau que « Ajouter », avec « Depuis ma bibliothèque » (R-COL-28).
 6. R-COL-20 · Une collection supprimée sur un autre appareil, ou un lien vers une collection qui n'existe pas affiche « Cette collection n'existe plus. » et propose « Voir toutes les photos ».
 7. R-COL-21 · La collection affichée suit les changements sans recharger la page : une photo rangée ou retirée, sur cet appareil ou un autre, y apparaît ou en disparaît. Une photo ajoutée pendant qu'une collection est affichée entre dans la bibliothèque et est rangée dans cette collection ; si le rangement échoue, un message le dit et la photo reste dans la bibliothèque.
 8. R-COL-22 · Remplacée : les cartes n'existent plus (R-COL-24, R-COL-25, R-COL-26). Chaque carte montrait une grande image carrée, puis le nom et le nombre de photos ; « Toutes » montrait une pile de photos sans nombre.
@@ -102,12 +109,12 @@ Une collection est une liste de photos de sa bibliothèque, rangées sous un nom
 
 **Messages affichés**
 
-| Situation                                  | Message                                                                                                                                                          |
-| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Collection vide                            | « Cette collection est vide. » — « Ajoutez-y une photo, ou rangez-y celles de « Toutes les photos » depuis leur menu « … ». » et le bouton « Ajouter une photo » |
-| Collection introuvable                     | « Cette collection n'existe plus. » et le bouton « Voir toutes les photos »                                                                                      |
-| Photo ajoutée dans une collection affichée | « Photo ajoutée à « Noël ». » (« 3 photos ajoutées à « Noël ». » pour plusieurs photos)                                                                          |
-| Collections non chargées                   | « Cette collection n'a pas pu être chargée. » et le bouton « Voir toutes les photos »                                                                            |
+| Situation                                  | Message                                                                                                                                                           |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Collection vide                            | « Cette collection est vide. » — « Ajoutez-y une photo, ou choisissez-en dans votre bibliothèque avec « Ajouter une photo ». » et le bouton « Ajouter une photo » |
+| Collection introuvable                     | « Cette collection n'existe plus. » et le bouton « Voir toutes les photos »                                                                                       |
+| Photo ajoutée dans une collection affichée | « Photo ajoutée à « Noël ». » (« 3 photos ajoutées à « Noël ». » pour plusieurs photos)                                                                           |
+| Collections non chargées                   | « Cette collection n'a pas pu être chargée. » et le bouton « Voir toutes les photos »                                                                             |
 
 **Ce qui n'est pas possible**
 

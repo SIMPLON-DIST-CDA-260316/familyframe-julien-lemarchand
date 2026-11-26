@@ -31,7 +31,7 @@ export function EmptyCollection({ onAdd }: AddProps): JSX.Element {
     <div className={NOTICE_CLASSES}>
       <p className="font-medium">Cette collection est vide.</p>
       <p className="max-w-xs text-sm text-muted-foreground">
-        Ajoutez-y une photo, ou rangez-y celles de « Toutes les photos » depuis leur menu « … ».
+        Ajoutez-y une photo, ou choisissez-en dans votre bibliothèque avec « Ajouter une photo ».
       </p>
       <AddPhotoButton onAdd={onAdd} />
     </div>

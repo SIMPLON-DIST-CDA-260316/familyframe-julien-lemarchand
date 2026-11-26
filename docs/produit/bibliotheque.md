@@ -7,7 +7,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 **Ce que l'on peut faire**
 
 - Toucher « Ajouter », en haut de la bibliothèque sur un ordinateur, ou le bouton rond « + » en bas à droite de l'écran sur un téléphone : le panneau « Ajouter une photo » s'ouvre, par le bas de l'écran sur un téléphone, au centre sur un ordinateur.
-- Dans ce panneau, prendre une photo avec l'appareil photo du téléphone (« Prendre une photo ») ou choisir une ou plusieurs images déjà enregistrées (« Choisir des images »).
+- Dans ce panneau, prendre une photo avec l'appareil photo du téléphone (« Prendre une photo ») ou choisir une ou plusieurs images déjà enregistrées (« Choisir des images »). Quand une collection est affichée, le panneau propose aussi « Depuis ma bibliothèque » (voir [collections.md](collections.md#ranger-ses-photos-dans-une-collection)).
 - Les photos choisies sont ajoutées aussitôt à sa bibliothèque : il n'y a rien d'autre à confirmer. Pour envoyer une photo à un ami sans la garder, passer par la page « Envoyer » (voir [partage.md](partage.md#envoyer-une-photo-depuis-la-page-envoyer)).
 - Suivre l'envoi sur la vignette de la photo, qui apparaît aussitôt dans la bibliothèque.
 
