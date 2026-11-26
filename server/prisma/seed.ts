@@ -42,6 +42,13 @@ if (process.env.NODE_ENV === 'production') {
   process.exit(1)
 }
 
+// --if-empty : seed seulement si la base est vide, ainsi le pre_start de Docker Compose n'efface jamais les data.
+if (process.argv.includes('--if-empty') && (await prisma.user.count()) > 0) {
+  logger.info('seed.skipped')
+  await prisma.$disconnect()
+  process.exit(0)
+}
+
 try {
   await seed()
 } finally {

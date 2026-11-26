@@ -1,0 +1,58 @@
+services:
+  db:
+    image: mongo:8.3.17
+    hostname: db
+    command: --replSet rs0
+    healthcheck:
+      # test: ["CMD", "mongosh", "--eval", "db.adminCommand({ ping: 1 })"]
+      test:
+        [
+          "CMD",
+          "mongosh",
+          "--quiet",
+          "--eval",
+          "try { rs.status() } catch (e) { rs.initiate() }",  # crée le replica set s'il n'existe pas encore
+          "--eval",
+          "quit(db.hello().isWritablePrimary ? 0 : 1)", # 0 = prêt à écrire (healthy), 1 = pas encore
+        ] 
+      interval: 10s
+      timeout: 5s
+      start_period: 30s
+      start_interval: 1s
+      retries: 5
+    volumes:
+      - "ff-mongo_data:/data/db"
+      - "ff-mongo_config:/data/configdb"
+
+  api:
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+    build:
+      context: ./server
+      target: main
+    image: ff-server:1.0.0
+    pre_start:
+      - command: pnpm db:push
+    ports:
+      - 3000:3000
+    env_file: ./server/.env
+    environment:
+      - DATABASE_URL=mongodb://db:27017/familyframe
+
+  client:
+    depends_on:
+      - api
+    build:
+      context: ./client
+      target: main
+    image: ff-client:1.0.0
+    ports:
+      - 5180:5180
+    environment:
+      - API_PROXY_TARGET=http://api:3000
+
+volumes:
+  ff-mongo_data:
+  ff-mongo_config:
