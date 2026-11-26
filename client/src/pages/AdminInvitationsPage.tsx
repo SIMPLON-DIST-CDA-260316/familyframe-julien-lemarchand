@@ -37,7 +37,7 @@ export default function AdminInvitationsPage(): JSX.Element {
   const { invitations, isLoading, error, reload } = useInvitations()
 
   return (
-    <PageMain>
+    <PageMain className="pb-10">
       <header className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold tracking-tight">Invitations</h1>
         <p className="text-sm text-muted-foreground">

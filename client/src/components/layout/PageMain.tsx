@@ -7,7 +7,8 @@ type Props = {
 }
 
 // Every page under the account bar: as wide as the bar, so the title starts under the logo.
-// pb-24 below md: a page's floating button never covers its last line.
+// pb-24 below md: a page's floating button never covers its last line. A page without one
+// passes pb-10.
 export function PageMain({ children, className }: Props): JSX.Element {
   return (
     <main

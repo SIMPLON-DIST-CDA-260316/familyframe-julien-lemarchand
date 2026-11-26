@@ -13,7 +13,7 @@ export default function SettingsPage(): JSX.Element | null {
   if (user === null) return null
 
   return (
-    <PageMain>
+    <PageMain className="pb-10">
       <header className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold tracking-tight">Préférences</h1>
         <p className="text-sm text-muted-foreground">
