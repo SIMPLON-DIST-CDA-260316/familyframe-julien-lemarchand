@@ -8,7 +8,7 @@ Date: 2026-11-26. Adds to [2026-11-26-library-context-design.md](2026-11-26-libr
 | Sticky sidebar                             | from `md`, the sidebar is `sticky` under the account bar, with its own `max-h` and `overflow-y-auto`. The bar's row gets a height token, `--account-bar-height: 3.75rem` (the 60 px measured in Chrome), used by the bar itself and by the sidebar's `top` and `max-h` | a long library no longer means scrolling back up to change collection; one number to change |
 | The family's news between title and photos | `LibraryMail` moves above the title row; R-COL-27 says again « juste au-dessus des photos »                                                                                                                                                                            | the actions row now touches what it acts on; the news still comes first                     |
 
-The sidebar's scroll box would clip the entries' focus ring: `p-1` with `-m-1` gives it room without moving the entries. While the offline notice shows inside the account bar, the bar is taller than the token and the sidebar's top slides under it; rare and harmless, left as is.
+The sidebar's scroll box would clip the entries' focus ring: `p-1` with `-m-1` gives it room, and the width goes from `w-52` to `w-54` so the entries keep their 13rem. `top` and `max-h` start from `--account-bar-bottom`, the notch inset plus the bar's row and its 1px border, so an iPad PWA with `viewport-fit=cover` keeps the sidebar below the bar. While the offline notice shows inside the account bar, the bar is taller than the token and the sidebar's top slides under it; rare and harmless, left as is.
 
 ## Plan
 

@@ -12,6 +12,8 @@
   --tab-bar-height: 4rem;
   /* The account bar's row, under the notch: what sticks below it starts there. */
   --account-bar-height: 3.75rem;
+  /* Where the bar ends: the notch above its row, the row, its 1px bottom border. */
+  --account-bar-bottom: calc(env(safe-area-inset-top) + var(--account-bar-height) + 1px);
   /* Toasts rise above the tab bar and the home bar while the bar shows (below md). */
   --toast-bottom: calc(var(--tab-bar-height) + env(safe-area-inset-bottom) + 16px);
   --radius: 0.625rem;
