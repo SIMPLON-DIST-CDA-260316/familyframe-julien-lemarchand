@@ -10,6 +10,8 @@
   color-scheme: light;
   /* One height for the phone's tab bar, the room the pages leave for it, and what floats above it. */
   --tab-bar-height: 4rem;
+  /* The account bar's row, under the notch: what sticks below it starts there. */
+  --account-bar-height: 3.75rem;
   /* Toasts rise above the tab bar and the home bar while the bar shows (below md). */
   --toast-bottom: calc(var(--tab-bar-height) + env(safe-area-inset-bottom) + 16px);
   --radius: 0.625rem;

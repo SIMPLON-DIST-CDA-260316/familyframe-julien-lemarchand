@@ -8,7 +8,7 @@ export function AccountBar(): JSX.Element {
   return (
     // The bar's own background runs under the notch; its content stays below it.
     <header className="sticky top-0 z-20 border-b bg-background/80 pt-[env(safe-area-inset-top)] backdrop-blur">
-      <div className="mx-auto flex max-w-page items-center gap-3 py-3 pr-[max(1rem,env(safe-area-inset-right))] pl-[max(1rem,env(safe-area-inset-left))]">
+      <div className="mx-auto flex h-(--account-bar-height) max-w-page items-center gap-3 pr-[max(1rem,env(safe-area-inset-right))] pl-[max(1rem,env(safe-area-inset-left))]">
         <Link to="/" className="mr-4 text-lg font-semibold tracking-tight">
           FamilyFrame
         </Link>
