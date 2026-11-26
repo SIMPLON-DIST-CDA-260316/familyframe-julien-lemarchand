@@ -87,6 +87,11 @@
 }
 
 @theme {
+  /* Page widths, as max-w-page and max-w-reading. The account bar and every page share the first,
+     so a title always starts under the logo; forms and lists keep to the second. */
+  --container-page: 64rem;
+  --container-reading: 42rem;
+
   /* As long as the longest slideshow interval, so the drift never stops on screen. */
   --animate-ken-burns: ken-burns 20s ease-out forwards;
 
