@@ -27,6 +27,17 @@ Going from one tab to the next, the title jumps sideways and the main button mov
 | Centred message pages | 404, the admin-only card, login and invite stay narrow and centred                                                         | a lone message or a form with no account bar has no edge to align to                     |
 | Phone                 | unchanged: under `md` the page is already one column with a 1rem gutter                                                    | the fix is for computers                                                                 |
 
+## Row action buttons
+
+Asked by Julien during the same pass: the « … » of the list view and of the thumbnails did not look alike.
+
+| Where                                                  | Button                                                                                   | Why                                                                                                  |
+| ------------------------------------------------------ | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| On the page (list row, collection title, Send's trash) | ghost `size="icon"`: 32 px (44 px under a finger), `rounded-lg`, `text-muted-foreground` | the list row's « … » was a 28 px circle, the collection's a dark 32 px square: one look for one role |
+| On a photo (thumbnail, viewer, frame)                  | the dark round pill, unchanged                                                           | over any image only a dark pill stays legible                                                        |
+
+The list view keeps the page's full width, as decided when the library's edges were aligned with the header.
+
 ## Out of scope
 
 The frame (full screen), the viewer and the dialogs.

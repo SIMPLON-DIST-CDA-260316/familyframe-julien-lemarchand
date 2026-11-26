@@ -61,7 +61,8 @@ export function PhotoListRow({ photo, isCurrent, onSelect }: PhotoListRowProps):
         photo={photo}
         label={`Actions : ${photoLabel(photo)}`}
         theme="app"
-        className="absolute top-1/2 right-0 -translate-y-1/2 rounded-full text-muted-foreground"
+        // The page's own row action, as Send's trash and a collection's « … »: not the photo pill.
+        className="absolute top-1/2 right-0 size-8 -translate-y-1/2 rounded-lg text-muted-foreground"
       />
     </li>
   )
