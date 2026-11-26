@@ -6,8 +6,8 @@ Une collection est une liste de photos de sa bibliothèque, rangées sous un nom
 
 **Ce que l'on peut faire**
 
-- Voir ses collections dans la rangée placée en haut de la bibliothèque, sous l'annonce des photos reçues (voir [Parcourir une collection](#parcourir-une-collection)).
-- Créer une collection avec « Nouvelle collection », au bout de cette rangée.
+- Voir ses collections dans la bibliothèque : dans la colonne de gauche sur un ordinateur, en touchant le titre de la page sur un téléphone (voir [Parcourir une collection](#parcourir-une-collection)).
+- Créer une collection avec le « + » placé à côté de « Collections » (ordinateur) ou avec « Nouvelle collection », en bas de la liste (téléphone).
 - Depuis le menu « … » placé à côté du nom de la collection affichée, la lire sur le cadre de cet appareil, la renommer ou la supprimer.
 
 **Règles**
@@ -15,8 +15,8 @@ Une collection est une liste de photos de sa bibliothèque, rangées sous un nom
 1. R-COL-01 · Un nom fait de 1 à 50 caractères ; les espaces au début et à la fin ne comptent pas.
 2. R-COL-02 · Deux collections d'un même compte ne portent pas le même nom. Les majuscules et les accents comptent : « noël » et « Noël » sont deux noms différents. Renommer une collection sous le nom qu'elle porte déjà est permis.
 3. R-COL-03 · Les collections sont classées par ordre alphabétique (« Été » avant « Noël »).
-4. R-COL-04 · Une collection créée depuis « Nouvelle collection », au bout de la rangée des collections, est vide et s'affiche aussitôt ; créée depuis le menu « … » d'une photo, elle contient aussitôt cette photo, sauf si la photo a été supprimée entre-temps : la collection reste alors vide, et un message dit pourquoi.
-5. R-COL-05 · Supprimer une collection demande une confirmation ; « Annuler » ferme la fenêtre sans rien changer. Ses photos restent dans la bibliothèque ; un cadre qui la lisait repasse à toute la bibliothèque (R-CAD-81). Supprimer la collection affichée ramène à « Toutes ».
+4. R-COL-04 · Une collection créée depuis la liste des collections (« + » ou « Nouvelle collection ») est vide et s'affiche aussitôt ; créée depuis le menu « … » d'une photo, elle contient aussitôt cette photo, sauf si la photo a été supprimée entre-temps : la collection reste alors vide, et un message dit pourquoi.
+5. R-COL-05 · Supprimer une collection demande une confirmation ; « Annuler » ferme la fenêtre sans rien changer. Ses photos restent dans la bibliothèque ; un cadre qui la lisait repasse à toute la bibliothèque (R-CAD-81). Supprimer la collection affichée ramène à « Toutes les photos ».
 6. R-COL-06 · Une collection créée, renommée ou supprimée l'est aussitôt sur tous les appareils connectés au compte, sans recharger la page.
 7. R-COL-07 · Les collections sont privées : personne d'autre ne les voit, pas même les amis.
 8. R-COL-14 · « Lire sur le cadre » ouvre le cadre en plein écran sur cette collection ; l'appareil retient ce choix (voir [cadre.md](cadre.md#choisir-les-photos-du-cadre), R-CAD-77). Si l'appareil ne peut rien retenir (navigateur qui bloque les données des sites), le cadre ne s'ouvre pas : un message invite à choisir la collection depuis le menu « … » du cadre.
@@ -25,7 +25,8 @@ Une collection est une liste de photos de sa bibliothèque, rangées sous un nom
 
 | Situation                       | Message                                                                                                                                                                               |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Rangée des collections          | « Toutes », chaque collection (son image, son nom, « N photos »), puis « Nouvelle collection »                                                                                        |
+| Liste des collections           | « Toutes les photos », « Collections », chaque collection (son image, son nom, son nombre de photos) ; « Nouvelle collection » sur un téléphone                                       |
+| Aucune collection               | « Aucune collection pour l'instant. »                                                                                                                                                 |
 | Chargement impossible           | « Vos collections n'ont pas pu être chargées. »                                                                                                                                       |
 | Création                        | « Nouvelle collection » — « Donnez-lui un nom, puis rangez-y vos photos depuis leur menu « … ». » Champ « Nom de la collection », bouton « Créer »                                    |
 | Renommage                       | « Renommer la collection » — « Le nouveau nom s'affiche partout, sur tous vos appareils. » Champ « Nom de la collection », bouton « Renommer »                                        |
@@ -78,31 +79,35 @@ Une collection est une liste de photos de sa bibliothèque, rangées sous un nom
 
 **Ce que l'on peut faire**
 
-- Dans la bibliothèque, choisir une collection dans la rangée placée sous l'annonce des photos reçues : seules ses photos s'affichent, et son nom devient le titre de la page.
-- Revenir à toutes les photos avec « Toutes », au début de la rangée.
+- Dans la bibliothèque, choisir une collection dans la liste des collections : seules ses photos s'affichent, et son nom devient le titre de la page.
+- Revenir à toutes les photos avec « Toutes les photos », en haut de la liste.
 - Ouvrir une photo de la collection en grand et passer d'une photo à l'autre sans sortir de la collection.
 - Ajouter une photo avec « Ajouter » pendant qu'une collection est affichée : elle y est rangée aussitôt.
 
 **Règles**
 
-1. R-COL-15 · La rangée propose « Toutes » puis chaque collection, par ordre alphabétique (R-COL-03), sous forme de cartes (R-COL-22). Le choix en cours est mis en avant par un contour autour de son image. Quand elle dépasse la largeur de l'écran, elle défile de côté et s'arrête toujours au début d'une carte ; le reste de la page ne bouge pas.
+1. R-COL-15 · Remplacée : la rangée de cartes n'existe plus ; les collections se choisissent dans une liste (R-COL-24, R-COL-25). La rangée proposait « Toutes » puis chaque collection, sous forme de cartes qui défilaient de côté.
 2. R-COL-16 · Une collection affiche ses photos dans le même ordre que la bibliothèque (R-BIB-20), 30 à la fois avec « Charger plus ».
 3. R-COL-17 · La collection choisie fait partie de l'adresse de la page : recharger la page, revenir en arrière ou ouvrir un lien enregistré montre la même collection.
 4. R-COL-18 · Une photo ouverte en grand depuis une collection fait défiler les seules photos de cette collection ; la fermer ramène dans la collection.
 5. R-COL-19 · Une collection vide le dit, explique comment y ranger des photos et propose « Ajouter une photo », qui ouvre le même panneau que « Ajouter ».
 6. R-COL-20 · Une collection supprimée sur un autre appareil, ou un lien vers une collection qui n'existe pas affiche « Cette collection n'existe plus. » et propose « Voir toutes les photos ».
 7. R-COL-21 · La collection affichée suit les changements sans recharger la page : une photo rangée ou retirée, sur cet appareil ou un autre, y apparaît ou en disparaît. Une photo ajoutée pendant qu'une collection est affichée entre dans la bibliothèque et est rangée dans cette collection ; si le rangement échoue, un message le dit et la photo reste dans la bibliothèque.
-8. R-COL-22 · Chaque carte montre une image carrée, puis sous elle le nom et le nombre de photos (« Aucune photo », « 1 photo », « 12 photos »). L'image d'une collection est sa photo la plus récente, quel que soit l'ordre dans lequel les photos y ont été rangées, et change d'elle-même quand une photo plus récente y entre ou que celle-ci en sort ; une collection vide montre un dossier gris. « Toutes » montre une pile de photos, sans nombre, et « Nouvelle collection », au bout, un « + ». Un nom trop long est coupé, mais s'affiche en entier au survol. Sur un téléphone, une carte fait environ 150 px de large, et la troisième est coupée au bord de l'écran ; sur un ordinateur, environ 180 px.
-9. R-COL-23 · Une collection affichée prend la place de « Bibliothèque » en tête de page : son nom en grand titre, suivi de son menu « … » (« Lire sur le cadre », « Renommer », « Supprimer »), et dessous le nombre de ses photos et les dates de la plus ancienne à la plus récente (« 12 photos · 1 nov. 2022 – 22 nov. 2026 »). Une seule date quand toutes ses photos sont du même jour, aucune quand elle est vide (« Aucune photo »). Avec « Toutes », l'en-tête redevient « Bibliothèque » et le nombre de photos de la bibliothèque. Pendant le court chargement d'une collection, l'en-tête dit « Bibliothèque » sans nombre de photos.
+8. R-COL-22 · Remplacée : les cartes n'existent plus (R-COL-24, R-COL-25, R-COL-26). Chaque carte montrait une grande image carrée, puis le nom et le nombre de photos ; « Toutes » montrait une pile de photos sans nombre.
+9. R-COL-23 · Remplacée : le titre dit désormais « Toutes les photos » plutôt que « Bibliothèque » (R-COL-27). Une collection affichée prenait la place de « Bibliothèque » en tête de page, avec son menu « … », le nombre de ses photos et ses dates.
+10. R-COL-24 · Sur un ordinateur, la liste des collections occupe une colonne à gauche des photos : « Toutes les photos » en haut, puis sous le petit titre « Collections » chaque collection par ordre alphabétique (R-COL-03), avec une petite image, son nom et, à droite, son nombre de photos. Le choix en cours est surligné. Un nom trop long est coupé, mais s'affiche en entier au survol. Le « + » à côté de « Collections » crée une collection. « Toutes les photos » n'indique pas de nombre : il s'affiche sous le titre de la page. Les miniatures tiennent sur trois colonnes à côté de la liste, quatre sur un grand écran.
+11. R-COL-25 · Sur un téléphone, il n'y a pas de colonne : le titre de la page, suivi d'une petite flèche, se touche pour ouvrir en bas de l'écran le panneau « Afficher ». Il propose « Toutes les photos », puis sous « Collections » chaque collection avec son image, son nom et « N photos · période », une coche sur le choix en cours, et « Nouvelle collection » en dernier. Choisir ferme le panneau et affiche ce choix ; ✕, la touche Échap ou un glissement vers le bas le ferment sans rien changer.
+12. R-COL-26 · L'image d'une collection est sa photo la plus récente, quel que soit l'ordre dans lequel les photos y ont été rangées, et change d'elle-même quand une photo plus récente y entre ou que celle-ci en sort. Une collection vide montre un dossier gris, « Toutes les photos » une pile de photos.
+13. R-COL-27 · Le titre de la page dit ce qui est affiché : « Toutes les photos » avec, dessous, le nombre de photos de la bibliothèque ; ou le nom de la collection, suivi de son menu « … » (« Lire sur le cadre », « Renommer », « Supprimer »), avec dessous le nombre de ses photos et les dates de la plus ancienne à la plus récente (« 12 photos · 1 nov. 2022 – 22 nov. 2026 »). Une seule date quand toutes ses photos sont du même jour, aucune quand elle est vide (« Aucune photo »). Sur la même ligne, juste au-dessus des photos, se trouvent le choix miniatures ou liste et, sur un ordinateur, « Mode cadre » et « Ajouter ». Pendant le court chargement d'une collection, ou quand elle ne peut pas être affichée, le titre dit « Bibliothèque », sans nombre de photos.
 
 **Messages affichés**
 
-| Situation                                  | Message                                                                                                                                               |
-| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Collection vide                            | « Cette collection est vide. » — « Ajoutez-y une photo, ou rangez-y celles de « Toutes » depuis leur menu « … ». » et le bouton « Ajouter une photo » |
-| Collection introuvable                     | « Cette collection n'existe plus. » et le bouton « Voir toutes les photos »                                                                           |
-| Photo ajoutée dans une collection affichée | « Photo ajoutée à « Noël ». » (« 3 photos ajoutées à « Noël ». » pour plusieurs photos)                                                               |
-| Collections non chargées                   | « Cette collection n'a pas pu être chargée. » et le bouton « Voir toutes les photos »                                                                 |
+| Situation                                  | Message                                                                                                                                                          |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Collection vide                            | « Cette collection est vide. » — « Ajoutez-y une photo, ou rangez-y celles de « Toutes les photos » depuis leur menu « … ». » et le bouton « Ajouter une photo » |
+| Collection introuvable                     | « Cette collection n'existe plus. » et le bouton « Voir toutes les photos »                                                                                      |
+| Photo ajoutée dans une collection affichée | « Photo ajoutée à « Noël ». » (« 3 photos ajoutées à « Noël ». » pour plusieurs photos)                                                                          |
+| Collections non chargées                   | « Cette collection n'a pas pu être chargée. » et le bouton « Voir toutes les photos »                                                                            |
 
 **Ce qui n'est pas possible**
 

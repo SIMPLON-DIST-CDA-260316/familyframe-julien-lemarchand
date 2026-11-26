@@ -1,9 +1,11 @@
 import { PlusIcon } from 'lucide-react'
 import { type JSX, type RefObject, useRef, useState } from 'react'
-import { CollectionsRow } from '@/components/collections/CollectionsRow.tsx'
-import { CollectionTitle } from '@/components/collections/CollectionTitle.tsx'
+import { CollectionActions } from '@/components/collections/CollectionActions.tsx'
+import { collectionSummary } from '@/components/collections/collectionSummary.ts'
 import { PageMain } from '@/components/layout/PageMain.tsx'
 import { AddPhotoPanel } from '@/components/library/AddPhotoPanel.tsx'
+import { CollectionsSheetButton } from '@/components/library/CollectionsSheetButton.tsx'
+import { CollectionsSidebar } from '@/components/library/CollectionsSidebar.tsx'
 import { LibraryHeader, LibraryTitle } from '@/components/library/LibraryHeader.tsx'
 import {
   EmptyCollection,
@@ -11,6 +13,7 @@ import {
   UnavailableCollection,
 } from '@/components/library/LibraryNotices.tsx'
 import { LibrarySection } from '@/components/library/LibrarySection.tsx'
+import { libraryCountLabel } from '@/components/library/libraryTexts.ts'
 import { LibraryMail } from '@/components/mail/LibraryMail.tsx'
 import { PageFab } from '@/components/nav/PageFab.tsx'
 import { PhotoViewer } from '@/components/viewer/PhotoViewer.tsx'
@@ -88,39 +91,85 @@ function LibraryBody(props: LibraryBodyProps): JSX.Element {
   )
 }
 
-type PageTitleProps = Pick<LibraryContentProps, 'selected' | 'library'> & {
-  allCardRef: RefObject<HTMLAnchorElement | null>
+type TitleRefs = {
+  // « Toutes les photos » in the sidebar, the title button on a phone: once the shown collection
+  // is deleted, the shown one takes focus.
+  allPhotosRef: RefObject<HTMLAnchorElement | null>
+  sheetButtonRef: RefObject<HTMLButtonElement | null>
 }
 
-// A shown collection titles the page with its own name; « Toutes » keeps « Bibliothèque ».
-// The library's count only under « Toutes »: while a collection loads, the photos are its own
-// and « Bibliothèque · 3 photos » would count them as the library's.
-function PageTitle({ selected, library, allCardRef }: PageTitleProps): JSX.Element {
+type PageTitleProps = Pick<LibraryContentProps, 'selected' | 'library'> & TitleRefs
+
+type TitleTexts = { name: string; subtitle: string | null }
+
+// The library's count only under « Toutes les photos »: while a collection loads, the photos are
+// its own, and its name is not known yet.
+function titleTexts({
+  selected,
+  library,
+}: Pick<PageTitleProps, 'selected' | 'library'>): TitleTexts {
   if (selected.status === 'found') {
-    return <CollectionTitle collection={selected.collection} fallbackRef={allCardRef} />
+    return { name: selected.collection.name, subtitle: collectionSummary(selected.collection) }
   }
-  return <LibraryTitle library={library} showsCount={selected.status === 'all'} />
+  if (selected.status !== 'all') return { name: 'Bibliothèque', subtitle: null }
+  const count = library.isFirstPageLoaded
+    ? libraryCountLabel(library.photos.length, library.hasMore)
+    : null
+  return { name: 'Toutes les photos', subtitle: count }
 }
 
+function PageTitle({
+  selected,
+  library,
+  allPhotosRef,
+  sheetButtonRef,
+}: PageTitleProps): JSX.Element {
+  const { name, subtitle } = titleTexts({ selected, library })
+  const fallbackRefs = [allPhotosRef, sheetButtonRef]
+  return (
+    <LibraryTitle
+      name={name}
+      subtitle={subtitle}
+      sheetButton={
+        <CollectionsSheetButton
+          name={name}
+          selectedId={selectedCollectionId(selected)}
+          buttonRef={sheetButtonRef}
+        />
+      }
+      actions={
+        selected.status === 'found' && (
+          <CollectionActions collection={selected.collection} fallbackRefs={fallbackRefs} />
+        )
+      }
+    />
+  )
+}
+
+// Two columns from md: the collections on the left, what they show on the right, its actions
+// right above the photos.
 function LibraryContent(props: LibraryContentProps): JSX.Element {
   const [layout, setLayout] = useLibraryLayout()
   const { selected, library, onAdd, addButtonRef } = props
-  // « Toutes »: where focus lands once the shown collection is deleted.
-  const allCardRef = useRef<HTMLAnchorElement>(null)
+  const allPhotosRef = useRef<HTMLAnchorElement>(null)
+  const sheetButtonRef = useRef<HTMLButtonElement>(null)
+  const refs = { allPhotosRef, sheetButtonRef }
   return (
-    <>
-      <LibraryHeader
-        title={<PageTitle selected={selected} library={library} allCardRef={allCardRef} />}
-        layout={layout}
-        onLayoutChange={setLayout}
-        onAdd={onAdd}
-        addButtonRef={addButtonRef}
-      />
-      {/* Above the photos: news from the family comes first. */}
-      <LibraryMail />
-      <CollectionsRow selectedId={selectedCollectionId(selected)} allCardRef={allCardRef} />
-      <LibraryBody {...props} layout={layout} />
-    </>
+    <div className="flex gap-8">
+      <CollectionsSidebar selectedId={selectedCollectionId(selected)} allPhotosRef={allPhotosRef} />
+      <div className="flex min-w-0 flex-1 flex-col gap-4 sm:gap-6">
+        <LibraryHeader
+          title={<PageTitle selected={selected} library={library} {...refs} />}
+          layout={layout}
+          onLayoutChange={setLayout}
+          onAdd={onAdd}
+          addButtonRef={addButtonRef}
+        />
+        {/* Above the photos: news from the family comes first. */}
+        <LibraryMail />
+        <LibraryBody {...props} layout={layout} />
+      </div>
+    </div>
   )
 }
 

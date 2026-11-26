@@ -1,6 +1,6 @@
 # Bibliothèque
 
-La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajoutées et celles que ses amis lui ont envoyées. Elle est privée. C'est la page d'accueil de l'application une fois connecté (« Ma bibliothèque » dans la barre du haut, l'onglet « Bibliothèque » sur un téléphone, « Bibliothèque » en titre de la page). La page est consacrée aux photos : les amis se gèrent sur la page « Amis » (voir [amis.md](amis.md)). Le cadre affiche ces mêmes photos (voir [cadre.md](cadre.md)) ; l'envoi à un ami est décrit dans [partage.md](partage.md).
+La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajoutées et celles que ses amis lui ont envoyées. Elle est privée. C'est la page d'accueil de l'application une fois connecté (« Ma bibliothèque » dans la barre du haut, l'onglet « Bibliothèque » sur un téléphone, « Toutes les photos » en titre de la page). La page est consacrée aux photos : les amis se gèrent sur la page « Amis » (voir [amis.md](amis.md)). Le cadre affiche ces mêmes photos (voir [cadre.md](cadre.md)) ; l'envoi à un ami est décrit dans [partage.md](partage.md).
 
 ## Ajouter une photo
 
@@ -79,7 +79,7 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 
 **Ce que l'on peut faire**
 
-- Voir ses photos sous l'en-tête « Bibliothèque », qui indique leur nombre, en miniatures (grille de vignettes carrées) ou en liste, regroupées par jour sous la date (« Aujourd'hui », « Hier », « dim. 22 nov. »…).
+- Voir ses photos sous le titre « Toutes les photos », qui indique leur nombre, en miniatures (grille de vignettes carrées) ou en liste, regroupées par jour sous la date (« Aujourd'hui », « Hier », « dim. 22 nov. »…).
 - Passer de l'un à l'autre avec les boutons « Miniatures » et « Liste ».
 - Charger les photos plus anciennes avec « Charger plus ».
 - Ouvrir une photo en grand dans l'application, puis passer à la suivante ou à la précédente d'un geste du doigt, avec les flèches à l'écran ou celles du clavier.
@@ -91,8 +91,8 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 - Ouvrir le menu « … » d'une photo (ou, sur Android, appuyer longuement sur sa miniature) pour lancer sa radio sur le cadre (voir [cadre.md](cadre.md#radio)), l'envoyer à un ami, la ranger dans ses collections (voir [collections.md](collections.md#ranger-ses-photos-dans-une-collection)) ou la supprimer.
 - Lancer le mode cadre, en plein écran, depuis la bibliothèque (« Mode cadre » sur un ordinateur, l'onglet « Cadre » sur un téléphone), ou depuis une photo ouverte pour que le diaporama commence par elle (voir [cadre.md](cadre.md)).
 - Découvrir les photos envoyées par ses proches depuis l'annonce placée sous l'en-tête (voir [partage.md](partage.md#recevoir-une-photo)).
-- N'afficher que les photos d'une collection, depuis la rangée « Toutes », « Noël », « Les vacances »… placée sous l'annonce (voir [collections.md](collections.md#parcourir-une-collection)).
-- Créer une collection au bout de cette rangée, et renommer, supprimer ou lire sur le cadre la collection affichée (voir [collections.md](collections.md)).
+- N'afficher que les photos d'une collection, depuis la liste « Toutes les photos », « Noël », « Les vacances »… : la colonne de gauche sur un ordinateur, le titre de la page sur un téléphone (voir [collections.md](collections.md#parcourir-une-collection)).
+- Créer une collection depuis cette liste, et renommer, supprimer ou lire sur le cadre la collection affichée (voir [collections.md](collections.md)).
 
 **Règles**
 
@@ -131,20 +131,20 @@ La bibliothèque contient toutes les photos d'un compte : celles qu'il a ajouté
 
 **Messages affichés**
 
-| Situation                                                 | Message                                                                                                                                                   |
-| --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| En-tête                                                   | « Bibliothèque », le nombre de photos, et les boutons « Ajouter » et « Mode cadre » (ordinateur) ; le nom d'une collection affichée à la place (R-COL-23) |
-| Bouton d'ajout sur un téléphone (survol, lecture d'écran) | « Ajouter une photo »                                                                                                                                     |
-| Chargement de la bibliothèque                             | formes grises (R-APP-71), « Chargement… » pour les lecteurs d'écran                                                                                       |
-| Chargement impossible (R-APP-73)                          | « Les photos n'ont pas pu être chargées. » et le bouton « Réessayer »                                                                                     |
-| Bibliothèque vide                                         | « Aucune photo pour l'instant. » et le bouton « Ajouter une photo »                                                                                       |
-| Photo en cours d'arrivée                                  | formes grises (R-APP-71), « Chargement… » pour les lecteurs d'écran                                                                                       |
-| Titre d'un jour de photos                                 | « Aujourd'hui », « Hier », « dim. 22 nov. », ou « sam. 14 juin 2025 » une autre année                                                                     |
-| Chargement des photos suivantes                           | « Chargement… » (sur le bouton « Charger plus »)                                                                                                          |
-| Photos reçues en attente                                  | « Vous avez N nouvelles photos » et le bouton « Découvrir » (voir [partage.md](partage.md#recevoir-une-photo))                                            |
-| Description d'une photo (lecture d'écran)                 | « Photo du 24 novembre 2026 » ou « Photo envoyée par [nom], du 24 novembre 2026 »                                                                         |
-| Partage impossible (R-BIB-72)                             | « La photo n'a pas pu être partagée. »                                                                                                                    |
-| Infos d'une photo sans collection (R-BIB-70)              | « Dans aucune collection »                                                                                                                                |
+| Situation                                                 | Message                                                                                                                                                        |
+| --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| En-tête                                                   | « Toutes les photos », le nombre de photos, et les boutons « Ajouter » et « Mode cadre » (ordinateur) ; le nom d'une collection affichée à la place (R-COL-27) |
+| Bouton d'ajout sur un téléphone (survol, lecture d'écran) | « Ajouter une photo »                                                                                                                                          |
+| Chargement de la bibliothèque                             | formes grises (R-APP-71), « Chargement… » pour les lecteurs d'écran                                                                                            |
+| Chargement impossible (R-APP-73)                          | « Les photos n'ont pas pu être chargées. » et le bouton « Réessayer »                                                                                          |
+| Bibliothèque vide                                         | « Aucune photo pour l'instant. » et le bouton « Ajouter une photo »                                                                                            |
+| Photo en cours d'arrivée                                  | formes grises (R-APP-71), « Chargement… » pour les lecteurs d'écran                                                                                            |
+| Titre d'un jour de photos                                 | « Aujourd'hui », « Hier », « dim. 22 nov. », ou « sam. 14 juin 2025 » une autre année                                                                          |
+| Chargement des photos suivantes                           | « Chargement… » (sur le bouton « Charger plus »)                                                                                                               |
+| Photos reçues en attente                                  | « Vous avez N nouvelles photos » et le bouton « Découvrir » (voir [partage.md](partage.md#recevoir-une-photo))                                                 |
+| Description d'une photo (lecture d'écran)                 | « Photo du 24 novembre 2026 » ou « Photo envoyée par [nom], du 24 novembre 2026 »                                                                              |
+| Partage impossible (R-BIB-72)                             | « La photo n'a pas pu être partagée. »                                                                                                                         |
+| Infos d'une photo sans collection (R-BIB-70)              | « Dans aucune collection »                                                                                                                                     |
 
 **Ce qui n'est pas possible**
 

@@ -15,9 +15,10 @@ type PhotoGridProps = {
 }
 
 // Edge to edge with the page's header. Three tight columns on a phone, as photo apps do, so a
-// screen shows a dozen photos. From sm, as many ~12rem columns as fit.
+// screen shows a dozen photos. From sm, as many ~12rem columns as fit; from md the collections
+// sidebar narrows the column: three, then four from lg.
 export const GRID_CLASSES =
-  'grid grid-cols-3 gap-1 sm:grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] sm:gap-4'
+  'grid grid-cols-3 gap-1 sm:grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] sm:gap-4 md:grid-cols-3 lg:grid-cols-4'
 
 // One grid per day, under its date: a day with two photos leaves the rest of its row empty.
 // children go first in their day, « Aujourd'hui », where their photos appear once sent.

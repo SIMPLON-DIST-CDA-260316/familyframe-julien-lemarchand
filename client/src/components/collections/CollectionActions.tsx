@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router'
 import { toast } from 'sonner'
 import type { Collection } from '@/collections/collection.ts'
 import { CollectionNameDialog } from '@/components/collections/CollectionNameDialog.tsx'
-import { collectionSummary } from '@/components/collections/collectionSummary.ts'
 import { DeleteCollectionDialog } from '@/components/collections/DeleteCollectionDialog.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import {
@@ -15,6 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu.tsx'
 import { type FrameSettings, readFrameSettings, writeFrameSettings } from '@/frameSettings.ts'
 import { enterFullscreen } from '@/fullscreen.ts'
+import { shownButton } from '@/lib/shownButton.ts'
 import { LIBRARY_BELOW_STATE } from '@/viewerHistory.ts'
 
 type BarDialog = 'rename' | 'delete' | null
@@ -40,9 +40,10 @@ type BarDialogsProps = {
   triggerRef: RefObject<HTMLButtonElement | null>
 }
 
-type CollectionTitleProps = {
+type CollectionActionsProps = {
   collection: Collection
-  fallbackRef: RefObject<HTMLElement | null>
+  // Where focus goes once the collection is deleted: the shown one takes it.
+  fallbackRefs: RefObject<HTMLElement | null>[]
 }
 
 // The frame reads its settings as it opens: the choice is stored first. A device that cannot store
@@ -131,22 +132,25 @@ function BarDialogs({ collection, dialog, onClose, ...props }: BarDialogsProps):
 }
 
 // Replace: back must not return to a collection that no longer exists. The dialog closed at the
-// click, before the server agreed, and gave focus back to the menu button that leaves with the title
-// now: « Toutes » stays on the page.
-function useLeaveDeletedCollection(fallbackRef: RefObject<HTMLElement | null>): () => void {
+// click, before the server agreed, and gave focus back to the menu button that leaves with the
+// collection now: « Toutes les photos » or the phone's title button stays on the page.
+function useLeaveDeletedCollection(fallbackRefs: RefObject<HTMLElement | null>[]): () => void {
   const navigate = useNavigate()
   return () => {
     navigate('/', { replace: true })
-    fallbackRef.current?.focus()
+    shownButton(fallbackRefs)?.focus()
   }
 }
 
 // The « … » beside the name: the menu and the dialogs it opens.
-function CollectionActions({ collection, fallbackRef }: CollectionTitleProps): JSX.Element {
+export function CollectionActions({
+  collection,
+  fallbackRefs,
+}: CollectionActionsProps): JSX.Element {
   const [dialog, setDialog] = useState<BarDialog>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const playOnFrame = usePlayOnFrame(collection.id)
-  const leaveDeletedCollection = useLeaveDeletedCollection(fallbackRef)
+  const leaveDeletedCollection = useLeaveDeletedCollection(fallbackRefs)
 
   return (
     <>
@@ -164,20 +168,5 @@ function CollectionActions({ collection, fallbackRef }: CollectionTitleProps): J
         triggerRef={triggerRef}
       />
     </>
-  )
-}
-
-// The page's title while a collection is shown: its name, what it holds and its own menu.
-export function CollectionTitle({ collection, fallbackRef }: CollectionTitleProps): JSX.Element {
-  return (
-    <div className="flex min-w-0 flex-col">
-      <div className="flex min-w-0 items-center gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight wrap-anywhere sm:text-3xl">
-          {collection.name}
-        </h1>
-        <CollectionActions collection={collection} fallbackRef={fallbackRef} />
-      </div>
-      <p className="min-h-5 text-sm text-muted-foreground">{collectionSummary(collection)}</p>
-    </div>
   )
 }
