@@ -86,6 +86,16 @@ export function putCollectionPhoto(
   return sendForCollection(url, { method: 'PUT' }, onUnauthenticated)
 }
 
+// Several library photos at once: the server adds those not in yet, or none if one is refused.
+export function postCollectionPhotos(
+  id: string,
+  photoIds: string[],
+  onUnauthenticated: () => void,
+): Promise<CollectionResult> {
+  const init = { method: 'POST', headers: JSON_HEADERS, body: JSON.stringify({ photoIds }) }
+  return sendForCollection(`/api/collections/${id}/photos`, init, onUnauthenticated)
+}
+
 export function deleteCollectionPhoto(
   id: string,
   photoId: string,

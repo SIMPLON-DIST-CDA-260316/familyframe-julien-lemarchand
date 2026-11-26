@@ -22,6 +22,7 @@ import {
   fetchCollections,
   patchCollection,
   postCollection,
+  postCollectionPhotos,
   putCollectionPhoto,
 } from '@/collections/collectionsApi.ts'
 import { connectPhotoSocket } from '@/photoSocket.ts'
@@ -107,6 +108,7 @@ function useCollectionActions(setState: SetState, dropUser: () => void): Collect
       rename: async (id, name) => apply(await patchCollection(id, name, dropUser)),
       remove: (id) => removeCollection(setState, id, dropUser),
       addPhoto: async (id, photoId) => apply(await putCollectionPhoto(id, photoId, dropUser)),
+      addPhotos: async (id, photoIds) => apply(await postCollectionPhotos(id, photoIds, dropUser)),
       removePhoto: async (id, photoId) => apply(await deleteCollectionPhoto(id, photoId, dropUser)),
     }
   }, [setState, dropUser])

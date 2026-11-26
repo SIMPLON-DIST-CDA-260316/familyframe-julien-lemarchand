@@ -13,6 +13,7 @@ export type CollectionsContextValue = {
   rename: (id: string, name: string) => Promise<CollectionResult>
   remove: (id: string) => Promise<CollectionDeletion>
   addPhoto: (id: string, photoId: string) => Promise<CollectionResult>
+  addPhotos: (id: string, photoIds: string[]) => Promise<CollectionResult>
   removePhoto: (id: string, photoId: string) => Promise<CollectionResult>
 }
 
