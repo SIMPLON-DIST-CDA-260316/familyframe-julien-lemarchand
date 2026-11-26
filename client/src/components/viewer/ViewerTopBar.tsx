@@ -98,7 +98,7 @@ export function ViewerTopBar({
       <PhotoActionsMenu
         photo={photo}
         label="Actions sur la photo"
-        className={VIEWER_BUTTON_CLASSES}
+        trigger={{ glassClassName: VIEWER_BUTTON_CLASSES }}
       >
         <SharePhotoItem photo={photo} />
       </PhotoActionsMenu>

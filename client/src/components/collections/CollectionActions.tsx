@@ -1,11 +1,11 @@
-import { EllipsisIcon, MonitorIcon, PencilIcon, Trash2Icon } from 'lucide-react'
+import { MonitorIcon, PencilIcon, Trash2Icon } from 'lucide-react'
 import { type JSX, type RefObject, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { toast } from 'sonner'
 import type { Collection } from '@/collections/collection.ts'
+import { MoreButton } from '@/components/actions/MoreButton.tsx'
 import { CollectionNameDialog } from '@/components/collections/CollectionNameDialog.tsx'
 import { DeleteCollectionDialog } from '@/components/collections/DeleteCollectionDialog.tsx'
-import { Button } from '@/components/ui/button.tsx'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -88,15 +88,7 @@ function CollectionMenu({ name, onSelect, onPlay, triggerRef }: CollectionMenuPr
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          ref={triggerRef}
-          variant="ghost"
-          size="icon"
-          className="text-muted-foreground"
-          aria-label={`Actions pour ${name}`}
-        >
-          <EllipsisIcon />
-        </Button>
+        <MoreButton ref={triggerRef} surface="page" aria-label={`Actions pour ${name}`} />
       </DropdownMenuTrigger>
       {/* Start: the button follows the name, at the left of the page. w-max: the content would
           take the button's width and wrap its items. */}

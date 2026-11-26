@@ -40,7 +40,11 @@ function SourceSubmenu({ settings }: { settings: SlideshowSettings }): JSX.Eleme
 
 export function SlideshowMenu({ photo, settings }: SlideshowMenuProps): JSX.Element {
   return (
-    <PhotoActionsMenu photo={photo} label="Actions sur la photo" className={GLASS_BUTTON_CLASSES}>
+    <PhotoActionsMenu
+      photo={photo}
+      label="Actions sur la photo"
+      trigger={{ glassClassName: GLASS_BUTTON_CLASSES }}
+    >
       <SourceSubmenu settings={settings} />
       <RadioSubmenu
         icon={FrameIcon}

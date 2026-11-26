@@ -3,6 +3,8 @@ import { type JSX, type ReactNode, type RefObject, useRef, useState } from 'reac
 import { toast } from 'sonner'
 import { useCollections } from '@/collections/CollectionsContext.ts'
 import type { Collection } from '@/collections/collection.ts'
+import type { IconButtonSurface } from '@/components/actions/IconButton.tsx'
+import { MoreButton } from '@/components/actions/MoreButton.tsx'
 import { CollectionNameDialog } from '@/components/collections/CollectionNameDialog.tsx'
 import { CollectionsSubmenu } from '@/components/collections/CollectionsSubmenu.tsx'
 import { DeletePhotoDialog } from '@/components/frame/DeletePhotoDialog.tsx'
@@ -28,13 +30,19 @@ type PhotoActionsMenuProps = {
   label: string
   // 'dark' by default: the menu and its dialogs portal to body, outside a dark screen.
   theme?: MenuTheme
-  className?: string
+  trigger: MenuTriggerLook
   // Items above "Supprimer": the slideshow adds its speed.
   children?: ReactNode
   // Set by a grid tile, whose long press opens the menu too; left out, the menu runs itself.
   open?: boolean
   onOpenChange?: (isOpen: boolean) => void
 }
+
+// surface: the shared « … » of the library (its className only places it). glassClassName: the
+// viewer's and the slideshow's control bars, whose buttons must match their neighbours.
+type MenuTriggerLook =
+  | { surface: IconButtonSurface; className?: string }
+  | { glassClassName: string }
 
 // The photo picked when a dialog opened: the slideshow may move on while it stays open.
 type MenuDialog = { kind: 'share' | 'delete' | 'createCollection'; photo: Photo } | null
@@ -97,22 +105,31 @@ function MenuDialogs({ dialog, themeClass, onClose, triggerRef }: MenuDialogsPro
   )
 }
 
-type MenuTriggerProps = Pick<PhotoActionsMenuProps, 'label' | 'className'> & {
+type MenuTriggerProps = Pick<PhotoActionsMenuProps, 'label' | 'trigger'> & {
   triggerRef: RefObject<HTMLButtonElement | null>
 }
 
-function MenuTrigger({ label, className, triggerRef }: MenuTriggerProps): JSX.Element {
+function MenuTrigger({ label, trigger, triggerRef }: MenuTriggerProps): JSX.Element {
   return (
     <DropdownMenuTrigger asChild>
-      <Button
-        ref={triggerRef}
-        variant="ghost"
-        size="icon-sm"
-        aria-label={label}
-        className={className}
-      >
-        <EllipsisIcon />
-      </Button>
+      {'surface' in trigger ? (
+        <MoreButton
+          ref={triggerRef}
+          surface={trigger.surface}
+          aria-label={label}
+          className={trigger.className}
+        />
+      ) : (
+        <Button
+          ref={triggerRef}
+          variant="ghost"
+          size="icon-sm"
+          aria-label={label}
+          className={trigger.glassClassName}
+        >
+          <EllipsisIcon />
+        </Button>
+      )}
     </DropdownMenuTrigger>
   )
 }
@@ -155,7 +172,7 @@ export function PhotoActionsMenu({
   photo,
   label,
   theme = 'dark',
-  className,
+  trigger,
   children,
   open,
   onOpenChange,
@@ -167,7 +184,7 @@ export function PhotoActionsMenu({
   return (
     <>
       <DropdownMenu open={open} onOpenChange={onOpenChange}>
-        <MenuTrigger label={label} className={className} triggerRef={triggerRef} />
+        <MenuTrigger label={label} trigger={trigger} triggerRef={triggerRef} />
         <MenuItems photo={photo} themeClass={themeClass} onOpen={setDialog}>
           {children}
         </MenuItems>

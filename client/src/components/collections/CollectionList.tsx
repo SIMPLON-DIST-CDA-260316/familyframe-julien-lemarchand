@@ -3,8 +3,8 @@ import type { JSX, ReactNode, RefObject } from 'react'
 import { Link } from 'react-router'
 import { useCollections } from '@/collections/CollectionsContext.ts'
 import type { Collection } from '@/collections/collection.ts'
+import { IconButton } from '@/components/actions/IconButton.tsx'
 import { collectionSummary } from '@/components/collections/collectionSummary.ts'
-import { Button } from '@/components/ui/button.tsx'
 import { cn } from '@/lib/utils.ts'
 import { libraryPath } from '@/viewerHistory.ts'
 
@@ -86,16 +86,15 @@ function CollectionsLabel({ onCreate }: Pick<CollectionListProps, 'onCreate'>): 
         Collections
       </p>
       {/* The phone has its own « Nouvelle collection » row at the end of the sheet. */}
-      <Button
-        variant="ghost"
-        size="icon-sm"
-        className="hidden text-muted-foreground md:inline-flex"
+      <IconButton
+        surface="page"
+        className="hidden md:inline-flex"
         aria-label="Nouvelle collection"
         title="Nouvelle collection"
         onClick={onCreate}
       >
         <PlusIcon />
-      </Button>
+      </IconButton>
     </div>
   )
 }

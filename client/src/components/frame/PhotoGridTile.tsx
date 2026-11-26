@@ -12,12 +12,9 @@ const TILE_CLASSES =
 const IMAGE_CLASSES =
   'aspect-square w-full object-cover [-webkit-touch-callout:none] select-none motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover/tile:scale-105'
 
-// A dark pill whatever the theme: it sits on the photo, not on the page. Under a finger it keeps
-// the mouse's 28 px look, 4 px from the corner, so it hides little of a ~115 px phone tile; an
-// invisible `after` 8 px wider on each side gives the finger its 44 px. z-10: stays above its own
-// tile when that tile is focused.
-const ELLIPSIS_CLASSES =
-  'absolute top-2 right-2 z-10 rounded-full bg-overlay text-on-overlay-muted backdrop-blur-sm hover:bg-overlay-strong hover:text-on-overlay aria-expanded:bg-overlay-strong aria-expanded:text-on-overlay dark:hover:bg-overlay-strong pointer-coarse:top-1 pointer-coarse:right-1 pointer-coarse:size-7 pointer-coarse:after:absolute pointer-coarse:after:-inset-2'
+// 6 px from the corner, so the 32 px pill hides little of a ~115 px phone tile. z-10: stays above
+// its own tile when that tile is focused.
+const MORE_POSITION_CLASSES = 'absolute top-1.5 right-1.5 z-10'
 
 type PhotoGridTileProps = {
   photo: Photo
@@ -50,7 +47,7 @@ export function PhotoGridTile({ photo, isCurrent, onSelect }: PhotoGridTileProps
         photo={photo}
         label={`Actions : ${photoLabel(photo)}`}
         theme="app"
-        className={ELLIPSIS_CLASSES}
+        trigger={{ surface: 'photo', className: MORE_POSITION_CLASSES }}
         {...menuProps}
       />
     </li>
