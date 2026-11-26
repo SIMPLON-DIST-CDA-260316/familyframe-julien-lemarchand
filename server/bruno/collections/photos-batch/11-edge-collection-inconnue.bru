@@ -1,17 +1,19 @@
 meta {
-  name: Edge - photoIds n'est pas une liste
+  name: Edge - collection inconnue
   type: http
-  seq: 6
+  seq: 11
 }
 
 post {
-  url: {{baseUrl}}/api/collections/{{collectionId}}/photos
+  url: {{baseUrl}}/api/collections/000000000000000000000000/photos
   body: json
   auth: none
 }
 
 body:json {
-  { "photoIds": "{{batchPhotoId}}" }
+  {
+    "photoIds": ["{{batchPhotoId}}"]
+  }
 }
 
 script:pre-request {
@@ -23,10 +25,11 @@ script:pre-request {
 }
 
 assert {
-  res.status: eq 400
-  res.body.error: eq BODY_INVALID
+  res.status: eq 404
+  res.body.error: eq COLLECTION_NOT_FOUND
 }
 
 docs {
-  EDGE → 400 BODY_INVALID : un id seul, hors d'une liste, est refusé.
+  EDGE → 404 COLLECTION_NOT_FOUND : la photo est bien celle du compte,
+  mais aucune collection n'a cet id.
 }

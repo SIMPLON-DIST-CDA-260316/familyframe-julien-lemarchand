@@ -1,5 +1,5 @@
 meta {
-  name: Edge - plus de 100 photos
+  name: Nominal - photos déjà dans la collection
   type: http
   seq: 7
 }
@@ -11,7 +11,9 @@ post {
 }
 
 body:json {
-  { "photoIds": [] }
+  {
+    "photoIds": ["{{batchPhotoId}}"]
+  }
 }
 
 script:pre-request {
@@ -20,15 +22,15 @@ script:pre-request {
   }
   // The throwaway account of invitations/accept/05, never the member (see collections/folder.bru).
   req.setHeader('Cookie', bru.getVar('inviteeCookie'))
-  req.setBody({ photoIds: Array(101).fill(bru.getVar('batchPhotoId')) })
 }
 
 assert {
-  res.status: eq 400
-  res.body.error: eq BODY_INVALID
+  res.status: eq 200
+  res.body.photoIds.length: eq 1
+  res.body.photoIds[0]: eq {{batchPhotoId}}
 }
 
 docs {
-  EDGE → 400 BODY_INVALID : 101 ids, au-delà des 100 d'un ajout. La même
-  photo répétée suffit : la borne compte ce qui est envoyé.
+  NOMINAL → 200 avec la collection telle quelle : renvoyer une photo déjà
+  là ne la double pas.
 }

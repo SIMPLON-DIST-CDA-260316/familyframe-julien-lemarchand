@@ -1,19 +1,17 @@
 meta {
-  name: Edge - collection inconnue
+  name: Edge - plus de 100 photos
   type: http
-  seq: 8
+  seq: 10
 }
 
 post {
-  url: {{baseUrl}}/api/collections/000000000000000000000000/photos
+  url: {{baseUrl}}/api/collections/{{collectionId}}/photos
   body: json
   auth: none
 }
 
 body:json {
-  {
-    "photoIds": ["{{batchPhotoId}}"]
-  }
+  { "photoIds": [] }
 }
 
 script:pre-request {
@@ -22,14 +20,15 @@ script:pre-request {
   }
   // The throwaway account of invitations/accept/05, never the member (see collections/folder.bru).
   req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+  req.setBody({ photoIds: Array(101).fill(bru.getVar('batchPhotoId')) })
 }
 
 assert {
-  res.status: eq 404
-  res.body.error: eq COLLECTION_NOT_FOUND
+  res.status: eq 400
+  res.body.error: eq BODY_INVALID
 }
 
 docs {
-  EDGE → 404 COLLECTION_NOT_FOUND : la photo est bien celle du compte,
-  mais aucune collection n'a cet id.
+  EDGE → 400 BODY_INVALID : 101 ids, au-delà des 100 d'un ajout. La même
+  photo répétée suffit : la borne compte ce qui est envoyé.
 }

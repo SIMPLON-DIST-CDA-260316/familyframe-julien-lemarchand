@@ -32,11 +32,12 @@ assert {
 script:post-response {
   const axios = require('axios')
   // A script request does not get the collection headers: send the cookie itself.
-  test("la collection n'a pas changé, même pour la photo connue", async () => {
-    const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/collections`, {
-      headers: { Cookie: bru.getVar('inviteeCookie') },
-    })
-    const collection = list.data.collections.find(({ id }) => id === bru.getVar('collectionId'))
+  // Read before test(): Bruno does not wait for an async test, the next request could run first.
+  const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/collections`, {
+    headers: { Cookie: bru.getVar('inviteeCookie') },
+  })
+  const collection = list.data.collections.find(({ id }) => id === bru.getVar('collectionId'))
+  test("la collection n'a pas changé, même pour la photo connue", () => {
     expect(collection.photoIds).to.eql([])
   })
 }

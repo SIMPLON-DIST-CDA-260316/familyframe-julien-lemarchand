@@ -1,19 +1,13 @@
 meta {
-  name: Nominal - photos déjà dans la collection
+  name: Nominal - supprimer la photo de la bibliothèque
   type: http
-  seq: 4
+  seq: 13
 }
 
-post {
-  url: {{baseUrl}}/api/collections/{{collectionId}}/photos
-  body: json
+delete {
+  url: {{baseUrl}}/api/photos/{{batchPhotoId}}
+  body: none
   auth: none
-}
-
-body:json {
-  {
-    "photoIds": ["{{batchPhotoId}}"]
-  }
 }
 
 script:pre-request {
@@ -25,12 +19,10 @@ script:pre-request {
 }
 
 assert {
-  res.status: eq 200
-  res.body.photoIds.length: eq 1
-  res.body.photoIds[0]: eq {{batchPhotoId}}
+  res.status: eq 204
 }
 
 docs {
-  NOMINAL → 200 avec la collection telle quelle : renvoyer une photo déjà
-  là ne la double pas.
+  NOMINAL → 204. Nettoyage : supprime la photo de `01`, qui sort aussi de
+  la collection ; rien ne reste sur Cloudinary.
 }

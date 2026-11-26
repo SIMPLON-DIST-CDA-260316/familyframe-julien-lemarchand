@@ -1,13 +1,17 @@
 meta {
-  name: Nominal - supprimer la photo de la bibliothèque
+  name: Edge - photoIds n'est pas une liste
   type: http
-  seq: 10
+  seq: 9
 }
 
-delete {
-  url: {{baseUrl}}/api/photos/{{batchPhotoId}}
-  body: none
+post {
+  url: {{baseUrl}}/api/collections/{{collectionId}}/photos
+  body: json
   auth: none
+}
+
+body:json {
+  { "photoIds": "{{batchPhotoId}}" }
 }
 
 script:pre-request {
@@ -19,10 +23,10 @@ script:pre-request {
 }
 
 assert {
-  res.status: eq 204
+  res.status: eq 400
+  res.body.error: eq BODY_INVALID
 }
 
 docs {
-  NOMINAL → 204. Nettoyage : supprime la photo de `01`, qui sort aussi de
-  la collection ; rien ne reste sur Cloudinary.
+  EDGE → 400 BODY_INVALID : un id seul, hors d'une liste, est refusé.
 }

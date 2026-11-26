@@ -1,0 +1,65 @@
+meta {
+  name: Nominal - photo reçue d'un ami, pas encore ouverte
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/photos/share
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  photo: @file(fixtures/photo.png) @contentType(image/png)
+  friendIds: {{inviteeId}}
+}
+
+script:pre-request {
+  const axios = require('axios')
+  if (!bru.getVar('inviteeCookie') || !bru.getVar('inviteEmail')) {
+    throw new Error('inviteeCookie ou inviteEmail absent : lancer toute la collection, invitations/accept/05 doit passer')
+  }
+  const baseUrl = bru.getEnvVar('baseUrl')
+  const inviteeHeaders = { Cookie: bru.getVar('inviteeCookie') }
+  const { data: me } = await axios.get(`${baseUrl}/api/auth/me`, { headers: inviteeHeaders })
+  bru.setVar('inviteeId', me.user.id)
+  // The member asks, the throwaway account accepts: only friends can send a photo.
+  const { data } = await axios.post(
+    `${baseUrl}/api/friendships`,
+    { email: bru.getVar('inviteEmail') },
+    { headers: { Cookie: bru.getVar('sessionCookie') } },
+  )
+  await axios.post(`${baseUrl}/api/friendships/${data.friendship.id}/accept`, null, {
+    headers: inviteeHeaders,
+  })
+  bru.setVar('batchFriendshipId', data.friendship.id)
+}
+
+assert {
+  res.status: eq 201
+  res.body.send.id: isString
+}
+
+script:post-response {
+  const axios = require('axios')
+  const baseUrl = bru.getEnvVar('baseUrl')
+  const memberHeaders = { Cookie: bru.getVar('sessionCookie') }
+  // The photo is read on the throwaway account's side, newest first.
+  const { data } = await axios.get(`${baseUrl}/api/photos/unopened`, {
+    headers: { Cookie: bru.getVar('inviteeCookie') },
+  })
+  bru.setVar('batchUnopenedPhotoId', data.photos[0].id)
+  // Neither the friendship nor the member's history line outlive this test.
+  await axios.delete(`${baseUrl}/api/friendships/${bru.getVar('batchFriendshipId')}`, {
+    headers: memberHeaders,
+  })
+  await axios.delete(`${baseUrl}/api/sends/${res.body.send.id}`, { headers: memberHeaders })
+}
+
+docs {
+  NOMINAL → 201. Préparation : le membre devient l'ami du compte jetable,
+  lui envoie un fichier, puis l'amitié et la ligne de son historique
+  d'envois sont supprimées. La photo attend le compte jetable, non ouverte ;
+  son id va dans `batchUnopenedPhotoId`, et `05` la supprime.
+}
