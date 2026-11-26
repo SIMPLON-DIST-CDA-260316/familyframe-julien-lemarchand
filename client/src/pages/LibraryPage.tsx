@@ -147,7 +147,7 @@ function PageTitle({
 }
 
 // Two columns from md: the collections on the left, what they show on the right, its actions
-// right above the photos.
+// above the photos, after the news from the family when there is some.
 function LibraryContent(props: LibraryContentProps): JSX.Element {
   const [layout, setLayout] = useLibraryLayout()
   const { selected, library, onAdd, addButtonRef } = props
