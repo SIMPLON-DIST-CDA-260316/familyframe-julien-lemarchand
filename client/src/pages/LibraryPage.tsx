@@ -2,6 +2,7 @@ import { PlusIcon } from 'lucide-react'
 import { type JSX, type RefObject, useRef, useState } from 'react'
 import { CollectionsRow } from '@/components/collections/CollectionsRow.tsx'
 import { CollectionTitle } from '@/components/collections/CollectionTitle.tsx'
+import { PageMain } from '@/components/layout/PageMain.tsx'
 import { AddPhotoPanel } from '@/components/library/AddPhotoPanel.tsx'
 import { LibraryHeader, LibraryTitle } from '@/components/library/LibraryHeader.tsx'
 import {
@@ -166,9 +167,8 @@ export default function LibraryPage(): JSX.Element {
   const addPanel = useAddPanel()
 
   return (
-    // pb-24 below md: the floating « Ajouter » never covers the last photos or « Charger plus ».
-    // Written per side so sm:pt-10 cannot undo it between sm and md.
-    <main className="mx-auto flex max-w-5xl flex-col gap-4 px-4 pt-6 pb-24 sm:gap-6 sm:pt-10 md:pb-10">
+    // Tighter on a phone, where the photos should show above the fold.
+    <PageMain className="gap-4 pt-6 sm:gap-6 sm:pt-10">
       <LibraryContent
         selected={selected}
         library={library}
@@ -184,6 +184,6 @@ export default function LibraryPage(): JSX.Element {
         onUpload={uploads.enqueue}
         isShowingPhotos={isShowingPhotos(selected)}
       />
-    </main>
+    </PageMain>
   )
 }

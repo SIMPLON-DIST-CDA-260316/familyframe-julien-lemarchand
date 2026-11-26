@@ -8,6 +8,7 @@ import { type FriendsView, FriendsViewToggle } from '@/components/friends/Friend
 import { NoFriendsYet } from '@/components/friends/NoFriendsYet.tsx'
 import { NoPendingRequests } from '@/components/friends/NoPendingRequests.tsx'
 import { RemoveFriendDialog } from '@/components/friends/RemoveFriendDialog.tsx'
+import { PageMain, ReadingColumn } from '@/components/layout/PageMain.tsx'
 import { PageFab } from '@/components/nav/PageFab.tsx'
 import { Alert, AlertDescription } from '@/components/ui/alert.tsx'
 import { Button } from '@/components/ui/button.tsx'
@@ -199,23 +200,24 @@ export default function FriendsPage(): JSX.Element {
   const headerButtonRef = useRef<HTMLButtonElement>(null)
 
   return (
-    // pb-24 below md: the floating button never covers the last friend's « Retirer ».
-    <main className="mx-auto flex max-w-2xl flex-col gap-8 px-4 pt-10 pb-24 md:pb-10">
+    <PageMain>
       <PageHeader onAddFriend={openDialog} addButtonRef={headerButtonRef} />
-      <Notices error={error || page.actions.error} notice={page.notice} />
-      {/* Only for the list's own load: a failed action keeps its message and the list. */}
-      {error && <RetryButton onRetry={reload} />}
-      {isLoading && <FriendsSkeleton />}
-      {!isLoading && !error && (
-        <FriendshipViews
-          friendships={friendships}
-          actions={page.actions}
-          view={page.view}
-          onViewChange={page.setView}
-          onAddFriend={openDialog}
-        />
-      )}
+      <ReadingColumn>
+        <Notices error={error || page.actions.error} notice={page.notice} />
+        {/* Only for the list's own load: a failed action keeps its message and the list. */}
+        {error && <RetryButton onRetry={reload} />}
+        {isLoading && <FriendsSkeleton />}
+        {!isLoading && !error && (
+          <FriendshipViews
+            friendships={friendships}
+            actions={page.actions}
+            view={page.view}
+            onViewChange={page.setView}
+            onAddFriend={openDialog}
+          />
+        )}
+      </ReadingColumn>
       <AddFriend page={page} onOpen={openDialog} headerButtonRef={headerButtonRef} />
-    </main>
+    </PageMain>
   )
 }

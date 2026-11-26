@@ -1,5 +1,6 @@
 import type { JSX } from 'react'
 import { useAuth } from '@/auth/AuthContext.ts'
+import { PageMain, ReadingColumn } from '@/components/layout/PageMain.tsx'
 import { AvatarCard } from '@/components/settings/AvatarCard.tsx'
 import { DisplayNameCard } from '@/components/settings/DisplayNameCard.tsx'
 import { EmailCard } from '@/components/settings/EmailCard.tsx'
@@ -12,18 +13,20 @@ export default function SettingsPage(): JSX.Element | null {
   if (user === null) return null
 
   return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-8 px-4 py-10">
+    <PageMain>
       <header className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold tracking-tight">Préférences</h1>
         <p className="text-sm text-muted-foreground">
           Votre profil, la sécurité de votre compte et le cadre de cet appareil.
         </p>
       </header>
-      <AvatarCard name={user.displayName} avatarUrl={user.avatarUrl} />
-      <DisplayNameCard displayName={user.displayName} />
-      <EmailCard email={user.email} />
-      <PasswordCard />
-      <FrameSettingsCard />
-    </main>
+      <ReadingColumn>
+        <AvatarCard name={user.displayName} avatarUrl={user.avatarUrl} />
+        <DisplayNameCard displayName={user.displayName} />
+        <EmailCard email={user.email} />
+        <PasswordCard />
+        <FrameSettingsCard />
+      </ReadingColumn>
+    </PageMain>
   )
 }
