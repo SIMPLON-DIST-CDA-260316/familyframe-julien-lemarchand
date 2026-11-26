@@ -32,6 +32,7 @@ Personne ne s'inscrit seul dans FamilyFrame : l'administrateur crée un lien d'i
 | Situation                             | Message                                                                                                                      |
 | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | En-tête de la page                    | « Invitations » — « Créez un lien pour inviter un proche dans FamilyFrame. »                                                 |
+| Carte de création                     | « Nouvelle invitation »                                                                                                      |
 | Champ de saisie                       | « E-mail de la personne invitée »                                                                                            |
 | Création en cours                     | « Création… » (sur le bouton « Créer le lien »)                                                                              |
 | Lien créé                             | « Lien d'invitation », puis « Envoyez ce lien vous-même. Il sert une seule fois, pendant 7 jours, et ne sera plus affiché. » |
