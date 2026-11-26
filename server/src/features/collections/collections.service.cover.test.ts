@@ -66,6 +66,7 @@ describe('listCollections', () => {
         deleteOwned: vi.fn(),
         findOwned: vi.fn(),
         hasOpenedPhoto: vi.fn(),
+        countOpenedPhotos: vi.fn(),
         addPhoto: vi.fn(),
         setPhotoIds: vi.fn(),
       },

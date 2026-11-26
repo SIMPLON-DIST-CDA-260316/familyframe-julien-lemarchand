@@ -21,13 +21,15 @@ docs {
   formé : 404 `COLLECTION_NOT_FOUND`. La liste est triée par nom, comme en
   français (« Été » avant « Noël »). Une photo entre dans une collection par
   `PUT /api/collections/:id/photos/:photoId` et en sort par `DELETE` sur le
-  même chemin ; une photo supprimée de la bibliothèque disparaît de ses
-  collections.
+  même chemin, plusieurs d'un coup par `POST /api/collections/:id/photos`
+  (JSON `{ photoIds }`) ; une photo supprimée de la bibliothèque disparaît
+  de ses collections.
 
   Toutes les requêtes passent par le compte jetable créé par
   `invitations/accept/05` (cookie `inviteeCookie`), jamais par le membre,
   dont les collections sont celles de la base de dev partagée : un compte
   neuf à chaque lancement, donc pas de reste d'un lancement interrompu. Le
   membre (cookie par défaut) sert d'« autre compte ». Le dossier finit sans
-  aucune collection. Ordre : `create`, `list`, `rename`, `photos`, `delete`.
+  aucune collection. Ordre : `create`, `list`, `rename`, `photos`, `photos-batch`,
+  `delete`.
 }

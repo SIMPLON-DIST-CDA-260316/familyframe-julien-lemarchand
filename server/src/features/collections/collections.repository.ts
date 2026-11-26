@@ -20,6 +20,8 @@ export type CollectionsRepository = {
   findOwned: (id: string, ownerId: string) => Promise<CollectionRecord | null>
   // A received photo joins a collection only once opened, like it joins the library.
   hasOpenedPhoto: (ownerId: string, photoId: string) => Promise<boolean>
+  // How many of photoIds are opened photos of ownerId: all of them, or the add is refused.
+  countOpenedPhotos: (ownerId: string, photoIds: string[]) => Promise<number>
   // null unless id is one of ownerId's collections without photoId yet.
   addPhoto: (id: string, ownerId: string, photoId: string) => Promise<CollectionRecord | null>
   // null unless id is one of ownerId's collections and its list is still readIds.
@@ -128,6 +130,8 @@ export function createCollectionsRepository(prisma: PrismaClient): CollectionsRe
       })
       return photo !== null
     },
+    countOpenedPhotos: (ownerId, photoIds) =>
+      prisma.photo.count({ where: { id: { in: photoIds }, ownerId, ...IS_OPENED } }),
     addPhoto: (id, ownerId, photoId) => addPhoto(prisma, id, ownerId, photoId),
     setPhotoIds: (id, ownerId, readIds, photoIds) =>
       setPhotoIds(prisma, { id, ownerId, readIds, photoIds }),

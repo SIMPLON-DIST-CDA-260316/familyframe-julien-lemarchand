@@ -1,0 +1,50 @@
+meta {
+  name: Nominal - ajouter des photos
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/collections/{{collectionId}}/photos
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "photoIds": ["{{batchPhotoId}}", "{{batchPhotoId}}"]
+  }
+}
+
+script:pre-request {
+  if (!bru.getVar('collectionId') || !bru.getVar('batchPhotoId')) {
+    throw new Error('collectionId ou batchPhotoId absent : lancer toute la collection, collections/create/01 et photos-batch/01 doivent passer')
+  }
+  // The throwaway account of invitations/accept/05, never the member (see collections/folder.bru).
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 200
+  res.body.id: eq {{collectionId}}
+  res.body.photoIds.length: eq 1
+  res.body.photoIds[0]: eq {{batchPhotoId}}
+  res.body.coverUrl: isString
+}
+
+script:post-response {
+  const axios = require('axios')
+  // A script request does not get the collection headers: send the cookie itself.
+  test('la liste des collections porte la photo', async () => {
+    const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/collections`, {
+      headers: { Cookie: bru.getVar('inviteeCookie') },
+    })
+    const collection = list.data.collections.find(({ id }) => id === bru.getVar('collectionId'))
+    expect(collection.photoIds).to.eql([bru.getVar('batchPhotoId')])
+  })
+}
+
+docs {
+  NOMINAL → 200 avec la collection. La photo, envoyée deux fois, n'entre
+  qu'une fois ; le script relit la liste : l'ajout est enregistré.
+}

@@ -1,16 +1,18 @@
 import { AppError } from '../../errors/app-error.js'
 import type { Logger } from '../../lib/logger.js'
 import type { ApiErrorCode, Collection } from '../../types.js'
-import { OBJECT_ID_PATTERN, parsePhotoId } from '../photos/photos.input.js'
+import {
+  parseCollectionId,
+  parseCollectionName,
+  parseMemberPhotoId,
+  parsePhotoIds,
+} from './collections.input.js'
 import type {
   CollectionRecord,
   CollectionsRepository,
   LivePhoto,
   WriteRefusal,
 } from './collections.repository.js'
-
-// A menu entry, like a display name: a bound keeps the menus and the frame settings readable.
-export const MAX_COLLECTION_NAME_LENGTH = 50
 
 const ERROR_BY_REFUSAL: Record<WriteRefusal, ApiErrorCode> = {
   not_found: 'COLLECTION_NOT_FOUND',
@@ -28,6 +30,9 @@ export type CollectionRename = CollectionAction & { name: unknown }
 // photoId comes from the URL too.
 export type PhotoMembership = CollectionAction & { photoId: string }
 
+// photoIds comes from the JSON body: validated by the service.
+export type PhotosMembership = CollectionAction & { photoIds: unknown }
+
 export type CollectionsServiceDeps = {
   repository: CollectionsRepository
   logger: Logger
@@ -44,27 +49,8 @@ export type CollectionsService = {
   renameCollection: (rename: CollectionRename) => Promise<Collection>
   deleteCollection: (action: CollectionAction) => Promise<void>
   addPhoto: (membership: PhotoMembership) => Promise<Collection>
+  addPhotos: (membership: PhotosMembership) => Promise<Collection>
   removePhoto: (membership: PhotoMembership) => Promise<Collection>
-}
-
-// Trimmed, like a display name: « Noël » and « Noël  » are the same name.
-export function parseCollectionName(name: unknown): string {
-  if (typeof name !== 'string') {
-    throw new AppError('COLLECTION_NAME_INVALID')
-  }
-  const trimmedName = name.trim()
-  if (trimmedName.length === 0 || trimmedName.length > MAX_COLLECTION_NAME_LENGTH) {
-    throw new AppError('COLLECTION_NAME_INVALID')
-  }
-  return trimmedName
-}
-
-// Prisma fails on an id that is not an ObjectId: that would be a 500, not a 404.
-function parseCollectionId(id: string): string {
-  if (!OBJECT_ID_PATTERN.test(id)) {
-    throw new AppError('COLLECTION_NOT_FOUND')
-  }
-  return id
 }
 
 function orThrow(result: CollectionRecord | WriteRefusal): CollectionRecord {
@@ -166,11 +152,6 @@ async function deleteCollection(
   logger.info('collection.deleted', { collectionId: deleted.id, userId: ownerId })
 }
 
-// MongoDB answers ObjectIds in lowercase: an id sent in capitals must compare equal to it.
-function parseMemberPhotoId(photoId: string): string {
-  return parsePhotoId(photoId).toLowerCase()
-}
-
 async function findOwnedOrThrow(
   { repository }: CollectionsServiceDeps,
   id: string,
@@ -199,6 +180,54 @@ async function addPhoto(
     deps.logger.info('collection.photo_added', { collectionId, photoId, userId: ownerId })
   }
   return toCollection(deps, added ?? (await findOwnedOrThrow(deps, collectionId, ownerId)))
+}
+
+// The ids not in yet, in the order chosen, appended only if the list is still the one read: null
+// when it changed in between, nothing was written.
+async function appendOnce(
+  deps: CollectionsServiceDeps,
+  collectionId: string,
+  { ownerId, photoIds }: { ownerId: string; photoIds: string[] },
+): Promise<CollectionRecord | null> {
+  const record = await findOwnedOrThrow(deps, collectionId, ownerId)
+  const missing = photoIds.filter((photoId) => !record.photoIds.includes(photoId))
+  if (missing.length === 0) return record
+  const appended = [...record.photoIds, ...missing]
+  const updated = await deps.repository.setPhotoIds(
+    collectionId,
+    ownerId,
+    record.photoIds,
+    appended,
+  )
+  if (updated) {
+    deps.logger.info('collection.photos_added', {
+      collectionId,
+      count: missing.length,
+      userId: ownerId,
+    })
+  }
+  return updated
+}
+
+// All or nothing, as the single add: one unknown, someone else's or unopened photo refuses the
+// whole list before any write. Photos already in stay where they are. One retry, as a removal.
+async function addPhotos(
+  deps: CollectionsServiceDeps,
+  { id, ownerId, ...input }: PhotosMembership,
+): Promise<Collection> {
+  const collectionId = parseCollectionId(id)
+  const photoIds = parsePhotoIds(input.photoIds)
+  if ((await deps.repository.countOpenedPhotos(ownerId, photoIds)) !== photoIds.length) {
+    throw new AppError('PHOTO_NOT_FOUND')
+  }
+  const addition = { ownerId, photoIds }
+  const record =
+    (await appendOnce(deps, collectionId, addition)) ??
+    (await appendOnce(deps, collectionId, addition))
+  if (!record) {
+    throw new Error('Collection kept changing while photos were added')
+  }
+  return toCollection(deps, record)
 }
 
 type Removal = { record: CollectionRecord; isRemoved: boolean }
@@ -248,6 +277,7 @@ export function createCollectionsService(deps: CollectionsServiceDeps): Collecti
     renameCollection: (rename) => renameCollection(deps, rename),
     deleteCollection: (action) => deleteCollection(deps, action),
     addPhoto: (membership) => addPhoto(deps, membership),
+    addPhotos: (membership) => addPhotos(deps, membership),
     removePhoto: (membership) => removePhoto(deps, membership),
   }
 }

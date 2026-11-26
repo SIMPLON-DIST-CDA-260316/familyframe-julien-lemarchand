@@ -11,6 +11,7 @@ export type CollectionsController = {
   rename: (req: Request<{ id: string }>, res: Response) => Promise<void>
   remove: (req: Request<{ id: string }>, res: Response) => Promise<void>
   addPhoto: (req: Request<MembershipParams>, res: Response) => Promise<void>
+  addPhotos: (req: Request<{ id: string }>, res: Response) => Promise<void>
   removePhoto: (req: Request<MembershipParams>, res: Response) => Promise<void>
 }
 
@@ -74,6 +75,21 @@ async function addPhoto(
   res.json(collection)
 }
 
+async function addPhotos(
+  deps: ControllerDeps,
+  req: Request<{ id: string }>,
+  res: Response,
+): Promise<void> {
+  const ownerId = currentUser(req).id
+  const collection = await deps.service.addPhotos({
+    id: req.params.id,
+    ownerId,
+    photoIds: req.body?.photoIds,
+  })
+  announceChange(deps, ownerId)
+  res.json(collection)
+}
+
 async function removePhoto(
   deps: ControllerDeps,
   req: Request<MembershipParams>,
@@ -97,6 +113,7 @@ export function createCollectionsController(
     rename: (req, res) => rename(deps, req, res),
     remove: (req, res) => remove(deps, req, res),
     addPhoto: (req, res) => addPhoto(deps, req, res),
+    addPhotos: (req, res) => addPhotos(deps, req, res),
     removePhoto: (req, res) => removePhoto(deps, req, res),
   }
 }

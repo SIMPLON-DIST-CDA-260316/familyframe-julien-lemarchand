@@ -2,13 +2,14 @@ import { describe, expect, it, vi } from 'vitest'
 import { AppError } from '../../errors/app-error.js'
 import type { Logger } from '../../lib/logger.js'
 import type { ApiErrorCode } from '../../types.js'
+import { parseCollectionName } from './collections.input.js'
 import type {
   CollectionRecord,
   CollectionsRepository,
   LivePhoto,
   WriteRefusal,
 } from './collections.repository.js'
-import { createCollectionsService, parseCollectionName } from './collections.service.js'
+import { createCollectionsService } from './collections.service.js'
 
 const OWNER_ID = '6b044f9d56a44767c7079b02'
 const PHOTO_ID = '6b044f9d56a44767c7079a01'
@@ -45,6 +46,7 @@ function makeDeps() {
       deleteOwned: vi.fn<CollectionsRepository['deleteOwned']>().mockResolvedValue(NOEL),
       findOwned: vi.fn<CollectionsRepository['findOwned']>(),
       hasOpenedPhoto: vi.fn<CollectionsRepository['hasOpenedPhoto']>(),
+      countOpenedPhotos: vi.fn<CollectionsRepository['countOpenedPhotos']>(),
       addPhoto: vi.fn<CollectionsRepository['addPhoto']>(),
       setPhotoIds: vi.fn<CollectionsRepository['setPhotoIds']>(),
     },

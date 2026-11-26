@@ -1,0 +1,48 @@
+meta {
+  name: Edge - une photo inconnue dans la liste
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/collections/{{collectionId}}/photos
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "photoIds": ["{{batchPhotoId}}", "000000000000000000000000"]
+  }
+}
+
+script:pre-request {
+  if (!bru.getVar('collectionId') || !bru.getVar('batchPhotoId')) {
+    throw new Error('collectionId ou batchPhotoId absent : lancer toute la collection, collections/create/01 et photos-batch/01 doivent passer')
+  }
+  // The throwaway account of invitations/accept/05, never the member (see collections/folder.bru).
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq PHOTO_NOT_FOUND
+}
+
+script:post-response {
+  const axios = require('axios')
+  // A script request does not get the collection headers: send the cookie itself.
+  test("la collection n'a pas changé, même pour la photo connue", async () => {
+    const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/collections`, {
+      headers: { Cookie: bru.getVar('inviteeCookie') },
+    })
+    const collection = list.data.collections.find(({ id }) => id === bru.getVar('collectionId'))
+    expect(collection.photoIds).to.eql([])
+  })
+}
+
+docs {
+  EDGE → 404 PHOTO_NOT_FOUND : tout ou rien. La photo du compte est
+  refusée avec l'id inconnu ; le script relit la liste : la collection est
+  restée vide.
+}
