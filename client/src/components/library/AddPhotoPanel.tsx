@@ -77,23 +77,19 @@ function AddChoices({ onUpload, onOpenLibrary }: AddChoicesProps): JSX.Element {
   )
 }
 
-// Sending to a friend lives on the Envoyer page now: this panel only adds. A file choice closes it
-// at once, the progress shows on the library's tiles; a pick from the library closes it once the
-// photos are in. Focus goes back to the shown « Ajouter », always there: the empty library's
-// « Ajouter une photo » leaves with the first tile. The floating button shows itself when it
-// takes focus, even if scrolling had hidden it.
-export function AddPhotoPanel(props: AddPhotoPanelProps): JSX.Element | null {
-  const { isOpen, onClose, onUpload, collection, returnFocusRefs } = props
+type OpenPanelProps = Omit<AddPhotoPanelProps, 'isOpen'>
+
+// Mounted only while open: every opening starts on the choices, however the last one closed.
+function OpenPanel({
+  onClose,
+  onUpload,
+  collection,
+  returnFocusRefs,
+}: OpenPanelProps): JSX.Element {
   const [view, setView] = useState<AddView>('choices')
-  if (!isOpen) return null
 
   function handleUpload(files: File[]): void {
     onUpload(files)
-    onClose()
-  }
-
-  function handleClose(): void {
-    setView('choices')
     onClose()
   }
 
@@ -103,14 +99,14 @@ export function AddPhotoPanel(props: AddPhotoPanelProps): JSX.Element | null {
   }
 
   return (
-    <ResponsivePanel onClose={handleClose} onCloseAutoFocus={returnFocus}>
+    <ResponsivePanel onClose={onClose} onCloseAutoFocus={returnFocus}>
       <AddPhotoHeading
         view={view}
         collectionName={collection?.name}
         onBack={() => setView('choices')}
       />
       {view === 'library' && collection ? (
-        <CollectionPick collection={collection} onAdded={handleClose} />
+        <CollectionPick collection={collection} onAdded={onClose} />
       ) : (
         <AddChoices
           onUpload={handleUpload}
@@ -119,4 +115,14 @@ export function AddPhotoPanel(props: AddPhotoPanelProps): JSX.Element | null {
       )}
     </ResponsivePanel>
   )
+}
+
+// Sending to a friend lives on the Envoyer page now: this panel only adds. A file choice closes it
+// at once, the progress shows on the library's tiles; a pick from the library closes it once the
+// photos are in. Focus goes back to the shown « Ajouter », always there: the empty library's
+// « Ajouter une photo » leaves with the first tile. The floating button shows itself when it
+// takes focus, even if scrolling had hidden it.
+export function AddPhotoPanel({ isOpen, ...props }: AddPhotoPanelProps): JSX.Element | null {
+  if (!isOpen) return null
+  return <OpenPanel {...props} />
 }
