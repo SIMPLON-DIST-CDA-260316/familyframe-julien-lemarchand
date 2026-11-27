@@ -39,5 +39,10 @@ docs {
   membre et l'admin : il n'en laisse aucune, et commence par effacer celles
   d'un lancement interrompu.
 
+  Environnement `Prod` : la stack de prod ne publie pas le port 3000, l'API
+  se joint par le proxy du client (`http://localhost:5180/api`). La prod n'a
+  pas de comptes de test (pas de seed) : `pnpm test:bruno:prod` ne lance que
+  les dossiers sans connexion (`health/`, `not-found/`).
+
   Chemins `@file()` relatifs à la racine de la collection (`server/bruno/`).
 }

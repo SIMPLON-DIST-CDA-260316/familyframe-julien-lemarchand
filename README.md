@@ -267,6 +267,7 @@ Outils de code, utilisables que l'app tourne dans Docker ou non :
 | `pnpm test`                     | tests unitaires du serveur (Vitest)     |
 | `pnpm test:hooks`               | tests des hooks Claude Code             |
 | `pnpm test:bruno`               | requêtes Bruno contre l'API lancée      |
+| `pnpm test:bruno:prod`          | requêtes Bruno sans compte, via 5180    |
 
 Sans Docker seulement (ils utilisent le `DATABASE_URL` de `server/.env`, pas la base du container) :
 
