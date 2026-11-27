@@ -67,7 +67,7 @@ Avec `-f compose.yaml`, seul ce fichier est chargé, sans l'override. On obtient
 
 - des images optimisées (code compilé, dépendances de prod seulement)
 - une base vide : les index sont créés, mais pas de comptes de test
-- le port de la base fermé
+- seul le port du client (5180) publié : l'API passe par son proxy (`http://localhost:5180/api`), la base n'est pas joignable
 
 ### Commandes utiles
 
@@ -158,10 +158,10 @@ docker run -d `
 docker build -t ff-server:1.0.0 ./server
 docker build -t ff-client:1.0.0 ./client
 
+# pas de -p : en prod, l'api se joint par le proxy du client (5180/api)
 docker run -d `
   --network $DATA_NETWORK `
   --name $SERVER_CONTAINER_NAME `
-  -p 3000:3000 `
   --env-file server/.env `
   -e DATABASE_URL=mongodb://${MONGO_CONTAINER_NAME}:27017/familyframe `
   ff-server:1.0.0
@@ -216,7 +216,7 @@ pnpm dev                             # lance client et serveur en parallèle
 | Service       | URL                   | Quand               |
 | ------------- | --------------------- | ------------------- |
 | Client (Vite) | http://localhost:5180 | toujours            |
-| API (Express) | http://localhost:3000 | toujours            |
+| API (Express) | http://localhost:3000 | dev                 |
 | Prisma Studio | http://localhost:5555 | dev, une fois lancé |
 | MongoDB       | `localhost:27017`     | dev avec Docker     |
 

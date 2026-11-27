@@ -37,8 +37,6 @@ services:
     image: ff-server:1.0.0
     pre_start:
       - command: pnpm db:push
-    ports:
-      - 3000:3000
     env_file: ./server/.env
     environment:
       - DATABASE_URL=mongodb://db:27017/familyframe
