@@ -13,7 +13,7 @@ export function CloseButton({ onClose }: CloseButtonProps): JSX.Element {
       variant="ghost"
       size="icon-sm"
       onClick={onClose}
-      aria-label="Fermer le diaporama"
+      aria-label="Quitter le mode cadre"
       className={GLASS_BUTTON_CLASSES}
     >
       <XIcon />

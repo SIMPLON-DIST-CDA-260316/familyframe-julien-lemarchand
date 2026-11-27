@@ -1,176 +1,62 @@
-import { type ChangeEvent, type JSX, type SubmitEvent, useEffect, useState } from 'react'
-import { useAuth } from '@/auth/AuthContext.ts'
+import { CameraIcon, ImageIcon } from 'lucide-react'
+import { type ChangeEvent, type JSX, useState } from 'react'
+import { PickButton } from '@/components/form/PickButton.tsx'
 import { Alert, AlertDescription } from '@/components/ui/alert.tsx'
-import { Button } from '@/components/ui/button.tsx'
-import { Input } from '@/components/ui/input.tsx'
-import { Label } from '@/components/ui/label.tsx'
-import type { Photo } from '@/photo.ts'
-import { postPhoto } from '@/photosApi.ts'
+import { tooManyPhotosMessage } from '@/upload/uploadTexts.ts'
 
-type UploadStatus = 'idle' | 'sending' | 'success' | 'error'
-
-type PhotoUpload = {
-  status: UploadStatus
-  error: string
-  // true when the photo was saved: the form then empties its inputs.
-  send: (file: File) => Promise<boolean>
-  clearStatus: () => void
-}
+// Enough for an outing's best shots; past it the queue would run for many minutes on a phone
+// network.
+const MAX_PHOTOS_PER_CHOICE = 20
 
 type UploadFormProps = {
-  onUploaded: (photo: Photo) => void
+  onUpload: (files: File[]) => void
 }
 
-type FileFieldProps = {
-  id: string
-  label: string
-  capture?: 'environment'
-  onChange: (event: ChangeEvent<HTMLInputElement>) => void
+function TooManyAlert({ message }: { message: string }): JSX.Element | null {
+  if (message === '') return null
+  return (
+    <Alert variant="destructive">
+      <AlertDescription>{message}</AlertDescription>
+    </Alert>
+  )
 }
 
-type FileFieldsProps = {
-  inputsKey: number
-  onChange: (event: ChangeEvent<HTMLInputElement>) => void
-}
-
-type UploadFormState = {
-  upload: PhotoUpload
-  file: File | null
-  inputsKey: number
-  handleFileChange: (event: ChangeEvent<HTMLInputElement>) => void
-  handleSubmit: (event: SubmitEvent<HTMLFormElement>) => Promise<void>
-}
-
-function usePreviewUrl(file: File | null): string | null {
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (!file) {
-      setPreviewUrl(null)
-      return
-    }
-    const url = URL.createObjectURL(file)
-    setPreviewUrl(url)
-    return () => URL.revokeObjectURL(url)
-  }, [file])
-
-  return previewUrl
-}
-
-function usePhotoUpload(onUploaded: (photo: Photo) => void): PhotoUpload {
-  const { dropUser } = useAuth()
-  const [status, setStatus] = useState<UploadStatus>('idle')
-  const [error, setError] = useState('')
-
-  async function send(file: File): Promise<boolean> {
-    setStatus('sending')
-    const result = await postPhoto(file)
-    // The session ended on the server: RequireAuth sends the user to /login.
-    if (result.status === 'unauthenticated') {
-      dropUser()
-      return false
-    }
-    if (result.status === 'failed') {
-      setError(result.message)
-      setStatus('error')
-      return false
-    }
-    onUploaded(result.photo)
-    setStatus('success')
-    return true
-  }
-
-  return { status, error, send, clearStatus: () => setStatus('idle') }
-}
-
-function useUploadForm(onUploaded: (photo: Photo) => void): UploadFormState {
-  const upload = usePhotoUpload(onUploaded)
-  const [file, setFile] = useState<File | null>(null)
-  // A new key remounts the file inputs, which empties them.
-  const [inputsKey, setInputsKey] = useState(0)
+// Adding is the panel's only intent: a choice uploads at once, the greyed tiles show the progress.
+// Too many: nothing is sent and the panel stays open with the message. The input is emptied once
+// read, so choosing the same files again still fires change.
+export function UploadForm({ onUpload }: UploadFormProps): JSX.Element {
+  const [tooManyMessage, setTooManyMessage] = useState('')
 
   function handleFileChange(event: ChangeEvent<HTMLInputElement>): void {
-    setFile(event.target.files?.[0] ?? null)
-    upload.clearStatus()
-  }
-
-  async function handleSubmit(event: SubmitEvent<HTMLFormElement>): Promise<void> {
-    event.preventDefault()
-    if (!file) return
-    if (await upload.send(file)) {
-      setFile(null)
-      setInputsKey((key) => key + 1)
+    const input = event.target
+    const chosen = Array.from(input.files ?? [])
+    input.value = ''
+    if (chosen.length === 0) return
+    if (chosen.length > MAX_PHOTOS_PER_CHOICE) {
+      setTooManyMessage(tooManyPhotosMessage(MAX_PHOTOS_PER_CHOICE, chosen.length))
+      return
     }
+    setTooManyMessage('')
+    onUpload(chosen)
   }
 
-  return { upload, file, inputsKey, handleFileChange, handleSubmit }
-}
-
-function FileField({ id, label, capture, onChange }: FileFieldProps): JSX.Element {
   return (
-    <div className="flex flex-col gap-2">
-      <Label htmlFor={id}>{label}</Label>
-      <Input id={id} type="file" accept="image/*" capture={capture} onChange={onChange} />
-    </div>
-  )
-}
-
-function FileFields({ inputsKey, onChange }: FileFieldsProps): JSX.Element {
-  return (
-    <>
-      <FileField
-        key={`camera-${inputsKey}`}
-        id="camera-photo"
-        label="Prendre une photo"
-        capture="environment"
-        onChange={onChange}
-      />
-      <FileField
-        key={`gallery-${inputsKey}`}
-        id="gallery-photo"
-        label="Choisir une image"
-        onChange={onChange}
-      />
-    </>
-  )
-}
-
-function UploadAlert({ status, error }: Pick<PhotoUpload, 'status' | 'error'>): JSX.Element | null {
-  if (status === 'success') {
-    return (
-      <Alert>
-        <AlertDescription>Photo envoyée !</AlertDescription>
-      </Alert>
-    )
-  }
-  if (status === 'error') {
-    return (
-      <Alert variant="destructive">
-        <AlertDescription>{error}</AlertDescription>
-      </Alert>
-    )
-  }
-  return null
-}
-
-export function UploadForm({ onUploaded }: UploadFormProps): JSX.Element {
-  const { upload, file, inputsKey, handleFileChange, handleSubmit } = useUploadForm(onUploaded)
-  const previewUrl = usePreviewUrl(file)
-
-  return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-      <FileFields inputsKey={inputsKey} onChange={handleFileChange} />
-      {previewUrl && (
-        <img
-          className="max-h-[40vh] w-full rounded-lg object-contain"
-          src={previewUrl}
-          alt="Aperçu avant envoi"
+    <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-2 gap-2">
+        <PickButton
+          label="Prendre une photo"
+          icon={<CameraIcon aria-hidden className="size-6" />}
+          capture="environment"
+          onChange={handleFileChange}
         />
-      )}
-      <Button type="submit" size="lg" disabled={!file || upload.status === 'sending'}>
-        {upload.status === 'sending' ? 'Envoi…' : 'Envoyer'}
-      </Button>
-      <UploadAlert status={upload.status} error={upload.error} />
-    </form>
+        <PickButton
+          label="Choisir des images"
+          icon={<ImageIcon aria-hidden className="size-6" />}
+          multiple
+          onChange={handleFileChange}
+        />
+      </div>
+      <TooManyAlert message={tooManyMessage} />
+    </div>
   )
 }

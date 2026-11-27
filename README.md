@@ -16,6 +16,8 @@ Projet de formation **Concepteur Développeur d'Applications** (Simplon), axé s
 
 Architecture, parcours d'une photo et choix techniques : [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
+Ce que l'application permet de faire et ses règles de gestion, sans détail technique : [`docs/produit/README.md`](docs/produit/README.md).
+
 ## Feuille de route
 
 - [x] **J1** — MVP fonctionnel en local, sans Docker
@@ -246,6 +248,31 @@ Quand le schéma change sur une base qui contient déjà des photos, un nouvel i
 
 - avec Docker : `docker compose down -v`, puis relancer
 - sans Docker : `pnpm db:seed` **avant** `pnpm db:push`
+
+### Utilisation
+
+| Service      | URL                                     |
+| ------------ | --------------------------------------- |
+| Connexion    | http://localhost:5180/login             |
+| Bibliothèque | http://localhost:5180                   |
+| Cadre        | http://localhost:5180/frame             |
+| Amis         | http://localhost:5180/friends           |
+| Préférences  | http://localhost:5180/settings          |
+| Invitations  | http://localhost:5180/admin/invitations |
+
+Sans session, la bibliothèque et le cadre redirigent vers `/login` ; le cadre se connecte une fois avec un compte et reste connecté tant qu'il est allumé : il recharge ses photos chaque jour, ce qui prolonge la session glissante de 90 jours.
+
+Le cadre (`/frame`) n'affiche que le diaporama : « Mode cadre » le lance en plein écran depuis la bibliothèque ou depuis une photo ouverte ; ✕, Échap ou la sortie du plein écran ramènent à la bibliothèque sur la photo qui était à l'écran. Son menu « … » règle le modèle d'affichage, l'ordre de lecture et la vitesse, retenus par appareil ; on les retrouve dans « Préférences », encart « Cadre de cet appareil ».
+
+Regarder ses photos : dans la bibliothèque, toucher une photo l'ouvre en grand ; balayer ou utiliser les flèches pour passer à la suivante, ✕ ou Échap pour revenir.
+
+Inviter un proche : connecté en admin, ouvrir « Invitations » depuis la bibliothèque, saisir son e-mail et transmettre soi-même le lien obtenu (message, SMS : l'application n'envoie pas d'e-mail). Le lien sert une seule fois, pendant 7 jours ; il ouvre une page où la personne choisit son nom et son mot de passe. Créer les liens depuis l'adresse que la famille utilise (`http://<ip-du-pc>:5180` sur le réseau local), pas depuis `localhost` : le lien reprend l'adresse de la page. Réinviter le même e-mail remplace l'ancien lien.
+
+Ajouter un ami : ouvrir « Amis » depuis la bibliothèque et saisir l'adresse e-mail exacte de son compte FamilyFrame (la personne doit déjà avoir un compte : sinon, demander une invitation à l'admin). Elle voit la demande sous « Demandes reçues » et l'accepte ou la refuse ; une fois acceptée, chacun peut retirer l'autre. Les listes ne se mettent pas à jour toutes seules : recharger la page pour voir la réponse de l'autre.
+
+Envoyer une photo à un ami : dans la bibliothèque ou sur le cadre, le menu « … » d'une photo propose « Envoyer à un ami » ; dans le panneau « Ajouter » de la bibliothèque, choisir un fichier puis « Envoyer à un ami » plutôt que « Ajouter à ma bibliothèque ». Le panneau « Envoyer à des proches » montre les amis acceptés : toucher ceux qui doivent la recevoir, puis « Envoyer à N personnes » ; une notification confirme à qui elle est partie. Un message facultatif (200 caractères au plus) peut l'accompagner. La photo n'entre que chez l'ami, comme une lettre non ouverte : sa bibliothèque annonce « Vous avez 1 nouvelle photo », et « Découvrir » la montre en grand avec « Envoyée par », votre nom et votre message, avant qu'elle rejoigne sa bibliothèque et son cadre. Le cadre affiche la même annonce en haut de l'écran et lance la découverte d'un toucher. Chacun supprime ses photos de son côté : retirer l'ami ou supprimer l'original ne retire pas la photo reçue.
+
+Modifier son compte : « Préférences », dans le menu du compte (l'avatar en haut à droite ; sur mobile, aussi l'onglet « Compte »). Chaque carte de compte a son « Enregistrer » : photo de profil (JPEG, PNG ou WebP, recadrée en carré), nom affiché et mot de passe ; la carte « Cadre de cet appareil » s'applique dès qu'on choisit. L'adresse e-mail ne se modifie pas encore. Changer de mot de passe déconnecte les autres appareils du compte : le cadre revient à la page de connexion à son prochain rechargement des photos (au plus tard le lendemain) ou à sa prochaine reconnexion ; s'y reconnecter avec le nouveau mot de passe.
 
 ## Scripts racine
 

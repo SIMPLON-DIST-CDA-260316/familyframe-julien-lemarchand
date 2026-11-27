@@ -1,0 +1,33 @@
+meta {
+  name: Edge - collection supprimée
+  type: http
+  seq: 13
+}
+
+get {
+  url: {{baseUrl}}/api/photos?collectionId={{listCollectionId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const axios = require('axios')
+  if (!bru.getVar('listCollectionId')) {
+    throw new Error('listCollectionId absent : lancer le dossier photos en entier, list/07 doit passer')
+  }
+  // Also the cleanup: the member keeps no collection from this folder.
+  await axios.delete(`${bru.getEnvVar('baseUrl')}/api/collections/${bru.getVar('listCollectionId')}`, {
+    headers: { Cookie: bru.getVar('sessionCookie') },
+  })
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq COLLECTION_NOT_FOUND
+}
+
+docs {
+  EDGE → 404 COLLECTION_NOT_FOUND : le script de départ supprime la
+  collection de `07` (ses photos restent dans la bibliothèque), puis la
+  requête la redemande, comme une page restée ouverte sur un autre appareil.
+}

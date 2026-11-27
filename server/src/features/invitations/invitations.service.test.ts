@@ -46,6 +46,7 @@ function makeDeps() {
     generateToken: vi.fn<InvitationsServiceDeps['generateToken']>().mockReturnValue(TOKEN),
     hashToken: vi.fn<InvitationsServiceDeps['hashToken']>().mockReturnValue(TOKEN_HASH),
     hashPassword: vi.fn<InvitationsServiceDeps['hashPassword']>(),
+    avatarUrl: vi.fn<InvitationsServiceDeps['avatarUrl']>(),
     now: vi.fn<InvitationsServiceDeps['now']>().mockReturnValue(NOW),
     logger: {
       info: vi.fn<Logger['info']>(),

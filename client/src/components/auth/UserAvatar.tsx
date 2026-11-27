@@ -1,17 +1,30 @@
-import type { JSX } from 'react'
+import { type JSX, useState } from 'react'
 import { cn } from '@/lib/utils.ts'
 
-type UserAvatarProps = { name: string; className?: string }
+// avatarUrl: null or absent shows the initial, as before any profile photo.
+type UserAvatarProps = { name: string; avatarUrl?: string | null; className?: string }
 
-export function UserAvatar({ name, className }: UserAvatarProps): JSX.Element {
+const AVATAR_CLASSES =
+  'grid size-9 shrink-0 place-items-center rounded-full bg-primary text-sm font-semibold text-primary-foreground uppercase'
+
+// Decorative (aria-hidden, empty alt): the name is always written next to it.
+export function UserAvatar({ name, avatarUrl, className }: UserAvatarProps): JSX.Element {
+  // The URL that failed, not a flag: a new URL (new photo) gets its own try.
+  const [failedUrl, setFailedUrl] = useState<string | null>(null)
+  // Cloudinary answers 404 once the image is deleted: the initial beats a broken image.
+  if (avatarUrl && avatarUrl !== failedUrl) {
+    return (
+      <img
+        src={avatarUrl}
+        alt=""
+        aria-hidden
+        onError={() => setFailedUrl(avatarUrl)}
+        className={cn(AVATAR_CLASSES, 'object-cover', className)}
+      />
+    )
+  }
   return (
-    <span
-      aria-hidden
-      className={cn(
-        'grid size-9 shrink-0 place-items-center rounded-full bg-primary text-sm font-semibold text-primary-foreground uppercase',
-        className,
-      )}
-    >
+    <span aria-hidden className={cn(AVATAR_CLASSES, className)}>
       {name.charAt(0)}
     </span>
   )

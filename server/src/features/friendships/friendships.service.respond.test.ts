@@ -1,10 +1,24 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { Logger } from '../../lib/logger.js'
-import type { FriendshipRecord, FriendshipsRepository } from './friendships.repository.js'
-import { createFriendshipsService } from './friendships.service.js'
+import type {
+  FriendshipParty,
+  FriendshipRecord,
+  FriendshipsRepository,
+} from './friendships.repository.js'
+import { createFriendshipsService, type FriendshipsServiceDeps } from './friendships.service.js'
 
-const MEMBER = { id: '6b044f9d56a44767c7079b02', email: 'membre@example.fr', displayName: 'Membre' }
-const MAMIE = { id: '6b044f9d56a44767c7079b05', email: 'mamie@example.fr', displayName: 'Mamie' }
+const MEMBER: FriendshipParty = {
+  id: '6b044f9d56a44767c7079b02',
+  email: 'membre@example.fr',
+  displayName: 'Membre',
+  avatarCloudinaryId: null,
+}
+const MAMIE: FriendshipParty = {
+  id: '6b044f9d56a44767c7079b05',
+  email: 'mamie@example.fr',
+  displayName: 'Mamie',
+  avatarCloudinaryId: null,
+}
 const FRIENDSHIP_ID = '6b044f9d56a44767c7079f01'
 
 // The member asked Mamie by default; each test changes only what it is about.
@@ -35,6 +49,7 @@ function makeDeps() {
         .mockResolvedValue(friendshipRecord({ status: 'accepted' })),
       deleteOf: vi.fn<FriendshipsRepository['deleteOf']>().mockResolvedValue(friendshipRecord()),
     },
+    avatarUrl: vi.fn<FriendshipsServiceDeps['avatarUrl']>(),
     logger: {
       info: vi.fn<Logger['info']>(),
       warn: vi.fn<Logger['warn']>(),
@@ -81,7 +96,7 @@ describe('acceptFriendship', () => {
 
     expect(friendship).toEqual({
       id: FRIENDSHIP_ID,
-      user: MEMBER,
+      user: { id: MEMBER.id, displayName: 'Membre', email: MEMBER.email, avatarUrl: null },
       createdAt: '2026-11-24T10:00:00.000Z',
     })
     expect(deps.logger.info).toHaveBeenCalledWith('friendship.accepted', {

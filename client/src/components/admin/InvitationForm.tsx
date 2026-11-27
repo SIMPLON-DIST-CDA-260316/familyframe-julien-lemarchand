@@ -48,6 +48,7 @@ export function InvitationForm({ onCreated }: InvitationFormProps): JSX.Element 
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       <TextField
         id="invitation-email"
+        enterKeyHint="send"
         label="E-mail de la personne invitée"
         type="email"
         autoComplete="off"

@@ -39,6 +39,23 @@ docs {
   membre et l'admin : il n'en laisse aucune, et commence par effacer celles
   d'un lancement interrompu.
 
+  Le dossier `selections/` lit les sélections de ce compte jetable, qu'il
+  remplit de ses propres photos puis vide.
+
+  Le dossier `account/` modifie aussi ce compte jetable, jamais le membre, et
+  le remet dans son état de départ en fin de dossier (voir
+  `account/folder.bru`). `account/avatar/` publie deux photos de profil sur
+  Cloudinary et les détruit avant la fin.
+
+  Le dossier `photos/share/` lit les ids du membre et de l'admin
+  (`memberId`, `adminId`, par `GET /api/auth/me`), rend les deux comptes amis
+  le temps de ses requêtes, puis supprime cette amitié. Les photos que l'admin
+  y reçoit restent après la fin de l'amitié : `photos/delete` les supprime.
+  Chaque envoi entre dans l'historique du membre ; ceux de `photos/share/`
+  et ceux de `collections/photos/07` et `selections/radio/09` gardent leur
+  image Cloudinary jusqu'à `sends/`, lancé après `photos/` (ordre
+  alphabétique des dossiers sans `seq`), qui les retire tous.
+
   Environnement `Prod` : la stack de prod ne publie pas le port 3000, l'API
   se joint par le proxy du client (`http://localhost:5180/api`). La prod n'a
   pas de comptes de test (pas de seed) : `pnpm test:bruno:prod` ne lance que

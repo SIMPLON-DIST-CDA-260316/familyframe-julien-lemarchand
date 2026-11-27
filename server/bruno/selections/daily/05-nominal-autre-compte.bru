@@ -1,0 +1,28 @@
+meta {
+  name: Nominal - un autre compte a son propre lot
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/selections/daily
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body.photoIds: isArray
+}
+
+script:post-response {
+  test('le lot du membre ne contient aucune photo du compte jetable', () => {
+    expect(res.body.photoIds).to.not.include(bru.getVar('dailyPhotoId'))
+    expect(res.body.photoIds).to.not.include(bru.getVar('dailySecondPhotoId'))
+  })
+}
+
+docs {
+  NOMINAL → 200 pour le membre (cookie par défaut) : son lot vient de sa
+  propre bibliothèque, jamais de celle du compte jetable.
+}

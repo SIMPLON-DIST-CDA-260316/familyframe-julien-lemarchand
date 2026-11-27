@@ -1,94 +1,87 @@
-import { ImagesIcon } from 'lucide-react'
 import type { JSX } from 'react'
-import { LibraryScreen } from '@/components/frame/LibraryScreen.tsx'
+import { FrameNotices } from '@/components/frame/FrameNotices.tsx'
+import { type FrameStatus, FrameStatusScreen } from '@/components/frame/FrameStatusScreen.tsx'
 import { SlideshowScreen } from '@/components/frame/SlideshowScreen.tsx'
-import { useFrameSelection } from '@/hooks/useFrameSelection.ts'
-import { useIdle } from '@/hooks/useIdle.ts'
-import { useOnIdle } from '@/hooks/useOnIdle.ts'
-import { usePhotoFeed } from '@/hooks/usePhotoFeed.ts'
-import { useSlideshowSettings } from '@/hooks/useSlideshowSettings.ts'
+import { MailRevealDialog } from '@/components/mail/MailRevealDialog.tsx'
+import { type FrameMode, useFrameMode } from '@/hooks/useFrameMode.ts'
+import { useMailReveal } from '@/hooks/useMailReveal.ts'
+import { usePhotoMail } from '@/hooks/usePhotoMail.ts'
+import { useScreenWakeLock } from '@/hooks/useScreenWakeLock.ts'
 import { cn } from '@/lib/utils.ts'
 
 // The frame is a screen on a wall: dark keeps the photos in front.
 const FRAME_CLASSES = 'dark min-h-svh bg-frame-background text-foreground'
-// The controls step aside quickly: the photo is what the wall is for.
-const CONTROLS_HIDE_DELAY_MS = 4000
-// Long enough to browse the library; after it, the wall goes back to showing photos.
-const LIBRARY_IDLE_DELAY_MS = 60_000
 
-function EmptyFrame(): JSX.Element {
+type FrameScreenProps = {
+  frame: FrameMode
+  hasWaitingPhotos: boolean
+}
+
+// Reached only without photos: once loaded, that means an empty collection, or an empty library
+// maybe with mail.
+function frameStatus(
+  { status, source }: Pick<FrameMode, 'status' | 'source'>,
+  hasWaitingPhotos: boolean,
+): FrameStatus {
+  if (status !== 'loaded') return status
+  if (source.kind === 'collection') return 'emptyCollection'
+  return hasWaitingPhotos ? 'unopened' : 'empty'
+}
+
+function FrameScreen({ frame, hasWaitingPhotos }: FrameScreenProps): JSX.Element {
+  if (frame.currentPhoto === undefined) {
+    return (
+      <FrameStatusScreen
+        status={frameStatus(frame, hasWaitingPhotos)}
+        className={FRAME_CLASSES}
+        onLeave={frame.leave}
+      />
+    )
+  }
+
   return (
+    // data-idle: the slideshow's shade reads it from CSS, without one more prop down the tree.
     <main
-      className={cn(
-        FRAME_CLASSES,
-        'grid place-items-center bg-radial from-frame-accent/10 to-transparent to-70%',
-      )}
+      data-idle={!frame.isActive}
+      className={cn('group/frame', FRAME_CLASSES, !frame.isActive && 'cursor-none')}
     >
-      <div className="flex flex-col items-center gap-4 px-6 text-center">
-        <ImagesIcon
-          aria-hidden
-          className="size-16 text-frame-accent/80 motion-safe:animate-pulse"
-        />
-        <p className="text-3xl font-medium">En attente de la première photo…</p>
-        {/* A first visitor needs the way in, not only the news that the frame is empty. */}
-        <p className="text-lg text-muted-foreground">
-          Envoyez-en une depuis votre téléphone : {window.location.host}
-        </p>
-      </div>
+      <SlideshowScreen
+        photos={frame.photos}
+        currentPhoto={frame.currentPhoto}
+        selection={frame.selection}
+        isActive={frame.isActive}
+        settings={frame.settings}
+        onClose={frame.leave}
+      />
     </main>
   )
 }
 
 export default function FramePage(): JSX.Element {
-  const photos = usePhotoFeed()
-  const isActive = useIdle(CONTROLS_HIDE_DELAY_MS)
-  const isLibraryActive = useIdle(LIBRARY_IDLE_DELAY_MS)
-  const settings = useSlideshowSettings()
-  // A paused photo was chosen by someone: a new arrival raises the badge instead of replacing it.
-  const selection = useFrameSelection(photos, isActive || !settings.isPlaying)
+  const frame = useFrameMode()
+  const mail = usePhotoMail()
+  const reveal = useMailReveal()
+  useScreenWakeLock()
 
-  function startSlideshow(): void {
-    selection.startSlideshow()
-    settings.onPlayingChange(true)
+  // The photos just opened joined the slideshow while the reveal was open: they were seen,
+  // no pill should announce them again.
+  function closeReveal(): void {
+    reveal.close()
+    frame.selection.showNewest()
   }
 
-  function openPhoto(id: string): void {
-    selection.openPhoto(id)
-    // A photo picked by hand is there to be looked at, not to slide away.
-    settings.onPlayingChange(false)
-  }
-
-  // The wall never shows a still grid: an unattended library turns into the slideshow.
-  useOnIdle(isLibraryActive, () => {
-    if (selection.mode === 'library') startSlideshow()
-  })
-
-  const currentPhoto = photos.find(({ id }) => id === selection.currentId)
-  if (currentPhoto === undefined) return <EmptyFrame />
-
-  const isSlideshow = selection.mode === 'slideshow'
   return (
-    // data-idle: the slideshow's shade reads it from CSS, without one more prop down the tree.
-    <main
-      data-idle={isSlideshow && !isActive}
-      className={cn('group/frame', FRAME_CLASSES, isSlideshow && !isActive && 'cursor-none')}
-    >
-      {isSlideshow ? (
-        <SlideshowScreen
-          photos={photos}
-          currentPhoto={currentPhoto}
-          selection={selection}
-          isActive={isActive}
-          settings={settings}
-        />
-      ) : (
-        <LibraryScreen
-          photos={photos}
-          currentId={currentPhoto.id}
-          onOpenPhoto={openPhoto}
-          onStartSlideshow={startSlideshow}
-        />
+    <>
+      <FrameScreen frame={frame} hasWaitingPhotos={mail.photos.length > 0} />
+      <FrameNotices
+        waitingCount={mail.photos.length}
+        newPhotoCount={frame.selection.newPhotoCount}
+        onReveal={() => reveal.start(mail.photos)}
+        onShowNewest={frame.selection.showNewest}
+      />
+      {reveal.photos !== null && (
+        <MailRevealDialog photos={reveal.photos} onOpen={mail.open} onClose={closeReveal} />
       )}
-    </main>
+    </>
   )
 }

@@ -1,0 +1,15 @@
+meta {
+  name: unopened
+  seq: 4
+}
+
+docs {
+  `GET /api/photos/unopened` → 200 `{ photos }` : les photos que des amis ont
+  envoyées au compte connecté et qu'il n'a pas encore ouvertes, la plus
+  récente en premier, toutes d'un coup (pas de pages). Elles ne sont pas dans
+  `GET /api/photos` tant qu'elles ne sont pas ouvertes. Les photos ajoutées
+  par leur propriétaire n'y passent jamais.
+
+  Lancé après `share/` : l'admin y a reçu `sharedPhotoId` et
+  `deviceSharedPhotoId`.
+}

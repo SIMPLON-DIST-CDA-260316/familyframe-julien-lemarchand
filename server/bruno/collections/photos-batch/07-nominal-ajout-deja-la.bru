@@ -1,0 +1,36 @@
+meta {
+  name: Nominal - photos déjà dans la collection
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/collections/{{collectionId}}/photos
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "photoIds": ["{{batchPhotoId}}"]
+  }
+}
+
+script:pre-request {
+  if (!bru.getVar('collectionId') || !bru.getVar('batchPhotoId')) {
+    throw new Error('collectionId ou batchPhotoId absent : lancer toute la collection, collections/create/01 et photos-batch/01 doivent passer')
+  }
+  // The throwaway account of invitations/accept/05, never the member (see collections/folder.bru).
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 200
+  res.body.photoIds.length: eq 1
+  res.body.photoIds[0]: eq {{batchPhotoId}}
+}
+
+docs {
+  NOMINAL → 200 avec la collection telle quelle : renvoyer une photo déjà
+  là ne la double pas.
+}

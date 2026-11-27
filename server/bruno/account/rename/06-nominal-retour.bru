@@ -1,0 +1,31 @@
+meta {
+  name: Nominal - retour au nom de départ
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{baseUrl}}/api/account
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "displayName": "Invitée"
+  }
+}
+
+script:pre-request {
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 200
+  res.body.user.displayName: eq Invitée
+}
+
+docs {
+  NOMINAL → 200 : le compte reprend le nom donné par
+  `invitations/accept/05`. Le dossier finit comme il a commencé.
+}

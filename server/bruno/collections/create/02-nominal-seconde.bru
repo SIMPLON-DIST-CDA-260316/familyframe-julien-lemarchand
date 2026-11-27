@@ -1,0 +1,39 @@
+meta {
+  name: Nominal - seconde collection
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/collections
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Été 2026"
+  }
+}
+
+script:pre-request {
+  if (!bru.getVar('inviteeCookie')) {
+    throw new Error('inviteeCookie absent : lancer toute la collection, invitations/accept/05 doit passer')
+  }
+  // The throwaway account of invitations/accept/05, never the member (see collections/folder.bru).
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 201
+  res.body.name: eq Été 2026
+}
+
+script:post-response {
+  bru.setVar('secondCollectionId', res.body.id)
+}
+
+docs {
+  NOMINAL → 201. Une seconde collection, dont le nom commence par un
+  accent : `list/01` vérifie le tri à la française.
+}

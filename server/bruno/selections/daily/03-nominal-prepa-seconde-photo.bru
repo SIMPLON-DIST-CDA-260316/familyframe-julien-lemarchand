@@ -1,0 +1,33 @@
+meta {
+  name: Nominal - seconde photo du compte jetable
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/photos
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  photo: @file(fixtures/photo.png) @contentType(image/png)
+}
+
+script:pre-request {
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 201
+  res.body.id: isString
+}
+
+script:post-response {
+  bru.setVar('dailySecondPhotoId', res.body.id)
+}
+
+docs {
+  NOMINAL → 201. Préparation : un second fichier, donc pas un doublon ; son
+  id va dans `dailySecondPhotoId`, et `07` le supprime.
+}

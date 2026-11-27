@@ -1,0 +1,36 @@
+meta {
+  name: Edge - mot de passe actuel faux
+  type: http
+  seq: 1
+}
+
+put {
+  url: {{baseUrl}}/api/account/password
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "currentPassword": "pas-le-bon-mot-de-passe",
+    "newPassword": "invite-bruno-nouveau"
+  }
+}
+
+script:pre-request {
+  if (!bru.getVar('inviteeCookie')) {
+    throw new Error('inviteeCookie absent : lancer toute la collection, invitations/accept/05 doit passer')
+  }
+  // The throwaway account of invitations/accept/05, never the member (see account/folder.bru).
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq PASSWORD_INCORRECT
+}
+
+docs {
+  EDGE → 400 PASSWORD_INCORRECT : une session seule ne suffit pas à changer
+  le mot de passe. Rien ne change : `05` part toujours de `invite-bruno-dev`.
+}

@@ -1,0 +1,35 @@
+meta {
+  name: Nominal - id de photo en majuscules
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/selections/radio/{{radioPhotoIdUpper}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('radioPhotoId')) {
+    throw new Error('radioPhotoId absent : lancer tout le dossier, radio/01 doit passer')
+  }
+  bru.setVar('radioPhotoIdUpper', bru.getVar('radioPhotoId').toUpperCase())
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 200
+  res.body.photoIds.length: eq 2
+}
+
+script:post-response {
+  test('la radio commence par la photo, son id en minuscules', () => {
+    expect(res.body.photoIds[0]).to.equal(bru.getVar('radioPhotoId'))
+  })
+}
+
+docs {
+  NOMINAL → 200 : un ObjectId ne distingue pas les majuscules. La radio
+  commence par la même photo, avec l'id tel que la bibliothèque l'écrit.
+}

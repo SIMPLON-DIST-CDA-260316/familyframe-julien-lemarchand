@@ -1,0 +1,28 @@
+meta {
+  name: Edge - message trop long avec un fichier de l'appareil
+  type: http
+  seq: 16
+}
+
+post {
+  url: {{baseUrl}}/api/photos/share
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  photo: @file(fixtures/photo.png) @contentType(image/png)
+  friendIds: {{adminId}}
+  message: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq MESSAGE_INVALID
+}
+
+docs {
+  EDGE → 400 MESSAGE_INVALID : le champ multipart `message` fait 201
+  caractères. Il est refusé avant toute conversion ou tout envoi à
+  Cloudinary.
+}

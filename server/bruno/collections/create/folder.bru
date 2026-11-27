@@ -1,0 +1,10 @@
+meta {
+  name: create
+  seq: 1
+}
+
+docs {
+  `POST /api/collections`, JSON `{ name }` → 201 avec la collection créée.
+  `01` et `02` créent les deux collections du dossier (`collectionId`,
+  `secondCollectionId`), supprimées par `delete/`.
+}

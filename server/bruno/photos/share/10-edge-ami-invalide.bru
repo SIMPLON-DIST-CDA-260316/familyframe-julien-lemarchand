@@ -1,0 +1,28 @@
+meta {
+  name: Edge - ami dont l'id n'est pas un ObjectId
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/api/photos/share
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  photo: @file(fixtures/photo.png) @contentType(image/png)
+  friendIds: pas-un-id
+}
+
+assert {
+  res.status: eq 200
+  res.body.send: isNull
+  res.body.outcomes[0].status: eq not_friends
+}
+
+docs {
+  EDGE → 200 et l'issue `not_friends`, pas une 400 ni une 500 : un id mal
+  formé dans `friendIds` reçoit la même issue que n'importe quel compte qui
+  n'est pas un ami, sans requête en base, et sans traitement d'image.
+}

@@ -1,0 +1,17 @@
+meta {
+  name: daily
+  seq: 1
+}
+
+docs {
+  `GET /api/selections/daily` → 200 `{ photoIds }` : la sélection du jour,
+  20 photos au plus, tirées d'abord parmi les photos arrivées avant
+  aujourd'hui (jour de Paris), puis complétées par celles du jour. Le même
+  lot toute la journée, sur tous les appareils ; un autre le lendemain.
+
+  Toutes les photos de ce dossier arrivent le jour même et le compte en a
+  moins de 20 : le lot les contient toutes. Le tirage lui-même (même lot
+  toute la journée, autre lot le lendemain, minuit à Paris) est vérifié par
+  les tests unitaires, qui choisissent l'heure. Un lancement à cheval sur
+  minuit (heure de Paris) peut échouer : le relancer.
+}

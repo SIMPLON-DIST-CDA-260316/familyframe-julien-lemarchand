@@ -15,8 +15,18 @@ assert {
   res.body.user.email: eq {{memberEmail}}
   res.body.user.role: eq member
   res.body.user.passwordHash: isUndefined
+  res.body.user.avatarCloudinaryId: isUndefined
+}
+
+script:post-response {
+  test('avatarUrl : null, ou une URL Cloudinary si le membre a choisi une photo', () => {
+    const { avatarUrl } = res.body.user
+    expect(avatarUrl === null || avatarUrl.startsWith('https://res.cloudinary.com/')).to.equal(true)
+  })
 }
 
 docs {
-  NOMINAL → 200 `{ user }`, avec le cookie rangé par `login/01`.
+  NOMINAL → 200 `{ user }`, avec le cookie rangé par `login/01`. `avatarUrl`
+  n'est pas comparé à `null` : la base de dev est partagée, le membre peut y
+  avoir choisi une photo de profil. L'id Cloudinary ne sort jamais.
 }

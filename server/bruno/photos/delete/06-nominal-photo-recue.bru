@@ -1,0 +1,42 @@
+meta {
+  name: Nominal - l'admin supprime la photo reçue
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{baseUrl}}/api/photos/{{sharedPhotoId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  // Without it the request hits /api/photos/ and fails with a misleading status.
+  if (!bru.getVar('sharedPhotoId') || !bru.getVar('adminCookie')) {
+    throw new Error('sharedPhotoId ou adminCookie absent : lancer toute la collection, photos/share/02 doit passer')
+  }
+  // The received photo is the admin's.
+  req.setHeader('Cookie', bru.getVar('adminCookie'))
+}
+
+assert {
+  res.status: eq 204
+}
+
+script:post-response {
+  const axios = require('axios')
+  test('la photo reçue ne figure plus chez l\'admin', async () => {
+    const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/photos`, {
+      headers: { Cookie: bru.getVar('adminCookie') },
+    })
+    expect(list.data.photos.map(({ id }) => id)).to.not.include(bru.getVar('sharedPhotoId'))
+  })
+}
+
+docs {
+  NOMINAL → 204 : l'admin supprime la photo reçue dans `share/02`. Le
+  membre a déjà supprimé l'original (`02`) : c'était la dernière photo qui
+  renvoyait à l'image, mais l'envoi du membre (`librarySendId`) y renvoie
+  encore. L'image reste jusqu'à `sends/delete`, qui retire cet envoi de
+  l'historique.
+}

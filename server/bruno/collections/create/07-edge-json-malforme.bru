@@ -1,0 +1,37 @@
+meta {
+  name: Edge - JSON malformé
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/collections
+  body: text
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:text {
+  {"name": "Noël"
+}
+
+script:pre-request {
+  if (!bru.getVar('inviteeCookie')) {
+    throw new Error('inviteeCookie absent : lancer toute la collection, invitations/accept/05 doit passer')
+  }
+  // The throwaway account of invitations/accept/05, never the member (see collections/folder.bru).
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq BODY_INVALID
+}
+
+docs {
+  EDGE → 400 BODY_INVALID : le routeur monte son propre `express.json()`, qui
+  refuse un corps JSON illisible.
+}

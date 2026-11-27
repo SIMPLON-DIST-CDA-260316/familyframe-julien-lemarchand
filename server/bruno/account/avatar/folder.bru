@@ -1,0 +1,17 @@
+meta {
+  name: avatar
+  seq: 3
+}
+
+docs {
+  `PUT /api/account/avatar`, `multipart/form-data` avec `avatar` (fichier)
+  → 200 `{ user }` : le serveur en fait un carré JPEG de 256 px (recadré au
+  centre), l'envoie sur Cloudinary (dossier `familyframe/avatars`) et
+  détruit l'ancienne image après l'enregistrement. Mêmes limites et mêmes
+  codes que l'envoi d'une photo. `DELETE /api/account/avatar` → 200
+  `{ user }` avec `avatarUrl` à `null`, même sans photo.
+
+  `05` et `06` publient deux vraies images sur Cloudinary ; `07` détruit la
+  dernière (`06` a déjà détruit celle de `05`). Le dossier finit sans photo
+  de profil, comme le compte au départ.
+}

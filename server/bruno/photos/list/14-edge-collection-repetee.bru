@@ -1,0 +1,22 @@
+meta {
+  name: Edge - collection répétée
+  type: http
+  seq: 14
+}
+
+get {
+  url: {{baseUrl}}/api/photos?collectionId=6b044f9d56a44767c7079c01&collectionId=6b044f9d56a44767c7079c02
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq QUERY_INVALID
+}
+
+docs {
+  EDGE → 400 QUERY_INVALID : `collectionId` donné deux fois. Express en fait
+  une liste, refusée avant toute lecture de collection, comme `limit` et
+  `cursor` répétés.
+}

@@ -1,0 +1,10 @@
+meta {
+  name: delete
+  seq: 2
+}
+
+docs {
+  `DELETE /api/sends/:id` → 204 : retire un envoi de l'historique du compte
+  connecté. Les photos reçues par les amis restent ; l'image Cloudinary part
+  avec son dernier usage.
+}

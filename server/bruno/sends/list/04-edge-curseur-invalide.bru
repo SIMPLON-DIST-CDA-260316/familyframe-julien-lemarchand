@@ -1,0 +1,20 @@
+meta {
+  name: Edge - curseur mal formé
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/sends?cursor=pas-un-id
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq QUERY_INVALID
+}
+
+docs {
+  EDGE → 400 QUERY_INVALID : le curseur est l'id d'un envoi.
+}

@@ -1,0 +1,29 @@
+meta {
+  name: Edge - fichier dans un autre champ
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{baseUrl}}/api/account/avatar
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  photo: @file(fixtures/photo.jpg) @contentType(image/jpeg)
+}
+
+script:pre-request {
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq UPLOAD_INVALID
+}
+
+docs {
+  EDGE → 400 UPLOAD_INVALID : le champ de l'envoi d'une photo (`photo`) n'est
+  pas celui de la photo de profil (`avatar`), Multer le refuse.
+}

@@ -1,58 +1,72 @@
-import { TimerIcon } from 'lucide-react'
+import { FrameIcon, ImagesIcon, ShuffleIcon, TimerIcon } from 'lucide-react'
 import type { JSX } from 'react'
+import { useCollections } from '@/collections/CollectionsContext.ts'
 import { GLASS_BUTTON_CLASSES } from '@/components/frame/controlClasses.ts'
-import { PhotoActionsMenu } from '@/components/frame/PhotoActionsMenu.tsx'
 import {
-  DropdownMenuPortal,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-} from '@/components/ui/dropdown-menu.tsx'
-import { SLIDESHOW_INTERVALS_MS } from '@/hooks/useSlideshow.ts'
+  INTERVAL_OPTIONS,
+  ORDER_OPTIONS,
+  playedSourceOptions,
+  TEMPLATE_OPTIONS,
+} from '@/components/frame/frameSettingOptions.ts'
+import { PhotoActionsMenu } from '@/components/frame/PhotoActionsMenu.tsx'
+import { RadioSubmenu } from '@/components/frame/RadioSubmenu.tsx'
+import { DropdownMenuSeparator } from '@/components/ui/dropdown-menu.tsx'
+import type { SlideshowSettings } from '@/hooks/useSlideshowSettings.ts'
 import type { Photo } from '@/photo.ts'
-
-const MS_PER_SECOND = 1000
+import { playedSourceKey, sourceFromKey, sourceKey } from '@/photoSource.ts'
 
 type SlideshowMenuProps = {
   photo: Photo
-  intervalMs: number
-  onIntervalChange: (intervalMs: number) => void
+  settings: SlideshowSettings
 }
 
-export function SlideshowMenu({
-  photo,
-  intervalMs,
-  onIntervalChange,
-}: SlideshowMenuProps): JSX.Element {
-  function selectInterval(value: string): void {
-    // Radio values are strings: only a speed from the list goes back to the slideshow.
-    const selectedMs = SLIDESHOW_INTERVALS_MS.find((interval) => String(interval) === value)
-    if (selectedMs !== undefined) onIntervalChange(selectedMs)
-  }
-
+// What the frame plays: the library, the day's selection, one collection, or the radio playing.
+// Choosing the radio again does nothing: it is not a stored choice. The library, checked while a
+// deleted collection is stored, is stored when chosen.
+function SourceSubmenu({ settings }: { settings: SlideshowSettings }): JSX.Element {
+  const { collections } = useCollections()
   return (
-    <PhotoActionsMenu photo={photo} label="Actions sur la photo" className={GLASS_BUTTON_CLASSES}>
-      <DropdownMenuSub>
-        <DropdownMenuSubTrigger>
-          <TimerIcon />
-          Vitesse
-        </DropdownMenuSubTrigger>
-        <DropdownMenuPortal>
-          {/* `dark`: the submenu portals to body, outside the frame's dark <main>. */}
-          <DropdownMenuSubContent className="dark">
-            <DropdownMenuRadioGroup value={String(intervalMs)} onValueChange={selectInterval}>
-              {SLIDESHOW_INTERVALS_MS.map((interval) => (
-                <DropdownMenuRadioItem key={interval} value={String(interval)}>
-                  {interval / MS_PER_SECOND} s
-                </DropdownMenuRadioItem>
-              ))}
-            </DropdownMenuRadioGroup>
-          </DropdownMenuSubContent>
-        </DropdownMenuPortal>
-      </DropdownMenuSub>
+    <RadioSubmenu
+      icon={ImagesIcon}
+      label="Photos"
+      options={playedSourceOptions(settings.source, collections)}
+      value={playedSourceKey(settings.source, collections)}
+      onValueChange={(key) => {
+        if (key !== sourceKey(settings.source)) settings.onSourceChange(sourceFromKey(key))
+      }}
+    />
+  )
+}
+
+export function SlideshowMenu({ photo, settings }: SlideshowMenuProps): JSX.Element {
+  return (
+    <PhotoActionsMenu
+      photo={photo}
+      label="Actions sur la photo"
+      trigger={{ glassClassName: GLASS_BUTTON_CLASSES }}
+    >
+      <SourceSubmenu settings={settings} />
+      <RadioSubmenu
+        icon={FrameIcon}
+        label="Affichage"
+        options={TEMPLATE_OPTIONS}
+        value={settings.template}
+        onValueChange={settings.onTemplateChange}
+      />
+      <RadioSubmenu
+        icon={ShuffleIcon}
+        label="Lecture"
+        options={ORDER_OPTIONS}
+        value={settings.order}
+        onValueChange={settings.onOrderChange}
+      />
+      <RadioSubmenu
+        icon={TimerIcon}
+        label="Vitesse"
+        options={INTERVAL_OPTIONS}
+        value={settings.intervalMs}
+        onValueChange={settings.onIntervalChange}
+      />
       <DropdownMenuSeparator />
     </PhotoActionsMenu>
   )

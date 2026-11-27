@@ -12,6 +12,8 @@ export type AuthContextValue = {
   logout: () => Promise<void>
   // For a 401 from the API: the session ended on the server.
   dropUser: () => void
+  // After an edit on /settings: the server answered the account as it saved it.
+  replaceUser: (user: PublicUser) => void
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null)

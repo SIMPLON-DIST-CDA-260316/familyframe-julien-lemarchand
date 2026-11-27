@@ -1,0 +1,17 @@
+meta {
+  name: open
+  seq: 5
+}
+
+docs {
+  `POST /api/photos/:id/open`, sans corps → 200 avec la photo ouverte. Elle
+  quitte `GET /api/photos/unopened` et rejoint `GET /api/photos` à sa date de
+  réception ; l'événement Socket.IO `photo:opened` (la photo) part vers les
+  connexions du propriétaire. Ouvrir une photo déjà ouverte répond 200 de
+  nouveau, sans rien changer. Une photo d'un autre compte, inconnue ou un id
+  mal formé : 404 `PHOTO_NOT_FOUND`.
+
+  L'admin ouvre `sharedPhotoId` (reçue dans `share/02`) ;
+  `deviceSharedPhotoId` reste non ouverte jusqu'à sa suppression dans
+  `delete/07`.
+}

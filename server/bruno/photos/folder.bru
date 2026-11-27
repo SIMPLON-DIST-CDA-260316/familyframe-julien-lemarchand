@@ -5,13 +5,23 @@ meta {
 docs {
   Toutes les routes demandent une session (cookie `ff_session`, envoyé par
   `collection.bru`) : sans elle, 401 `UNAUTHENTICATED`. Chaque photo
-  appartient au compte qui l'a envoyée : la liste, la suppression et les
-  événements Socket.IO ne concernent que les photos du compte connecté.
+  appartient à un compte : celui qui l'a ajoutée, ou l'ami qui l'a reçue. La
+  liste, la suppression et les événements Socket.IO ne concernent que les
+  photos du compte connecté.
 
-  Une photo renvoyée par l'API : `{ id, url, thumbnailUrl, createdAt }`
-  (`createdAt` en ISO 8601). Une erreur : `{ error }`, un code
-  (`PHOTO_MISSING`, `UPLOAD_INVALID`, `QUERY_INVALID`, `UNAUTHENTICATED`,
-  `PHOTO_NOT_FOUND`, `PHOTO_DUPLICATE`, `PHOTO_TOO_LARGE`, `FORMAT_UNSUPPORTED`,
-  `IMAGE_UNREADABLE`, `SERVER_ERROR`) que le client traduit en français.
-  Ordre des dossiers : `create`, `list`, `delete`.
+  Une photo renvoyée par l'API : `{ id, url, thumbnailUrl, createdAt,
+  senderName, message }` (`createdAt` en ISO 8601 ; `senderName`, le nom de
+  l'ami qui l'a envoyée, `null` pour une photo ajoutée par son propriétaire ;
+  `message`, le mot de l'ami joint à la photo, `null` sans message). Une
+  erreur : `{ error }`, un code
+  (`PHOTO_MISSING`, `UPLOAD_INVALID`, `BODY_INVALID`, `QUERY_INVALID`,
+  `UNAUTHENTICATED`, `PHOTO_NOT_FOUND`, `PHOTO_DUPLICATE`,
+  `PHOTO_TOO_LARGE`, `FORMAT_UNSUPPORTED`, `IMAGE_UNREADABLE`, `MESSAGE_INVALID`,
+  `COLLECTION_NOT_FOUND`, `SERVER_ERROR`)
+  que le client traduit en français.
+  Une photo envoyée par un ami arrive non ouverte : elle attend dans
+  `unopened` jusqu'à ce que son propriétaire l'ouvre (`open`), puis rejoint
+  la bibliothèque.
+  Ordre des dossiers : `create`, `list`, `share`, `unopened`, `open`,
+  `delete`.
 }

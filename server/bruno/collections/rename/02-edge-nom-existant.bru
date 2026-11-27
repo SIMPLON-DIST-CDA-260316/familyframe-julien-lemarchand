@@ -1,0 +1,35 @@
+meta {
+  name: Edge - nom d'une autre collection
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{baseUrl}}/api/collections/{{secondCollectionId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Noël 2026"
+  }
+}
+
+script:pre-request {
+  if (!bru.getVar('inviteeCookie')) {
+    throw new Error('inviteeCookie absent : lancer toute la collection, invitations/accept/05 doit passer')
+  }
+  // The throwaway account of invitations/accept/05, never the member (see collections/folder.bru).
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 409
+  res.body.error: eq COLLECTION_EXISTS
+}
+
+docs {
+  EDGE → 409 COLLECTION_EXISTS : « Été 2026 » prend le nom de l'autre
+  collection du compte.
+}

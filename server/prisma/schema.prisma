@@ -23,9 +23,16 @@ model User {
   displayName            String
   passwordHash           String
   role                   Role         @default(member)
+  // null until the account picks a profile photo; the image lives on Cloudinary.
+  avatarCloudinaryId     String?
   createdAt              DateTime     @default(now())
   sessions               Session[]
-  photos                 Photo[]
+  photos                 Photo[]      @relation("PhotoOwner")
+  // Photos this account sent to friends: they live in the friends' libraries.
+  sentPhotos             Photo[]      @relation("PhotoSender")
+  // One per send action: the sender's history.
+  sends                  Send[]
+  collections            Collection[]
   invitations            Invitation[]
   sentFriendRequests     Friendship[] @relation("FriendshipRequester")
   receivedFriendRequests Friendship[] @relation("FriendshipAddressee")
@@ -45,14 +52,49 @@ model Session {
 model Photo {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   ownerId      String   @db.ObjectId
-  owner        User     @relation(fields: [ownerId], references: [id])
+  owner        User     @relation("PhotoOwner", fields: [ownerId], references: [id])
+  // null when the owner uploaded it; else the friend who sent it.
+  senderId     String?  @db.ObjectId
+  sender       User?    @relation("PhotoSender", fields: [senderId], references: [id])
   url          String
   cloudinaryId String
   sha256       String
+  // The stored image's size in pixels and its weight in bytes, as Cloudinary measured it at
+  // upload. Unset on photos saved before step 15: the photo's info then leaves them out.
+  width        Int?
+  height       Int?
+  bytes        Int?
+  // The sender's note, 200 characters at most; absent when there is none.
+  message      String?
+  // false until the owner opens a photo a friend sent. Unset on photos saved before
+  // step 9: they count as opened.
+  isOpened     Boolean?
+  // When the owner first opened it; unset on every other photo. The day's selection counts a
+  // photo opened today as one of today's, wherever it was received.
+  openedAt     DateTime?
   createdAt    DateTime @default(now())
 
   @@unique([ownerId, sha256])
   @@index([ownerId, id])
+  @@index([cloudinaryId])
+}
+
+// One send action: a photo given to one or more friends at once. Each friend got their own Photo
+// pointing to the same Cloudinary image; this record is the sender's history line, and it keeps
+// the image alive after the friends delete their photos.
+model Send {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  senderId     String   @db.ObjectId
+  sender       User     @relation(fields: [senderId], references: [id])
+  // Only the friends who received it: a refused friend is not listed.
+  recipientIds String[] @db.ObjectId
+  url          String
+  cloudinaryId String
+  // The note sent with it, 200 characters at most; absent when there is none.
+  message      String?
+  createdAt    DateTime @default(now())
+
+  @@index([senderId, id])
   @@index([cloudinaryId])
 }
 
@@ -82,4 +124,19 @@ model Friendship {
 
   @@index([requesterId])
   @@index([addresseeId])
+}
+
+model Collection {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  ownerId   String   @db.ObjectId
+  owner     User     @relation(fields: [ownerId], references: [id])
+  name      String
+  // The owner's photos, in the order they were added. Prisma has no $pull: a deleted photo's id
+  // stays here, and reads keep only the photos still in the library. Written as [] at creation:
+  // MongoDB matches « does not have » only on a field that exists.
+  photoIds  String[] @db.ObjectId
+  createdAt DateTime @default(now())
+
+  // Two collections with the same name would look alike in every menu.
+  @@unique([ownerId, name])
 }

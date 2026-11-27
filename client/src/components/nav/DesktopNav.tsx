@@ -14,9 +14,9 @@ export function DesktopNav(): JSX.Element {
   const items = useNavItems()
   return (
     <nav className="hidden items-center gap-1 md:flex">
-      {items.map(({ to, label, icon: Icon }) => (
+      {items.map(({ to, label, icon: Icon, onClick }) => (
         // end: "/" would otherwise stay active on every page.
-        <NavLink key={to} to={to} end className={navLinkClasses}>
+        <NavLink key={to} to={to} end className={navLinkClasses} onClick={onClick}>
           <Icon aria-hidden className="size-4" />
           {label}
         </NavLink>

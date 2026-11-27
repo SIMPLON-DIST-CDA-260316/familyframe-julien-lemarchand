@@ -1,0 +1,29 @@
+meta {
+  name: Edge - message trop long
+  type: http
+  seq: 14
+}
+
+post {
+  url: {{baseUrl}}/api/photos/{{createdPhotoId}}/share
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "friendIds": ["{{adminId}}"],
+    "message": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq MESSAGE_INVALID
+}
+
+docs {
+  EDGE → 400 MESSAGE_INVALID : un message de 201 caractères, un de plus que
+  la limite. Le message est vérifié avant l'ami : la fin de l'amitié (`13`)
+  ne change pas la réponse.
+}

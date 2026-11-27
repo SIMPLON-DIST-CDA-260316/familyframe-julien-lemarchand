@@ -1,0 +1,40 @@
+meta {
+  name: Nominal - fin de l'amitié, les photos reçues restent
+  type: http
+  seq: 13
+}
+
+delete {
+  url: {{baseUrl}}/api/friendships/{{shareFriendshipId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('shareFriendshipId') || !bru.getVar('sharedPhotoId') || !bru.getVar('deviceSharedPhotoId')) {
+    throw new Error('shareFriendshipId, sharedPhotoId ou deviceSharedPhotoId absent : lancer tout le dossier photos/share, 02 et 08 doivent passer')
+  }
+}
+
+assert {
+  res.status: eq 204
+}
+
+script:post-response {
+  const axios = require('axios')
+  test('les deux photos reçues attendent toujours l\'admin', async () => {
+    const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/photos/unopened`, {
+      headers: { Cookie: bru.getVar('adminCookie') },
+    })
+    const ids = list.data.photos.map(({ id }) => id)
+    expect(ids).to.include(bru.getVar('sharedPhotoId'))
+    expect(ids).to.include(bru.getVar('deviceSharedPhotoId'))
+  })
+}
+
+docs {
+  NOMINAL → 204 : le membre retire l'admin de ses amis (l'amitié de `02`).
+  Le script vérifie que les deux photos reçues (`02` et `08`) attendent
+  toujours l'admin, non ouvertes : ce sont ses photos, rien ne part en
+  cascade.
+}

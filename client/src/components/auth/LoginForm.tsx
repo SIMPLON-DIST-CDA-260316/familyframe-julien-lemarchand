@@ -1,6 +1,7 @@
 import { type JSX, type SubmitEvent, useState } from 'react'
 import type { LoginResult } from '@/auth/authApi.ts'
 import { PasswordInput } from '@/components/form/PasswordInput.tsx'
+import { EMAIL_KEYBOARD_PROPS } from '@/components/form/TextField.tsx'
 import { Alert, AlertDescription } from '@/components/ui/alert.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import { Input } from '@/components/ui/input.tsx'
@@ -36,6 +37,7 @@ export function LoginForm({ onLogin }: LoginFormProps): JSX.Element {
           id="email"
           type="email"
           autoComplete="username"
+          {...EMAIL_KEYBOARD_PROPS}
           value={email}
           onChange={(event) => setEmail(event.target.value)}
           required
@@ -47,6 +49,7 @@ export function LoginForm({ onLogin }: LoginFormProps): JSX.Element {
         <PasswordInput
           id="password"
           autoComplete="current-password"
+          enterKeyHint="go"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           required

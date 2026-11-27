@@ -1,0 +1,21 @@
+meta {
+  name: Edge - id mal formé
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/api/sends/pas-un-id
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq SEND_NOT_FOUND
+}
+
+docs {
+  EDGE → 404 SEND_NOT_FOUND : un id qui n'est pas un ObjectId est un envoi
+  inconnu de plus, refusé avant toute requête en base.
+}

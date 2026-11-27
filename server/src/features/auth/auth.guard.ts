@@ -17,6 +17,14 @@ export function currentUser(req: RequestWithUser): PublicUser {
   return req.user
 }
 
+// Same contract as currentUser: a password change keeps this session and closes the others.
+export function currentSessionId(req: Pick<Request, 'sessionId'>): string {
+  if (!req.sessionId) {
+    throw new AppError('UNAUTHENTICATED')
+  }
+  return req.sessionId
+}
+
 // Mounted after requireAuth: the role comes from the session it already loaded, no extra query.
 export function requireRole(role: UserRole): RoleGuard {
   return (req, _res, next) => {

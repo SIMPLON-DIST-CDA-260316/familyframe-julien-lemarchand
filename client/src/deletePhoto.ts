@@ -1,3 +1,4 @@
+import { toast } from 'sonner'
 import { errorMessage } from '@/api.ts'
 import type { Photo } from '@/photo.ts'
 
@@ -9,9 +10,9 @@ export async function deletePhoto({ id }: Photo): Promise<void> {
     if (!res.ok) {
       // Not JSON when the dev proxy answers for a stopped API.
       const data: unknown = await res.json().catch(() => null)
-      window.alert(errorMessage(data))
+      toast.error(errorMessage(data))
     }
   } catch {
-    window.alert(errorMessage(null))
+    toast.error(errorMessage(null))
   }
 }

@@ -1,0 +1,55 @@
+meta {
+  name: Edge - une photo reçue pas encore ouverte dans la liste
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/collections/{{collectionId}}/photos
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "photoIds": ["{{batchPhotoId}}", "{{batchUnopenedPhotoId}}"]
+  }
+}
+
+script:pre-request {
+  if (!bru.getVar('collectionId') || !bru.getVar('batchPhotoId')) {
+    throw new Error('collectionId ou batchPhotoId absent : lancer toute la collection, collections/create/01 et photos-batch/01 doivent passer')
+  }
+  if (!bru.getVar('batchUnopenedPhotoId')) {
+    throw new Error('batchUnopenedPhotoId absent : lancer tout le dossier, photos-batch/04 doit passer')
+  }
+  // The throwaway account of invitations/accept/05, never the member (see collections/folder.bru).
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq PHOTO_NOT_FOUND
+}
+
+script:post-response {
+  const axios = require('axios')
+  // Read before test(): Bruno does not wait for an async test, the next request could run first.
+  const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/collections`, {
+    headers: { Cookie: bru.getVar('inviteeCookie') },
+  })
+  const collection = list.data.collections.find(({ id }) => id === bru.getVar('collectionId'))
+  test("la collection n'a pas changé, même pour la photo du compte", () => {
+    expect(collection.photoIds).to.eql([])
+  })
+  // The photo was only for this test: deleted, its image leaves Cloudinary.
+  await axios.delete(`${bru.getEnvVar('baseUrl')}/api/photos/${bru.getVar('batchUnopenedPhotoId')}`, {
+    headers: { Cookie: bru.getVar('inviteeCookie') },
+  })
+}
+
+docs {
+  EDGE → 404 PHOTO_NOT_FOUND : une photo reçue n'entre dans une collection
+  qu'une fois ouverte ; avec elle, toute la liste est refusée. Le script
+  vérifie que la collection est restée vide, puis supprime la photo reçue.
+}

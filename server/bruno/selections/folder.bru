@@ -1,0 +1,18 @@
+meta {
+  name: selections
+  seq: 6
+}
+
+docs {
+  Les sélections automatiques du compte connecté, en lecture seule. Une
+  sélection renvoyée par l'API vaut `{ photoIds }` : des ids de photos
+  ouvertes de la bibliothèque, que le cadre retrouve parmi les photos qu'il
+  a déjà chargées.
+
+  Toutes les requêtes passent par le compte jetable créé par
+  `invitations/accept/05` (cookie `inviteeCookie`), jamais par le membre,
+  dont la bibliothèque est celle de la base de dev partagée : le compte
+  jetable n'a aucune photo en arrivant ici (`collections/` a supprimé les
+  siennes). Le membre (cookie par défaut) sert d'« autre compte ». Chaque
+  sous-dossier ajoute ses propres photos et les supprime avant la fin.
+}

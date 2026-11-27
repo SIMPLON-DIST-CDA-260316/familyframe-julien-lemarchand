@@ -3,6 +3,7 @@ export type FriendUser = {
   id: string
   displayName: string
   email: string
+  avatarUrl: string | null
 }
 
 // id is the friendship's, user the other side; createdAt is an ISO 8601 string.
@@ -27,7 +28,9 @@ function isFriendUser(value: unknown): value is FriendUser {
     'displayName' in value &&
     typeof value.displayName === 'string' &&
     'email' in value &&
-    typeof value.email === 'string'
+    typeof value.email === 'string' &&
+    'avatarUrl' in value &&
+    (value.avatarUrl === null || typeof value.avatarUrl === 'string')
   )
 }
 

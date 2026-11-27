@@ -1,22 +1,15 @@
 import { AppError } from '../../errors/app-error.js'
+import { parseDisplayName, parsePassword } from '../../lib/account-input.js'
 import { parseEmail } from '../../lib/email.js'
 import type { Logger } from '../../lib/logger.js'
 import type { CreatedInvitation, Invitation, InvitationStatus, PublicUser } from '../../types.js'
-import type {
-  InvitationRecord,
-  InvitationsRepository,
-  UserRecord,
-} from './invitations.repository.js'
+import { type AvatarUrlBuilder, toPublicUser } from '../auth/public-user.js'
+import type { InvitationRecord, InvitationsRepository } from './invitations.repository.js'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 export const INVITATION_DURATION_MS = 7 * DAY_MS
 // What generateToken produces: 32 random bytes in hex.
 const TOKEN_PATTERN = /^[0-9a-f]{64}$/
-// Shown on frames and next to shared photos: a bound keeps the layout.
-export const DISPLAY_NAME_MAX_LENGTH = 50
-// OWASP ASVS: at least 12, allow up to 128; the maximum keeps argon2 away from huge inputs.
-export const PASSWORD_MIN_LENGTH = 12
-export const PASSWORD_MAX_LENGTH = 128
 
 // email comes straight from the JSON body: validated here, at the boundary.
 export type NewInvitationInput = { email: unknown; invitedById: string }
@@ -29,6 +22,7 @@ export type InvitationsServiceDeps = {
   generateToken: () => string
   hashToken: (token: string) => string
   hashPassword: (plain: string) => Promise<string>
+  avatarUrl: AvatarUrlBuilder
   now: () => Date
   logger: Logger
 }
@@ -37,29 +31,6 @@ export type InvitationsService = {
   createInvitation: (input: NewInvitationInput) => Promise<CreatedInvitation>
   listInvitations: () => Promise<Invitation[]>
   acceptInvitation: (acceptance: InvitationAcceptance) => Promise<PublicUser>
-}
-
-function parseDisplayName(displayName: unknown): string {
-  if (typeof displayName !== 'string') {
-    throw new AppError('DISPLAY_NAME_INVALID')
-  }
-  const trimmedName = displayName.trim()
-  if (trimmedName.length === 0 || trimmedName.length > DISPLAY_NAME_MAX_LENGTH) {
-    throw new AppError('DISPLAY_NAME_INVALID')
-  }
-  return trimmedName
-}
-
-// Not trimmed: a space is a character the person chose.
-function parsePassword(password: unknown): string {
-  if (
-    typeof password !== 'string' ||
-    password.length < PASSWORD_MIN_LENGTH ||
-    password.length > PASSWORD_MAX_LENGTH
-  ) {
-    throw new AppError('PASSWORD_INVALID')
-  }
-  return password
 }
 
 // Used comes first: the admin learns the person signed up, even after the 7 days.
@@ -79,11 +50,6 @@ function toInvitation(record: InvitationRecord, now: Date): Invitation {
     createdAt: record.createdAt.toISOString(),
     expiresAt: record.expiresAt.toISOString(),
   }
-}
-
-// The password hash never leaves the service.
-function toPublicUser({ id, email, displayName, role }: UserRecord): PublicUser {
-  return { id, email, displayName, role }
 }
 
 async function createInvitation(
@@ -161,7 +127,7 @@ async function acceptInvitation(
   }
   await repository.markUsed(invitation.id, now())
   logger.info('invitation.accepted', { invitationId: invitation.id, userId: user.id })
-  return toPublicUser(user)
+  return toPublicUser(user, deps.avatarUrl)
 }
 
 export function createInvitationsService(deps: InvitationsServiceDeps): InvitationsService {

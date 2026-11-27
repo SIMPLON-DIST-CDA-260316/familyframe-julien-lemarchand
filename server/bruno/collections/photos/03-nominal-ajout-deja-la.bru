@@ -1,0 +1,29 @@
+meta {
+  name: Nominal - ajouter une photo déjà là
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseUrl}}/api/collections/{{collectionId}}/photos/{{collectionPhotoId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('collectionId') || !bru.getVar('collectionPhotoId')) {
+    throw new Error('collectionId ou collectionPhotoId absent : lancer toute la collection, collections/create/01 et photos/01 doivent passer')
+  }
+  // The throwaway account of invitations/accept/05, never the member (see collections/folder.bru).
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 200
+  res.body.photoIds.length: eq 1
+}
+
+docs {
+  NOMINAL → 200, la photo une seule fois : ajouter une photo déjà dans la
+  collection ne la double pas (un double clic, deux appareils).
+}

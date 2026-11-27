@@ -1,0 +1,36 @@
+meta {
+  name: Nominal - photo dans la bibliothèque du compte jetable
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/photos
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  photo: @file(fixtures/photo.jpg) @contentType(image/jpeg)
+}
+
+script:pre-request {
+  if (!bru.getVar('inviteeCookie')) {
+    throw new Error('inviteeCookie absent : lancer toute la collection, invitations/accept/05 doit passer')
+  }
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 201
+  res.body.id: isString
+}
+
+script:post-response {
+  bru.setVar('batchPhotoId', res.body.id)
+}
+
+docs {
+  NOMINAL → 201. Préparation : une photo dans la bibliothèque du compte
+  jetable ; son id va dans `batchPhotoId`, et `10` la supprime.
+}

@@ -1,0 +1,46 @@
+meta {
+  name: Nominal - nouvelle photo à la place de l'ancienne
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{baseUrl}}/api/account/avatar
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  avatar: @file(fixtures/photo.png) @contentType(image/png)
+}
+
+script:pre-request {
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 200
+  res.body.user.avatarUrl: isString
+}
+
+script:post-response {
+  const axios = require('axios')
+  const baseUrl = bru.getEnvVar('baseUrl')
+  test('une autre image que celle de 05', () => {
+    expect(res.body.user.avatarUrl).to.not.equal(bru.getVar('firstAvatarUrl'))
+  })
+  test('GET /api/auth/me renvoie la nouvelle URL', async () => {
+    // A script request does not get the collection headers: send the cookie itself.
+    const me = await axios.get(`${baseUrl}/api/auth/me`, {
+      headers: { Cookie: bru.getVar('inviteeCookie') },
+    })
+    expect(me.data.user.avatarUrl).to.equal(res.body.user.avatarUrl)
+  })
+}
+
+docs {
+  NOMINAL → 200 : un PNG remplace le JPEG de `05`. L'URL change (nouvelle
+  image), `GET /api/auth/me` la renvoie. Le serveur détruit l'image de `05`
+  après l'enregistrement : le CDN peut encore la servir un moment, le test
+  ne la recharge donc pas.
+}

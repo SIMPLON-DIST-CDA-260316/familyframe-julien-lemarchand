@@ -1,0 +1,31 @@
+meta {
+  name: Nominal - retour au mot de passe de départ
+  type: http
+  seq: 10
+}
+
+put {
+  url: {{baseUrl}}/api/account/password
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "currentPassword": "invite-bruno-nouveau",
+    "newPassword": "invite-bruno-dev"
+  }
+}
+
+script:pre-request {
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 204
+}
+
+docs {
+  NOMINAL → 204 : le compte reprend `invite-bruno-dev`, et la session de
+  `08` est fermée au passage. Le dossier finit comme il a commencé.
+}

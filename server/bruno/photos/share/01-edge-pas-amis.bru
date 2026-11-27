@@ -1,0 +1,57 @@
+meta {
+  name: Edge - pas encore amis
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/photos/{{createdPhotoId}}/share
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "friendIds": ["{{adminId}}"]
+  }
+}
+
+script:pre-request {
+  const axios = require('axios')
+  if (!bru.getVar('createdPhotoId') || !bru.getVar('adminCookie')) {
+    throw new Error('createdPhotoId ou adminCookie absent : lancer toute la collection, auth/login/05 et photos/create/01 doivent passer')
+  }
+  const baseUrl = bru.getEnvVar('baseUrl')
+  // A script request does not get the collection headers: send the cookie itself.
+  const idOf = async (cookie) => {
+    const { data } = await axios.get(`${baseUrl}/api/auth/me`, { headers: { Cookie: cookie } })
+    return data.user.id
+  }
+  const headers = { Cookie: bru.getVar('sessionCookie') }
+  const memberId = await idOf(bru.getVar('sessionCookie'))
+  const adminId = await idOf(bru.getVar('adminCookie'))
+  bru.setVar('memberId', memberId)
+  bru.setVar('adminId', adminId)
+  // An interrupted run may have left the member and the admin friends: the run starts clean.
+  const { data } = await axios.get(`${baseUrl}/api/friendships`, { headers })
+  const leftovers = [...data.friends, ...data.incoming, ...data.outgoing].filter(
+    ({ user }) => user.id === adminId,
+  )
+  for (const { id } of leftovers) {
+    await axios.delete(`${baseUrl}/api/friendships/${id}`, { headers })
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.send: isNull
+  res.body.outcomes[0].status: eq not_friends
+}
+
+docs {
+  EDGE → 200, `send` à `null` et l'issue `not_friends` pour l'admin : le
+  membre envoie sa photo (`create/01`) à l'admin, qui n'est pas encore son
+  ami. Personne ne l'a reçue : aucun envoi n'entre dans l'historique. Le script de départ range les ids
+  des deux comptes dans `memberId` et `adminId`, puis supprime toute amitié
+  membre-admin laissée par un lancement interrompu.
+}

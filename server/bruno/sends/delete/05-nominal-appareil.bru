@@ -1,0 +1,41 @@
+meta {
+  name: Nominal - retirer l'envoi de l'appareil
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/api/sends/{{deviceSendId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('deviceSendId')) {
+    throw new Error('deviceSendId absent : lancer toute la collection, photos/share/08 doit passer')
+  }
+}
+
+assert {
+  res.status: eq 204
+}
+
+script:post-response {
+  const axios = require('axios')
+  const historyIds = async () => {
+    const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/sends`, {
+      headers: { Cookie: bru.getVar('sessionCookie') },
+    })
+    return list.data.sends.map(({ id }) => id)
+  }
+  test('la ligne a quitté l\'historique', async () => {
+    expect(await historyIds()).to.not.include(bru.getVar('deviceSendId'))
+  })
+}
+
+docs {
+  NOMINAL → 204. `photos/delete/07` a déjà supprimé la photo reçue par
+  l'admin : cet envoi était le dernier usage de l'image téléversée depuis
+  l'appareil, Cloudinary la détruit (`send.deleted` avec
+  `isImageDestroyed: true` dans les logs).
+}

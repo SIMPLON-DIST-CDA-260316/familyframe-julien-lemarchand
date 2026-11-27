@@ -1,4 +1,6 @@
 import type { JSX } from 'react'
+import { InvitationsSkeleton } from '@/components/admin/InvitationsSkeleton.tsx'
+import { RetryButton } from '@/components/feedback/RetryButton.tsx'
 import { Alert, AlertDescription } from '@/components/ui/alert.tsx'
 import { Badge } from '@/components/ui/badge.tsx'
 import type { Invitation, InvitationStatus } from '@/invitation.ts'
@@ -43,21 +45,26 @@ type InvitationListProps = {
   invitations: Invitation[]
   isLoading: boolean
   error: string
+  onRetry: () => void
 }
 
 export function InvitationList({
   invitations,
   isLoading,
   error,
+  onRetry,
 }: InvitationListProps): JSX.Element {
   if (error) {
     return (
-      <Alert variant="destructive">
-        <AlertDescription>{error}</AlertDescription>
-      </Alert>
+      <div className="flex flex-col gap-3">
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+        <RetryButton onRetry={onRetry} />
+      </div>
     )
   }
-  if (isLoading) return <p className="text-sm text-muted-foreground">Chargement…</p>
+  if (isLoading) return <InvitationsSkeleton />
   if (invitations.length === 0) {
     return <p className="text-sm text-muted-foreground">Aucune invitation pour l'instant.</p>
   }

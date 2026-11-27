@@ -1,15 +1,14 @@
 import { type JSX, type SubmitEvent, useState } from 'react'
 import { useAuth } from '@/auth/AuthContext.ts'
+import {
+  DISPLAY_NAME_MAX_LENGTH,
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_MISMATCH_MESSAGE,
+} from '@/auth/accountRules.ts'
 import { TextField } from '@/components/form/TextField.tsx'
 import { Alert, AlertDescription } from '@/components/ui/alert.tsx'
 import { Button } from '@/components/ui/button.tsx'
-
-// Mirror the server's limits (invitations.service.ts): the browser catches most mistakes
-// before a request. Keep both in sync.
-const DISPLAY_NAME_MAX_LENGTH = 50
-const PASSWORD_MIN_LENGTH = 12
-const PASSWORD_MAX_LENGTH = 128
-const PASSWORD_MISMATCH_MESSAGE = 'Les deux mots de passe ne correspondent pas.'
 
 type InviteFields = { displayName: string; password: string; confirmation: string }
 
@@ -42,7 +41,6 @@ function useInviteForm({ token, onJoiningChange }: InviteFormProps): InviteFormS
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault()
-    // No password reset exists: a typo would lock the account, so the client compares.
     if (fields.password !== fields.confirmation) {
       setError(PASSWORD_MISMATCH_MESSAGE)
       return
@@ -96,6 +94,7 @@ export function InviteForm(props: InviteFormProps): JSX.Element {
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       <TextField
         id="display-name"
+        enterKeyHint="go"
         label="Votre nom"
         type="text"
         autoComplete="name"

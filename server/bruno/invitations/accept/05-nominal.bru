@@ -32,6 +32,7 @@ assert {
   res.body.user.displayName: eq Invitée
   res.body.user.role: eq member
   res.body.user.passwordHash: isUndefined
+  res.body.user.avatarUrl: isNull
 }
 
 script:post-response {
@@ -64,7 +65,7 @@ script:post-response {
 
 docs {
   NOMINAL → 201 `{ user }`, un compte `member` à l'adresse de l'invitation,
-  et un cookie `ff_session`. Le script vérifie que ce cookie ouvre bien une
+  sans photo de profil (`avatarUrl` à `null`), et un cookie `ff_session`. Le script vérifie que ce cookie ouvre bien une
   session du nouveau compte (`GET /api/auth/me`), puis que l'admin voit
   l'invitation « utilisée » (`GET /api/invitations`). Le cookie du nouveau
   compte va dans `inviteeCookie` : `friendships/` s'en sert comme tiers.

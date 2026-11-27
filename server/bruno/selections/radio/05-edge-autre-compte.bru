@@ -1,0 +1,22 @@
+meta {
+  name: Edge - photo d'un autre compte
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/selections/radio/{{radioPhotoId}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq PHOTO_NOT_FOUND
+}
+
+docs {
+  EDGE → 404 PHOTO_NOT_FOUND : le membre (cookie par défaut) demande une
+  radio sur une photo du compte jetable. La réponse est celle d'une photo
+  inconnue.
+}

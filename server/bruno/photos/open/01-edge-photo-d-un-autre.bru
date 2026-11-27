@@ -1,0 +1,39 @@
+meta {
+  name: Edge - photo d'un autre compte
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/photos/{{sharedPhotoId}}/open
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  // Without it the request hits /api/photos//open and fails with a misleading status.
+  if (!bru.getVar('sharedPhotoId')) {
+    throw new Error('sharedPhotoId absent : lancer toute la collection, photos/share/02 doit passer')
+  }
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq PHOTO_NOT_FOUND
+}
+
+script:post-response {
+  const axios = require('axios')
+  test('la photo attend toujours l\'admin', async () => {
+    const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/photos/unopened`, {
+      headers: { Cookie: bru.getVar('adminCookie') },
+    })
+    expect(list.data.photos.map(({ id }) => id)).to.include(bru.getVar('sharedPhotoId'))
+  })
+}
+
+docs {
+  EDGE → 404 PHOTO_NOT_FOUND : le membre, qui a envoyé la photo, essaie
+  d'ouvrir la copie de l'admin. La réponse est celle d'une photo inconnue ;
+  le script vérifie que la photo attend toujours l'admin.
+}

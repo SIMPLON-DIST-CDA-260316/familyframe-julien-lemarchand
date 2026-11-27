@@ -52,6 +52,7 @@ export function FriendRequestForm({ onDone }: FriendRequestFormProps): JSX.Eleme
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       <TextField
         id="friend-email"
+        enterKeyHint="send"
         label="E-mail du proche"
         type="email"
         autoComplete="off"

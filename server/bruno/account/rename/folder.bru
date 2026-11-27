@@ -1,0 +1,11 @@
+meta {
+  name: rename
+  seq: 1
+}
+
+docs {
+  `PATCH /api/account`, JSON `{ displayName }` → 200 `{ user }`. Mêmes règles
+  qu'à la création du compte : rogné, 1 à 50 caractères, sinon 400
+  `DISPLAY_NAME_INVALID`. L'e-mail ne change pas ici. `06` rend au compte son
+  nom de départ, « Invitée ».
+}

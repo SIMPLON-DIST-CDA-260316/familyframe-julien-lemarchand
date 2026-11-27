@@ -1,9 +1,21 @@
 <!doctype html>
-<html lang="fr">
+<html lang="fr" data-palette="encre">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Installable from the browser menu: no service worker, the app still needs the network. -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <!-- iOS reads its home screen icon and name from these, not from the manifest's icons. -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="FamilyFrame" />
+    <meta name="description" content="Le cadre photo connecté de la famille." />
+    <!-- cover: the page reaches under the notch and the home bar; the safe-area insets keep the controls clear of them. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- Before the stylesheet loads, the page already takes the device's light or dark colours. -->
+    <meta name="color-scheme" content="light dark" />
+    <!-- « Encre »'s background, for the first paint: themeColor.ts then copies the active palette and theme's. -->
+    <meta name="theme-color" content="#fcfaf7" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f1215" media="(prefers-color-scheme: dark)" />
     <title>FamilyFrame</title>
   </head>
   <body>

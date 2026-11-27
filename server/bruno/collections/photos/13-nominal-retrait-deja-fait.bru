@@ -1,0 +1,29 @@
+meta {
+  name: Nominal - retirer une photo absente
+  type: http
+  seq: 13
+}
+
+delete {
+  url: {{baseUrl}}/api/collections/{{collectionId}}/photos/{{collectionPhotoId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('collectionId') || !bru.getVar('collectionPhotoId')) {
+    throw new Error('collectionId ou collectionPhotoId absent : lancer toute la collection, collections/create/01 et photos/01 doivent passer')
+  }
+  // The throwaway account of invitations/accept/05, never the member (see collections/folder.bru).
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 200
+  res.body.photoIds.length: eq 0
+}
+
+docs {
+  NOMINAL → 200 avec la collection telle quelle : retirer une photo qui
+  n'y est pas ne change rien.
+}

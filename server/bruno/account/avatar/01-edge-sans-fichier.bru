@@ -1,0 +1,33 @@
+meta {
+  name: Edge - sans fichier
+  type: http
+  seq: 1
+}
+
+put {
+  url: {{baseUrl}}/api/account/avatar
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  legende: une photo de profil sans fichier
+}
+
+script:pre-request {
+  if (!bru.getVar('inviteeCookie')) {
+    throw new Error('inviteeCookie absent : lancer toute la collection, invitations/accept/05 doit passer')
+  }
+  // The throwaway account of invitations/accept/05, never the member (see account/folder.bru).
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq PHOTO_MISSING
+}
+
+docs {
+  EDGE → 400 PHOTO_MISSING : un champ texte (le corps multipart n'est pas
+  vide), mais aucun fichier dans `avatar`.
+}

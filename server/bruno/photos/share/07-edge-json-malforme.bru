@@ -1,0 +1,29 @@
+meta {
+  name: Edge - JSON malformé
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/photos/{{createdPhotoId}}/share
+  body: text
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:text {
+  {"friendIds": ["pas fini"
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq BODY_INVALID
+}
+
+docs {
+  EDGE → 400 BODY_INVALID : cette route lit du JSON (`express.json()`, monté
+  sur elle seule), et ce corps est illisible.
+}

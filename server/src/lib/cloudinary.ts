@@ -12,19 +12,40 @@ cloudinary.config({
 // Covers a contact sheet cell (up to about 320 CSS px) on a 2x screen.
 const THUMBNAIL_SIZE = 640
 
+// The frame and the viewer: a full HD screen. The stored photo is larger, kept for printing.
+const DISPLAY_SIZE = 1920
+
+// A phone's screen: the viewer picks it there (srcset) and saves the bigger download.
+const MEDIUM_SIZE = 1280
+
 // Decided per request: WebP when the browser takes it and it is lighter, else JPEG.
 // Compression is picked from the image content.
 const OPTIMIZED_DELIVERY: ImageTransformationOptions = { fetch_format: 'auto', quality: 'auto' }
 
 export type UploadedImage = { url: string; cloudinaryId: string }
 
-export type DeliveryUrls = { url: string; thumbnailUrl: string }
+// Shown in a photo's info: an avatar does not keep them.
+export type UploadedPhoto = UploadedImage & { width: number; height: number; bytes: number }
+
+export type DeliveryUrls = { url: string; mediumUrl: string; thumbnailUrl: string }
 
 // Data URI rather than a stream: simpler, and fine up to 10 MB.
-export async function uploadImage(jpeg: Buffer): Promise<UploadedImage> {
+async function uploadToFolder(jpeg: Buffer, folder: string): Promise<UploadedPhoto> {
   const dataUri = `data:image/jpeg;base64,${jpeg.toString('base64')}`
-  const result = await cloudinary.uploader.upload(dataUri, { folder: 'familyframe' })
-  return { url: result.secure_url, cloudinaryId: result.public_id }
+  const { secure_url, public_id, width, height, bytes } = await cloudinary.uploader.upload(
+    dataUri,
+    { folder },
+  )
+  return { url: secure_url, cloudinaryId: public_id, width, height, bytes }
+}
+
+export function uploadImage(jpeg: Buffer): Promise<UploadedPhoto> {
+  return uploadToFolder(jpeg, 'familyframe')
+}
+
+// A folder of their own: the Cloudinary console tells profile photos from library photos.
+export function uploadAvatar(jpeg: Buffer): Promise<UploadedImage> {
+  return uploadToFolder(jpeg, 'familyframe/avatars')
 }
 
 // invalidate: the CDN would otherwise keep serving the cached derived images.
@@ -48,16 +69,34 @@ function deliveryUrl(cloudinaryId: string, transformation: ImageTransformationOp
   })
 }
 
-// No resize for the full photo: sharp already capped it at upload.
+const THUMBNAIL: ImageTransformationOptions = {
+  crop: 'fill',
+  gravity: 'auto',
+  width: THUMBNAIL_SIZE,
+  height: THUMBNAIL_SIZE,
+}
+
+// The library's square thumbnail; a collection's cover reuses it, an already allowed transformation.
+export function thumbnailUrl(cloudinaryId: string): string {
+  return deliveryUrl(cloudinaryId, [THUMBNAIL, OPTIMIZED_DELIVERY])
+}
+
+// limit: shrinks a larger photo, never enlarges one; photos stored before the 4096 px cap stay
+// at 1920 px and go through unchanged.
+function limitedUrl(cloudinaryId: string, size: number): string {
+  const limit: ImageTransformationOptions = { crop: 'limit', width: size, height: size }
+  return deliveryUrl(cloudinaryId, [limit, OPTIMIZED_DELIVERY])
+}
+
 export function deliveryUrls(cloudinaryId: string): DeliveryUrls {
-  const thumbnail: ImageTransformationOptions = {
-    crop: 'fill',
-    gravity: 'auto',
-    width: THUMBNAIL_SIZE,
-    height: THUMBNAIL_SIZE,
-  }
   return {
-    url: deliveryUrl(cloudinaryId, [OPTIMIZED_DELIVERY]),
-    thumbnailUrl: deliveryUrl(cloudinaryId, [thumbnail, OPTIMIZED_DELIVERY]),
+    url: limitedUrl(cloudinaryId, DISPLAY_SIZE),
+    mediumUrl: limitedUrl(cloudinaryId, MEDIUM_SIZE),
+    thumbnailUrl: thumbnailUrl(cloudinaryId),
   }
+}
+
+// toAvatarJpeg already made it a 256 px square: only the format and the compression change.
+export function avatarUrl(cloudinaryId: string): string {
+  return deliveryUrl(cloudinaryId, [OPTIMIZED_DELIVERY])
 }

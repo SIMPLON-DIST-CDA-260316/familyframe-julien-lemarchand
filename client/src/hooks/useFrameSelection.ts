@@ -1,23 +1,21 @@
 import { useState } from 'react'
 import type { Photo } from '@/photo.ts'
 
-export type FrameMode = 'library' | 'slideshow'
-
 export type FrameSelection = {
-  mode: FrameMode
   currentId: string | undefined
   newPhotoCount: number
   selectPhoto: (id: string) => void
-  openPhoto: (id: string) => void
   showNewest: () => void
-  startSlideshow: () => void
-  closeSlideshow: () => void
 }
 
-export function useFrameSelection(photos: Photo[], isActive: boolean): FrameSelection {
-  const [mode, setMode] = useState<FrameMode>('library')
+// startId: the photo the slideshow starts on (/frame?photo=<id>), null for the newest.
+export function useFrameSelection(
+  photos: Photo[],
+  isActive: boolean,
+  startId: string | null,
+): FrameSelection {
   // null follows the newest photo.
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(startId)
   const [newPhotoCount, setNewPhotoCount] = useState(0)
   const newestId = photos.at(0)?.id
   const [shownNewestId, setShownNewestId] = useState(newestId)
@@ -25,11 +23,9 @@ export function useFrameSelection(photos: Photo[], isActive: boolean): FrameSele
   const pinnedId = photos.find(({ id }) => id === selectedId)?.id
 
   function handleArrival(previousNewestId: string): void {
-    if (isActive || mode === 'library') {
-      // Someone is looking: keep their photo on screen, or ringed in the library.
+    if (isActive) {
+      // Someone is looking: keep their photo on screen.
       setSelectedId(pinnedId ?? previousNewestId)
-      // The badge belongs to the slideshow: in the library the new photo simply appears first.
-      if (mode === 'library') return
       // A refetch after a reconnect can bring several photos at once.
       const previousNewestIndex = photos.findIndex(({ id }) => id === previousNewestId)
       const arrivedCount = Math.max(previousNewestIndex, 1)
@@ -65,30 +61,5 @@ export function useFrameSelection(photos: Photo[], isActive: boolean): FrameSele
     setSelectedId(id)
   }
 
-  function openPhoto(id: string): void {
-    selectPhoto(id)
-    setMode('slideshow')
-  }
-
-  function startSlideshow(): void {
-    showNewest()
-    setMode('slideshow')
-  }
-
-  function closeSlideshow(): void {
-    setMode('library')
-    // A leftover count would make the idle jump move the library's ring to the newest photo.
-    setNewPhotoCount(0)
-  }
-
-  return {
-    mode,
-    currentId: pinnedId ?? newestId,
-    newPhotoCount,
-    selectPhoto,
-    openPhoto,
-    showNewest,
-    startSlideshow,
-    closeSlideshow,
-  }
+  return { currentId: pinnedId ?? newestId, newPhotoCount, selectPhoto, showNewest }
 }

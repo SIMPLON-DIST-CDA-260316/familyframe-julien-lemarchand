@@ -11,6 +11,13 @@ describe('toErrorResponse', () => {
     })
   })
 
+  it('answers a share message that is too long or not text with 400', () => {
+    expect(toErrorResponse(new AppError('MESSAGE_INVALID'))).toEqual({
+      status: 400,
+      body: { error: 'MESSAGE_INVALID' },
+    })
+  })
+
   it('answers a member on an admin route with 403', () => {
     expect(toErrorResponse(new AppError('FORBIDDEN'))).toEqual({
       status: 403,
@@ -32,6 +39,13 @@ describe('toErrorResponse', () => {
     })
   })
 
+  it("answers a send gone from the history, or someone else's, with 404", () => {
+    expect(toErrorResponse(new AppError('SEND_NOT_FOUND'))).toEqual({
+      status: 404,
+      body: { error: 'SEND_NOT_FOUND' },
+    })
+  })
+
   it('answers an unknown, replaced or malformed invitation token with 404', () => {
     expect(toErrorResponse(new AppError('INVITATION_NOT_FOUND'))).toEqual({
       status: 404,
@@ -50,6 +64,27 @@ describe('toErrorResponse', () => {
     expect(toErrorResponse(new AppError('FRIENDSHIP_NOT_FOUND'))).toEqual({
       status: 404,
       body: { error: 'FRIENDSHIP_NOT_FOUND' },
+    })
+  })
+
+  it('answers a collection name that is blank, too long or not text with 400', () => {
+    expect(toErrorResponse(new AppError('COLLECTION_NAME_INVALID'))).toEqual({
+      status: 400,
+      body: { error: 'COLLECTION_NAME_INVALID' },
+    })
+  })
+
+  it('answers an unknown, malformed or foreign collection id with 404', () => {
+    expect(toErrorResponse(new AppError('COLLECTION_NOT_FOUND'))).toEqual({
+      status: 404,
+      body: { error: 'COLLECTION_NOT_FOUND' },
+    })
+  })
+
+  it('answers a collection name the account already uses with 409', () => {
+    expect(toErrorResponse(new AppError('COLLECTION_EXISTS'))).toEqual({
+      status: 409,
+      body: { error: 'COLLECTION_EXISTS' },
     })
   })
 
@@ -142,6 +177,13 @@ describe('toErrorResponse', () => {
     expect(toErrorResponse(new AppError('PASSWORD_INVALID'))).toEqual({
       status: 400,
       body: { error: 'PASSWORD_INVALID' },
+    })
+  })
+
+  it('answers a wrong current password with 400, not 401', () => {
+    expect(toErrorResponse(new AppError('PASSWORD_INCORRECT'))).toEqual({
+      status: 400,
+      body: { error: 'PASSWORD_INCORRECT' },
     })
   })
 

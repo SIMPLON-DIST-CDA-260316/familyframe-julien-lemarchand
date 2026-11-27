@@ -6,27 +6,44 @@ const UNAUTHENTICATED_SOCKET_ERROR = 'UNAUTHENTICATED'
 
 export type PhotoSocket = Socket<ServerToClientEvents>
 
+// Each page listens to the events it shows: the library ignores photo:received, the
+// waiting photos ignore photo:new.
 export type PhotoSocketHandlers = {
   onConnect: () => void
-  onNewPhoto: (photo: Photo) => void
-  onDeletedPhoto: (id: string) => void
   onRefused: () => void
+  onNewPhoto?: (photo: Photo) => void
+  onReceivedPhoto?: (photo: Photo) => void
+  onOpenedPhoto?: (photo: Photo) => void
+  onDeletedPhoto?: (id: string) => void
+  onCollectionsChanged?: () => void
 }
 
+type PhotoEvent = 'photo:new' | 'photo:received' | 'photo:opened'
+
 // Socket.IO types are a promise, not a check.
-function handleNewPhoto(photo: unknown, onNewPhoto: (photo: Photo) => void): void {
-  if (!isPhoto(photo)) {
-    console.error('Unexpected photo:new payload from the API')
-    return
-  }
-  onNewPhoto(photo)
+function listenForPhoto(
+  socket: PhotoSocket,
+  event: PhotoEvent,
+  onPhoto: ((photo: Photo) => void) | undefined,
+): void {
+  if (!onPhoto) return
+  socket.on(event, (photo: unknown) => {
+    if (!isPhoto(photo)) {
+      console.error(`Unexpected ${event} payload from the API`)
+      return
+    }
+    onPhoto(photo)
+  })
 }
 
 export function connectPhotoSocket({
   onConnect,
-  onNewPhoto,
-  onDeletedPhoto,
   onRefused,
+  onNewPhoto,
+  onReceivedPhoto,
+  onOpenedPhoto,
+  onDeletedPhoto,
+  onCollectionsChanged,
 }: PhotoSocketHandlers): PhotoSocket {
   // Same origin: Vite proxies /socket.io to the API, the session cookie goes with it.
   const socket: PhotoSocket = io()
@@ -36,7 +53,10 @@ export function connectPhotoSocket({
   socket.on('connect_error', ({ message }) => {
     if (message === UNAUTHENTICATED_SOCKET_ERROR) onRefused()
   })
-  socket.on('photo:new', (photo) => handleNewPhoto(photo, onNewPhoto))
-  socket.on('photo:deleted', onDeletedPhoto)
+  listenForPhoto(socket, 'photo:new', onNewPhoto)
+  listenForPhoto(socket, 'photo:received', onReceivedPhoto)
+  listenForPhoto(socket, 'photo:opened', onOpenedPhoto)
+  if (onDeletedPhoto) socket.on('photo:deleted', onDeletedPhoto)
+  if (onCollectionsChanged) socket.on('collections:changed', onCollectionsChanged)
   return socket
 }

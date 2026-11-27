@@ -1,0 +1,45 @@
+meta {
+  name: Nominal - première photo de profil
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/api/account/avatar
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  avatar: @file(fixtures/photo.jpg) @contentType(image/jpeg)
+}
+
+script:pre-request {
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 200
+  res.body.user.email: eq {{inviteEmail}}
+  res.body.user.avatarUrl: isString
+  res.body.user.avatarCloudinaryId: isUndefined
+}
+
+script:post-response {
+  const axios = require('axios')
+  const { avatarUrl } = res.body.user
+  test('une URL Cloudinary signée, dans le dossier des photos de profil', () => {
+    expect(avatarUrl).to.match(/^https:\/\/res\.cloudinary\.com\/.+\/familyframe\/avatars\//)
+  })
+  test('l\'image se charge (transformations strictes comprises)', async () => {
+    const image = await axios.get(avatarUrl, { responseType: 'arraybuffer' })
+    expect(image.headers['content-type']).to.match(/^image\//)
+  })
+  bru.setVar('firstAvatarUrl', avatarUrl)
+}
+
+docs {
+  NOMINAL → 200 `{ user }` avec `avatarUrl`, l'URL signée de l'image dans
+  `familyframe/avatars`, jamais son id Cloudinary. Le script charge l'image :
+  une URL qui ne passe pas les transformations strictes répondrait 401.
+}

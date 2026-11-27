@@ -24,6 +24,7 @@ const NEW_USER: UserRecord = {
   displayName: 'Mamie',
   passwordHash: PASSWORD_HASH,
   role: 'member',
+  avatarCloudinaryId: null,
   createdAt: NOW,
 }
 const ACCEPTANCE: InvitationAcceptance = { token: TOKEN, displayName: 'Mamie', password: PASSWORD }
@@ -59,6 +60,7 @@ function makeDeps() {
     generateToken: vi.fn<InvitationsServiceDeps['generateToken']>(),
     hashToken: vi.fn<InvitationsServiceDeps['hashToken']>().mockReturnValue(TOKEN_HASH),
     hashPassword: vi.fn<InvitationsServiceDeps['hashPassword']>().mockResolvedValue(PASSWORD_HASH),
+    avatarUrl: vi.fn<InvitationsServiceDeps['avatarUrl']>(),
     now: vi.fn<InvitationsServiceDeps['now']>().mockReturnValue(NOW),
     logger: {
       info: vi.fn<Logger['info']>(),
@@ -190,7 +192,13 @@ describe('acceptInvitation: the account', () => {
       passwordHash: PASSWORD_HASH,
     })
     expect(deps.repository.markUsed).toHaveBeenCalledWith(INVITATION_ID, NOW)
-    expect(user).toEqual({ id: NEW_USER.id, email: EMAIL, displayName: 'Mamie', role: 'member' })
+    expect(user).toEqual({
+      id: NEW_USER.id,
+      email: EMAIL,
+      displayName: 'Mamie',
+      role: 'member',
+      avatarUrl: null,
+    })
   })
 
   it('rejects an address that got an account meanwhile, leaving the invitation unused', async () => {

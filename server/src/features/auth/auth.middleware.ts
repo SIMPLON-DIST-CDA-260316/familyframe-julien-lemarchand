@@ -5,11 +5,12 @@ import type { PublicUser } from '../../types.js'
 import { setSessionCookie } from './auth.cookie.js'
 import type { AuthService } from './auth.service.js'
 
-// Declaration merging: every Express handler sees req.user typed, without casts.
+// Declaration merging: every Express handler sees req.user and req.sessionId typed, without casts.
 declare global {
   namespace Express {
     interface Request {
       user?: PublicUser
+      sessionId?: string
     }
   }
 }
@@ -20,11 +21,12 @@ export function createRequireAuth(service: AuthService): RequestHandler {
     if (token === null) {
       throw new AppError('UNAUTHENTICATED')
     }
-    const { user, expiresAt, isRenewed } = await service.authenticateAndSlide(token)
+    const { user, sessionId, expiresAt, isRenewed } = await service.authenticateAndSlide(token)
     if (isRenewed) {
       setSessionCookie(res, token, expiresAt)
     }
     req.user = user
+    req.sessionId = sessionId
     next()
   }
 }

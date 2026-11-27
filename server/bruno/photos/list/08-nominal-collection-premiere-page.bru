@@ -1,0 +1,44 @@
+meta {
+  name: Nominal - collection, première page d'une photo
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/api/photos?collectionId={{listCollectionId}}&limit=1
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  const axios = require('axios')
+  if (!bru.getVar('listCollectionId') || !bru.getVar('createdPngId')) {
+    throw new Error('listCollectionId ou createdPngId absent : lancer le dossier photos en entier, create/02 et list/07 doivent passer')
+  }
+  // The PNG of create/02 joins the collection: two photos, so two pages of one.
+  await axios.put(
+    `${bru.getEnvVar('baseUrl')}/api/collections/${bru.getVar('listCollectionId')}/photos/${bru.getVar('createdPngId')}`,
+    null,
+    { headers: { Cookie: bru.getVar('sessionCookie') } },
+  )
+}
+
+assert {
+  res.status: eq 200
+  res.body.photos.length: eq 1
+  res.body.nextCursor: isString
+}
+
+script:post-response {
+  test('la photo attendue', () => {
+    expect(res.body.photos[0].id).to.equal(bru.getVar('createdPngId'))
+  })
+  // 09 asks for the page after this one.
+  bru.setVar('collectionNextCursor', res.body.nextCursor)
+}
+
+docs {
+  NOMINAL → 200, une photo et un `nextCursor` : la collection compte deux
+  photos, la plus récente (`create/02`) vient en premier, comme dans la
+  bibliothèque.
+}

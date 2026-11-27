@@ -1,0 +1,21 @@
+meta {
+  name: password
+  seq: 2
+}
+
+docs {
+  `PUT /api/account/password`, JSON `{ currentPassword, newPassword }` → 204
+  sans corps. Le mot de passe actuel est vérifié (sinon 400
+  `PASSWORD_INCORRECT`, pas 401 : la session reste valide), le nouveau suit
+  la règle de l'invitation (12 à 128 caractères, sinon 400
+  `PASSWORD_INVALID`).
+
+  Toutes les autres sessions du compte sont fermées, celle de la requête
+  reste ouverte. Effet sur les cookies de la collection : `inviteeCookie` est
+  la session de la requête, il reste valide ; `sessionCookie` (membre) et
+  `adminCookie` sont d'autres comptes, intouchés. `05` ouvre d'abord une
+  seconde session du compte (`inviteeOtherCookie`) : `06` vérifie qu'elle est
+  fermée, `07` que la session courante ne l'est pas. `08` se connecte avec le
+  nouveau mot de passe (une session de plus, que `10` ferme), `10` remet
+  `invite-bruno-dev`.
+}

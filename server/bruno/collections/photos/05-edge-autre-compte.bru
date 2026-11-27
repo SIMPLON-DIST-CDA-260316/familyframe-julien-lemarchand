@@ -1,0 +1,42 @@
+meta {
+  name: Edge - collection et photo d'un autre compte
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/api/collections/{{collectionId}}/photos/{{collectionPhotoId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('collectionId') || !bru.getVar('collectionPhotoId')) {
+    throw new Error('collectionId ou collectionPhotoId absent : lancer toute la collection, collections/create/01 et photos/01 doivent passer')
+  }
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq PHOTO_NOT_FOUND
+}
+
+script:post-response {
+  const axios = require('axios')
+  // A script request does not get the collection headers: send the cookie itself.
+  const photoIdsOf = async (collectionId) => {
+    const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/collections`, {
+      headers: { Cookie: bru.getVar('inviteeCookie') },
+    })
+    return list.data.collections.find(({ id }) => id === collectionId).photoIds
+  }
+  test('la collection du compte jetable n\'a pas changé', async () => {
+    expect(await photoIdsOf(bru.getVar('collectionId'))).to.eql([bru.getVar('collectionPhotoId')])
+  })
+}
+
+docs {
+  EDGE → 404 PHOTO_NOT_FOUND : le membre (cookie par défaut) vise la
+  collection et la photo du compte jetable. La photo n'est pas la sienne :
+  il n'apprend rien, et la collection ne change pas.
+}

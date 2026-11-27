@@ -1,0 +1,29 @@
+meta {
+  name: Edge - l'ami a déjà cette photo
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/photos/{{createdPhotoId}}/share
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "friendIds": ["{{adminId}}"]
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.send: isNull
+  res.body.outcomes[0].status: eq duplicate
+}
+
+docs {
+  EDGE → 200, `send` à `null` et l'issue `duplicate` : la même photo, une
+  seconde fois. L'admin a déjà ce fichier (même SHA-256) depuis `02` : rien
+  n'est écrit, ni photo ni envoi.
+}

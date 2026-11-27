@@ -6,41 +6,39 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  /* The color-scheme meta lets the browser pick dark: a page left light by the theme keeps light controls. */
+  color-scheme: light;
+  /* One height for the phone's tab bar, the room the pages leave for it, and what floats above it. */
+  --tab-bar-height: 4rem;
+  /* The account bar's row, under the notch: what sticks below it starts there. */
+  --account-bar-height: 3.75rem;
+  /* Where the bar ends: the notch above its row, the row, its 1px bottom border. */
+  --account-bar-bottom: calc(env(safe-area-inset-top) + var(--account-bar-height) + 1px);
+  /* Toasts rise above the tab bar and the home bar while the bar shows (below md). */
+  --toast-bottom: calc(var(--tab-bar-height) + env(safe-area-inset-bottom) + 16px);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-  /* .dark is app-wide (theme.ts): the frame's warm palette gets its own tokens instead. */
+  /* .dark is app-wide (theme.ts): the frame's warm wall, mat and print get their own tokens instead, the same in every palette. */
   --frame-background: oklch(0.14 0.008 60);
-  --frame-accent: oklch(0.82 0.12 75);
+  /* Warm off-whites: a cardboard mat, and the glossier white of a print. */
+  --frame-mat: oklch(0.94 0.014 85);
+  --frame-print: oklch(0.98 0.006 85);
+  --frame-print-foreground: oklch(0.33 0.01 60);
+  /* The wall's soft light, the bevel cut into the mat, the shadow a mat or a print casts on the wall. */
+  --frame-wall-glow: oklch(1 0 0 / 6%);
+  --frame-bevel: oklch(1 0 0 / 90%);
+  --frame-shadow: oklch(0 0 0 / 60%);
+  /* The chrome drawn over a photo: dark and neutral whatever the theme, since it sits on the photo, not on the page. */
+  --overlay: oklch(0 0 0 / 55%);
+  --overlay-strong: oklch(0 0 0 / 75%);
+  --overlay-hover: oklch(1 0 0 / 10%);
+  --overlay-selected: oklch(1 0 0 / 20%);
+  --overlay-border: oklch(1 0 0 / 15%);
+  --on-overlay: oklch(1 0 0);
+  --on-overlay-muted: oklch(1 0 0 / 80%);
+  /* Where a caption's gradient starts, at the photo's edge. */
+  --scrim: oklch(0 0 0 / 70%);
+  /* Behind every dialog and sheet: enough to set the window apart, with or without a blur. */
+  --backdrop: oklch(0 0 0 / 30%);
 }
 
 @theme inline {
@@ -48,23 +46,27 @@
   --font-sans: "Geist Variable", sans-serif;
   --color-frame-background: var(--frame-background);
   --color-frame-accent: var(--frame-accent);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
+  --color-frame-accent-foreground: var(--frame-accent-foreground);
+  --color-frame-mat: var(--frame-mat);
+  --color-frame-print: var(--frame-print);
+  --color-frame-print-foreground: var(--frame-print-foreground);
+  --color-frame-wall-glow: var(--frame-wall-glow);
+  --color-frame-bevel: var(--frame-bevel);
+  --color-frame-shadow: var(--frame-shadow);
+  --color-overlay: var(--overlay);
+  --color-overlay-strong: var(--overlay-strong);
+  --color-overlay-hover: var(--overlay-hover);
+  --color-overlay-selected: var(--overlay-selected);
+  --color-overlay-border: var(--overlay-border);
+  --color-on-overlay: var(--on-overlay);
+  --color-on-overlay-muted: var(--on-overlay-muted);
+  --color-scrim: var(--scrim);
+  --color-backdrop: var(--backdrop);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -89,6 +91,11 @@
 }
 
 @theme {
+  /* Page widths, as max-w-page and max-w-reading. The account bar and every page share the first,
+     so a title always starts under the logo; forms and lists keep to the second. */
+  --container-page: 64rem;
+  --container-reading: 42rem;
+
   /* As long as the longest slideshow interval, so the drift never stops on screen. */
   --animate-ken-burns: ken-burns 20s ease-out forwards;
 
@@ -102,8 +109,115 @@
   }
 }
 
+/* md and up: no tab bar, Sonner's own desktop offset. */
+@media (width >= 48rem) {
+  :root {
+    --toast-bottom: 24px;
+  }
+}
+
+/* While a page's floating button shows (PageFab), toasts also clear it: its 3.5rem and a gap. */
+@media (width < 48rem) {
+  :root[data-fab-shown] {
+    --toast-bottom: calc(
+      var(--tab-bar-height) +
+      env(safe-area-inset-bottom) +
+      16px +
+      3.5rem +
+      12px
+    );
+  }
+}
+
 .dark {
   color-scheme: dark;
+}
+
+/*
+ * Palettes. Components only use the semantic names below (bg-primary, text-muted-foreground…);
+ * each palette gives them its own values, in light and in dark.
+ * « Encre », the default: written on :root and .dark without the attribute, so a page without
+ * data-palette (or with an unknown one) still gets it.
+ */
+:root {
+  --background: oklch(0.985 0.004 75);
+  --foreground: oklch(0.22 0.014 255);
+  --card: oklch(0.998 0.002 75);
+  --card-foreground: var(--foreground);
+  --popover: var(--card);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.46 0.09 255);
+  --primary-foreground: var(--background);
+  --secondary: oklch(0.945 0.007 75);
+  --secondary-foreground: oklch(0.26 0.014 255);
+  --muted: var(--secondary);
+  --muted-foreground: oklch(0.49 0.012 255);
+  --accent: var(--secondary);
+  --accent-foreground: var(--secondary-foreground);
+  --destructive: oklch(0.55 0.2 27);
+  --destructive-foreground: var(--background);
+  --border: oklch(0.9 0.007 75);
+  --input: var(--border);
+  --ring: var(--primary);
+  --frame-accent: oklch(0.82 0.1 78);
+  --frame-accent-foreground: oklch(0.24 0.03 60);
+}
+
+.dark {
+  --background: oklch(0.18 0.008 255);
+  --foreground: oklch(0.95 0.005 75);
+  --card: oklch(0.23 0.01 255);
+  --card-foreground: var(--foreground);
+  --popover: var(--card);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.76 0.085 252);
+  --primary-foreground: oklch(0.19 0.03 255);
+  --secondary: oklch(0.27 0.011 255);
+  --secondary-foreground: var(--foreground);
+  --muted: var(--secondary);
+  --muted-foreground: oklch(0.72 0.012 255);
+  --accent: var(--secondary);
+  --accent-foreground: var(--foreground);
+  --destructive: oklch(0.7 0.17 25);
+  --destructive-foreground: oklch(0.2 0.03 25);
+  --border: oklch(0.31 0.011 255);
+  --input: var(--border);
+  --ring: var(--primary);
+  --frame-accent: oklch(0.8 0.09 78);
+  --frame-accent-foreground: oklch(0.22 0.03 60);
+}
+
+/*
+ * « Actuelle »: shadcn's neutral palette, as the app looked before « Encre ». The attribute makes
+ * these selectors outrank :root and .dark. The dark block also matches a .dark element inside the
+ * page (the frame, the viewer, their menus), so a dark screen never mixes in « Encre ».
+ */
+:root[data-palette="actuelle"] {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --frame-accent: oklch(0.82 0.12 75);
+  --frame-accent-foreground: oklch(0 0 0);
+}
+
+:root[data-palette="actuelle"].dark,
+:root[data-palette="actuelle"] .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -119,22 +233,12 @@
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(1 0 0);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --frame-accent: oklch(0.82 0.12 75);
+  --frame-accent-foreground: oklch(0 0 0);
 }
 
 @layer base {

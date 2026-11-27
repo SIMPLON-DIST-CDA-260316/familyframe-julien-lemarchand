@@ -14,6 +14,7 @@ const USER: UserRecord = {
   displayName: 'Membre',
   passwordHash: '$argon2id$stored-hash',
   role: 'member',
+  avatarCloudinaryId: null,
   createdAt: new Date('2026-11-01T10:00:00Z'),
 }
 const PUBLIC_USER = {
@@ -21,6 +22,7 @@ const PUBLIC_USER = {
   email: 'membre@familyframe.test',
   displayName: 'Membre',
   role: 'member',
+  avatarUrl: null,
 }
 const CREDENTIALS = { email: 'membre@familyframe.test', password: 'secret' }
 
@@ -54,6 +56,9 @@ function makeDeps() {
     hashToken: vi.fn<AuthServiceDeps['hashToken']>().mockReturnValue(TOKEN_HASH),
     generateToken: vi.fn<AuthServiceDeps['generateToken']>().mockReturnValue(TOKEN),
     verifyPassword: vi.fn<AuthServiceDeps['verifyPassword']>().mockResolvedValue(true),
+    avatarUrl: vi.fn<AuthServiceDeps['avatarUrl']>(
+      (cloudinaryId) => `https://cdn.test/${cloudinaryId}`,
+    ),
     now: vi.fn<AuthServiceDeps['now']>().mockReturnValue(NOW),
     logger: {
       info: vi.fn<Logger['info']>(),
@@ -228,13 +233,14 @@ describe('authenticate', () => {
     expect(deps.repository.deleteSession).toHaveBeenCalledWith('6b044f9d56a44767c7079c01')
   })
 
-  it('returns the public user and the session end', async () => {
+  it('returns the public user, the session id and the session end', async () => {
     const deps = makeDeps()
     const session = sessionExpiringIn(60 * DAY_MS)
     deps.repository.findSessionByTokenHash.mockResolvedValue(session)
 
     await expect(createAuthService(deps).authenticate(TOKEN)).resolves.toEqual({
       user: PUBLIC_USER,
+      sessionId: '6b044f9d56a44767c7079c01',
       expiresAt: session.expiresAt,
       isRenewed: false,
     })
@@ -267,7 +273,12 @@ describe('authenticateAndSlide', () => {
 
     const result = await createAuthService(deps).authenticateAndSlide(TOKEN)
 
-    expect(result).toEqual({ user: PUBLIC_USER, expiresAt: SESSION_END, isRenewed: true })
+    expect(result).toEqual({
+      user: PUBLIC_USER,
+      sessionId: '6b044f9d56a44767c7079c01',
+      expiresAt: SESSION_END,
+      isRenewed: true,
+    })
     expect(deps.repository.extendSession).toHaveBeenCalledWith(
       '6b044f9d56a44767c7079c01',
       SESSION_END,

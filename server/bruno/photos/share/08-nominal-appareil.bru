@@ -1,0 +1,58 @@
+meta {
+  name: Nominal - envoi d'un fichier de l'appareil
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/api/photos/share
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  photo: @file(fixtures/photo.png) @contentType(image/png)
+  friendIds: {{adminId}}
+}
+
+assert {
+  res.status: eq 201
+  res.body.send.id: isString
+  res.body.send.message: isNull
+  res.body.send.recipients[0].id: eq {{adminId}}
+  res.body.outcomes[0].status: eq sent
+}
+
+script:post-response {
+  const axios = require('axios')
+  const photosOf = async (cookie, path) => {
+    const list = await axios.get(`${bru.getEnvVar('baseUrl')}${path}`, {
+      headers: { Cookie: cookie },
+    })
+    return list.data.photos
+  }
+  const adminCookie = bru.getVar('adminCookie')
+  // Newest first: the file just sent, ahead of the photo of 02.
+  const [received] = await photosOf(adminCookie, '/api/photos/unopened')
+  if (res.body.send?.id && received) {
+    bru.setVar('deviceSendId', res.body.send.id)
+    bru.setVar('deviceSharedPhotoId', received.id)
+  }
+  test('la photo attend l\'admin, non ouverte, et n\'est pas chez le membre', async () => {
+    const idsOf = async (cookie, path) => (await photosOf(cookie, path)).map(({ id }) => id)
+    expect(received?.senderName).to.equal(bru.getEnvVar('memberDisplayName'))
+    expect(received?.message).to.equal(null)
+    expect(await idsOf(adminCookie, '/api/photos')).to.not.include(received?.id)
+    expect(await idsOf(bru.getVar('sessionCookie'), '/api/photos')).to.not.include(received?.id)
+  })
+}
+
+docs {
+  NOMINAL → 201 avec l'envoi enregistré, `message` `null` (aucun message
+  envoyé). Le fichier est converti et envoyé à Cloudinary une fois, mais
+  n'entre que chez l'ami, non ouvert. L'id de l'envoi va dans
+  `deviceSendId` (repris par `sends/`), celui de la photo reçue dans
+  `deviceSharedPhotoId` ; le script vérifie qu'elle attend l'admin dans
+  `GET /api/photos/unopened` avec le nom du membre, hors de sa
+  bibliothèque, et qu'elle est absente de celle du membre.
+}

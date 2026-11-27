@@ -1,0 +1,32 @@
+meta {
+  name: Nominal - connexion avec le nouveau mot de passe
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/api/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{inviteEmail}}",
+    "password": "invite-bruno-nouveau"
+  }
+}
+
+script:pre-request {
+  req.deleteHeader('Cookie')
+}
+
+assert {
+  res.status: eq 200
+  res.body.user.email: eq {{inviteEmail}}
+}
+
+docs {
+  NOMINAL → 200 : le nouveau mot de passe est bien enregistré. Cette session
+  n'est pas gardée : `10` la ferme en remettant l'ancien mot de passe.
+}

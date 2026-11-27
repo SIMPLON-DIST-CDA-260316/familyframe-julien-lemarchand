@@ -1,0 +1,20 @@
+meta {
+  name: photos-batch
+  seq: 5
+}
+
+docs {
+  `POST /api/collections/:id/photos` (JSON `{ photoIds }`) → 200 avec la
+  collection : ajoute plusieurs photos de la bibliothèque d'un coup, à la
+  fin et dans l'ordre envoyé ; une photo déjà là ou envoyée deux fois n'est
+  ajoutée qu'une fois. `photoIds` est une liste de 1 à 100 ids texte, sinon
+  400 `BODY_INVALID`. Tout ou rien : une seule photo inconnue, d'un autre
+  compte ou pas encore ouverte refuse toute la liste, 404 `PHOTO_NOT_FOUND`,
+  et la collection ne change pas.
+
+  Travaille sur la collection `collectionId`, vide après `photos/14`, avec
+  une photo que `01` ajoute à la bibliothèque du compte jetable ; `13` la
+  supprime. `03` vise une photo du membre, `04` fait recevoir au compte
+  jetable une photo qu'il n'ouvre pas, que `05` supprime : rien ne reste
+  sur Cloudinary, ni amitié ni envoi chez le membre.
+}

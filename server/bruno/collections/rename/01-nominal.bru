@@ -1,0 +1,51 @@
+meta {
+  name: Nominal - nouveau nom
+  type: http
+  seq: 1
+}
+
+patch {
+  url: {{baseUrl}}/api/collections/{{collectionId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": " Noël 2026 "
+  }
+}
+
+script:pre-request {
+  if (!bru.getVar('collectionId') || !bru.getVar('inviteeCookie')) {
+    throw new Error('collectionId ou inviteeCookie absent : lancer toute la collection, collections/create/01 doit passer')
+  }
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 200
+  res.body.id: eq {{collectionId}}
+  res.body.name: eq Noël 2026
+}
+
+script:post-response {
+  const axios = require('axios')
+  // A script request does not get the collection headers: send the cookie itself.
+  const namesOf = async (cookie) => {
+    const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/collections`, {
+      headers: { Cookie: cookie },
+    })
+    return list.data.collections.map(({ name }) => name)
+  }
+  test('la liste porte le nouveau nom', async () => {
+    const names = await namesOf(bru.getVar('inviteeCookie'))
+    expect(names).to.include('Noël 2026')
+    expect(names).to.not.include('Noël')
+  })
+}
+
+docs {
+  NOMINAL → 200 avec le nom rogné. Le script relit la liste : l'ancien nom
+  a disparu.
+}

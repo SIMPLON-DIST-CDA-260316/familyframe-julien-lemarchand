@@ -1,0 +1,25 @@
+meta {
+  name: Nominal - la session de la requête reste ouverte
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/auth/me
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 200
+  res.body.user.email: eq {{inviteEmail}}
+}
+
+docs {
+  NOMINAL → 200 : `inviteeCookie`, la session qui a changé le mot de passe,
+  marche toujours. `avatar/` s'en sert ensuite.
+}

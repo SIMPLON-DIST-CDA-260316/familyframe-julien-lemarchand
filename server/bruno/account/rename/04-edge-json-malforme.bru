@@ -1,0 +1,33 @@
+meta {
+  name: Edge - JSON malformé
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/account
+  body: text
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:text {
+  {"displayName": "Invitée"
+}
+
+script:pre-request {
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq BODY_INVALID
+}
+
+docs {
+  EDGE → 400 BODY_INVALID : la route monte son propre `express.json()`, qui
+  refuse un corps JSON illisible.
+}

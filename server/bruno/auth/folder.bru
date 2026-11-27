@@ -14,6 +14,7 @@ docs {
   `environments/Local.bru`. Le membre est le compte de toutes les requêtes ;
   l'admin crée les invitations (`invitations/`) et sert à vérifier qu'un
   compte ne touche pas aux photos d'un autre.
-  Un utilisateur renvoyé par l'API vaut `{ id, email, displayName, role }`,
-  jamais le hash du mot de passe.
+  Un utilisateur renvoyé par l'API vaut `{ id, email, displayName, role,
+  avatarUrl }` (`avatarUrl` : `null` sans photo de profil), jamais le hash du
+  mot de passe ni l'id Cloudinary de la photo.
 }

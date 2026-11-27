@@ -1,0 +1,50 @@
+meta {
+  name: Nominal - retirer une photo
+  type: http
+  seq: 12
+}
+
+delete {
+  url: {{baseUrl}}/api/collections/{{collectionId}}/photos/{{collectionPhotoId}}
+  body: none
+  auth: none
+}
+
+script:pre-request {
+  if (!bru.getVar('collectionId') || !bru.getVar('collectionPhotoId')) {
+    throw new Error('collectionId ou collectionPhotoId absent : lancer toute la collection, collections/create/01 et photos/01 doivent passer')
+  }
+  // The throwaway account of invitations/accept/05, never the member (see collections/folder.bru).
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 200
+  res.body.photoIds.length: eq 0
+  res.body.coverUrl: isNull
+  res.body.newestPhotoAt: isNull
+}
+
+script:post-response {
+  const axios = require('axios')
+  // A script request does not get the collection headers: send the cookie itself.
+  const photoIdsOf = async (collectionId) => {
+    const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/collections`, {
+      headers: { Cookie: bru.getVar('inviteeCookie') },
+    })
+    return list.data.collections.find(({ id }) => id === collectionId).photoIds
+  }
+  test('la photo reste dans la bibliothèque', async () => {
+    const { data } = await axios.get(`${bru.getEnvVar('baseUrl')}/api/photos`, {
+      headers: { Cookie: bru.getVar('inviteeCookie') },
+    })
+    expect(data.photos.map(({ id }) => id)).to.include(bru.getVar('collectionPhotoId'))
+    expect(await photoIdsOf(bru.getVar('collectionId'))).to.eql([])
+  })
+}
+
+docs {
+  NOMINAL → 200 avec la collection vide, sans couverture ni dates. Retirer une photo d'une
+  collection ne la supprime pas : le script la retrouve dans la
+  bibliothèque.
+}

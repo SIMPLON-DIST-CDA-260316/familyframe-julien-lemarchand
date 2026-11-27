@@ -1,0 +1,32 @@
+meta {
+  name: Edge - photoIds n'est pas une liste
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/api/collections/{{collectionId}}/photos
+  body: json
+  auth: none
+}
+
+body:json {
+  { "photoIds": "{{batchPhotoId}}" }
+}
+
+script:pre-request {
+  if (!bru.getVar('collectionId') || !bru.getVar('batchPhotoId')) {
+    throw new Error('collectionId ou batchPhotoId absent : lancer toute la collection, collections/create/01 et photos-batch/01 doivent passer')
+  }
+  // The throwaway account of invitations/accept/05, never the member (see collections/folder.bru).
+  req.setHeader('Cookie', bru.getVar('inviteeCookie'))
+}
+
+assert {
+  res.status: eq 400
+  res.body.error: eq BODY_INVALID
+}
+
+docs {
+  EDGE → 400 BODY_INVALID : un id seul, hors d'une liste, est refusé.
+}

@@ -1,0 +1,35 @@
+meta {
+  name: Edge - collection d'un autre compte
+  type: http
+  seq: 1
+}
+
+delete {
+  url: {{baseUrl}}/api/collections/{{collectionId}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 404
+  res.body.error: eq COLLECTION_NOT_FOUND
+}
+
+script:post-response {
+  const axios = require('axios')
+  // A script request does not get the collection headers: send the cookie itself.
+  const namesOf = async (cookie) => {
+    const list = await axios.get(`${bru.getEnvVar('baseUrl')}/api/collections`, {
+      headers: { Cookie: cookie },
+    })
+    return list.data.collections.map(({ name }) => name)
+  }
+  test('la collection est toujours là', async () => {
+    expect(await namesOf(bru.getVar('inviteeCookie'))).to.include('Noël 2026')
+  })
+}
+
+docs {
+  EDGE → 404 COLLECTION_NOT_FOUND : le membre essaie de supprimer la
+  collection du compte jetable ; elle reste.
+}

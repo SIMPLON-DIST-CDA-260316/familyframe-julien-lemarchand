@@ -1,0 +1,35 @@
+meta {
+  name: collections
+  seq: 5
+}
+
+docs {
+  Les collections du compte connecté : `GET /api/collections` → 200
+  `{ collections }`, `POST /api/collections` (JSON `{ name }`) → 201,
+  `PATCH /api/collections/:id` (JSON `{ name }`) → 200, `DELETE
+  /api/collections/:id` → 204. Une collection renvoyée par l'API vaut
+  `{ id, name, photoIds, coverUrl, oldestPhotoAt, newestPhotoAt }`, jamais
+  son propriétaire : `coverUrl` est la vignette signée de sa photo la plus
+  récente, les deux dates (ISO) celles de sa photo la plus ancienne et de la
+  plus récente ; les trois valent null tant qu'elle est vide. Chaque écriture envoie
+  l'événement Socket.IO `collections:changed`, sans contenu, aux connexions
+  du propriétaire : elles relisent la liste.
+
+  Le nom est rogné et fait 1 à 50 caractères, sinon 400
+  `COLLECTION_NAME_INVALID` ; un nom que le compte utilise déjà, 409
+  `COLLECTION_EXISTS`. La collection d'un autre compte, inconnue ou un id mal
+  formé : 404 `COLLECTION_NOT_FOUND`. La liste est triée par nom, comme en
+  français (« Été » avant « Noël »). Une photo entre dans une collection par
+  `PUT /api/collections/:id/photos/:photoId` et en sort par `DELETE` sur le
+  même chemin, plusieurs d'un coup par `POST /api/collections/:id/photos`
+  (JSON `{ photoIds }`) ; une photo supprimée de la bibliothèque disparaît
+  de ses collections.
+
+  Toutes les requêtes passent par le compte jetable créé par
+  `invitations/accept/05` (cookie `inviteeCookie`), jamais par le membre,
+  dont les collections sont celles de la base de dev partagée : un compte
+  neuf à chaque lancement, donc pas de reste d'un lancement interrompu. Le
+  membre (cookie par défaut) sert d'« autre compte ». Le dossier finit sans
+  aucune collection. Ordre : `create`, `list`, `rename`, `photos`, `photos-batch`,
+  `delete`.
+}

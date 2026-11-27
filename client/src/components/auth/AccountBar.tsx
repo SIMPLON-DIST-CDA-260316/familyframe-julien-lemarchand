@@ -1,23 +1,25 @@
 import type { JSX } from 'react'
 import { Link } from 'react-router'
 import { UserMenu } from '@/components/auth/UserMenu.tsx'
+import { OfflineBanner } from '@/components/feedback/OfflineBanner.tsx'
 import { DesktopNav } from '@/components/nav/DesktopNav.tsx'
-import { MobileNav } from '@/components/nav/MobileNav.tsx'
 
 export function AccountBar(): JSX.Element {
   return (
-    <header className="sticky top-0 z-20 border-b bg-background/80 backdrop-blur">
-      <div className="mx-auto flex max-w-5xl items-center gap-3 px-4 py-3">
-        <MobileNav />
+    // The bar's own background runs under the notch; its content stays below it.
+    <header className="sticky top-0 z-20 border-b bg-background/80 pt-[env(safe-area-inset-top)] backdrop-blur">
+      <div className="mx-auto flex h-(--account-bar-height) max-w-page items-center gap-3 pr-[max(1rem,env(safe-area-inset-right))] pl-[max(1rem,env(safe-area-inset-left))]">
         <Link to="/" className="mr-4 text-lg font-semibold tracking-tight">
           FamilyFrame
         </Link>
         <DesktopNav />
-        {/* On mobile the burger menu holds the account and the logout. */}
-        <div className="ml-auto hidden md:block">
+        {/* On a phone too: the tab bar holds the pages, this menu the account and the logout. */}
+        <div className="ml-auto">
           <UserMenu />
         </div>
       </div>
+      {/* In the sticky header: the notice stays in view while the page scrolls. */}
+      <OfflineBanner />
     </header>
   )
 }
