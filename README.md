@@ -57,6 +57,8 @@ docker compose up -d --build
 - Prisma Studio sur le port 5555
 - la base joignable depuis la machine sur `mongodb://localhost:27017/familyframe?directConnection=true` (Compass, mongosh). Le port n'est ouvert que sur `127.0.0.1`, car la base n'a pas encore d'authentification.
 
+![Containers en dev](docs/images/docker-dev.png)
+
 ### Lancer en prod
 
 ```bash
@@ -68,6 +70,8 @@ Avec `-f compose.yaml`, seul ce fichier est chargé, sans l'override. On obtient
 - des images optimisées (code compilé, dépendances de prod seulement)
 - une base vide : les index sont créés, mais pas de comptes de test
 - seul le port du client (5180) publié : l'API passe par son proxy (`http://localhost:5180/api`), la base n'est pas joignable
+
+![Containers en prod](docs/images/docker-prod.png)
 
 ### Commandes utiles
 
