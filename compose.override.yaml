@@ -1,0 +1,30 @@
+services:
+  db:
+    ports:
+      # Pas encore d'authentification sur mongo (prévue plus tard).
+      # En attendant, le port n'est ouvert que sur ma machine (127.0.0.1).
+      - 127.0.0.1:27017:27017 # Compass / mongosh depuis Windows (?directConnection=true)
+
+  api:
+    build:
+      target: dev
+    image: ff-server:dev # live reload + dev deps
+    pre_start:
+      - command: pnpm db:seed --if-empty
+    ports:
+      - 3000:3000 # Bruno / curl en direct ; en prod, l'api passe par le proxy du client (5180/api)
+      - 5555:5555 # pour exposer prisma studio
+    volumes:
+      - ./server/src:/app/src
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+
+  client:
+    build:
+      target: dev # serveur Vite avec live reload
+    image: ff-client:dev
+    volumes:
+      - ./client/src:/app/src
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+  
