@@ -23,6 +23,8 @@ services:
     volumes:
       - "ff-mongo_data:/data/db"
       - "ff-mongo_config:/data/configdb"
+    networks:
+      - data
 
   api:
     depends_on:
@@ -40,6 +42,9 @@ services:
     env_file: ./server/.env
     environment:
       - DATABASE_URL=mongodb://db:27017/familyframe
+    networks: # seule l'api est sur les deux réseaux : elle fait le pont
+      - web
+      - data
 
   client:
     depends_on:
@@ -52,6 +57,12 @@ services:
       - 5180:5180
     environment:
       - API_PROXY_TARGET=http://api:3000
+    networks:
+      - web
+
+networks:
+  web: # client <-> api : le proxy de Vite joint l'api ici
+  data: # api <-> db : le client ne peut pas joindre la base
 
 volumes:
   ff-mongo_data:

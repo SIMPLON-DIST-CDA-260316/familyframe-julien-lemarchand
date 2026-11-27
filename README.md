@@ -89,21 +89,25 @@ Les mêmes étapes que le compose, tapées une par une avec la CLI Docker : pour
 **0. Variables** (à refaire dans chaque nouveau terminal) : si un nom change, on le change ici seulement.
 
 ```powershell
-$NETWORK_NAME          = "ff-network"
+$WEB_NETWORK           = "ff-web"
+$DATA_NETWORK          = "ff-data"
 $MONGO_CONTAINER_NAME  = "ff-mongo"
 $SERVER_CONTAINER_NAME = "ff-server"
 $CLIENT_CONTAINER_NAME = "ff-client"
 ```
 
-**1. Réseau et base** (communs au dev et à la prod)
+**1. Réseaux et base** (communs au dev et à la prod)
 
 ```powershell
-# un réseau pour que les containers se trouvent par leur nom
-docker network create $NETWORK_NAME
+# deux réseaux, comme le compose : web (client + api) et data (api + base)
+# sur un même réseau, les containers se trouvent par leur nom
+docker network create $WEB_NETWORK
+docker network create $DATA_NETWORK
 
 # la base, en replica set (Prisma en a besoin), données gardées dans un volume nommé
+# seulement sur data : le client ne peut pas la joindre
 docker run -d `
-  --network $NETWORK_NAME `
+  --network $DATA_NETWORK `
   --name $MONGO_CONTAINER_NAME `
   --hostname $MONGO_CONTAINER_NAME `
   -v ff-mongo_data:/data/db `
@@ -121,7 +125,7 @@ docker build --target dev -t ff-server:dev ./server
 docker build --target dev -t ff-client:dev ./client
 
 docker run -d `
-  --network $NETWORK_NAME `
+  --network $DATA_NETWORK `
   --name $SERVER_CONTAINER_NAME `
   -p 3000:3000 `
   -p 5555:5555 `
@@ -131,12 +135,15 @@ docker run -d `
   -v ${PWD}/server/src:/app/src `
   ff-server:dev
 
+# l'api fait le pont : on la branche aussi sur web, pour que le client la joigne
+docker network connect $WEB_NETWORK $SERVER_CONTAINER_NAME
+
 # ce que fait le pre_start du compose
 docker exec $SERVER_CONTAINER_NAME pnpm db:push
 docker exec $SERVER_CONTAINER_NAME pnpm db:seed --if-empty
 
 docker run -d `
-  --network $NETWORK_NAME `
+  --network $WEB_NETWORK `
   --name $CLIENT_CONTAINER_NAME `
   -p 5180:5180 `
   -e API_PROXY_TARGET=http://${SERVER_CONTAINER_NAME}:3000 `
@@ -152,18 +159,20 @@ docker build -t ff-server:1.0.0 ./server
 docker build -t ff-client:1.0.0 ./client
 
 docker run -d `
-  --network $NETWORK_NAME `
+  --network $DATA_NETWORK `
   --name $SERVER_CONTAINER_NAME `
   -p 3000:3000 `
   --env-file server/.env `
   -e DATABASE_URL=mongodb://${MONGO_CONTAINER_NAME}:27017/familyframe `
   ff-server:1.0.0
 
+docker network connect $WEB_NETWORK $SERVER_CONTAINER_NAME
+
 # ce que fait le pre_start du compose
 docker exec $SERVER_CONTAINER_NAME pnpm db:push
 
 docker run -d `
-  --network $NETWORK_NAME `
+  --network $WEB_NETWORK `
   --name $CLIENT_CONTAINER_NAME `
   -p 5180:5180 `
   -e API_PROXY_TARGET=http://${SERVER_CONTAINER_NAME}:3000 `
@@ -177,7 +186,7 @@ Sans `--target`, `docker build` prend le dernier stage du Dockerfile (`main`).
 ```powershell
 docker stop $CLIENT_CONTAINER_NAME $SERVER_CONTAINER_NAME $MONGO_CONTAINER_NAME
 docker container rm $CLIENT_CONTAINER_NAME $SERVER_CONTAINER_NAME $MONGO_CONTAINER_NAME
-docker network rm $NETWORK_NAME
+docker network rm $WEB_NETWORK $DATA_NETWORK
 # docker volume rm ff-mongo_data   # seulement pour repartir d'une base vide
 ```
 
